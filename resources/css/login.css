@@ -1,0 +1,245 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #311832;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.login-container {
+    background: #541142;
+    border: 1px solid #6b2558;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    color: #c4aabf;
+    font-size: 13px;
+    text-decoration: none;
+    margin-bottom: 16px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: #00e5b0;
+}
+
+h2 {
+    text-align: center;
+    color: #ffffff;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #c4aabf;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #e8d5e4;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+label span.required {
+    color: #F44336;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #311832;
+    border: 1px solid #6b2558;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.input-wrapper:focus-within {
+    border-color: #00e5b0;
+    box-shadow: 0 0 0 3px rgba(0,229,176,0.15);
+}
+
+.input-wrapper.error {
+    border-color: #F44336;
+    box-shadow: 0 0 0 3px rgba(244,67,54,0.15);
+}
+
+.input-icon {
+    padding: 0 12px;
+    color: #c4aabf;
+    font-size: 15px;
+}
+
+input {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    background: transparent;
+    color: #fff;
+}
+
+input::placeholder {
+    color: #7a5a74;
+}
+
+.eye-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 12px;
+    color: #c4aabf;
+    font-size: 15px;
+    transition: color 0.2s;
+}
+
+.eye-btn:hover {
+    color: #00e5b0;
+}
+
+.field-error {
+    color: #F44336;
+    font-size: 12px;
+    margin-top: 6px;
+    display: none;
+}
+
+.field-error.visible {
+    display: block;
+}
+
+.forgot-link {
+    text-align: right;
+    margin-top: 8px;
+}
+
+.forgot-link a {
+    color: #c4aabf;
+    font-size: 12px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-link a:hover {
+    color: #00e5b0;
+}
+
+.server-error {
+    background: rgba(244,67,54,0.1);
+    border: 1px solid rgba(244,67,54,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #F44336;
+    font-size: 14px;
+    margin-bottom: 16px;
+    text-align: center;
+    display: none;
+}
+
+.server-error.visible {
+    display: block;
+}
+
+.blocked-box {
+    background: rgba(244,67,54,0.1);
+    border: 1px solid rgba(244,67,54,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #F44336;
+    font-size: 14px;
+    margin-bottom: 16px;
+    display: none;
+}
+
+.blocked-box.visible {
+    display: block;
+}
+
+.blocked-box strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.blocked-box .timer {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.btn-login {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #00c9ff 0%, #00e5b0 100%);
+    color: #1a0a1a;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+}
+
+.btn-login:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,229,176,0.4);
+    background: linear-gradient(135deg, #00e5b0 0%, #00c9ff 100%);
+}
+
+.btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 24px;
+    color: #c4aabf;
+    font-size: 13px;
+}
+
+.register-link a {
+    color: #00e5b0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    background: rgba(244,67,54,0.1);
+    border: 1px solid rgba(244,67,54,0.3);
+    color: #F44336;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
