@@ -12,7 +12,7 @@
         <h2>Inicio de sesión</h2>
         <div class="subtitle">Accede a tu portafolio profesional</div>
 
-        @if($errors->any())
+        @if($errors->has('email') && !str_contains($errors->first('email'), 'segundos'))
             <div class="error-message">
                 @foreach($errors->all() as $error)
                     <p>{{ $error }}</p>
@@ -20,7 +20,7 @@
             </div>
         @endif
 
-        <div class="server-error" id="serverError">
+        <div class="server-error" id="serverError" style="display:none;">
             Correo o contraseña incorrectos
         </div>
 
@@ -123,38 +123,33 @@
         });
 
         // Mostrar error de servidor si Laravel devuelve error
-        @if($errors->has('email') || $errors->has('password'))
-            attempts = {{ session('login_attempts', 0) }};
-            if (attempts >= 3) {
-                startBlock();
+        @if($errors->has('email'))
+                const mensaje = @json($errors->first('email'));
+                const match = mensaje.match(/(\d+)\s*segundos/);
+            if (match) {
+                blocked = true;
+                document.getElementById('blockedBox').classList.add('visible');
+                document.getElementById('btnLogin').disabled = true;
+
+                let remaining = parseInt(match[1]);
+                const timerEl = document.getElementById('timer');
+
+                const interval = setInterval(() => {
+                    remaining--;
+                    const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+                    const s = String(remaining % 60).padStart(2, '0');
+                    timerEl.textContent = `${m}:${s}`;
+                    if (remaining <= 0) {
+                        clearInterval(interval);
+                        blocked = false;
+                        document.getElementById('blockedBox').classList.remove('visible');
+                        document.getElementById('btnLogin').disabled = false;
+                    }
+                }, 1000);
             } else {
-                document.getElementById('serverError').classList.add('visible');
+            document.getElementById('serverError').classList.add('visible');
             }
         @endif
-
-        function startBlock() {
-            blocked = true;
-            document.getElementById('blockedBox').classList.add('visible');
-            document.getElementById('serverError').classList.remove('visible');
-            document.getElementById('btnLogin').disabled = true;
-
-            let seconds = 4 * 60 + 32;
-            const timerEl = document.getElementById('timer');
-
-            const interval = setInterval(() => {
-                seconds--;
-                const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-                const s = String(seconds % 60).padStart(2, '0');
-                timerEl.textContent = `${m}:${s}`;
-                if (seconds <= 0) {
-                    clearInterval(interval);
-                    blocked = false;
-                    attempts = 0;
-                    document.getElementById('blockedBox').classList.remove('visible');
-                    document.getElementById('btnLogin').disabled = false;
-                }
-            }, 1000);
-        }
     </script>
 </body>
 </html>
