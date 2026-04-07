@@ -13,10 +13,12 @@ class User extends Authenticatable implements MustVerifyEmail
     // T3: campos que se pueden llenar masivamente
     protected $fillable = [
         'name',
+        'last_name',
         'email',
         'password',
         'role',
         'status',
+        'terms_accepted',
     ];
 
     // Campos que NUNCA se envían al frontend

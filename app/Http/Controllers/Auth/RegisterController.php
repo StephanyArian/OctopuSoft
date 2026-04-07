@@ -22,6 +22,7 @@ class RegisterController extends Controller
 
             // T4: campos obligatorios
             'name'     => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
 
             // T4 + T5: obligatorio, formato email, único en BD
             'email'    => ['required', 'email', 'unique:users,email'],
@@ -35,10 +36,12 @@ class RegisterController extends Controller
                 'regex:/[A-Z]/',   // al menos una mayúscula
                 'regex:/[0-9]/',   // al menos un número
             ],
+            'terms' => ['accepted'],
 
         ], [
             // T11: mensajes de error 
             'name.required'       => 'El nombre es obligatorio.',
+            'last_name.required'  => 'El apellido es obligatorio.',
             'email.required'      => 'El correo electrónico es obligatorio.',
             'email.email'         => 'Ingresa un correo electrónico válido.',
             'email.unique'        => 'Este correo ya está registrado.',
@@ -46,15 +49,18 @@ class RegisterController extends Controller
             'password.min'        => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed'  => 'Las contraseñas no coinciden.',
             'password.regex'      => 'La contraseña debe incluir al menos una mayúscula y un número.',
+            'terms.accepted'     => 'Debes aceptar los términos y condiciones.',
         ]);
 
         //T8: Implementar registro de usuario con formulario y controlador
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => $request->password,
-            'role'     => 'user',
-            'status'   => 'pending',
+            'name'       => $request->name,
+            'last_name'  => $request->last_name,
+            'email'      => $request->email,
+            'password'   => $request->password,
+            'role'       => 'user',
+            'status'     => 'pending',
+            'terms_accepted' => true,
         ]);
 
         //  T10: Enviar correo de verificación 
