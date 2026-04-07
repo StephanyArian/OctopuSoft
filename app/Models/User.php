@@ -10,27 +10,25 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $table = 'usuario';
+    protected $table = 'users';
 
     protected $fillable = [
-        'nombre',
-        'apellido',
         'email',
-        'password_hash',
+        'password',
     ];
 
     protected $hidden = [
-        'password_hash',
+        'password',
         'remember_token',
     ];
 
-    protected $authPasswordName = 'password_hash';
+    protected $authPasswordName = 'password';
 
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password_hash' => 'hashed',
+            'password' => 'hashed',
         ];
     }
 }
