@@ -1,0 +1,70 @@
+:root {
+    --burg-deep:  #2d0a1e;
+    --burg-mid:   #4a1030;
+    --burg-soft:  #6b1f45;
+    --teal:       #0abf9e;
+    --teal-light: #1de8c0;
+    --teal-dim:   #07866e;
+    --white:      #ffffff;
+    --off:        #f5f6f8;
+    --gray-100:   #edf0f4;
+    --gray-300:   #c8cdd8;
+    --gray-500:   #7a8298;
+    --gray-700:   #3d4459;
+    --dark:       #111827;
+}
+
+/* FONDO */
+.bg-auth {
+    background: linear-gradient(135deg, var(--burg-deep), var(--burg-mid));
+}
+
+/* CARD */
+.card-auth {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* INPUTS */
+.input-auth {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    outline: none;
+}
+
+.input-auth::placeholder {
+    color: #ccc;
+}
+
+.input-auth:focus {
+    border-color: var(--teal-light);
+}
+
+/* BOTÓN */
+.btn-auth {
+    background: linear-gradient(90deg, var(--teal), var(--teal-light));
+    color: white;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 12px;
+    transition: 0.3s;
+}
+
+.btn-auth:hover {
+    opacity: 0.9;
+}
+
+/* TEXTO */
+.label-auth {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.text-muted {
+    color: #94a3b8;
+}
