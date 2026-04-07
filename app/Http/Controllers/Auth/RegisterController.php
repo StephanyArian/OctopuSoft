@@ -48,5 +48,25 @@ class RegisterController extends Controller
             'password.regex'      => 'La contraseña debe incluir al menos una mayúscula y un número.',
         ]);
 
+        //T8: Implementar registro de usuario con formulario y controlador
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => $request->password,
+            'role'     => 'user',
+            'status'   => 'pending',
+        ]);
+
+        //  T10: Enviar correo de verificación 
+        $user->sendEmailVerificationNotification();
+
+        // T9: Iniciar sesión automáticamente con sesiones Laravel 
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        // Redirigir al dashboard con mensaje de éxito 
+        return redirect()->route('dashboard')
+                         ->with('success', '¡Bienvenido! Tu cuenta fue creada correctamente.');
+    
     }
 }
