@@ -1,52 +1,64 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    @endpush
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+    <div class="register-container">
+        <h2 class="register-title">Crear Cuenta</h2>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <form method="POST" action="{{ route('register') }}">
+            @csrf
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <!-- Nombre y Apellido (ahora en dos columnas) -->
+            <div class="row-fields">
+                <div class="form-group">
+                    <label for="first_name" class="form-label">Nombre</label>
+                    <input id="first_name" class="form-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus>
+                    <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
+                </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+                <div class="form-group">
+                    <label for="last_name" class="form-label">Apellido</label>
+                    <input id="last_name" class="form-input" type="text" name="last_name" value="{{ old('last_name') }}" required>
+                    <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
+                </div>
+            </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <!-- Correo -->
+            <div class="form-group">
+                <label for="email" class="form-label">Correo</label>
+                <input id="email" class="form-input" type="email" name="email" value="{{ old('email') }}" required>
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <input id="password" class="form-input" type="password" name="password" required>
+                <small class="password-hint">Mínimo 8 caracteres, 1 mayúscula y 1 número</small>
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+            <!-- Confirmar Contraseña -->
+            <div class="form-group">
+                <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
+                <input id="password_confirmation" class="form-input" type="password" name="password_confirmation" required>
+            </div>
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+            <!-- Términos -->
+            <div class="terms-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="terms" required>
+                    <span>Acepto los términos y condiciones</span>
+                </label>
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+            <!-- Botones -->
+            <button type="submit" class="register-btn">Registrarse</button>
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
+            <div class="login-link">
+                ¿Ya tienes cuenta? <a href="{{ route('login') }}">Inicia sesión</a>
+            </div>
+        </form>
+    </div>
 </x-guest-layout>
