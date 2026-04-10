@@ -37,14 +37,9 @@
                             {{ __('Perfil') }}
                         </x-dropdown-link>
 
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Cerrar Sesión') }}
-                            </x-dropdown-link>
-                        </form>
+                        <x-dropdown-link :href="route('cerrar.sesion')">
+                            {{ __('Cerrar Sesión') }}
+                        </x-dropdown-link>
                     </x-slot>
                 </x-dropdown>
             </div>
@@ -53,8 +48,8 @@
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" style="color: #0abf9e;" class="inline-flex items-center justify-center p-2 rounded-md focus:outline-none transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -62,7 +57,7 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden" style="background-color: #2d0a1e;">
+    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden" style="background-color: #2d0a1e;">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color: #ffffff;">
                 {{ __('Mi portafolio') }}
@@ -71,8 +66,12 @@
 
         <div class="pt-4 pb-1" style="border-top: 1px solid #4a1030;">
             <div class="px-4">
-                <div class="font-medium text-base" style="color: #ffffff;">{{ Auth::user()->first_name ?? Auth::user()->name ?? 'Usuario' }}</div>
-                <div class="font-medium text-sm" style="color: #0abf9e;">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-base" style="color: #ffffff;">
+                    {{ Auth::user()->first_name ?? Auth::user()->name ?? 'Usuario' }}
+                </div>
+                <div class="font-medium text-sm" style="color: #0abf9e;">
+                    {{ Auth::user()->email }}
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
@@ -80,14 +79,9 @@
                     {{ __('Perfil') }}
                 </x-responsive-nav-link>
 
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();" style="color: #ffffff;">
-                        {{ __('Cerrar Sesión') }}
-                    </x-responsive-nav-link>
-                </form>
+                <x-responsive-nav-link :href="route('cerrar.sesion')" style="color: #ffffff;">
+                    {{ __('Cerrar Sesión') }}
+                </x-responsive-nav-link>
             </div>
         </div>
     </div>

@@ -1,8 +1,14 @@
-<x-app-layout>
+<x-app-layout> 
     <x-slot name="header">
-        <h2 class="font-semibold text-xl leading-tight" style="color: #2d0a1e;">
-            {{ __('Dashboard') }}
-        </h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <h2 class="font-semibold text-xl leading-tight" style="color: #2d0a1e;">
+                {{ __('Dashboard') }}
+            </h2>
+
+            <a href="{{ route('cerrar.sesion') }}" class="logout-btn">
+                Cerrar sesión
+            </a>
+        </div>
     </x-slot>
 
     <style>
@@ -52,6 +58,24 @@
             color: #2d0a1e;
             font-size: 16px;
             font-weight: 500;
+        }
+
+        /* Botón cerrar sesión */
+        .logout-btn {
+            display: inline-block;
+            padding: 10px 18px;
+            background: linear-gradient(90deg, #2d0a1e, #0abf9e);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
         }
 
         /* Mariposas en esquina inferior derecha - 400px */
