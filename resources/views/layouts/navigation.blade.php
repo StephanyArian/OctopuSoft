@@ -22,7 +22,10 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button style="color: #1de8c0; background: transparent; border: 1px solid #0abf9e;" class="inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md focus:outline-none transition ease-in-out duration-150">
+                        <button style="color: #1de8c0; background: transparent; border: 1px solid #0abf9e; border-radius: 50px; padding: 8px 16px; transition: all 0.3s ease;" 
+                                onmouseover="this.style.backgroundColor='#0abf9e'; this.style.color='#2d0a1e';" 
+                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#1de8c0';"
+                                class="inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md focus:outline-none transition ease-in-out duration-150">
                             <div>{{ Auth::user()->first_name ?? Auth::user()->name ?? 'Usuario' }}</div>
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -33,13 +36,20 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Perfil') }}
-                        </x-dropdown-link>
-
-                        <x-dropdown-link :href="route('cerrar.sesion')">
-                            {{ __('Cerrar Sesión') }}
-                        </x-dropdown-link>
+                        <div style="border: 2px solid #0abf9e; border-radius: 12px; overflow: hidden; background: white; min-width: 160px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <a href="{{ route('profile.edit') }}" 
+                               style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; transition: all 0.3s ease; font-size: 14px;"
+                               onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                               onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                {{ __('Perfil') }}
+                            </a>
+                            <a href="{{ route('cerrar.sesion') }}" 
+                               style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px;"
+                               onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                               onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                {{ __('Cerrar Sesión') }}
+                            </a>
+                        </div>
                     </x-slot>
                 </x-dropdown>
             </div>
@@ -47,7 +57,7 @@
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" style="color: #0abf9e;" class="inline-flex items-center justify-center p-2 rounded-md focus:outline-none transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 20 20">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
