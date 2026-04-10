@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\SessionController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,3 +34,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     });
   
 require __DIR__.'/auth.php';
+
+Route::post('/logout-others', [SessionController::class, 'logoutOtherDevices'])
+    ->middleware('auth')
+    ->name('logout.others');
