@@ -73,6 +73,12 @@ Schema::create('sessions', function (Blueprint $table) {
     $table->timestamps();
 });
 
+//RECUPERAR CONTRASEÑA
+Schema::create('password_reset_tokens', function (Blueprint $table) {
+    $table->string('email')->primary();
+    $table->string('token');
+    $table->timestamp('created_at')->nullable();
+});
         // =====================================================
         // 5. PROFESSIONAL_NETWORKS
         // =====================================================
@@ -272,6 +278,7 @@ Schema::create('sessions', function (Blueprint $table) {
         Schema::dropIfExists('portfolios');
         Schema::dropIfExists('professional_networks');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('users');
         Schema::dropIfExists('platform_network');
         Schema::dropIfExists('professions');
