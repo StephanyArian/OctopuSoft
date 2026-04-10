@@ -4,10 +4,6 @@
             <h2 class="font-semibold text-xl leading-tight" style="color: #2d0a1e;">
                 {{ __('Dashboard') }}
             </h2>
-
-            <a href="{{ route('cerrar.sesion') }}" class="logout-btn">
-                Cerrar sesión
-            </a>
         </div>
     </x-slot>
 
@@ -114,5 +110,4 @@
         <img src="{{ asset('imagenes/mariposas.gif') }}" 
              alt="Mariposas animadas">
     </div>
-
 </x-app-layout>
