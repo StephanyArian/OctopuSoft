@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
+    <!-- Font Awesome 6 (Iconos profesionales) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
     <style>
         * {
             margin: 0;
@@ -39,22 +42,106 @@
             color: var(--dark);
         }
 
-        /* Navegación */
+        /* Navegación responsiva estilo LinkedIn - CON FONDO DEL FOOTER */
         .navbar {
-            background: var(--white);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: var(--burg-deep); /* MISMO COLOR DEL FOOTER: #2d0a1e */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
-        .container {
+        .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        /* Botones */
+        /* LOGO EN COLOR VERDE */
+        .logo h2 {
+            color: var(--teal); /* VERDE #0abf9e */
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        /* Menú hamburguesa */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--white); /* BLANCO */
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            color: var(--teal);
+        }
+
+        /* Navegación desktop - TEXTO BLANCO */
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--white); /* BLANCO */
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 0;
+        }
+
+        .nav-link:hover {
+            color: var(--teal); /* VERDE al hacer hover */
+        }
+
+        /* Botones en navbar */
+        .navbar .btn-primary {
+            background: var(--teal);
+            color: var(--burg-deep);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .navbar .btn-primary:hover {
+            background: var(--teal-light);
+            transform: translateY(-2px);
+        }
+
+        .navbar .btn-outline-nav {
+            background: transparent;
+            color: var(--white);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: 2px solid var(--teal);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .navbar .btn-outline-nav:hover {
+            background: var(--teal);
+            color: var(--burg-deep);
+            transform: translateY(-2px);
+        }
+
+        /* Botones generales */
         .btn-primary {
             background: var(--teal);
             color: var(--white);
@@ -140,7 +227,6 @@
             background-repeat: no-repeat;
         }
 
-        /* Overlay oscuro para que el texto se lea mejor */
         .hero::before {
             content: '';
             position: absolute;
@@ -338,15 +424,27 @@
         }
 
         .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
             color: var(--gray-300);
-            font-size: 1.5rem;
-            transition: color 0.3s;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
             text-decoration: none;
         }
 
         .social-links a:hover {
-            color: var(--teal-light);
+            transform: translateY(-3px);
         }
+
+        .social-links a:hover .fa-facebook { color: #1877f2; }
+        .social-links a:hover .fa-instagram { color: #e4405f; }
+        .social-links a:hover .fa-envelope { color: #ea4335; }
+        .social-links a:hover .fa-whatsapp { color: #25d366; }
 
         .footer-bottom {
             text-align: center;
@@ -355,21 +453,45 @@
             font-size: 0.875rem;
         }
 
-        /* Navbar links */
-        .nav-link {
-            text-decoration: none;
-            color: var(--gray-700);
-            font-weight: 500;
-            transition: color 0.3s;
-            padding: 8px 0;
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .nav-link:hover {
-            color: var(--teal);
-        }
-
-        /* Responsive */
+        /* ========== RESPONSIVE: MÓVIL ========== */
         @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px 0 10px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                margin-top: 16px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+            }
+
+            .navbar .btn-primary,
+            .navbar .btn-outline-nav {
+                width: 100%;
+                text-align: center;
+            }
+
             .hero h1 {
                 font-size: 2rem;
             }
@@ -377,39 +499,58 @@
             .section-title {
                 font-size: 1.75rem;
             }
-            
-            .navbar .container {
+
+            .hero-buttons {
                 flex-direction: column;
-                gap: 15px;
+                align-items: center;
             }
-            
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
+
+            .hero-buttons .btn-primary,
+            .hero-buttons .btn-outline {
+                width: 80%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-container {
+                padding: 12px 16px;
+            }
+
+            .logo h2 {
+                font-size: 1.2rem;
+            }
+
+            .menu-toggle {
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- NAVBAR -->
+    <!-- NAVBAR CON FONDO #2d0a1e (COLOR DEL FOOTER) -->
     <nav class="navbar">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; flex-wrap: wrap;">
+        <div class="nav-container">
             <div class="logo">
-                <h2 style="background: linear-gradient(135deg, var(--burg-soft) 0%, var(--burg-deep) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">PORTAFOLIO</h2>
+                <h2>PORTAFOLIO</h2> <!-- Ahora es VERDE -->
             </div>
             
-            <div class="nav-links" style="display: flex; gap: 32px; align-items: center; flex-wrap: wrap;">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="nav-links" id="navLinks">
                 <a href="#inicio" class="nav-link">Inicio</a>
-                <a href="#que-es" class="nav-link">¿Qué es el sistema?</a>
+                <a href="#que-es" class="nav-link">Nuestro sistema</a>
                 <a href="#beneficios" class="nav-link">Beneficios</a>
                 <a href="#como-funciona" class="nav-link">Cómo funciona</a>
                 
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="btn-primary" style="padding: 8px 20px;">Dashboard</a>
+                        <a href="{{ url('/dashboard') }}" class="btn-primary">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="nav-link" style="font-weight: 600;">Iniciar sesión</a>
-                        <a href="{{ route('register') }}" class="btn-primary" style="padding: 8px 20px;">Registrarse</a>
+                        <a href="{{ route('login') }}" class="btn-outline-nav">Iniciar sesión</a>
+                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
                     @endauth
                 @endif
             </div>
@@ -435,10 +576,10 @@
     <!-- ¿QUÉ ES EL SISTEMA? -->
     <section id="que-es" class="section section-white">
         <div class="container">
-            <h2 class="section-title">¿Qué es este sistema?</h2>
+            <h2 class="section-title">Informa a las personas adecuadas de que buscas empleo</h2>
             <div style="max-width: 800px; margin: 0 auto; text-align: center;">
                 <p style="font-size: 1.125rem; color: var(--gray-700); margin-bottom: 24px; line-height: 1.6;">
-                    Es una plataforma que te ayuda a crear y gestionar tu portfolio digital en pocos minutos, sin necesidad de conocimientos técnicos.
+                    "El mundo necesita conocer tu talento. No esperes más para crear un portafolio que te represente. Empieza hoy, es gratis y muy fácil."
                 </p>
                 <p style="color: var(--gray-500); font-size: 1rem;">
                     Ideal para profesionales, estudiantes, desarrolladores, diseñadores y cualquier persona que quiera mostrar su trabajo de manera profesional.
@@ -455,22 +596,30 @@
             
             <div class="benefits-grid">
                 <div class="benefit-card">
-                    <div class="benefit-icon">🎨</div>
+                    <div class="benefit-icon">
+                        <img src="/imagenes/diseno.png" alt="Diseños Profesionales" style="width: 40px; height: 40px; object-fit: contain;">
+                    </div>
                     <h3>Diseños Profesionales</h3>
                     <p>Plantillas modernas y personalizables para todos los estilos.</p>
                 </div>
                 <div class="benefit-card">
-                    <div class="benefit-icon">🚀</div>
+                    <div class="benefit-icon">
+                        <img src="/imagenes/facil.jpg" alt="Fácil de Usar" style="width: 40px; height: 40px; object-fit: contain;">
+                    </div>
                     <h3>Fácil de Usar</h3>
                     <p>Crea tu portafolio en minutos, sin complicaciones técnicas.</p>
                 </div>
                 <div class="benefit-card">
-                    <div class="benefit-icon">📱</div>
+                    <div class="benefit-icon">
+                        <img src="/imagenes/dispisitivos.jpg" alt="Acceso desde cualquier dispositivo" style="width: 40px; height: 40px; object-fit: contain;">
+                    </div>
                     <h3>Acceso desde cualquier dispositivo</h3>
                     <p>Tu portafolio se ve bien en todos lados.</p>
                 </div>
                 <div class="benefit-card">
-                    <div class="benefit-icon">🔗</div>
+                    <div class="benefit-icon">
+                        <img src="/imagenes/compartir.jpg" alt="Comparte tu Trabajo" style="width: 40px; height: 40px; object-fit: contain;">
+                    </div>
                     <h3>Comparte tu Trabajo</h3>
                     <p>Comparte tu portafolio con un enlace único y profesional.</p>
                 </div>
@@ -544,10 +693,10 @@
                 <div class="footer-links">
                     <h4>Redes Sociales</h4>
                     <div class="social-links">
-                        <a href="#">📘</a>
-                        <a href="#">🐦</a>
-                        <a href="#">📷</a>
-                        <a href="#">💼</a>
+                        <a href="https://facebook.com/tu-perfil" target="_blank"><i class="fab fa-facebook"></i></a>
+                        <a href="https://instagram.com/tu-perfil" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="mailto:tucorreo@gmail.com"><i class="fas fa-envelope"></i></a>
+                        <a href="https://wa.me/tu-numero" target="_blank"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
             </div>
@@ -556,5 +705,34 @@
             </div>
         </div>
     </footer>
+
+    <!-- JavaScript para el menú hamburguesa -->
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            
+            const icon = menuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        const links = document.querySelectorAll('.nav-link');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                const icon = menuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            });
+        });
+    </script>
 </body>
 </html>
