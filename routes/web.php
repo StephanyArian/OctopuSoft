@@ -37,6 +37,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.update');
 
+
 Route::middleware('auth')->group(function () {
     // ========== RUTAS PARA CREAR PERFIL (HU-05) ==========
     Route::get('/profile/create', [ProfileController::class, 'create'])->name('profile.create');
@@ -57,6 +58,10 @@ Route::middleware('auth')->group(function () {
             ->header('Pragma', 'no-cache')
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     })->name('cerrar.sesion');
+
+    Route::get('/informacion-academica', function () {
+        return view('informacion-academica');
+    })->middleware(['auth'])->name('informacion.academica');
 });
 
 require __DIR__.'/auth.php';
