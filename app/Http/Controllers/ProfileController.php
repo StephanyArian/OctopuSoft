@@ -21,6 +21,28 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return redirect()->route('dashboard');
+    }   
+
+    public function store(Request $request): RedirectResponse
+    {
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'title' => 'nullable|string|max:255',
+        'location' => 'nullable|string|max:255',
+        'bio' => 'nullable|string|max:500',
+        'photo' => 'nullable|image|mimes:jpeg,png|max:2048',
+    ]);
+
+    $user = $request->user();
+    $user->name = $request->name;
+    $user->save();
+
+    return redirect()->route('dashboard')->with('success', 'Perfil guardado exitosamente.');
+    }   
+
     /**
      * Update the user's profile information.
      */

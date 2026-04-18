@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
-
+use App\Http\Controllers\InformacionAcademicaController;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -40,7 +40,9 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 
 Route::middleware('auth')->group(function () {
     // ========== RUTAS PARA CREAR PERFIL (HU-05) ==========
-    Route::get('/profile/create', [ProfileController::class, 'create'])->name('profile.create');
+    Route::get('/profile/create', function () {
+        return redirect()->route('dashboard');
+    })->name('profile.create');
     Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
     // ====================================================
     
@@ -59,9 +61,8 @@ Route::middleware('auth')->group(function () {
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     })->name('cerrar.sesion');
 
-    Route::get('/informacion-academica', function () {
-        return view('informacion-academica');
-    })->middleware(['auth'])->name('informacion.academica');
+    Route::get('/informacion-academica', [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
+    Route::post('/informacion-academica', [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
 });
 
 require __DIR__.'/auth.php';
