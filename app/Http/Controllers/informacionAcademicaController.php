@@ -18,29 +18,58 @@ class InformacionAcademicaController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'institucion'     => 'required|string|max:255',
-        'titulo_obtenido' => 'required|string|max:255',
-        'fecha_inicio'    => 'required',
-        'fecha_fin'       => 'nullable',
-        'descripcion'     => 'nullable|string|max:1000',
-        'estudio_actual'  => 'nullable',
-    ]);
+    {
+        $request->validate([
+            'institucion'     => 'required|string|max:255',
+            'titulo_obtenido' => 'required|string|max:255',
+            'fecha_inicio'    => 'required',
+            'fecha_fin'       => 'nullable',
+            'descripcion'     => 'nullable|string|max:1000',
+            'estudio_actual'  => 'nullable',
+        ]);
 
-    Experience::create([
-        'user_id'     => auth()->id(),
-        'type'        => 'education',
-        'institution' => $request->institucion,
-        'title'       => $request->titulo_obtenido,
-        'description' => $request->descripcion,
-        'start_date'  => $request->fecha_inicio . '-01',
-        'end_date'    => $request->estudio_actual ? null : ($request->fecha_fin ? $request->fecha_fin . '-01' : null),
-        'is_current'  => $request->has('estudio_actual'),
-        'is_visible'  => true,
-    ]);
+        Experience::create([
+            'user_id'     => auth()->id(),
+            'type'        => 'education',
+            'institution' => $request->institucion,
+            'title'       => $request->titulo_obtenido,
+            'description' => $request->descripcion,
+            'start_date'  => $request->fecha_inicio . '-01',
+            'end_date'    => $request->estudio_actual ? null : ($request->fecha_fin ? $request->fecha_fin . '-01' : null),
+            'is_current'  => $request->has('estudio_actual'),
+            'is_visible'  => true,
+        ]);
 
-    return redirect()->route('informacion.academica')
-        ->with('success', 'Formación académica guardada correctamente');
-}
+        return redirect()->route('informacion.academica')
+            ->with('success', 'Formación académica guardada correctamente');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $formacion = Experience::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $formacion->update([
+            'institution' => $request->institucion,
+            'title'       => $request->titulo_obtenido,
+            'description' => $request->descripcion,
+            'start_date'  => $request->fecha_inicio . '-01',
+            'end_date'    => $request->estudio_actual ? null : ($request->fecha_fin ? $request->fecha_fin . '-01' : null),
+            'is_current'  => $request->estudio_actual ? true : false,
+        ]);
+
+        return response()->json($formacion->fresh());
+    }
+
+    public function destroy($id)
+    {
+        $formacion = Experience::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $formacion->delete();
+
+        return response()->json(['success' => true]);
+    }
 }

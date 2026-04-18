@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/informacion-academica', [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
     Route::post('/informacion-academica', [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
+    Route::put('/informacion-academica/{id}', [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
+    Route::delete('/informacion-academica/{id}', [InformacionAcademicaController::class, 'destroy'])->name('informacion.academica.destroy');
 });
 
 require __DIR__.'/auth.php';

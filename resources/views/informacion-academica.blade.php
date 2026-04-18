@@ -116,43 +116,11 @@
                             </form>
                         </div>
  
-                        @if($formaciones->count() > 0)
-<div class="historial-divider">
-    <span>— HISTORIAL —</span>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 14px;">
-    @foreach($formaciones as $index => $formacion)
-    <div class="historial-card">
-        <div class="historial-card-header">
-            <span class="historial-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
-            @if($formacion->is_current)
-                <span class="badge-actual">Actual</span>
-            @endif
-        </div>
-        <div class="historial-title">{{ $formacion->title }}</div>
-        <div class="historial-subtitle">{{ $formacion->institution }}</div>
-        <div class="historial-tags">
-            <span class="tag tag-teal">
-                {{ $formacion->start_date->format('M Y') }}
-                – {{ $formacion->is_current ? 'Presente' : ($formacion->end_date ? $formacion->end_date->format('M Y') : '') }}
-            </span>
-            <span class="tag tag-gray">{{ $formacion->is_current ? 'En curso' : 'Finalizado' }}</span>
-        </div>
-        @if($formacion->description)
-            <div class="historial-desc">{{ $formacion->description }}</div>
-        @endif
-        <div class="historial-actions">
-            <button class="btn-sm">✎ Editar</button>
-            <button class="btn-sm danger">✕ Eliminar</button>
-        </div>
-    </div>
-    @endforeach
-</div>
-@endif
 
 
- 
+                        <div id="historial-react" data-formaciones="{{ json_encode($formaciones) }}"></div>
+
+                    </div>{{-- /main --}}                         
                     </div>{{-- /main --}}
                 </div>{{-- /body-row --}}
             </div>{{-- /shell --}}
@@ -206,4 +174,6 @@
             if (!isValid) e.preventDefault();
         });
     </script>
+    @viteReactRefresh
+    @vite('resources/js/informacion-academica.jsx')
 </x-app-layout>
