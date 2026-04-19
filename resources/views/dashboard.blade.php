@@ -159,36 +159,11 @@
             border-left: 3px solid var(--teal);
         }
 
-        /* NÚMEROS ELIMINADOS - LOS COMENTAMOS */
-        /* .sidebar-item::before {
-            content: counter(item-counter);
-            counter-increment: item-counter;
-            width: 24px;
-            height: 24px;
-            background: var(--gray-100);
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--gray-500);
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-item.active::before {
-            background: var(--teal);
-            color: var(--white);
-        }
-
-        .sidebar {
-            counter-reset: item-counter;
-        } */
-
         .main {
             flex: 1;
             padding: 32px 40px;
             background: var(--white);
+            transition: all 0.3s ease;
         }
 
         .page-title {
@@ -509,15 +484,16 @@
                 </div>
                 <div class="body-row">
                     <div class="sidebar">
-                        <div class="sidebar-item active">Personal</div>
-                        <div class="sidebar-item">Experiencia laboral</div>
-                        <div class="sidebar-item">Información académica</div>
-                        <div class="sidebar-item">Habilidades técnicas</div>
-                        <div class="sidebar-item">Habilidades blandas</div>
-                        <div class="sidebar-item">Proyectos</div>
-                        <div class="sidebar-item">Redes profesionales y contacto</div>
+                        <div class="sidebar-item active" id="personalLink" style="cursor: pointer;">Personal</div>
+                        <div class="sidebar-item" id="experienciaLink" style="cursor: pointer;">Experiencia laboral</div>
+                        <div class="sidebar-item" id="academicaLink" style="cursor: pointer;">Información académica</div>
+                        <div class="sidebar-item" id="habilidadesTecnicasLink" style="cursor: pointer;">Habilidades técnicas</div>
+                        <div class="sidebar-item" id="habilidadesBlandasLink" style="cursor: pointer;">Habilidades blandas</div>
+                        <div class="sidebar-item" id="proyectosLink" style="cursor: pointer;">📁 Proyectos</div>
+                        <div class="sidebar-item" id="redesLink" style="cursor: pointer;">Redes profesionales y contacto</div>
                     </div>
-                    <div class="main">
+                    <div class="main" id="mainContent">
+                        <!-- Contenido dinámico se cargará aquí -->
                         <div class="page-title">Perfil Personal</div>
                         <div class="section-card">
                             <div class="section-subtitle">
@@ -632,6 +608,52 @@
             if (!isValid) {
                 e.preventDefault();
             }
+        });
+
+        // Función para cargar proyectos dinámicamente
+        function cargarProyectos() {
+            fetch('{{ url("/proyectos-content") }}')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('mainContent').innerHTML = html;
+                    // Re-ejecutar scripts de la vista cargada
+                    const scripts = document.querySelectorAll('#mainContent script');
+                    scripts.forEach(script => {
+                        const nuevoScript = document.createElement('script');
+                        if (script.src) {
+                            nuevoScript.src = script.src;
+                        } else {
+                            nuevoScript.textContent = script.textContent;
+                        }
+                        document.body.appendChild(nuevoScript);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Función para cargar perfil personal (vista por defecto)
+        function cargarPerfilPersonal() {
+            // El perfil personal ya está cargado por defecto
+            // Esta función se puede usar para recargar si es necesario
+            location.reload();
+        }
+
+        // Evento click en Proyectos
+        document.getElementById('proyectosLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            cargarProyectos();
+            
+            // Actualizar clase activa en el sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+
+        // Evento click en Personal (recargar página)
+        document.getElementById('personalLink')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '{{ url("/dashboard") }}';
         });
     </script>
 </x-app-layout>

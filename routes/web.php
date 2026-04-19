@@ -57,6 +57,12 @@ Route::middleware('auth')->group(function () {
             ->header('Pragma', 'no-cache')
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     })->name('cerrar.sesion');
+
+    // ========== RUTA PARA PROYECTOS (HU-10) ==========
+    Route::get('/proyectos-content', function () {
+        return view('secciones.proyectos');
+    })->name('proyectos.content');
+    // =================================================
 });
 
 require __DIR__.'/auth.php';
