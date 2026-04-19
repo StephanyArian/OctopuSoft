@@ -1,5 +1,7 @@
 {{-- resources/views/secciones/proyectos.blade.php --}}
-{{-- HU-10: Gestionar mis proyectos (T1–T11) --}}
+{{-- HU-10: Gestionar mis proyectos + HU-22: Agregar tecnologías --}}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
     /* ── Variables de color del sistema ── */
@@ -68,7 +70,7 @@
     }
 
     /* ══════════════════════════════════════
-       FORMULARIO ACOPLADO (Nuevo/Editar)
+       FORMULARIO ACOPLADO
     ══════════════════════════════════════ */
     .proy-form-card {
         background: #f8fafc;
@@ -149,57 +151,271 @@
         min-height: 80px;
     }
 
-    .proy-form-actions {
+    /* ══════════════════════════════════════
+       TECNOLOGÍAS - VERSIÓN PROFESIONAL
+    ══════════════════════════════════════ */
+    .tec-section {
+        background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 16px;
+        border: 1px solid rgba(10, 191, 158, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        transition: all 0.3s ease;
+    }
+
+    .tec-section:hover {
+        border-color: rgba(10, 191, 158, 0.3);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .tec-header {
         display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 24px;
-        padding-top: 20px;
-        border-top: 1px solid #e2e8f0;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
     }
 
-    .proy-btn-cancel {
-        padding: 8px 24px;
-        border-radius: 40px;
-        border: 1.5px solid #e2e8f0;
-        background: white;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all .2s;
+    .tec-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .proy-btn-cancel:hover {
-        background: #f1f5f9;
+    .tec-icon {
+        font-size: 22px;
     }
 
-    .proy-btn-save {
-        padding: 8px 28px;
-        border-radius: 40px;
-        border: none;
+    .tec-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        letter-spacing: -0.3px;
+    }
+
+    .tec-badge-count {
         background: linear-gradient(135deg, var(--teal), var(--teal-dim));
         color: white;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all .2s;
-    }
-
-    .proy-btn-save:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(10,191,158,.4);
-    }
-
-    .proy-err-msg {
         font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 30px;
+        box-shadow: 0 2px 6px rgba(10, 191, 158, 0.2);
+    }
+
+    .tec-subtitle {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .tec-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        min-height: 70px;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 14px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s;
+    }
+
+    .tec-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%);
+        color: #1e293b;
+        padding: 6px 12px 6px 10px;
+        border-radius: 40px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        animation: badgePop 0.25s ease-out;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    @keyframes badgePop {
+        0% { transform: scale(0.8); opacity: 0; }
+        80% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .tec-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .tec-badge-logo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+    }
+
+    .tec-badge-logo i {
+        font-size: 14px;
+    }
+
+    .tec-badge-remove {
+        cursor: pointer;
         color: #ef4444;
-        display: none;
+        font-weight: bold;
+        font-size: 14px;
+        margin-left: 4px;
+        transition: all 0.2s;
+        width: 18px;
+        height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
     }
 
-    .proy-err-msg.visible {
-        display: block;
+    .tec-badge-remove:hover {
+        background: rgba(239, 68, 68, 0.1);
+        transform: scale(1.15);
     }
 
-    .proy-inp.proy-err, .proy-textarea.proy-err {
-        border-color: #ef4444;
+    .tec-empty-state {
+        width: 100%;
+        text-align: center;
+        padding: 16px;
+    }
+
+    .tec-empty-icon {
+        font-size: 32px;
+        margin-bottom: 8px;
+        opacity: 0.5;
+    }
+
+    .tec-empty-text {
+        font-size: 13px;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .tec-empty-hint {
+        font-size: 11px;
+        color: #cbd5e1;
+        margin-top: 4px;
+    }
+
+    .tec-input-wrapper {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .tec-input-group {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .tec-input-icon {
+        position: absolute;
+        left: 14px;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+    }
+
+    .tec-input {
+        width: 100%;
+        padding: 12px 12px 12px 42px;
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        font-size: 13px;
+        font-family: inherit;
+        background: white;
+        transition: all 0.2s;
+    }
+
+    .tec-input:focus {
+        outline: none;
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(10, 191, 158, 0.1);
+    }
+
+    .tec-btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+        color: white;
+        border: none;
+        padding: 0 22px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 2px 6px rgba(10, 191, 158, 0.3);
+    }
+
+    .tec-btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(10, 191, 158, 0.4);
+    }
+
+    .tec-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding: 8px 0;
+    }
+
+    .tec-suggestions-label {
+        font-size: 11px;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .tec-suggestion-chip {
+        background: #f1f5f9;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .tec-suggestion-chip i {
+        font-size: 10px;
+    }
+
+    .tec-suggestion-chip:hover {
+        background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .tec-footer {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+        font-size: 10px;
+        color: #94a3b8;
+    }
+
+    .tec-footer-icon {
+        font-size: 12px;
     }
 
     /* ══════════════════════════════════════
@@ -208,7 +424,7 @@
     .proy-grid {
         display: grid;
         gap: 20px;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     }
 
     .proy-card {
@@ -275,11 +491,35 @@
         overflow: hidden;
     }
 
+    .proy-card-tec {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 10px 0;
+    }
+
+    .tec-mini {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .tec-mini i {
+        font-size: 10px;
+    }
+
     .proy-card-footer {
         display: flex;
         justify-content: space-between;
         align-items: center;
         font-size: 11px;
+        margin-top: 8px;
     }
 
     .proy-card-fecha {
@@ -334,7 +574,62 @@
         border-radius: 40px;
         font-weight: 700;
         cursor: pointer;
+        transition: all .2s;
     }
+
+    .proy-empty-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(10,191,158,.4);
+    }
+
+    /* FORM ACTIONS */
+    .proy-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .proy-btn-cancel {
+        padding: 8px 24px;
+        border-radius: 40px;
+        border: 1.5px solid #e2e8f0;
+        background: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .proy-btn-cancel:hover {
+        background: #f1f5f9;
+    }
+
+    .proy-btn-save {
+        padding: 8px 28px;
+        border-radius: 40px;
+        border: none;
+        background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all .2s;
+    }
+
+    .proy-btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(10,191,158,.4);
+    }
+
+    .proy-err-msg {
+        font-size: 11px;
+        color: #ef4444;
+        display: none;
+    }
+
+    .proy-err-msg.visible { display: block; }
+    .proy-inp.proy-err, .proy-textarea.proy-err { border-color: #ef4444; }
 
     /* TOASTS */
     .proy-toast {
@@ -350,6 +645,10 @@
         animation: toastIn .3s ease forwards;
     }
 
+    .proy-toast.error {
+        background: #ef4444;
+    }
+
     @keyframes toastIn {
         from { opacity: 0; transform: translateX(100px); }
         to { opacity: 1; transform: translateX(0); }
@@ -362,6 +661,13 @@
         .proy-field-full {
             grid-column: span 1;
         }
+        .tec-input-wrapper {
+            flex-direction: column;
+        }
+        .tec-btn-add {
+            padding: 10px;
+            justify-content: center;
+        }
     }
 </style>
 
@@ -373,13 +679,14 @@
     </div>
     <button class="proy-btn-nuevo" id="proyBtnMostrarForm">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="white">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
         Nuevo Proyecto
     </button>
 </div>
 
-{{-- FORMULARIO ACOPLADO (se muestra al hacer clic) --}}
+{{-- FORMULARIO ACOPLADO --}}
 <div class="proy-form-card" id="proyFormCard">
     <div class="proy-form-title" id="proyFormTitle">➕ Nuevo Proyecto</div>
     
@@ -410,6 +717,63 @@
             </select>
         </div>
     </div>
+
+    {{-- SECCIÓN DE TECNOLOGÍAS PROFESIONAL --}}
+    <div class="tec-section">
+        <div class="tec-header">
+            <div class="tec-header-left">
+                <span class="tec-icon">🛠️</span>
+                <span class="tec-title">Stack Tecnológico</span>
+            </div>
+            <div class="tec-badge-count" id="tecCountBadge">0</div>
+        </div>
+        
+        <div class="tec-subtitle">
+            Tecnologías, frameworks y lenguajes utilizados en este proyecto
+        </div>
+        
+        <div id="tecBadgesContainer" class="tec-badges">
+            <div class="tec-empty-state">
+                <div class="tec-empty-icon">🔧</div>
+                <div class="tec-empty-text">Aún no hay tecnologías agregadas</div>
+                <div class="tec-empty-hint">Comienza escribiendo el nombre de una tecnología</div>
+            </div>
+        </div>
+        
+        <div class="tec-input-wrapper">
+            <div class="tec-input-group">
+                <div class="tec-input-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" id="tecInput" class="tec-input" 
+                       placeholder="Ej: Laravel, React, Vue, Tailwind, Node.js..." 
+                       maxlength="50" autocomplete="off">
+            </div>
+            <button type="button" id="tecBtnAgregar" class="tec-btn-add">
+                <i class="fas fa-plus"></i>
+                Agregar
+            </button>
+        </div>
+        
+        <div class="tec-suggestions">
+            <span class="tec-suggestions-label"><i class="fas fa-fire"></i> Sugerencias:</span>
+            <button type="button" class="tec-suggestion-chip" data-tec="Laravel"><i class="fab fa-laravel"></i> Laravel</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="React"><i class="fab fa-react"></i> React</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="Vue.js"><i class="fab fa-vuejs"></i> Vue.js</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="Node.js"><i class="fab fa-node-js"></i> Node.js</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="Tailwind"><i class="fab fa-css3-alt"></i> Tailwind</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="Python"><i class="fab fa-python"></i> Python</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="Flutter"><i class="fab fa-flutter"></i> Flutter</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="Docker"><i class="fab fa-docker"></i> Docker</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="PHP"><i class="fab fa-php"></i> PHP</button>
+            <button type="button" class="tec-suggestion-chip" data-tec="MySQL"><i class="fas fa-database"></i> MySQL</button>
+        </div>
+        
+        <div class="tec-footer">
+            <span class="tec-footer-icon"><i class="fas fa-lightbulb"></i></span>
+            <span>Máximo 15 tecnologías • Sin duplicados • Haz clic en ✕ para eliminar</span>
+        </div>
+    </div>
     
     <div class="proy-form-actions">
         <button class="proy-btn-cancel" id="proyBtnCancelarForm">Cancelar</button>
@@ -425,6 +789,7 @@
     const STORAGE_KEY = 'portafolio_proyectos';
     let proyectos = [];
     let editandoId = null;
+    let tecnologiasActuales = [];
 
     // Elementos DOM
     const formCard = document.getElementById('proyFormCard');
@@ -437,7 +802,138 @@
     const inputFecha = document.getElementById('proyFecha');
     const selectEstado = document.getElementById('proyEstado');
     const grid = document.getElementById('proyGrid');
+    const tecBadgesContainer = document.getElementById('tecBadgesContainer');
+    const tecInput = document.getElementById('tecInput');
+    const tecBtnAgregar = document.getElementById('tecBtnAgregar');
+    const tecCountBadge = document.getElementById('tecCountBadge');
 
+    // ==================== TECNOLOGÍAS CON LOGOS PROFESIONALES ====================
+    function getTecnologiaLogo(tecnologia) {
+        const lowerTec = tecnologia.toLowerCase();
+        
+        const techMap = [
+            { keywords: ['laravel'], icon: '<i class="fab fa-laravel" style="color: #ff2d20;"></i>' },
+            { keywords: ['react'], icon: '<i class="fab fa-react" style="color: #61dafb;"></i>' },
+            { keywords: ['vue', 'vue.js'], icon: '<i class="fab fa-vuejs" style="color: #42b883;"></i>' },
+            { keywords: ['node', 'node.js'], icon: '<i class="fab fa-node-js" style="color: #339933;"></i>' },
+            { keywords: ['python'], icon: '<i class="fab fa-python" style="color: #3776ab;"></i>' },
+            { keywords: ['javascript', 'js'], icon: '<i class="fab fa-js" style="color: #f7df1e;"></i>' },
+            { keywords: ['typescript', 'ts'], icon: '<i class="fab fa-js" style="color: #3178c6;"></i>' },
+            { keywords: ['tailwind'], icon: '<i class="fab fa-css3-alt" style="color: #06b6d4;"></i>' },
+            { keywords: ['bootstrap'], icon: '<i class="fab fa-bootstrap" style="color: #7952b3;"></i>' },
+            { keywords: ['php'], icon: '<i class="fab fa-php" style="color: #777bb4;"></i>' },
+            { keywords: ['java'], icon: '<i class="fab fa-java" style="color: #007396;"></i>' },
+            { keywords: ['flutter'], icon: '<i class="fab fa-flutter" style="color: #02569b;"></i>' },
+            { keywords: ['docker'], icon: '<i class="fab fa-docker" style="color: #2496ed;"></i>' },
+            { keywords: ['mysql'], icon: '<i class="fas fa-database" style="color: #4479a1;"></i>' },
+            { keywords: ['postgresql', 'postgres'], icon: '<i class="fas fa-database" style="color: #336791;"></i>' },
+            { keywords: ['mongodb'], icon: '<i class="fas fa-database" style="color: #47a248;"></i>' },
+            { keywords: ['git'], icon: '<i class="fab fa-git-alt" style="color: #f05032;"></i>' },
+            { keywords: ['github'], icon: '<i class="fab fa-github" style="color: #181717;"></i>' },
+            { keywords: ['figma'], icon: '<i class="fab fa-figma" style="color: #f24e1e;"></i>' },
+            { keywords: ['angular'], icon: '<i class="fab fa-angular" style="color: #dd0031;"></i>' },
+            { keywords: ['django'], icon: '<i class="fab fa-python" style="color: #092e20;"></i>' },
+            { keywords: ['spring'], icon: '<i class="fab fa-java" style="color: #6db33f;"></i>' },
+            { keywords: ['swift'], icon: '<i class="fab fa-swift" style="color: #fa7343;"></i>' },
+            { keywords: ['kotlin'], icon: '<i class="fab fa-kotlin" style="color: #7f52ff;"></i>' },
+            { keywords: ['html'], icon: '<i class="fab fa-html5" style="color: #e34f26;"></i>' },
+            { keywords: ['css'], icon: '<i class="fab fa-css3-alt" style="color: #1572b6;"></i>' },
+            { keywords: ['sass'], icon: '<i class="fab fa-sass" style="color: #cc6699;"></i>' },
+            { keywords: ['jquery'], icon: '<i class="fab fa-js" style="color: #0769ad;"></i>' },
+            { keywords: ['express'], icon: '<i class="fab fa-node-js" style="color: #000000;"></i>' },
+            { keywords: ['next.js', 'nextjs'], icon: '<i class="fab fa-react" style="color: #000000;"></i>' }
+        ];
+        
+        for (let tech of techMap) {
+            for (let keyword of tech.keywords) {
+                if (lowerTec.includes(keyword)) {
+                    return tech.icon;
+                }
+            }
+        }
+        
+        return '<i class="fas fa-code"></i>';
+    }
+
+    function renderizarTecnologias() {
+        if (!tecBadgesContainer) return;
+        
+        if (tecCountBadge) {
+            tecCountBadge.textContent = tecnologiasActuales.length;
+        }
+        
+        if (tecnologiasActuales.length === 0) {
+            tecBadgesContainer.innerHTML = `
+                <div class="tec-empty-state">
+                    <div class="tec-empty-icon"><i class="fas fa-tools"></i></div>
+                    <div class="tec-empty-text">Aún no hay tecnologías agregadas</div>
+                    <div class="tec-empty-hint">Comienza escribiendo el nombre de una tecnología</div>
+                </div>
+            `;
+            return;
+        }
+        
+        tecBadgesContainer.innerHTML = '';
+        tecnologiasActuales.forEach(tec => {
+            const logo = getTecnologiaLogo(tec);
+            const badge = document.createElement('span');
+            badge.className = 'tec-badge';
+            badge.innerHTML = `
+                <span class="tec-badge-logo">${logo}</span>
+                <span class="tec-badge-name">${escapeHtml(tec)}</span>
+                <span class="tec-badge-remove" data-tec="${escapeHtml(tec)}">✕</span>
+            `;
+            tecBadgesContainer.appendChild(badge);
+        });
+        
+        document.querySelectorAll('.tec-badge-remove').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tecAEliminar = btn.dataset.tec;
+                tecnologiasActuales = tecnologiasActuales.filter(t => t !== tecAEliminar);
+                renderizarTecnologias();
+            });
+        });
+    }
+
+    function agregarTecnologia() {
+        const nueva = tecInput.value.trim();
+        
+        if (nueva === '') {
+            mostrarToast('❌ Ingresa una tecnología', 'error');
+            return;
+        }
+        if (tecnologiasActuales.includes(nueva)) {
+            mostrarToast('❌ Esta tecnología ya está agregada', 'error');
+            return;
+        }
+        if (tecnologiasActuales.length >= 15) {
+            mostrarToast('❌ Máximo 15 tecnologías por proyecto', 'error');
+            return;
+        }
+        
+        tecnologiasActuales.push(nueva);
+        renderizarTecnologias();
+        tecInput.value = '';
+        tecInput.focus();
+        mostrarToast(`✅ "${nueva}" agregada`, 'success');
+    }
+
+    function cargarTecnologias(tecnologias) {
+        tecnologiasActuales = tecnologias || [];
+        renderizarTecnologias();
+    }
+
+    function obtenerTecnologias() {
+        return [...tecnologiasActuales];
+    }
+
+    function limpiarTecnologias() {
+        tecnologiasActuales = [];
+        renderizarTecnologias();
+        tecInput.value = '';
+    }
+
+    // ==================== PROYECTOS ====================
     function cargar() {
         try {
             proyectos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -456,7 +952,7 @@
         selectEstado.value = 'En curso';
         editandoId = null;
         formTitle.innerHTML = '➕ Nuevo Proyecto';
-        // Limpiar errores
+        limpiarTecnologias();
         inputNombre.classList.remove('proy-err');
         inputDesc.classList.remove('proy-err');
         document.getElementById('proyErrNombre').classList.remove('visible');
@@ -507,24 +1003,21 @@
                     <div class="proy-card-nombre">${escapeHtml(p.nombre)}</div>
                     <div class="proy-card-actions">
                         <button class="proy-icon-btn btn-editar" data-id="${p.id}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0abf9e" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                            </svg>
+                            <i class="fas fa-edit" style="color: #0abf9e;"></i>
                         </button>
                         <button class="proy-icon-btn btn-eliminar" data-id="${p.id}">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6l-1 14H6L5 6"/>
-                                <path d="M10 11v6"/><path d="M14 11v6"/>
-                            </svg>
+                            <i class="fas fa-trash-alt" style="color: #ef4444;"></i>
                         </button>
                     </div>
                 </div>
                 <div class="proy-card-body">
                     <div class="proy-card-desc">${escapeHtml(p.descripcion)}</div>
+                    <div class="proy-card-tec">
+                        ${(p.tecnologias || []).slice(0, 4).map(tec => `<span class="tec-mini">${getTecnologiaLogo(tec)} ${escapeHtml(tec)}</span>`).join('')}
+                        ${(p.tecnologias || []).length > 4 ? `<span class="tec-mini">+${p.tecnologias.length - 4}</span>` : ''}
+                    </div>
                     <div class="proy-card-footer">
-                        <span class="proy-card-fecha">📅 ${p.fecha || 'Sin fecha'}</span>
+                        <span class="proy-card-fecha"><i class="far fa-calendar-alt"></i> ${p.fecha || 'Sin fecha'}</span>
                         <span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span>
                     </div>
                 </div>
@@ -554,6 +1047,7 @@
         inputDesc.value = proyecto.descripcion;
         inputFecha.value = proyecto.fecha || '';
         selectEstado.value = proyecto.estado;
+        cargarTecnologias(proyecto.tecnologias || []);
         formTitle.innerHTML = '✏️ Editar Proyecto';
         mostrarForm();
     }
@@ -574,6 +1068,7 @@
         const descripcion = inputDesc.value.trim();
         const fecha = inputFecha.value;
         const estado = selectEstado.value;
+        const tecnologias = obtenerTecnologias();
         let isValid = true;
 
         if (!nombre) {
@@ -598,10 +1093,10 @@
 
         if (editandoId) {
             const index = proyectos.findIndex(p => p.id === editandoId);
-            proyectos[index] = { ...proyectos[index], nombre, descripcion, fecha, estado };
+            proyectos[index] = { ...proyectos[index], nombre, descripcion, fecha, estado, tecnologias };
             mostrarToast('Proyecto actualizado', 'success');
         } else {
-            proyectos.push({ id: Date.now(), nombre, descripcion, fecha, estado });
+            proyectos.push({ id: Date.now(), nombre, descripcion, fecha, estado, tecnologias });
             mostrarToast('Proyecto creado', 'success');
         }
 
@@ -613,7 +1108,8 @@
     function mostrarToast(mensaje, tipo) {
         const toast = document.createElement('div');
         toast.className = 'proy-toast';
-        toast.innerHTML = `✅ ${mensaje}`;
+        if (tipo === 'error') toast.classList.add('error');
+        toast.innerHTML = mensaje;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
@@ -627,6 +1123,16 @@
     btnMostrarForm.addEventListener('click', () => { limpiarForm(); mostrarForm(); });
     btnCancelarForm.addEventListener('click', ocultarForm);
     btnGuardarForm.addEventListener('click', guardarProyecto);
+    tecBtnAgregar.addEventListener('click', agregarTecnologia);
+    tecInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') agregarTecnologia(); });
+    
+    // Sugerencias
+    document.querySelectorAll('.tec-suggestion-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            tecInput.value = chip.dataset.tec;
+            agregarTecnologia();
+        });
+    });
 
     // Iniciar
     cargar();
