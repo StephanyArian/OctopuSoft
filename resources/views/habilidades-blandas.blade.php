@@ -1,4 +1,4 @@
-{{-- resources/views/habilidades-tecnicas.blade.php --}}
+{{-- resources/views/habilidades-blandas.blade.php --}}
 <x-app-layout>
     <x-slot name="header">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -33,19 +33,19 @@
                         <a href="{{ route('profile.create') }}"  class="sidebar-item">Personal</a>
                         <div class="sidebar-item">Experiencia laboral</div>
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
-                        <a href="{{ route('skills.tecnicas') }}"  class="sidebar-item active">Habilidades técnicas</a>
-                        <a href="{{ route('skills.blandas') }}"  class="sidebar-item">Habilidades blandas</a>
+                        <a href="{{ route('skills.tecnicas') }}"  class="sidebar-item">Habilidades técnicas</a>
+                        <a href="{{ route('skills.blandas') }}"  class="sidebar-item active">Habilidades blandas</a>
                         <div class="sidebar-item">Proyectos</div>
                         <div class="sidebar-item">Redes profesionales y contacto</div>
                     </div>
 
                     {{-- Contenido --}}
                     <div class="main">
-                        <div class="page-title">Habilidades técnicas</div>
+                        <div class="page-title">Habilidades blandas</div>
 
                         <div class="section-card">
                             <div class="section-subtitle">
-                                Registra tus tecnologías, herramientas y lenguajes con su nivel de dominio.
+                                Agrega tus habilidades interpersonales y de comunicación para enriquecer tu perfil.
                             </div>
 
                             {{-- Alertas --}}
@@ -89,7 +89,7 @@
                             @if(!$atLimit || $editSkill)
                                 @if(!$showForm)
                                     <button class="btn-agregar" onclick="toggleForm(true)">
-                                        + Agregar habilidad técnica
+                                        + Agregar habilidad blanda
                                     </button>
                                 @endif
 
@@ -103,41 +103,24 @@
                                                 @csrf
                                                 <input type="hidden" name="_action" value="store">
                                         @endif
-                                            <input type="hidden" name="type" value="technical">
+                                            <input type="hidden" name="type" value="soft">
 
-                                            <div class="form-row">
-                                                <div class="form-group">
-                                                    <label class="form-label">
-                                                        Nombre de la habilidad <span class="required">*</span>
-                                                    </label>
-                                                    <input type="text" name="name" class="form-input"
-                                                        placeholder="Ej. Python, Figma, React..."
-                                                        value="{{ old('name', $editSkill?->name) }}"
-                                                        autocomplete="off">
-                                                    @error('name')
-                                                        <span class="error-message">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label class="form-label">
-                                                        Nivel de dominio <span class="required">*</span>
-                                                    </label>
-                                                    <select name="level" class="form-input">
-                                                        <option value="">Seleccionar nivel</option>
-                                                        <option value="1" {{ old('level', $editSkill?->level) == 1 ? 'selected' : '' }}>Básico</option>
-                                                        <option value="2" {{ old('level', $editSkill?->level) == 2 ? 'selected' : '' }}>Intermedio</option>
-                                                        <option value="3" {{ old('level', $editSkill?->level) == 3 ? 'selected' : '' }}>Avanzado</option>
-                                                    </select>
-                                                    @error('level')
-                                                        <span class="error-message">{{ $message }}</span>
-                                                    @enderror
-                                                </div>
+                                            <div class="form-group">
+                                                <label class="form-label">
+                                                    Nombre de la habilidad <span class="required">*</span>
+                                                </label>
+                                                <input type="text" name="name" class="form-input"
+                                                    placeholder="Ej. Trabajo en equipo, Liderazgo..."
+                                                    value="{{ old('name', $editSkill?->name) }}"
+                                                    autocomplete="off">
+                                                @error('name')
+                                                    <span class="error-message">{{ $message }}</span>
+                                                @enderror
                                             </div>
 
                                             <div class="btn-row">
                                                 <button type="submit" class="btn primary">
-                                                    {{ $editSkill ? 'Guardar cambios' : 'Guardar habilidad' }}
+                                                    {{ $editSkill ? 'Guardar cambios' : 'Guardar' }}
                                                 </button>
                                                 <button type="button" class="btn" onclick="toggleForm(false)">
                                                     Cancelar
@@ -149,68 +132,41 @@
                             @else
                                 <div class="alert-skill warning">
                                     <div class="alert-skill-icon">!</div>
-                                    <span>Has alcanzado el límite máximo de 20 habilidades técnicas.</span>
+                                    <span>Has alcanzado el límite máximo de 20 habilidades blandas.</span>
                                 </div>
                             @endif
 
-                            {{-- Contador + historial --}}
-                            <div style="margin-top:28px;">
-                                @if($total > 0)
-                                    <div class="skills-counter">
-                                        <div class="historial-divider" style="flex:1;margin:0;">
-                                            <span>Historial</span>
+                            {{-- Pills / lista --}}
+                            @if($total > 0)
+                                <div class="soft-pills-wrap" style="margin-top:28px;">
+                                    @foreach($skills as $skill)
+                                        <div class="soft-pill">
+                                            <span>{{ $skill->name }}</span>
+                                            <div class="soft-pill-actions">
+                                                <a href="{{ route('skills.blandas') }}?edit={{ $skill->id }}"
+                                                   class="soft-pill-btn" title="Editar">
+                                                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                                                        <path d="M9.5 1.5l2 2-7 7H2.5v-2l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                                                    </svg>
+                                                </a>
+                                                <button class="soft-pill-btn danger"
+                                                    onclick="openDeleteModal('{{ $skill->id }}', '{{ addslashes($skill->name) }}')"
+                                                    title="Eliminar">×</button>
+                                            </div>
                                         </div>
-                                        <span class="skills-counter-badge {{ $atLimit ? 'full' : 'ok' }}" style="margin-left:14px;">
-                                            {{ $total }} / 20
-                                        </span>
-                                    </div>
-                                @else
-                                    <div class="historial-divider"><span>Historial</span></div>
-                                @endif
-                            </div>
-
-                            {{-- Lista --}}
-                            @forelse($skills as $index => $skill)
-                                <div class="skill-card">
-                                    <span class="skill-card-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
-
-                                    <div class="skill-card-info">
-                                        <div class="skill-card-name">{{ $skill->name }}</div>
-                                        <div class="skill-progress">
-                                            <div class="skill-progress-fill {{ $skill->levelBadgeClass() }}"></div>
-                                        </div>
-                                    </div>
-
-                                    <span class="badge-nivel badge-{{ $skill->levelBadgeClass() }}">
-                                        {{ $skill->levelLabel() }}
-                                    </span>
-
-                                    <div class="skill-actions">
-                                        <a href="{{ route('skills.tecnicas') }}?edit={{ $skill->id }}" class="btn-sm">
-                                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                                                <path d="M9.5 1.5l2 2-7 7H2.5v-2l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                                            </svg>
-                                            Editar
-                                        </a>
-                                        <button class="btn-sm danger" onclick="openDeleteModal('{{ $skill->id }}', '{{ addslashes($skill->name) }}')">
-                                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                                                <path d="M2 3.5h9M5 3.5V2.5h3v1M4.5 3.5l.5 7M8.5 3.5l-.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                                            </svg>
-                                            Eliminar
-                                        </button>
-                                    </div>
+                                    @endforeach
                                 </div>
-                            @empty
-                                <div class="skills-empty">
+                            @else
+                                <div class="skills-empty" style="margin-top:28px;">
                                     <div class="skills-empty-icon">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                             <circle cx="10" cy="10" r="8" stroke="#c8cdd8" stroke-width="1.5"/>
                                             <path d="M10 7v4M10 13v.5" stroke="#c8cdd8" stroke-width="1.5" stroke-linecap="round"/>
                                         </svg>
                                     </div>
-                                    Aún no has agregado habilidades técnicas.
+                                    Aún no has agregado habilidades blandas.
                                 </div>
-                            @endforelse
+                            @endif
 
                         </div>{{-- /section-card --}}
                     </div>{{-- /main --}}

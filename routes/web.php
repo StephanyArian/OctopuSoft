@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\InformacionAcademicaController;
+use App\Http\Controllers\SkillController;
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -37,15 +39,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.update');
 
-
 Route::middleware('auth')->group(function () {
-    // ========== RUTAS PARA CREAR PERFIL (HU-05) ==========
-    Route::get('/profile/create', function () {
-        return redirect()->route('dashboard');
-    })->name('profile.create');
-    Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
-    // ====================================================
-    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -61,10 +55,29 @@ Route::middleware('auth')->group(function () {
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     })->name('cerrar.sesion');
 
+    // Informacion academica — ruta que dashboard.blade.php ya referenciaba
+    // --- Informacion academica ---
+    // Esta es para ver la página
     Route::get('/informacion-academica', [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
+    
+    // Esta es la que te falta (la que causa el error "Route not defined")
     Route::post('/informacion-academica', [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
+
+    // Estas son para editar y borrar (vía AJAX o formularios)
     Route::put('/informacion-academica/{id}', [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
     Route::delete('/informacion-academica/{id}', [InformacionAcademicaController::class, 'destroy'])->name('informacion.academica.destroy');
+    
+
+     // ── Perfil personal (dashboard) ──────────────────────────
+    Route::get('/perfil', [ProfileController::class, 'create'])->name('profile.create'); 
+    Route::post('/perfil', [ProfileController::class, 'store'])->name('profile.store');    
+
+    Route::get('/habilidades-tecnicas', [SkillController::class, 'tecnicas'])->name('skills.tecnicas');
+    Route::get('/habilidades-blandas',  [SkillController::class, 'blandas'])->name('skills.blandas');
+    Route::post('/skills',              [SkillController::class, 'store'])->name('skills.store');
+    Route::put('/skills/{skill}',       [SkillController::class, 'update'])->name('skills.update');
+    Route::delete('/skills/{skill}',    [SkillController::class, 'destroy'])->name('skills.destroy');
+
 });
 
 require __DIR__.'/auth.php';

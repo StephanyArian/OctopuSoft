@@ -1,0 +1,314 @@
+
+/*  Botón agregar  */
+.btn-agregar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-dim));
+    color: var(--white);
+    border: none;
+    border-radius: 40px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 12px rgba(10, 191, 158, 0.3);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-agregar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10, 191, 158, 0.4);
+    background: linear-gradient(135deg, var(--teal-light), var(--teal));
+    color: var(--white);
+}
+
+/* Formulario inline  */
+.skill-form-box {
+    border: 1.5px solid var(--gray-100);
+    border-radius: 16px;
+    padding: 22px 24px;
+    background: var(--off);
+    margin-bottom: 24px;
+    transition: border-color 0.3s;
+}
+
+.skill-form-box.has-error {
+    border-color: #e74c3c;
+    background: #fff8f8;
+}
+
+/*  Alertas  */
+.alert-skill {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.alert-skill.error {
+    background: #fdf0ef;
+    border: 1px solid rgba(231, 76, 60, 0.25);
+    color: #c0392b;
+}
+
+.alert-skill.warning {
+    background: #fef9ec;
+    border: 1px solid rgba(230, 168, 42, 0.3);
+    color: #7d5a0a;
+}
+
+.alert-skill.success {
+    background: rgba(10, 191, 158, 0.08);
+    border: 1px solid rgba(10, 191, 158, 0.3);
+    color: var(--teal-dim);
+}
+
+.alert-skill-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.alert-skill.error   .alert-skill-icon { background: #e74c3c; color: white; }
+.alert-skill.warning .alert-skill-icon { background: #e6a82a; color: white; }
+.alert-skill.success .alert-skill-icon { background: var(--teal); color: white; }
+
+/*  Estado vacío  */
+.skills-empty {
+    border: 1.5px dashed var(--gray-300);
+    border-radius: 14px;
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 14px;
+    background: var(--off);
+    font-weight: 500;
+}
+
+.skills-empty-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+}
+
+/* Contador / límite  */
+.skills-counter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.skills-counter-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+}
+
+.skills-counter-badge.ok   { background: rgba(10,191,158,0.1); color: var(--teal-dim); }
+.skills-counter-badge.full { background: rgba(230,168,42,0.12); color: #7d5a0a; }
+
+/*  Tarjeta de habilidad */
+.skill-card {
+    border: 1px solid var(--gray-100);
+    border-radius: 14px;
+    padding: 16px 20px;
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+.skill-card:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+    border-color: var(--gray-300);
+}
+
+.skill-card-index {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    border-radius: 6px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+}
+
+.skill-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.skill-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--burg-deep);
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Barra de progreso (solo técnicas) */
+.skill-progress {
+    height: 5px;
+    border-radius: 99px;
+    background: var(--gray-100);
+    overflow: hidden;
+    width: 100%;
+}
+
+.skill-progress-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+
+.skill-progress-fill.basico     { width: 33%; background: #3498db; }
+.skill-progress-fill.intermedio { width: 66%; background: #e6a82a; }
+.skill-progress-fill.avanzado   { width: 100%; background: var(--teal); }
+
+/* Badges de nivel */
+.badge-nivel {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.badge-basico     { background: #ebf5fb; color: #1a5276; }
+.badge-intermedio { background: #fef9ec; color: #7d5a0a; }
+.badge-avanzado   { background: rgba(10,191,158,0.1); color: var(--teal-dim); }
+
+/* Pills (habilidades blandas) */
+.soft-pills-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.soft-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(10,191,158,0.08);
+    border: 1px solid rgba(10,191,158,0.25);
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-dim);
+}
+
+.soft-pill-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.soft-pill-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 2px;
+    color: var(--gray-500);
+    font-size: 13px;
+    line-height: 1;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.soft-pill-btn:hover       { color: var(--teal-dim); }
+.soft-pill-btn.danger:hover { color: #e74c3c; }
+
+/*  Acciones de la tarjeta  */
+.skill-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* Modal de confirmación de eliminación */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-backdrop.active {
+    display: flex;
+}
+
+.modal-box {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.modal-box h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--burg-deep);
+    margin-bottom: 10px;
+}
+
+.modal-box p {
+    font-size: 14px;
+    color: var(--gray-500);
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.modal-box .btn-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 40px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    transition: all 0.3s;
+}
+
+.modal-box .btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+}

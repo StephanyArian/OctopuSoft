@@ -32,13 +32,13 @@
                 </div>
                 <div class="body-row">
                     <div class="sidebar">
-                        <a href="{{ route('profile.create') }}" class="sidebar-item">Personal</a>
-                        <div class="sidebar-item">Experiencia laboral</div>
-                        <a href="{{ route('informacion.academica') }}" class="sidebar-item active">Información académica</a>
-                        <div class="sidebar-item">Habilidades técnicas</div>
-                        <div class="sidebar-item">Habilidades blandas</div>
-                        <div class="sidebar-item">Proyectos</div>
-                        <div class="sidebar-item">Redes profesionales y contacto</div>
+                         <a href="{{ route('profile.create') }}" class="sidebar-item">Personal</a>
+                         <div class="sidebar-item">Experiencia laboral</div>
+                         <a href="{{ route('informacion.academica') }}" class="sidebar-item active">Información académica</a>
+                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
+                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
+                         <div class="sidebar-item">Proyectos</div>
+                         <div class="sidebar-item">Redes profesionales y contacto</div>
                     </div>
  
                     <div class="main">
