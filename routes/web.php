@@ -7,6 +7,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\InformacionAcademicaController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\RedContactoController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -73,6 +75,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/skills',              [SkillController::class, 'store'])->name('skills.store');
     Route::put('/skills/{skill}',       [SkillController::class, 'update'])->name('skills.update');
     Route::delete('/skills/{skill}',    [SkillController::class, 'destroy'])->name('skills.destroy');
+
+    //Redes y Contacto
+    Route::get('/redes-contacto', [RedContactoController::class, 'index'])->name('redes.index');
+    Route::post('/redes-contacto', [RedContactoController::class, 'store'])->name('redes.store');
 
 });
 
