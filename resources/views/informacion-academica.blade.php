@@ -33,7 +33,7 @@
                 <div class="body-row">
                     <div class="sidebar">
                         <a href="{{ route('profile.create') }}" class="sidebar-item">Personal</a>
-                        <div class="sidebar-item">Experiencia laboral</div>
+                        <a href="{{ route('experiencia.laboral') }}" class="sidebar-item">Experiencia laboral</a>
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item active">Información académica</a>
                         <div class="sidebar-item">Habilidades técnicas</div>
                         <div class="sidebar-item">Habilidades blandas</div>

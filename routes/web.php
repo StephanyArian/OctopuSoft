@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\SessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\InformacionAcademicaController;
+use App\Http\Controllers\ExperienciaLaboralController;
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -65,6 +67,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/informacion-academica', [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
     Route::put('/informacion-academica/{id}', [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
     Route::delete('/informacion-academica/{id}', [InformacionAcademicaController::class, 'destroy'])->name('informacion.academica.destroy');
+
+     // ========== EXPERIENCIA LABORAL (HU-08) ==========
+    Route::get('/experiencia-laboral',          [ExperienciaLaboralController::class, 'index'])->name('experiencia.laboral');
+    Route::post('/experiencia-laboral',         [ExperienciaLaboralController::class, 'store'])->name('experiencia.laboral.store');
+    Route::put('/experiencia-laboral/{id}',     [ExperienciaLaboralController::class, 'update'])->name('experiencia.laboral.update');
+    Route::delete('/experiencia-laboral/{id}',  [ExperienciaLaboralController::class, 'destroy'])->name('experiencia.laboral.destroy');
 });
 
 require __DIR__.'/auth.php';
