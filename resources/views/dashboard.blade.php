@@ -37,10 +37,10 @@
                         <div class="sidebar-item active">Personal</div>
                         <a href="{{ route('experiencia.laboral') }}" class="sidebar-item">Experiencia laboral</a>
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
-                        <div class="sidebar-item">Habilidades técnicas</div>
-                        <div class="sidebar-item">Habilidades blandas</div>
+                        <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
+                        <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
                         <div class="sidebar-item">Proyectos</div>
-                        <div class="sidebar-item">Redes profesionales y contacto</div>
+                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
                     <div class="main">
                         <div class="page-title">Perfil Personal</div>

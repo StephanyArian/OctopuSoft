@@ -33,5 +33,10 @@ class User extends Authenticatable
     {
     return $this->password ?? '';
     }
+
+    public function skills()
+    {
+    return $this->hasMany(\App\Models\Skill::class);
+    }
     
 }

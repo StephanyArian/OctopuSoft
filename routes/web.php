@@ -7,6 +7,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\InformacionAcademicaController;
 use App\Http\Controllers\ExperienciaLaboralController;
+use App\Http\Controllers\SkillController;
+use App\Http\Controllers\RedContactoController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -39,15 +42,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')
     ->name('password.update');
 
-
 Route::middleware('auth')->group(function () {
-    // ========== RUTAS PARA CREAR PERFIL (HU-05) ==========
-    Route::get('/profile/create', function () {
-        return redirect()->route('dashboard');
-    })->name('profile.create');
-    Route::post('/profile/store', [ProfileController::class, 'store'])->name('profile.store');
-    // ====================================================
-    
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -63,6 +58,8 @@ Route::middleware('auth')->group(function () {
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     })->name('cerrar.sesion');
 
+    // Informacion academica -
+    
     Route::get('/informacion-academica', [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
     Route::post('/informacion-academica', [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
     Route::put('/informacion-academica/{id}', [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
@@ -73,6 +70,23 @@ Route::middleware('auth')->group(function () {
     Route::post('/experiencia-laboral',         [ExperienciaLaboralController::class, 'store'])->name('experiencia.laboral.store');
     Route::put('/experiencia-laboral/{id}',     [ExperienciaLaboralController::class, 'update'])->name('experiencia.laboral.update');
     Route::delete('/experiencia-laboral/{id}',  [ExperienciaLaboralController::class, 'destroy'])->name('experiencia.laboral.destroy');
+    
+
+     //  Perfil personal (dashboard) 
+    Route::get('/perfil', [ProfileController::class, 'create'])->name('profile.create'); 
+    Route::post('/perfil', [ProfileController::class, 'store'])->name('profile.store');    
+
+    // Skill tecnicas y blandas
+    Route::get('/habilidades-tecnicas', [SkillController::class, 'tecnicas'])->name('skills.tecnicas');
+    Route::get('/habilidades-blandas',  [SkillController::class, 'blandas'])->name('skills.blandas');
+    Route::post('/skills',              [SkillController::class, 'store'])->name('skills.store');
+    Route::put('/skills/{skill}',       [SkillController::class, 'update'])->name('skills.update');
+    Route::delete('/skills/{skill}',    [SkillController::class, 'destroy'])->name('skills.destroy');
+
+    //Redes y Contacto
+    Route::get('/redes-contacto', [RedContactoController::class, 'index'])->name('redes.index');
+    Route::post('/redes-contacto', [RedContactoController::class, 'store'])->name('redes.store');
+
 });
 
 require __DIR__.'/auth.php';
