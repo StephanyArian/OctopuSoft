@@ -29,11 +29,11 @@ class ProfileController extends Controller
     public function store(Request $request): RedirectResponse
     {
     $request->validate([
-        'name' => 'required|string|max:255',
-        'title' => 'nullable|string|max:255',
-        'location' => 'nullable|string|max:255',
-        'bio' => 'nullable|string|max:500',
-        'photo' => 'nullable|image|mimes:jpeg,png|max:2048',
+        'first_name' => 'required|string|max:255',
+        'profession_id' => 'nullable|string|max:255',
+        'country' => 'nullable|string|max:255',
+        'biography' => 'nullable|string|max:500',
+        'photo_url' => 'nullable|image|mimes:jpeg,png|max:2048',
     ]);
 
     $user = $request->user();
