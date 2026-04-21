@@ -38,7 +38,7 @@
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
                         <div class="sidebar-item">Proyectos</div>
-                        <div class="sidebar-item">Redes profesionales y contacto</div>
+                        <a href="{{ route('redes.index') }}" class="sidebar-item active">Redes profesionales y contacto  </a>
                     </div>
  
                     <div class="main">
