@@ -90,6 +90,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/redes-contacto', [RedContactoController::class, 'index'])->name('redes.index');
     Route::post('/redes-contacto', [RedContactoController::class, 'store'])->name('redes.store');
 
+    // ========== RUTA PARA PROYECTOS (HU-10) ==========
+    Route::get('/proyectos-content', function () {
+        return view('secciones.proyectos');
+    })->name('proyectos.content');
+    // =================================================
 });
 
 require __DIR__.'/auth.php';
