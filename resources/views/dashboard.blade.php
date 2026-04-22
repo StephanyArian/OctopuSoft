@@ -484,13 +484,13 @@
                 </div>
                 <div class="body-row">
                     <div class="sidebar">
-                        <div class="sidebar-item active" id="personalLink" style="cursor: pointer;">Personal</div>
-                        <div class="sidebar-item" id="experienciaLink" style="cursor: pointer;">Experiencia laboral</div>
-                        <div class="sidebar-item" id="academicaLink" style="cursor: pointer;">Información académica</div>
-                        <div class="sidebar-item" id="habilidadesTecnicasLink" style="cursor: pointer;">Habilidades técnicas</div>
-                        <div class="sidebar-item" id="habilidadesBlandasLink" style="cursor: pointer;">Habilidades blandas</div>
+                        <a href="{{ route('profile.create') }}" class="sidebar-item active" id="personalLink" style="cursor: pointer; text-decoration: none;">Personal</a>
+                        <a href="{{ route('experiencia.laboral') }}" class="sidebar-item" id="experienciaLink" style="cursor: pointer; text-decoration: none;">Experiencia laboral</a>
+                        <a href="{{ route('informacion.academica') }}" class="sidebar-item" id="academicaLink" style="cursor: pointer; text-decoration: none;">Información académica</a>
+                        <a href="{{ route('skills.tecnicas') }}" class="sidebar-item" id="habilidadesTecnicasLink" style="cursor: pointer; text-decoration: none;">Habilidades técnicas</a>
+                        <a href="{{ route('skills.blandas') }}" class="sidebar-item" id="habilidadesBlandasLink" style="cursor: pointer; text-decoration: none;">Habilidades blandas</a>
                         <div class="sidebar-item" id="proyectosLink" style="cursor: pointer;">📁 Proyectos</div>
-                        <div class="sidebar-item" id="redesLink" style="cursor: pointer;">Redes profesionales y contacto</div>
+                        <a href="{{ route('redes.index') }}" class="sidebar-item" id="redesLink" style="cursor: pointer; text-decoration: none;">Redes profesionales y contacto</a>
                     </div>
                     <div class="main" id="mainContent">
                         <!-- Contenido dinámico se cargará aquí -->
