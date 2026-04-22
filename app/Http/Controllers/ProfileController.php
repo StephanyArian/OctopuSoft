@@ -28,20 +28,53 @@ class ProfileController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-    $request->validate([
-        'first_name' => 'required|string|max:255',
-        'profession_id' => 'nullable|string|max:255',
-        'country' => 'nullable|string|max:255',
-        'biography' => 'nullable|string|max:500',
-        'photo_url' => 'nullable|image|mimes:jpeg,png|max:2048',
-    ]);
+        // Validar los datos del formulario
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+            'bio' => 'nullable|string|max:500',
+            'photo' => 'nullable|image|mimes:jpeg,png|max:2048'
+        ]);
 
-    $user = $request->user();
-    $user->name = $request->name;
-    $user->save();
+        $user = $request->user();
+        
+        // Separar nombre completo en first_name y last_name
+        $fullName = explode(' ', $request->name, 2);
+        $user->first_name = $fullName[0];
+        $user->last_name = $fullName[1] ?? '';
+        
+        // Guardar la biografía
+        $user->biography = $request->bio;
+        
+        // Separar ubicación en ciudad y país
+        if ($request->location) {
+            $location = explode(',', $request->location, 2);
+            $user->city = trim($location[0]);
+            $user->country = trim($location[1] ?? '');
+        }
+        
+        // Guardar el título profesional (profesión)
+        if ($request->title) {
+            // Buscar o crear la profesión
+            $profession = \App\Models\Profession::firstOrCreate(
+                ['name' => $request->title]
+            );
+            $user->profession_id = $profession->id;
+        }
+        
+        // ✅ MODIFICADO: Guardar la foto como BASE64 en la base de datos
+        if ($request->hasFile('photo')) {
+            $image = $request->file('photo');
+            $imageData = base64_encode(file_get_contents($image));
+            $mimeType = $image->getMimeType();
+            $user->photo_base64 = 'data:' . $mimeType . ';base64,' . $imageData;
+        }
+        
+        $user->save();
 
-    return redirect()->route('dashboard')->with('success', 'Perfil guardado exitosamente.');
-    }   
+        return redirect()->route('dashboard')->with('success', 'Perfil guardado exitosamente.');
+    }
 
     /**
      * Update the user's profile information.
@@ -78,5 +111,17 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * ✅ NUEVO: Eliminar la foto de perfil
+     */
+    public function deletePhoto(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $user->photo_base64 = null;
+        $user->save();
+        
+        return redirect()->route('dashboard')->with('success', 'Foto eliminada exitosamente');
     }
 }

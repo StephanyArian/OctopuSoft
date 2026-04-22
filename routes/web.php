@@ -47,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // ✅ NUEVA RUTA PARA ELIMINAR FOTO (SOLO ESTO SE AGREGÓ)
+    Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
+
     Route::post('/logout-others', [SessionController::class, 'logoutOtherDevices'])
         ->name('logout.others');
 

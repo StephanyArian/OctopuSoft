@@ -17,6 +17,14 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'biography',
+        'photo_url',
+        'photo_base64',
+        'phone',
+        'country',
+        'city',
+        'website',
+        'profession_id',
     ];
 
     protected $hidden = [
@@ -31,12 +39,17 @@ class User extends Authenticatable
 
     public function getAuthPassword(): string
     {
-    return $this->password ?? '';
+        return $this->password ?? '';
     }
 
     public function skills()
     {
-    return $this->hasMany(\App\Models\Skill::class);
+        return $this->hasMany(\App\Models\Skill::class);
     }
-    
+
+    // Relación con profesión
+    public function profession()
+    {
+        return $this->belongsTo(Profession::class);
+    }
 }
