@@ -94,7 +94,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/proyectos-content', function () {
         return view('secciones.proyectos');
     })->name('proyectos.content');
+
+
+    Route::get('/proyectos',         [App\Http\Controllers\ProyectoController::class, 'index']);
+    Route::post('/proyectos',        [App\Http\Controllers\ProyectoController::class, 'store']);
+    Route::put('/proyectos/{id}',    [App\Http\Controllers\ProyectoController::class, 'update']);
+    Route::delete('/proyectos/{id}', [App\Http\Controllers\ProyectoController::class, 'destroy']);
+
+
+    Route::get('/proyectos/{id}/evidencias', [App\Http\Controllers\EvidenciaController::class, 'index']);
+    Route::post('/proyectos/{id}/evidencias', [App\Http\Controllers\EvidenciaController::class, 'store']);
+    Route::delete('/evidencias/{id}', [App\Http\Controllers\EvidenciaController::class, 'destroy']);
     // =================================================
 });
+
 
 require __DIR__.'/auth.php';

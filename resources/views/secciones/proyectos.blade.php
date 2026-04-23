@@ -1,6 +1,7 @@
 {{-- resources/views/secciones/proyectos.blade.php --}}
 {{-- HU-10: Gestionar mis proyectos + HU-22: Agregar tecnologías --}}
 
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
@@ -419,6 +420,98 @@
     }
 
     /* ══════════════════════════════════════
+       BOTÓN EVIDENCIAS (debajo del stack)
+    ══════════════════════════════════════ */
+    .ev-trigger-wrap {
+        margin-top: 14px;
+    }
+ 
+    .ev-trigger-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-radius: 16px;
+        border: 1.5px dashed rgba(10,191,158,.4);
+        background: rgba(10,191,158,.04);
+        cursor: pointer;
+        transition: all .2s;
+        font-family: inherit;
+        gap: 12px;
+    }
+ 
+    .ev-trigger-btn:hover {
+        border-color: var(--teal);
+        background: rgba(10,191,158,.09);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(10,191,158,.12);
+    }
+ 
+    .ev-trigger-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+ 
+    .ev-trigger-icon-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(10,191,158,.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+ 
+    .ev-trigger-texts strong {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--burg-deep);
+        display: block;
+        margin-bottom: 2px;
+    }
+ 
+    .ev-trigger-texts span {
+        font-size: 12px;
+        color: #94a3b8;
+    }
+ 
+    .ev-trigger-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+ 
+    .ev-trigger-count {
+        background: var(--teal);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        display: none;
+    }
+ 
+    .ev-trigger-count.visible { display: inline-flex; }
+ 
+    .ev-trigger-arrow {
+        color: #94a3b8;
+        font-size: 13px;
+        transition: transform .2s;
+    }
+ 
+    .ev-trigger-btn:hover .ev-trigger-arrow {
+        color: var(--teal);
+        transform: translateX(3px);
+    }
+
+
+
+    /* ══════════════════════════════════════
        TARJETAS DE PROYECTOS
     ══════════════════════════════════════ */
     .proy-grid {
@@ -672,7 +765,7 @@
 </style>
 
 {{-- HEADER --}}
-<div class="proy-header">
+<div class="proy-header" id="proyHeader">
     <div class="proy-title-wrap">
         <h2>Mis Proyectos</h2>
         <p>Gestiona y organiza todos tus proyectos profesionales</p>
@@ -774,6 +867,23 @@
             <span>Máximo 15 tecnologías • Sin duplicados • Haz clic en ✕ para eliminar</span>
         </div>
     </div>
+
+    {{-- ══ BOTÓN EVIDENCIAS (debajo del stack tecnológico) ══ --}}
+    <div class="ev-trigger-wrap">
+        <button type="button" class="ev-trigger-btn" id="proyBtnEvidencias">
+            <div class="ev-trigger-left">
+                <div class="ev-trigger-icon-box">📎</div>
+                <div class="ev-trigger-texts">
+                    <strong>Agregar Evidencias</strong>
+                    <span>Imágenes, enlaces y repositorios del proyecto</span>
+                </div>
+            </div>
+            <div class="ev-trigger-right">
+                <span class="ev-trigger-count" id="evTriggerCount">0</span>
+                <i class="fas fa-chevron-right ev-trigger-arrow"></i>
+            </div>
+        </button>
+    </div>
     
     <div class="proy-form-actions">
         <button class="proy-btn-cancel" id="proyBtnCancelarForm">Cancelar</button>
@@ -784,28 +894,39 @@
 {{-- GRID DE PROYECTOS --}}
 <div class="proy-grid" id="proyGrid"></div>
 
+
+{{-- ══ SECCIÓN EVIDENCIAS (oculta por defecto) ════════ --}}
+<div id="evSectionWrapper" style="display:none">
+    @include('secciones.evidencia')
+</div>
+
 <script>
 (function() {
     const STORAGE_KEY = 'portafolio_proyectos';
-    let proyectos = [];
-    let editandoId = null;
+    let proyectos          = [];
+    let editandoId         = null;
     let tecnologiasActuales = [];
-
-    // Elementos DOM
-    const formCard = document.getElementById('proyFormCard');
-    const formTitle = document.getElementById('proyFormTitle');
-    const btnMostrarForm = document.getElementById('proyBtnMostrarForm');
+ 
+    // ── DOM refs ─────────────────────────────────────────────
+    const proyHeader      = document.getElementById('proyHeader');
+    const formCard        = document.getElementById('proyFormCard');
+    const formTitle       = document.getElementById('proyFormTitle');
+    const btnMostrarForm  = document.getElementById('proyBtnMostrarForm');
     const btnCancelarForm = document.getElementById('proyBtnCancelarForm');
-    const btnGuardarForm = document.getElementById('proyBtnGuardarForm');
-    const inputNombre = document.getElementById('proyNombre');
-    const inputDesc = document.getElementById('proyDesc');
-    const inputFecha = document.getElementById('proyFecha');
-    const selectEstado = document.getElementById('proyEstado');
-    const grid = document.getElementById('proyGrid');
-    const tecBadgesContainer = document.getElementById('tecBadgesContainer');
-    const tecInput = document.getElementById('tecInput');
-    const tecBtnAgregar = document.getElementById('tecBtnAgregar');
-    const tecCountBadge = document.getElementById('tecCountBadge');
+    const btnGuardarForm  = document.getElementById('proyBtnGuardarForm');
+    const inputNombre     = document.getElementById('proyNombre');
+    const inputDesc       = document.getElementById('proyDesc');
+    const inputFecha      = document.getElementById('proyFecha');
+    const selectEstado    = document.getElementById('proyEstado');
+    const grid            = document.getElementById('proyGrid');
+    const tecBadgesCont   = document.getElementById('tecBadgesContainer');
+    const tecInput        = document.getElementById('tecInput');
+    const tecBtnAgregar   = document.getElementById('tecBtnAgregar');
+    const tecCountBadge   = document.getElementById('tecCountBadge');
+    const evWrapper       = document.getElementById('evSectionWrapper');
+    const btnEvidencias   = document.getElementById('proyBtnEvidencias');
+    const evTriggerCount  = document.getElementById('evTriggerCount');
+ 
 
     // ==================== TECNOLOGÍAS CON LOGOS PROFESIONALES ====================
     function getTecnologiaLogo(tecnologia) {
@@ -969,6 +1090,13 @@
         inputNombre.focus();
     }
 
+    // ── Badge de evidencias en el botón ──────────────────────
+    function actualizarBadgeEvidencias(proyecto) {
+        const cant = proyecto ? (proyecto.evidencias || []).length : 0;
+        evTriggerCount.textContent = cant;
+        evTriggerCount.classList.toggle('visible', cant > 0);
+    }
+
     function renderizar() {
         if (!grid) return;
         
@@ -1042,6 +1170,7 @@
     function editarProyecto(id) {
         const proyecto = proyectos.find(p => p.id === id);
         if (!proyecto) return;
+        window._proyectoParaEvidencias = proyecto;
         editandoId = id;
         inputNombre.value = proyecto.nombre;
         inputDesc.value = proyecto.descripcion;
@@ -1094,9 +1223,12 @@
         if (editandoId) {
             const index = proyectos.findIndex(p => p.id === editandoId);
             proyectos[index] = { ...proyectos[index], nombre, descripcion, fecha, estado, tecnologias };
+            window._proyectoParaEvidencias = proyectos[index];
             mostrarToast('Proyecto actualizado', 'success');
         } else {
+            const nuevo = { id: Date.now(), nombre, descripcion, fecha, estado, tecnologias };
             proyectos.push({ id: Date.now(), nombre, descripcion, fecha, estado, tecnologias });
+            window._proyectoParaEvidencias = nuevo;
             mostrarToast('Proyecto creado', 'success');
         }
 
@@ -1104,6 +1236,44 @@
         ocultarForm();
         renderizar();
     }
+
+    // ══════════════════════════════════════
+    // NAVEGACIÓN ↔ EVIDENCIAS
+    // ══════════════════════════════════════
+    function abrirEvidencias(proyecto) {
+        window._proyectoParaEvidencias = proyecto;
+ 
+        // Ocultar vista proyectos
+        proyHeader.style.display  = 'none';
+        formCard.classList.remove('open');
+        grid.style.display        = 'none';
+ 
+        // Mostrar vista evidencias
+        evWrapper.style.display   = 'block';
+ 
+        // Inicializar evidencia.blade.php con el proyecto
+        if (typeof window.evInit === 'function') {
+            window.evInit(proyecto);
+        }
+    }
+ 
+    // Botón "Agregar Evidencias" dentro del formulario
+    btnEvidencias?.addEventListener('click', () => {
+        if (!window._proyectoParaEvidencias) {
+            mostrarToast('❌ Primero guarda el proyecto para agregar evidencias', 'error');
+            return;
+        }
+        abrirEvidencias(window._proyectoParaEvidencias);
+    });
+ 
+    // Volver desde evidencia.blade.php
+    document.addEventListener('ev:volver', () => {
+        evWrapper.style.display  = 'none';
+        proyHeader.style.display = '';
+        grid.style.display       = '';
+        renderizar(); // refresca contadores de evidencias en las cards
+    });
+ 
 
     function mostrarToast(mensaje, tipo) {
         const toast = document.createElement('div');

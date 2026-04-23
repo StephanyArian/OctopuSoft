@@ -260,6 +260,19 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('owner');
             $table->integer('expiration');
         });
+
+         Schema::create('project_evidencias', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
+            $table->enum('tipo', ['imagen', 'enlace', 'repositorio']);
+            $table->string('titulo', 150)->nullable();
+            $table->string('url', 500)->nullable();
+            $table->string('imagen_path', 500)->nullable();
+            $table->timestamps();
+        });
+
+
+
     }
 
     /**
@@ -268,6 +281,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
     public function down(): void
     {
         // Eliminar en orden inverso (respetando dependencias)
+        Schema::dropIfExists('project_evidencias');
         Schema::dropIfExists('project_technology');
         Schema::dropIfExists('project_skill');
         Schema::dropIfExists('projects');
