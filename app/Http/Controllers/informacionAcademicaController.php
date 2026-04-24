@@ -22,21 +22,21 @@ class InformacionAcademicaController extends Controller
     {
         
         $request->validate([
-            'institucion'     => 'required|string|max:60|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
-            'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
+            'titulo_obtenido' => 'nullable|string|max:30|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'fecha_inicio'    => 'required|date_format:Y-m|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m|after:fecha_inicio',
-            'descripcion'     => 'nullable|string|max:255',
+            'descripcion'     => 'nullable|string|max:255|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,}).+$/u',
             'estudio_actual'  => 'nullable',
             'especialidad'    => 'nullable|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
 
          ], [
             'institucion.required'     => 'La institución es obligatoria',
             'institucion.max'          => 'La institución no puede tener más de 60 caracteres',
-            'institucion.regex'        => 'La institución solo debe contener letras',
+            'institucion.regex'        => 'La institución no parece ser un nombre válido',
             'titulo_obtenido.required' => 'El título es obligatorio',
             'titulo_obtenido.max'      => 'El título no puede tener más de 30 caracteres',
-            'titulo_obtenido.regex'    => 'El título solo debe contener letras',
+            'titulo_obtenido.regex'    => 'El título no parece ser un nombre valido',
             'fecha_inicio.required'    => 'La fecha de inicio es obligatoria',
             'fecha_inicio.date_format' => 'La fecha de inicio debe tener formato Año-Mes (ej: 2024-01)',
             'fecha_inicio.before_or_equal' => 'La fecha de inicio no puede ser futura',
@@ -80,7 +80,7 @@ class InformacionAcademicaController extends Controller
     {
 
         $request->validate([
-            'institucion'     => 'required|string|max:60|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'fecha_inicio'    => 'required|date_format:Y-m|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m|after:fecha_inicio',
