@@ -1,16 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="font-semibold text-xl leading-tight" style="color: var(--burg-deep);">
-                {{ __('Formulario de Perfil Profesional') }}
-            </h2>
-            <!-- Botón cerrar sesión -->
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button type="submit" class="logout-btn" style="background: linear-gradient(90deg, var(--burg-deep), var(--teal)); color: white; padding: 8px 20px; border-radius: 40px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; border: none; cursor: pointer;">
-                    Cerrar sesión
-                </button>
-            </form>
+            
         </div>
     </x-slot>
 
@@ -477,7 +468,7 @@
             @endif
 
             <div class="shell">
-                <div class="header-bar">BIENVENIDO</div>
+                
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
                     <div class="nav-tab muted">VER PERFIL</div>
@@ -542,22 +533,25 @@
                                         <div style="flex:1;display:flex;flex-direction:column;gap:16px">
                                             <div class="form-group">
                                                 <label class="form-label">Nombre completo <span class="required">*</span></label>
-                                                <input class="form-input" type="text" id="name" name="name" placeholder="Ej. Juan Pérez García" value="{{ old('name', $user->first_name . ' ' . $user->last_name) }}">
+                                                <input class="form-input" type="text" id="name" name="name" placeholder="Ej. Juan Pérez García" value="{{ old('name', $user->first_name . ' ' . $user->last_name) }}" maxlength="30" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
                                                 <div id="nameError" class="error-message hidden">El nombre es obligatorio</div>
+                                                <span class="text-xs text-gray-400 mt-1">Máximo 30 caracteres - Solo letras</span>
                                             </div>
                                             <div class="form-group">
                                                 <label class="form-label">Título profesional</label>
-                                                <input class="form-input" type="text" id="title" name="title" placeholder="Ej. Desarrollador de Software" value="{{ old('title', $user->profession ? $user->profession->name : '') }}">
+                                                <input class="form-input" type="text" id="title" name="title" placeholder="Ej. Desarrollador de Software" value="{{ old('title', $user->profession ? $user->profession->name : '') }}" maxlength="30" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
+                                                <span class="text-xs text-gray-400 mt-1">Máximo 30 caracteres - Solo letras</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Ubicación</label>
-                                        <input class="form-input" type="text" id="location" name="location" placeholder="Ciudad, País" value="{{ old('location', $user->city . ($user->country ? ', ' . $user->country : '')) }}">
+                                        <input class="form-input" type="text" id="location" name="location" placeholder="Ciudad, País" value="{{ old('location', $user->city . ($user->country ? ', ' . $user->country : '')) }}" maxlength="30">
+                                        <span class="text-xs text-gray-400 mt-1">Máximo 30 caracteres</span>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Biografía profesional</label>
-                                        <textarea class="form-textarea" id="bio" name="bio" placeholder="Escribe una breve presentación sobre ti, tu experiencia y lo que te apasiona profesionalmente...">{{ old('bio', $user->biography) }}</textarea>
+                                        <textarea class="form-textarea" id="bio" name="bio" placeholder="Escribe una breve presentación sobre ti, tu experiencia y lo que te apasiona profesionalmente..." maxlength="500">{{ old('bio', $user->biography) }}</textarea>
                                         <div id="bioError" class="error-message hidden">La biografía no puede exceder los 500 caracteres</div>
                                         <span class="text-xs text-gray-400 mt-1">Máximo 500 caracteres</span>
                                     </div>
@@ -604,15 +598,83 @@
         document.getElementById('profileForm').addEventListener('submit', function(e) {
             let isValid = true;
             
+            // Validación de NOMBRE COMPLETO (solo letras, espacios y acentos)
             const name = document.getElementById('name').value.trim();
             const nameError = document.getElementById('nameError');
+            const nameRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
+            
             if (name === '') {
                 nameError.classList.remove('hidden');
+                nameError.textContent = 'El nombre es obligatorio';
                 isValid = false;
-            } else {
+            } 
+            else if (name.length > 30) {
+                nameError.classList.remove('hidden');
+                nameError.textContent = 'El nombre no puede exceder los 30 caracteres';
+                isValid = false;
+            }
+            else if (!nameRegex.test(name)) {
+                nameError.classList.remove('hidden');
+                nameError.textContent = 'El nombre solo puede contener letras y espacios';
+                isValid = false;
+            }
+            else {
                 nameError.classList.add('hidden');
             }
             
+            // Validación de TÍTULO PROFESIONAL (solo letras y espacios)
+            const title = document.getElementById('title').value.trim();
+            let titleError = document.getElementById('titleError');
+            if (!titleError) {
+                titleError = document.createElement('div');
+                titleError.id = 'titleError';
+                titleError.className = 'error-message hidden';
+                document.getElementById('title').parentNode.appendChild(titleError);
+            }
+            
+            const titleRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
+            
+            if (title.length > 30) {
+                titleError.classList.remove('hidden');
+                titleError.textContent = 'El título profesional no puede exceder los 30 caracteres';
+                isValid = false;
+            }
+            else if (title !== '' && !titleRegex.test(title)) {
+                titleError.classList.remove('hidden');
+                titleError.textContent = 'El título profesional solo puede contener letras y espacios';
+                isValid = false;
+            }
+            else {
+                titleError.classList.add('hidden');
+            }
+            
+            // Validación de UBICACIÓN (letras, números, espacios, comas y guiones)
+            const location = document.getElementById('location').value.trim();
+            let locationError = document.getElementById('locationError');
+            if (!locationError) {
+                locationError = document.createElement('div');
+                locationError.id = 'locationError';
+                locationError.className = 'error-message hidden';
+                document.getElementById('location').parentNode.appendChild(locationError);
+            }
+            
+            const locationRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s.,\-]+$/;
+            
+            if (location.length > 30) {
+                locationError.classList.remove('hidden');
+                locationError.textContent = 'La ubicación no puede exceder los 30 caracteres';
+                isValid = false;
+            }
+            else if (location !== '' && !locationRegex.test(location)) {
+                locationError.classList.remove('hidden');
+                locationError.textContent = 'La ubicación solo puede contener letras, números, espacios, puntos, comas y guiones';
+                isValid = false;
+            }
+            else {
+                locationError.classList.add('hidden');
+            }
+            
+            // Validación de BIOGRAFÍA
             const bio = document.getElementById('bio').value;
             const bioError = document.getElementById('bioError');
             if (bio.length > 500) {
@@ -622,6 +684,7 @@
                 bioError.classList.add('hidden');
             }
             
+            // Validación de FOTO
             const photo = document.getElementById('photoInput').files[0];
             const photoError = document.getElementById('photoError');
             if (photo) {
