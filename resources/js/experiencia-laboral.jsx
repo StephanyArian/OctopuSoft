@@ -168,7 +168,13 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
             setEditando(null);
         } else {
             const data = await res.json();
-            setErrorEdicion(data.error || 'Error al guardar los cambios.');
+            // Si vienen errores múltiples del controller, los junta en un solo mensaje
+            if (data.errors) {
+                const lista = Object.values(data.errors).join(' — ');
+                setErrorEdicion(lista);
+            } else {
+                setErrorEdicion(data.error || 'Error al guardar los cambios.');
+            }
         }
     }
 
