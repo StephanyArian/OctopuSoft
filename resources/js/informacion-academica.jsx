@@ -50,6 +50,10 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
             const updated = await res.json();
             setFormaciones(formaciones.map(f => f.id === id ? updated : f));
             setEditando(null);
+        }else if (res.status === 422) {
+            const errores = await res.json();
+            const msgs = Object.values(errores.errors).flat().join('\n');
+            alert(msgs);
         }
     }
 
@@ -81,12 +85,14 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     <div className="form-group">
                                         <label className="form-label">Fecha de inicio</label>
                                         <input className="form-input" type="month" name="fecha_inicio"
-                                            defaultValue={f.start_date ? f.start_date.substring(0, 7) : ''} required />
+                                            defaultValue={f.start_date ? f.start_date.substring(0, 7) : ''} 
+                                            min="1950-01" max={new Date().toISOString().substring(0, 7)} required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de fin</label>
                                         <input className="form-input" type="month" name="fecha_fin"
-                                            defaultValue={f.end_date ? f.end_date.substring(0, 7) : ''} />
+                                            defaultValue={f.end_date ? f.end_date.substring(0, 7) : ''} 
+                                            min="1950-01" max={new Date().toISOString().substring(0, 7)} />
                                     </div>
                                 </div>
                                 <div className="form-checkbox-row" style={{ marginBottom: '12px' }}>
