@@ -69,8 +69,9 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Institución <span class="required">*</span></label>
-                                            <input class="form-input" type="text" name="institucion" id="institucion"
-                                                placeholder="Ej. Universidad Mayor de San Simón" value="{{ old('institucion') }}">
+                                            <textarea class="form-input" name="institucion" id="institucion"
+                                                placeholder="Ej. Universidad Mayor de San Simón" maxlength="60" rows="2"
+                                                style="resize: none;">{{ old('institucion') }}</textarea>
                                             <div id="institucionError" class="error-message hidden">La institución es obligatoria</div>
                                             @error('institucion')
                                                  <div class="error-message">{{ $message }}</div>
@@ -79,7 +80,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Título obtenido <span class="required">*</span></label>
                                             <input class="form-input" type="text" name="titulo_obtenido" id="tituloObtenido"
-                                                placeholder="Ej. Ingeniería de Sistemas" value="{{ old('titulo_obtenido') }}">
+                                                placeholder="Ej. Ingeniería de Sistemas" value="{{ old('titulo_obtenido') }}"  maxlength="30" >
                                             <div id="tituloObtenidoError" class="error-message hidden">El título obtenido es obligatorio</div>
                                             @error('titulo_obtenido')
                                                 <div class="error-message">{{ $message }}</div>
@@ -97,7 +98,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Especialidad</label>
                                             <input class="form-input" type="text" name="especialidad" id="especialidad"
-                                                placeholder="Campo de estudio" value="{{ old('especialidad') }}">
+                                                placeholder="Campo de estudio" value="{{ old('especialidad') }}"  maxlength="30" >
                                         </div>
                                     </div>
  
