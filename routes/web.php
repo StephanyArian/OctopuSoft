@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // ✅ NUEVA RUTA PARA ELIMINAR FOTO (SOLO ESTO SE AGREGÓ)
+    // NUEVA RUTA PARA ELIMINAR FOTO 
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
     Route::post('/logout-others', [SessionController::class, 'logoutOtherDevices'])
@@ -68,7 +68,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/informacion-academica/{id}', [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
     Route::delete('/informacion-academica/{id}', [InformacionAcademicaController::class, 'destroy'])->name('informacion.academica.destroy');
 
-     // ========== EXPERIENCIA LABORAL (HU-08) ==========
+     // EXPERIENCIA LABORAL (HU-08) 
     Route::get('/experiencia-laboral',          [ExperienciaLaboralController::class, 'index'])->name('experiencia.laboral');
     Route::post('/experiencia-laboral',         [ExperienciaLaboralController::class, 'store'])->name('experiencia.laboral.store');
     Route::put('/experiencia-laboral/{id}',     [ExperienciaLaboralController::class, 'update'])->name('experiencia.laboral.update');
@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/redes-contacto', [RedContactoController::class, 'index'])->name('redes.index');
     Route::post('/redes-contacto', [RedContactoController::class, 'store'])->name('redes.store');
 
-    // ========== RUTA PARA PROYECTOS (HU-10) ==========
+    // RUTA PARA PROYECTOS (HU-10) 
     Route::get('/proyectos-content', function () {
         return view('secciones.proyectos');
     })->name('proyectos.content');
@@ -105,7 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/proyectos/{id}/evidencias', [App\Http\Controllers\EvidenciaController::class, 'index']);
     Route::post('/proyectos/{id}/evidencias', [App\Http\Controllers\EvidenciaController::class, 'store']);
     Route::delete('/evidencias/{id}', [App\Http\Controllers\EvidenciaController::class, 'destroy']);
-    // =================================================
+    
 });
 
 

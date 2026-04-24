@@ -113,6 +113,7 @@
                                                     <input type="text" name="name" class="form-input"
                                                         placeholder="Ej. Python, Figma, React..."
                                                         value="{{ old('name', $editSkill?->name) }}"
+                                                        maxlength="50"
                                                         autocomplete="off">
                                                     @error('name')
                                                         <span class="error-message">{{ $message }}</span>
@@ -139,7 +140,7 @@
                                                 <button type="submit" class="btn primary">
                                                     {{ $editSkill ? 'Guardar cambios' : 'Guardar habilidad' }}
                                                 </button>
-                                                <button type="button" class="btn" onclick="toggleForm(false)">
+                                                <button type="button" class="btn" onclick="cancelForm()">
                                                     Cancelar
                                                 </button>
                                             </div>
@@ -238,6 +239,11 @@
         function toggleForm(show) {
             document.getElementById('skill-form-wrap').style.display = show ? 'block' : 'none';
         }
+
+        function cancelForm() {
+            window.location.href = window.location.pathname;
+        }
+        
         function openDeleteModal(id, name) {
             document.getElementById('modal-skill-name').textContent = name;
             document.getElementById('delete-form').action = '/skills/' + id;
