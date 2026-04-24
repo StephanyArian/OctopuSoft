@@ -30,11 +30,14 @@ class ProfileController extends Controller
     {
         // Validar los datos del formulario
         $request->validate([
-            'name' => 'required|string|max:255',
-            'title' => 'nullable|string|max:255',
-            'location' => 'nullable|string|max:255',
+            'name' => ['required', 'string', 'max:30', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
+            'title' => ['nullable', 'string', 'max:30', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
+            'location' => 'nullable|string|max:30',
             'bio' => 'nullable|string|max:500',
             'photo' => 'nullable|image|mimes:jpeg,png|max:2048'
+        ], [
+            'name.regex' => 'El nombre solo debe contener letras y espacios.',
+            'title.regex' => 'El título profesional solo debe contener letras y espacios.'
         ]);
 
         $user = $request->user();

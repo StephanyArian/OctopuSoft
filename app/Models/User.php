@@ -52,4 +52,33 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Profession::class);
     }
+
+    /**
+     * Mutadores para limitar automáticamente los campos a sus longitudes máximas
+     * Esto sirve como capa adicional de seguridad en el modelo
+     */
+    public function setFirstNameAttribute($value)
+    {
+        $this->attributes['first_name'] = $value ? substr($value, 0, 30) : null;
+    }
+
+    public function setLastNameAttribute($value)
+    {
+        $this->attributes['last_name'] = $value ? substr($value, 0, 30) : null;
+    }
+
+    public function setBiographyAttribute($value)
+    {
+        $this->attributes['biography'] = $value ? substr($value, 0, 500) : null;
+    }
+
+    public function setCityAttribute($value)
+    {
+        $this->attributes['city'] = $value ? substr($value, 0, 30) : null;
+    }
+
+    public function setCountryAttribute($value)
+    {
+        $this->attributes['country'] = $value ? substr($value, 0, 30) : null;
+    }
 }
