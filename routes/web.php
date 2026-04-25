@@ -12,7 +12,6 @@ use App\Http\Controllers\RedContactoController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvidenciaController;
 
-
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -25,6 +24,7 @@ Route::get('/dashboard', function () {
         ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// RESET PASSWORD
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
     ->middleware('guest')->name('password.request');
 
@@ -41,16 +41,14 @@ Route::get('/reset-password/{token}', function ($token) {
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')->name('password.update');
 
+// RUTAS PROTEGIDAS
 Route::middleware('auth')->group(function () {
+
+    // PERFIL
     Route::get('/profile',   [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-<<<<<<< HEAD
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // NUEVA RUTA PARA ELIMINAR FOTO 
-=======
-    Route::delete('/profile',[ProfileController::class, 'destroy'])->name('profile.destroy');
->>>>>>> 6de8423 (Cambio de proyecto)
     Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])->name('profile.photo.delete');
 
     Route::post('/logout-others', [SessionController::class, 'logoutOtherDevices'])->name('logout.others');
@@ -63,69 +61,53 @@ Route::middleware('auth')->group(function () {
             ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
     })->name('cerrar.sesion');
 
+    // INFORMACIÓN ACADÉMICA
     Route::get('/informacion-academica',         [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
     Route::post('/informacion-academica',        [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
     Route::put('/informacion-academica/{id}',    [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
     Route::delete('/informacion-academica/{id}', [InformacionAcademicaController::class, 'destroy'])->name('informacion.academica.destroy');
 
-<<<<<<< HEAD
-     // EXPERIENCIA LABORAL (HU-08) 
-=======
->>>>>>> 6de8423 (Cambio de proyecto)
+    // EXPERIENCIA LABORAL
     Route::get('/experiencia-laboral',          [ExperienciaLaboralController::class, 'index'])->name('experiencia.laboral');
     Route::post('/experiencia-laboral',         [ExperienciaLaboralController::class, 'store'])->name('experiencia.laboral.store');
     Route::put('/experiencia-laboral/{id}',     [ExperienciaLaboralController::class, 'update'])->name('experiencia.laboral.update');
     Route::delete('/experiencia-laboral/{id}',  [ExperienciaLaboralController::class, 'destroy'])->name('experiencia.laboral.destroy');
 
+    // PERFIL (CREAR)
     Route::get('/perfil',  [ProfileController::class, 'create'])->name('profile.create');
     Route::post('/perfil', [ProfileController::class, 'store'])->name('profile.store');
 
+    // SKILLS
     Route::get('/habilidades-tecnicas', [SkillController::class, 'tecnicas'])->name('skills.tecnicas');
     Route::get('/habilidades-blandas',  [SkillController::class, 'blandas'])->name('skills.blandas');
     Route::post('/skills',              [SkillController::class, 'store'])->name('skills.store');
     Route::put('/skills/{skill}',       [SkillController::class, 'update'])->name('skills.update');
     Route::delete('/skills/{skill}',    [SkillController::class, 'destroy'])->name('skills.destroy');
 
+    // REDES
     Route::get('/redes-contacto',  [RedContactoController::class, 'index'])->name('redes.index');
     Route::post('/redes-contacto', [RedContactoController::class, 'store'])->name('redes.store');
 
-<<<<<<< HEAD
-    // RUTA PARA PROYECTOS (HU-10) 
-    Route::get('/proyectos-content', function () {
-        return view('secciones.proyectos');
-    })->name('proyectos.content');
-=======
-    // ========== PROYECTOS — PÁGINA COMPLETA ==========
+    // PROYECTOS (VISTA)
     Route::get('/mis-proyectos', function () {
         return view('proyectos');
     })->name('proyectos');
->>>>>>> 6de8423 (Cambio de proyecto)
 
-    // ========== PROYECTOS — API JSON ==========
-    Route::get('/proyectos',         [ProyectoController::class, 'index'])  ->name('proyectos.index');
-    Route::post('/proyectos',        [ProyectoController::class, 'store'])  ->name('proyectos.store');
-    Route::put('/proyectos/{id}',    [ProyectoController::class, 'update']) ->name('proyectos.update');
+    // PROYECTOS (API)
+    Route::get('/proyectos',         [ProyectoController::class, 'index'])->name('proyectos.index');
+    Route::post('/proyectos',        [ProyectoController::class, 'store'])->name('proyectos.store');
+    Route::put('/proyectos/{id}',    [ProyectoController::class, 'update'])->name('proyectos.update');
     Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
 
-<<<<<<< HEAD
-    Route::get('/proyectos',         [App\Http\Controllers\ProyectoController::class, 'index']);
-    Route::post('/proyectos',        [App\Http\Controllers\ProyectoController::class, 'store']);
-    Route::put('/proyectos/{id}',    [App\Http\Controllers\ProyectoController::class, 'update']);
-    Route::delete('/proyectos/{id}', [App\Http\Controllers\ProyectoController::class, 'destroy']);
-
-
-    Route::get('/proyectos/{id}/evidencias', [App\Http\Controllers\EvidenciaController::class, 'index']);
-    Route::post('/proyectos/{id}/evidencias', [App\Http\Controllers\EvidenciaController::class, 'store']);
-    Route::delete('/evidencias/{id}', [App\Http\Controllers\EvidenciaController::class, 'destroy']);
-    
-=======
+    // EVIDENCIAS
     Route::get('/mis-evidencias', function () {
-    return view('evidencia');
- })->name('evidencias');// ========== EVIDENCIAS ==========
-    Route::get('/proyectos/{id}/evidencias',  [EvidenciaController::class, 'index'])  ->name('evidencias.index');
-    Route::post('/proyectos/{id}/evidencias', [EvidenciaController::class, 'store'])  ->name('evidencias.store');
+        return view('evidencia');
+    })->name('evidencias');
+
+    Route::get('/proyectos/{id}/evidencias',  [EvidenciaController::class, 'index'])->name('evidencias.index');
+    Route::post('/proyectos/{id}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
     Route::delete('/evidencias/{id}',         [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
->>>>>>> 6de8423 (Cambio de proyecto)
+
 });
 
 require __DIR__.'/auth.php';
