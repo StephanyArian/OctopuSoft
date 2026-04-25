@@ -475,12 +475,13 @@
                 </div>
                 <div class="body-row">
                     <div class="sidebar">
-                        <a href="{{ route('profile.create') }}" class="sidebar-item active" id="personalLink" style="cursor: pointer; text-decoration: none;">Personal</a>
-                        <a href="{{ route('experiencia.laboral') }}" class="sidebar-item" id="experienciaLink" style="cursor: pointer; text-decoration: none;">Experiencia laboral</a>
-                        <a href="{{ route('informacion.academica') }}" class="sidebar-item" id="academicaLink" style="cursor: pointer; text-decoration: none;">Información académica</a>
-                        <a href="{{ route('skills.tecnicas') }}" class="sidebar-item" id="habilidadesTecnicasLink" style="cursor: pointer; text-decoration: none;">Habilidades técnicas</a>
-                        <a href="{{ route('skills.blandas') }}" class="sidebar-item" id="habilidadesBlandasLink" style="cursor: pointer; text-decoration: none;">Habilidades blandas</a>
-                        <div class="sidebar-item" id="proyectosLink" style="cursor: pointer;">📁 Proyectos</div>
+                     <a href="{{ route('profile.create') }}" class="sidebar-item active" id="personalLink" style="cursor: pointer; text-decoration: none;">Personal</a>
+<a href="{{ route('experiencia.laboral') }}" class="sidebar-item" id="experienciaLink" style="cursor: pointer; text-decoration: none;">Experiencia laboral</a>
+<a href="{{ route('informacion.academica') }}" class="sidebar-item" id="academicaLink" style="cursor: pointer; text-decoration: none;">Información académica</a>
+<a href="{{ route('skills.tecnicas') }}" class="sidebar-item" id="habilidadesTecnicasLink" style="cursor: pointer; text-decoration: none;">Habilidades técnicas</a>
+<a href="{{ route('skills.blandas') }}" class="sidebar-item" id="habilidadesBlandasLink" style="cursor: pointer; text-decoration: none;">Habilidades blandas</a>
+<a href="{{ route('proyectos') }}" class="sidebar-item" style="text-decoration:none;">Proyectos</a>  {{-- ← solo este, elimina el duplicado --}}
+<a href="{{ route('redes.index') }}" class="sidebar-item" id="redesLink" style="cursor: pointer; text-decoration: none;">Redes profesionales y contacto</a>
                         <a href="{{ route('redes.index') }}" class="sidebar-item" id="redesLink" style="cursor: pointer; text-decoration: none;">Redes profesionales y contacto</a>
                     </div>
                     <div class="main" id="mainContent">
@@ -707,26 +708,7 @@
             }
         });
 
-        // Función para cargar proyectos dinámicamente
-        function cargarProyectos() {
-            fetch('{{ url("/proyectos-content") }}')
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('mainContent').innerHTML = html;
-                    // Re-ejecutar scripts de la vista cargada
-                    const scripts = document.querySelectorAll('#mainContent script');
-                    scripts.forEach(script => {
-                        const nuevoScript = document.createElement('script');
-                        if (script.src) {
-                            nuevoScript.src = script.src;
-                        } else {
-                            nuevoScript.textContent = script.textContent;
-                        }
-                        document.body.appendChild(nuevoScript);
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        }
+       
 
         // Función para cargar perfil personal (vista por defecto)
         function cargarPerfilPersonal() {
@@ -736,16 +718,16 @@
         }
 
         // Evento click en Proyectos
-        document.getElementById('proyectosLink')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            cargarProyectos();
+       // document.getElementById('proyectosLink')?.addEventListener('click', function(e) {
+         //   e.preventDefault();
+           // cargarProyectos();
             
             // Actualizar clase activa en el sidebar
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            this.classList.add('active');
-        });
+            //document.querySelectorAll('.sidebar-item').forEach(item => {
+              //  item.classList.remove('active');
+            //});
+            //this.classList.add('active');
+        //});
 
         // Evento click en Personal (recargar página)
         document.getElementById('personalLink')?.addEventListener('click', function(e) {
