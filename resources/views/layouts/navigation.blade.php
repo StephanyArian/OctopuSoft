@@ -11,9 +11,9 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color: #ffffff;">
-                        {{ __('Mi portafolio') }}
+                <div class=" space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color:  #0abf9e; font-weight: 900;font-size: 16px; letter-spacing: 1px;font-family: 'Arial Black', sans-serif;">
+                        {{ __('MI PORTAFOLIO') }}
                     </x-nav-link>
                 </div>
             </div>

@@ -355,13 +355,13 @@
             background: linear-gradient(135deg, var(--burg-deep), var(--burg-mid));
             color: var(--white);
             padding: 10px 20px;
-            font-size: 12px;
-            letter-spacing: 1px;
+            font-family: 'Figtree', sans-serif;
             font-weight: 700;
+            letter-spacing: 3px;
+            font-size: 11px;
             text-align: center;
             text-transform: uppercase;
         }
-
         .error-message {
             color: #e74c3c;
             font-size: 11px;

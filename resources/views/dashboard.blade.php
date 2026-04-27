@@ -17,6 +17,7 @@
             @endif
 
             <div class="shell">
+                 <div class="header-bar">BIENVENIDO</div>
                 
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
