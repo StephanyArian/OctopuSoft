@@ -39,8 +39,7 @@ Route::get('/reset-password/{token}', function ($token) {
 })->middleware('guest')->name('password.reset');
 
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
-    ->middleware('guest')->name('password.update');
-
+    ->middleware('guest')->name('password.reset.store');
 // RUTAS PROTEGIDAS
 Route::middleware('auth')->group(function () {
 
