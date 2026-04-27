@@ -104,8 +104,8 @@ Route::middleware('auth')->group(function () {
         return view('evidencia');
     })->name('evidencias');
 
-    Route::get('/proyectos/{id}/evidencias',  [EvidenciaController::class, 'index'])->name('evidencias.index');
-    Route::post('/proyectos/{id}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
+    Route::get('/proyectos/{proyectoId}/evidencias',  [EvidenciaController::class, 'index'])->name('evidencias.index');
+    Route::post('/proyectos/{proyectoId}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
     Route::delete('/evidencias/{id}',         [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
 
 });

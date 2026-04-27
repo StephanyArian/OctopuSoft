@@ -1,18 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="font-semibold text-xl leading-tight" style="color: var(--burg-deep);">
-                {{ __('Formulario de Perfil Profesional') }}
-            </h2>
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button type="submit" class="logout-btn" style="background: linear-gradient(90deg, var(--burg-deep), var(--teal)); color: white; padding: 8px 20px; border-radius: 40px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; border: none; cursor: pointer;">
-                    Cerrar sesión
-                </button>
-            </form>
-        </div>
-    </x-slot>
-
+    
     <link rel="stylesheet" href="{{ asset('css/experiencia-laboral.css') }}">
 
     <div class="main-content">
@@ -35,7 +22,7 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <div class="sidebar-item">Proyectos</div>
+                        <a href="{{ route('proyectos') }}" class="sidebar-item" >Proyectos</a>  
                         <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
 
@@ -164,68 +151,7 @@
         </div>
     </div>
 
-    <script>
-        function toggleFechaFin(checkbox) {
-            const group = document.getElementById('fechaFinGroup');
-            const ids   = ['fechaFinDia','fechaFinMes','fechaFinAnio'];
-            ids.forEach(id => {
-                document.getElementById(id).disabled = checkbox.checked;
-                if (checkbox.checked) document.getElementById(id).value = '';
-            });
-            group.style.opacity = checkbox.checked ? '0.4' : '1';
-        }
-
-        function resetForm() {
-            document.getElementById('experienciaForm').reset();
-            document.getElementById('fechaFinGroup').style.opacity = '1';
-            ['fechaFinDia','fechaFinMes','fechaFinAnio'].forEach(id => {
-                document.getElementById(id).disabled = false;
-            });
-        }
-
-        document.getElementById('experienciaForm').addEventListener('submit', function(e) {
-            let isValid = true;
-
-            const empresa = document.getElementById('empresa').value.trim();
-            const empresaError = document.getElementById('empresaError');
-            if (!empresa) { empresaError.classList.remove('hidden'); isValid = false; }
-            else { empresaError.classList.add('hidden'); }
-
-            const cargo = document.getElementById('cargo').value.trim();
-            const cargoError = document.getElementById('cargoError');
-            if (!cargo) { cargoError.classList.remove('hidden'); isValid = false; }
-            else { cargoError.classList.add('hidden'); }
-
-            const inicioDia  = document.getElementById('fechaInicioDia').value;
-            const inicioMes  = document.getElementById('fechaInicioMes').value;
-            const inicioAnio = document.getElementById('fechaInicioAnio').value;
-            const fechaInicioError = document.getElementById('fechaInicioError');
-            if (!inicioDia || !inicioMes || !inicioAnio) {
-                fechaInicioError.classList.remove('hidden'); isValid = false;
-            } else { fechaInicioError.classList.add('hidden'); }
-
-            const finDia   = document.getElementById('fechaFinDia').value;
-            const finMes   = document.getElementById('fechaFinMes').value;
-            const finAnio  = document.getElementById('fechaFinAnio').value;
-            const actual   = document.getElementById('trabajoActual').checked;
-            const fechaFinError = document.getElementById('fechaFinError');
-
-            if (!actual && finDia && finMes && finAnio && inicioDia && inicioMes && inicioAnio) {
-                const inicio = new Date(inicioAnio, parseInt(inicioMes)-1, parseInt(inicioDia));
-                const fin    = new Date(finAnio,    parseInt(finMes)-1,    parseInt(finDia));
-                if (fin < inicio) {
-                    fechaFinError.classList.remove('hidden'); isValid = false;
-                } else { fechaFinError.classList.add('hidden'); }
-            } else { fechaFinError.classList.add('hidden'); }
-
-            if (!isValid) e.preventDefault();
-        });
-
-        window.addEventListener('DOMContentLoaded', function() {
-            const cb = document.getElementById('trabajoActual');
-            if (cb.checked) toggleFechaFin(cb);
-        });
-    </script>
+    <script src="{{ asset('js/experiencia-laboral.js') }}"></script>
 
     @viteReactRefresh
     @vite('resources/js/experiencia-laboral.jsx')

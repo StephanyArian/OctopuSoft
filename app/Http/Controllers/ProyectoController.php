@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Project;
 use App\Models\Portfolio;
 use App\Models\Technology;
+use Illuminate\Support\Facades\Log;
+
 
 class ProyectoController extends Controller
 {
@@ -28,6 +30,7 @@ class ProyectoController extends Controller
     // GET /proyectos
     public function index()
     {
+        try{
         $portfolio = $this->obtenerPortfolio();
 
         $proyectos = Project::with('technologies', 'evidencias')
@@ -37,11 +40,16 @@ class ProyectoController extends Controller
             ->map(fn($p) => $this->formato($p));
 
         return response()->json($proyectos);
+        }catch(\Exception $e){
+            Log::error('Error al cargar proyectos: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cargar proyectos'], 500);
+        }
     }
 
     // POST /proyectos
     public function store(Request $request)
     {
+        try{
         $request->validate([
             'nombre'       => 'required|string|max:255',
             'descripcion'  => 'required|string|max:500',
@@ -50,13 +58,14 @@ class ProyectoController extends Controller
             'tecnologias'  => 'nullable|array',
             'tecnologias.*'=> 'string|max:100',
         ]);
+         
+        \Log::info('Tecnologías recibidas:', ['tecnologias' => $request->input('tecnologias')]);
 
         $portfolio = $this->obtenerPortfolio();
 
         $proyecto = Project::create([
             'portfolio_id' => $portfolio->id,
             'name'         => $request->input('nombre'),
-            'summary'      => null,
             'description'  => $request->input('descripcion'),
             'start_date'   => $request->input('fecha') ?: null,
             'status'       => $request->input('estado', 'En curso'),
@@ -70,11 +79,17 @@ class ProyectoController extends Controller
         $proyecto->load('technologies', 'evidencias');
 
         return response()->json($this->formato($proyecto), 201);
+
+        }catch (\Exception $e){
+            Log::error('Error al crear proyecto: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al crear proyecto: ' . $e->getMessage()], 500);
+        }
     }
 
     // PUT /proyectos/{id}
     public function update(Request $request, int $id)
     {
+        try{
         $portfolio = $this->obtenerPortfolio();
 
         $proyecto = Project::where('id', $id)
@@ -102,11 +117,16 @@ class ProyectoController extends Controller
         $proyecto->load('technologies', 'evidencias');
 
         return response()->json($this->formato($proyecto));
+        }catch(\Exception $e){
+            Log::error('Error al actualizar proyecto: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al actualizar proyecto'], 500);
+        }
     }
 
     // DELETE /proyectos/{id}
     public function destroy(int $id)
     {
+        try{
         $portfolio = $this->obtenerPortfolio();
 
         $proyecto = Project::where('id', $id)
@@ -123,6 +143,11 @@ class ProyectoController extends Controller
         $proyecto->delete();
 
         return response()->json(['ok' => true]);
+        }catch(\Exception $e){
+            Log::error('Error al eliminar proyecto: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al eliminar proyecto'], 500);
+
+        }
     }
 
     // ── Sincroniza tecnologías: busca o crea en tabla technologies y adjunta ──

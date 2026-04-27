@@ -5,35 +5,51 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Proyecto extends Model
+
+class Project extends Model
 {
     use HasFactory;
 
-    protected $table = 'proyectos';
+    protected $table = 'projects';
 
     protected $fillable = [
-        'user_id',
-        'nombre',
-        'descripcion',
-        'fecha',
-        'estado',
-        'tecnologias',
+        'portfolio_id',
+        'name',
+        'summary',
+        'description',
+        'role',
+        'demo_url',
+        'repository_url',
+        'start_date',
+        'end_date',
+        'status',
+        'is_featured',
+        'is_visible',
+        'display_order',
     ];
 
     protected $casts = [
-        'tecnologias' => 'array',
-        'fecha'       => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'is_featured' => 'boolean',
+        'is_visible' => 'boolean',
     ];
+
+    public function portfolio()
+    {
+        return $this->belongsTo(Portfolio::class);
+    }
+
+    public function technologies()
+    {
+        return $this->belongsToMany(Technology::class, 'project_technology');
+    }
 
     // Relación con evidencias
     public function evidencias()
     {
-        return $this->hasMany(ProyectoEvidencia::class, 'proyecto_id');
+        return $this->hasMany(ProjectEvidencia::class, 'project_id');
     }
 
-    // Scope para filtrar por usuario
-    public function scopeDelUsuario($query, $userId)
-    {
-        return $query->where('user_id', $userId);
-    }
+    
 }

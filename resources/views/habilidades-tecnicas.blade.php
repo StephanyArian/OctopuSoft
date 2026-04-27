@@ -1,18 +1,6 @@
 {{-- resources/views/habilidades-tecnicas.blade.php --}}
 <x-app-layout>
-    <x-slot name="header">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="font-semibold text-xl leading-tight" style="color: var(--burg-deep);">
-                {{ __('Formulario de Perfil Profesional') }}
-            </h2>
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button type="submit" class="logout-btn" style="background: linear-gradient(90deg, var(--burg-deep), var(--teal)); color: white; padding: 8px 20px; border-radius: 40px; font-weight: 600; font-size: 14px; border: none; cursor: pointer;">
-                    Cerrar sesión
-                </button>
-            </form>
-        </div>
-    </x-slot>
+   
 
     <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
     <link rel="stylesheet" href="{{ asset('css/skills.css') }}">
@@ -35,8 +23,8 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}"  class="sidebar-item active">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}"  class="sidebar-item">Habilidades blandas</a>
-                        <div class="sidebar-item">Proyectos</div>
-                        <a href="{{ route('redes.index') }}" class="sidebar-item active">Redes profesionales y contacto  </a>
+                        <a href="{{ route('proyectos') }}" class="sidebar-item">Proyectos</a> 
+                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto  </a>
                     </div>
 
                     {{-- Contenido --}}
@@ -235,26 +223,5 @@
         </div>
     </div>
 
-    <script>
-        function toggleForm(show) {
-            document.getElementById('skill-form-wrap').style.display = show ? 'block' : 'none';
-        }
-
-        function cancelForm() {
-            window.location.href = window.location.pathname;
-        }
-        
-        function openDeleteModal(id, name) {
-            document.getElementById('modal-skill-name').textContent = name;
-            document.getElementById('delete-form').action = '/skills/' + id;
-            document.getElementById('delete-modal').classList.add('active');
-        }
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').classList.remove('active');
-        }
-        document.getElementById('delete-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeDeleteModal();
-        });
-    </script>
-
+    <script src="{{ asset('js/habilidades-tecnicas.js') }}"></script>
 </x-app-layout>

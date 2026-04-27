@@ -1,17 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="font-semibold text-xl leading-tight" style="color: var(--burg-deep);">
-                {{ __('Formulario de Perfil Profesional') }}
-            </h2>
-            <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <button type="submit" class="logout-btn" style="background: linear-gradient(90deg, var(--burg-deep), var(--teal)); color: white; padding: 8px 20px; border-radius: 40px; font-weight: 600; font-size: 14px; transition: all 0.3s ease; border: none; cursor: pointer;">
-                    Cerrar sesión
-                </button>
-            </form>
-        </div>
-    </x-slot>
+    
  
     <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
  
@@ -50,8 +38,8 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item active">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <div class="sidebar-item">Proyectos</div>
-                        <a href="{{ route('redes.index') }}" class="sidebar-item active">Redes profesionales y contacto  </a>
+                        <a href="{{ route('proyectos') }}" class="sidebar-item" >Proyectos</a>  
+                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto  </a>
                     </div>
  
                     <div class="main">
@@ -151,96 +139,7 @@
         </div>
     </div>
  
-    <script>
-        function toggleFechaFin(checkbox) {
-            const fechaFin = document.getElementById('fechaFin');
-            fechaFin.disabled = checkbox.checked;
-            if (checkbox.checked) {
-                fechaFin.value = '';
-                const fechaFinError = document.getElementById('fechaFinError');
-                if (fechaFinError) fechaFinError.classList.add('hidden');
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('academicForm').reset();
-            document.getElementById('fechaFin').disabled = false;
-            // Ocultar todos los mensajes de error
-            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
-        }
-
-        document.getElementById('academicForm').addEventListener('submit', function(e) {
-            let isValid = true;
-
-            // Limpiar errores previos
-            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
-
-            // Validar Institución
-            const institucion = document.getElementById('institucion').value.trim();
-            if (!institucion) {
-                document.getElementById('institucionError').classList.remove('hidden');
-                document.getElementById('institucion').classList.add('error');
-                isValid = false;
-            }} else if (!soloLetras.test(institucion)) {
-                     document.getElementById('institucionError').textContent = 'La institución solo debe contener letras';
-                     document.getElementById('institucionError').classList.remove('hidden');
-                    document.getElementById('institucion').classList.add('error');
-                    isValid = false;
-            } else {
-                document.getElementById('institucionError').classList.add('hidden');
-            }
-
-            // Validar Título Obtenido
-            const tituloObtenido = document.getElementById('tituloObtenido').value.trim();
-            if (!tituloObtenido) {
-                document.getElementById('tituloObtenidoError').classList.remove('hidden');
-                document.getElementById('tituloObtenido').classList.add('error');
-                isValid = false;
-            } else if (!soloLetras.test(tituloObtenido)) {
-                 document.getElementById('tituloObtenidoError').textContent = 'El título solo debe contener letras';
-                    document.getElementById('tituloObtenidoError').classList.remove('hidden');
-                 document.getElementById('tituloObtenido').classList.add('error');
-                 isValid = false;
-            } else {
-                 document.getElementById('tituloObtenidoError').classList.add('hidden');
-            }
-
-            
-
-            // Validar Fecha Inicio
-            const fechaInicio = document.getElementById('fechaInicio').value;
-            if (!fechaInicio) {
-                document.getElementById('fechaInicioError').classList.remove('hidden');
-                document.getElementById('fechaInicio').classList.add('error');
-                isValid = false;
-            }
-
-            // Validación de fechas (lo NUEVO)
-            const estudioActual = document.getElementById('estudioActual').checked;
-            const fechaFin = document.getElementById('fechaFin').value;
-            const fechaFinError = document.getElementById('fechaFinError');
-            
-            if (!estudioActual && fechaInicio) {
-                if (!fechaFin) {
-                    fechaFinError.innerText = 'Debes indicar una fecha de fin o marcar "Estudio actual"';
-                    fechaFinError.classList.remove('hidden');
-                    document.getElementById('fechaFin').classList.add('error');
-                    isValid = false;
-                } else if (fechaFin <= fechaInicio) {
-                    fechaFinError.innerText = 'La fecha de fin debe ser posterior a la fecha de inicio';
-                    fechaFinError.classList.remove('hidden');
-                    document.getElementById('fechaFin').classList.add('error');
-                    isValid = false;
-                }
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-    </script>
+    <script src="{{ asset('js/informacion-academica.js') }}"></script>
     @viteReactRefresh
     @vite('resources/js/informacion-academica.jsx')
 </x-app-layout>

@@ -1,19 +1,6 @@
 <x-app-layout>
 
-    <x-slot name="header">
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2 class="font-semibold text-xl leading-tight" style="color: var(--burg-deep);">
-                {{ __('Formulario de Perfil Profesional') }}
-            </h2>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    Cerrar sesión
-                </button>
-            </form>
-        </div>
-    </x-slot>
 
     {{-- ESTILOS --}}
     <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
@@ -39,7 +26,7 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <div class="sidebar-item">Proyectos</div>
+                        <a href="{{ route('proyectos') }}" class="sidebar-item" >Proyectos</a>  
                         <a href="{{ route('redes.index') }}" class="sidebar-item active">Redes profesionales y contacto</a>
                     </div>
 

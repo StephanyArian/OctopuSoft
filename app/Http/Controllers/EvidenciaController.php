@@ -103,6 +103,7 @@ class EvidenciaController extends Controller
     // ── Formato de respuesta compatible con evidencia.blade.php ──
     private function formato(ProjectEvidencia $ev): array
     {
+        
         return [
             'id'             => $ev->id,
             'tipo'           => $ev->tipo,
@@ -111,8 +112,8 @@ class EvidenciaController extends Controller
             'url_publica'    => $ev->imagen_path
                                     ? asset('storage/' . $ev->imagen_path)
                                     : $ev->url,
-            'descripcion'    => null,
-            'plataforma'     => null,
+            'descripcion' => $ev->descripcion ?? null,
+            'plataforma'  => $ev->plataforma  ?? null,
             'created_at'     => $ev->created_at,
         ];
     }
