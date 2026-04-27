@@ -117,7 +117,7 @@ function checkMatch() {
     const cp  = document.getElementById('confirm_password').value;
     const err = document.getElementById('matchError');
     const inp = document.getElementById('confirm_password');
-    if (cp && np !== cp) {
+    if (cp.length > 0 && np !== cp)  {
         err.classList.remove('hidden');
         inp.classList.add('input-error-state');
     } else {

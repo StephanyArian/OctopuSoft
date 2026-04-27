@@ -41,7 +41,7 @@
                                style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; transition: all 0.3s ease; font-size: 14px;"
                                onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
                                onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
-                                {{ __('Perfil') }}
+                                {{ __('Configuracion') }}
                             </a>
                             <a href="{{ route('cerrar.sesion') }}" 
                                style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px;"
@@ -86,7 +86,7 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')" style="color: #ffffff;">
-                    {{ __('Perfil') }}
+                    {{ __('Configuracion') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link :href="route('cerrar.sesion')" style="color: #ffffff;">
