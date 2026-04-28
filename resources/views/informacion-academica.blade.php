@@ -26,7 +26,7 @@
             @endif
  
             <div class="shell">
-                <div class="header-bar">BIENVENIDO</div>
+                <div class="header-bar" style="display: none;"></div>
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
                     <div class="nav-tab muted">VER PERFIL</div>

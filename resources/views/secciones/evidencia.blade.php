@@ -27,7 +27,6 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="shell">
-                <div class="header-bar">BIENVENIDO</div>
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
                     <div class="nav-tab muted">VER PERFIL</div>
