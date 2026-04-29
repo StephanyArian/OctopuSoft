@@ -40,7 +40,7 @@ class SkillController extends Controller
         if (!$isException) {
             $onlyAlpha       = preg_replace('/[^a-zA-Z]/u', '', $trimmed);
             $consonantGroups = preg_match_all(
-                '/[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{4,}/',
+                '/[bcdfghjklmnpqrstvwxBCDFGHJKLMNPQRSTVWX]{4,}/',
                 $onlyAlpha
             );
             if ($consonantGroups > 0) {
@@ -56,7 +56,7 @@ class SkillController extends Controller
         $letterCount = mb_strlen($onlyLetters);
 
         if ($letterCount > 3) {
-            $vowelCount = preg_match_all('/[aeiouáéíóúAEIOUÁÉÍÓÚ]/u', $onlyLetters);
+            $vowelCount = preg_match_all('/[aeiouyáéíóúAEIOUÁÉÍÓÚY]/u', $onlyLetters);
             $vowelRatio = $vowelCount / $letterCount;
 
             if ($vowelRatio < 0.18) {
