@@ -54,13 +54,6 @@
                 </div>
             </div>
 
-            <div class="terms-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="terms" required>
-                    <span>Acepto los términos y condiciones</span>
-                </label>
-            </div>
-
             <button type="submit" class="register-btn">Registrarse</button>
 
             <div class="login-link">
