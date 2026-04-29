@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/ProyectoController.php
 
 namespace App\Http\Controllers;
 
@@ -8,11 +9,10 @@ use App\Models\Project;
 use App\Models\Portfolio;
 use App\Models\Technology;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Storage;
 
 class ProyectoController extends Controller
 {
-    // Obtiene o crea el portfolio del usuario autenticado
     private function obtenerPortfolio(): Portfolio
     {
         return Portfolio::firstOrCreate(
@@ -27,130 +27,154 @@ class ProyectoController extends Controller
         );
     }
 
-    // GET /proyectos
     public function index()
     {
-        try{
-        $portfolio = $this->obtenerPortfolio();
-
-        $proyectos = Project::with('technologies', 'evidencias')
-            ->where('portfolio_id', $portfolio->id)
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(fn($p) => $this->formato($p));
-
-        return response()->json($proyectos);
-        }catch(\Exception $e){
+        try {
+            $portfolio = $this->obtenerPortfolio();
+            $proyectos = Project::with('technologies', 'evidencias')
+                ->where('portfolio_id', $portfolio->id)
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(fn($p) => $this->formato($p));
+            return response()->json($proyectos);
+        } catch(\Exception $e) {
             Log::error('Error al cargar proyectos: ' . $e->getMessage());
             return response()->json(['error' => 'Error al cargar proyectos'], 500);
         }
     }
 
-    // POST /proyectos
     public function store(Request $request)
     {
-        try{
-        $request->validate([
-            'nombre'       => 'required|string|max:255',
-            'descripcion'  => 'required|string|max:500',
-            'fecha'        => 'nullable|date',
-            'estado'       => 'nullable|string|max:50',
-            'tecnologias'  => 'nullable|array',
-            'tecnologias.*'=> 'string|max:100',
-        ]);
-         
-        \Log::info('Tecnologías recibidas:', ['tecnologias' => $request->input('tecnologias')]);
+        try {
+            $request->validate([
+                'nombre'       => 'required|string|max:255',
+                'descripcion'  => 'required|string|max:500',
+                'fecha'        => 'nullable|date',
+                'fecha_fin'    => 'nullable|date',
+                'estado'       => 'nullable|string|max:50',
+                'rol'          => 'nullable|string|max:150',
+                'cliente'      => 'nullable|string|max:255',
+                'visibilidad'  => 'nullable|in:publico,privado',
+                'tecnologias'  => 'nullable|array',
+                'tecnologias.*'=> 'string|max:100',
+            ]);
 
-        $portfolio = $this->obtenerPortfolio();
+            $portfolio = $this->obtenerPortfolio();
 
-        $proyecto = Project::create([
-            'portfolio_id' => $portfolio->id,
-            'name'         => $request->input('nombre'),
-            'description'  => $request->input('descripcion'),
-            'start_date'   => $request->input('fecha') ?: null,
-            'status'       => $request->input('estado', 'En curso'),
-            'is_visible'   => true,
-            'is_featured'  => false,
-        ]);
+            $proyecto = Project::create([
+                'portfolio_id' => $portfolio->id,
+                'name'         => $request->input('nombre'),
+                'description'  => $request->input('descripcion'),
+                'start_date'   => $request->input('fecha') ?: null,
+                'end_date'     => $request->input('fecha_fin') ?: null,
+                'status'       => $request->input('estado', 'En curso'),
+                'role'         => $request->input('rol'),
+                'company'      => $request->input('cliente'),
+                'is_visible'   => $request->input('visibilidad') === 'publico',
+            ]);
 
-        // Sincronizar tecnologías
-        $this->sincronizarTecnologias($proyecto, $request->input('tecnologias', []));
+            $this->sincronizarTecnologias($proyecto, $request->input('tecnologias', []));
+            $proyecto->load('technologies', 'evidencias');
 
-        $proyecto->load('technologies', 'evidencias');
-
-        return response()->json($this->formato($proyecto), 201);
-
-        }catch (\Exception $e){
+            return response()->json($this->formato($proyecto), 201);
+        } catch (\Exception $e) {
             Log::error('Error al crear proyecto: ' . $e->getMessage());
             return response()->json(['error' => 'Error al crear proyecto: ' . $e->getMessage()], 500);
         }
     }
 
-    // PUT /proyectos/{id}
     public function update(Request $request, int $id)
     {
-        try{
-        $portfolio = $this->obtenerPortfolio();
+        try {
+            $portfolio = $this->obtenerPortfolio();
+            $proyecto = Project::where('id', $id)
+                ->where('portfolio_id', $portfolio->id)
+                ->firstOrFail();
 
-        $proyecto = Project::where('id', $id)
-            ->where('portfolio_id', $portfolio->id)
-            ->firstOrFail();
+            $request->validate([
+                'nombre'       => 'required|string|max:255',
+                'descripcion'  => 'required|string|max:500',
+                'fecha'        => 'nullable|date',
+                'fecha_fin'    => 'nullable|date',
+                'estado'       => 'nullable|string|max:50',
+                'rol'          => 'nullable|string|max:150',
+                'cliente'      => 'nullable|string|max:255',
+                'visibilidad'  => 'nullable|in:publico,privado',
+                'tecnologias'  => 'nullable|array',
+                'tecnologias.*'=> 'string|max:100',
+            ]);
 
-        $request->validate([
-            'nombre'       => 'required|string|max:255',
-            'descripcion'  => 'required|string|max:500',
-            'fecha'        => 'nullable|date',
-            'estado'       => 'nullable|string|max:50',
-            'tecnologias'  => 'nullable|array',
-            'tecnologias.*'=> 'string|max:100',
-        ]);
+            $proyecto->update([
+                'name'        => $request->input('nombre'),
+                'description' => $request->input('descripcion'),
+                'start_date'  => $request->input('fecha') ?: null,
+                'end_date'    => $request->input('fecha_fin') ?: null,
+                'status'      => $request->input('estado', 'En curso'),
+                'role'        => $request->input('rol'),
+                'company'     => $request->input('cliente'),
+                'is_visible'  => $request->input('visibilidad') === 'publico',
+            ]);
 
-        $proyecto->update([
-            'name'        => $request->input('nombre'),
-            'description' => $request->input('descripcion'),
-            'start_date'  => $request->input('fecha') ?: null,
-            'status'      => $request->input('estado', 'En curso'),
-        ]);
+            $this->sincronizarTecnologias($proyecto, $request->input('tecnologias', []));
+            $proyecto->load('technologies', 'evidencias');
 
-        $this->sincronizarTecnologias($proyecto, $request->input('tecnologias', []));
-
-        $proyecto->load('technologies', 'evidencias');
-
-        return response()->json($this->formato($proyecto));
-        }catch(\Exception $e){
+            return response()->json($this->formato($proyecto));
+        } catch (\Exception $e) {
             Log::error('Error al actualizar proyecto: ' . $e->getMessage());
             return response()->json(['error' => 'Error al actualizar proyecto'], 500);
         }
     }
 
-    // DELETE /proyectos/{id}
-    public function destroy(int $id)
+    /**
+     * Toggle rápido de visibilidad (público/privado) sin necesidad de editar.
+     */
+    public function toggleVisibilidad(Request $request, int $id)
     {
-        try{
-        $portfolio = $this->obtenerPortfolio();
+        try {
+            $portfolio = $this->obtenerPortfolio();
+            $proyecto = Project::where('id', $id)
+                ->where('portfolio_id', $portfolio->id)
+                ->firstOrFail();
 
-        $proyecto = Project::where('id', $id)
-            ->where('portfolio_id', $portfolio->id)
-            ->firstOrFail();
+            $request->validate([
+                'is_visible' => 'required|boolean',
+            ]);
 
-        // Eliminar imágenes físicas de las evidencias
-        foreach ($proyecto->evidencias as $ev) {
-            if ($ev->imagen_path) {
-                \Storage::disk('public')->delete($ev->imagen_path);
-            }
-        }
+            $proyecto->update([
+                'is_visible' => $request->input('is_visible'),
+            ]);
 
-        $proyecto->delete();
-
-        return response()->json(['ok' => true]);
-        }catch(\Exception $e){
-            Log::error('Error al eliminar proyecto: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al eliminar proyecto'], 500);
-
+            return response()->json([
+                'ok'         => true,
+                'is_visible' => $proyecto->is_visible,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar visibilidad: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al cambiar visibilidad'], 500);
         }
     }
 
-    // ── Sincroniza tecnologías: busca o crea en tabla technologies y adjunta ──
+    public function destroy(int $id)
+    {
+        try {
+            $portfolio = $this->obtenerPortfolio();
+            $proyecto = Project::where('id', $id)
+                ->where('portfolio_id', $portfolio->id)
+                ->firstOrFail();
+
+            foreach ($proyecto->evidencias as $ev) {
+                if ($ev->imagen_path) {
+                    Storage::disk('public')->delete($ev->imagen_path);
+                }
+            }
+            $proyecto->delete();
+            return response()->json(['ok' => true]);
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar proyecto: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al eliminar proyecto'], 500);
+        }
+    }
+
     private function sincronizarTecnologias(Project $proyecto, array $nombres): void
     {
         $ids = [];
@@ -163,7 +187,6 @@ class ProyectoController extends Controller
         $proyecto->technologies()->sync($ids);
     }
 
-    // ── Formato de respuesta para el frontend ──
     private function formato(Project $p): array
     {
         return [
@@ -171,7 +194,11 @@ class ProyectoController extends Controller
             'nombre'      => $p->name,
             'descripcion' => $p->description,
             'fecha'       => $p->start_date?->format('Y-m-d'),
+            'fecha_fin'   => $p->end_date?->format('Y-m-d'),
             'estado'      => $p->status,
+            'rol'         => $p->role,
+            'cliente'     => $p->company,
+            'is_visible'  => $p->is_visible,
             'tecnologias' => $p->technologies->pluck('name')->toArray(),
             'evidencias'  => $p->evidencias->count(),
         ];

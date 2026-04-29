@@ -18,6 +18,7 @@ class Project extends Model
         'summary',
         'description',
         'role',
+        'company',           // ← AGREGA ESTA LÍNEA
         'demo_url',
         'repository_url',
         'start_date',
@@ -50,6 +51,4 @@ class Project extends Model
     {
         return $this->hasMany(ProjectEvidencia::class, 'project_id');
     }
-
-    
 }

@@ -40,6 +40,7 @@ Route::get('/reset-password/{token}', function ($token) {
 
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')->name('password.reset.store');
+
 // RUTAS PROTEGIDAS
 Route::middleware('auth')->group(function () {
 
@@ -93,10 +94,11 @@ Route::middleware('auth')->group(function () {
     })->name('proyectos');
 
     // PROYECTOS (API)
-    Route::get('/proyectos',         [ProyectoController::class, 'index'])->name('proyectos.index');
-    Route::post('/proyectos',        [ProyectoController::class, 'store'])->name('proyectos.store');
-    Route::put('/proyectos/{id}',    [ProyectoController::class, 'update'])->name('proyectos.update');
-    Route::delete('/proyectos/{id}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
+    Route::get('/proyectos',                          [ProyectoController::class, 'index'])->name('proyectos.index');
+    Route::post('/proyectos',                         [ProyectoController::class, 'store'])->name('proyectos.store');
+    Route::put('/proyectos/{id}',                     [ProyectoController::class, 'update'])->name('proyectos.update');
+    Route::patch('/proyectos/{id}/visibilidad',       [ProyectoController::class, 'toggleVisibilidad'])->name('proyectos.toggleVisibilidad');
+    Route::delete('/proyectos/{id}',                  [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
 
     // EVIDENCIAS
     Route::get('/mis-evidencias', function () {
@@ -105,7 +107,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/proyectos/{proyectoId}/evidencias',  [EvidenciaController::class, 'index'])->name('evidencias.index');
     Route::post('/proyectos/{proyectoId}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
-    Route::delete('/evidencias/{id}',         [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
+    Route::delete('/evidencias/{id}',                 [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
 
 });
 
