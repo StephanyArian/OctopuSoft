@@ -3,28 +3,25 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\PlataformaRed;
 
 class PlatformNetworkSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         $platforms = [
             ['name' => 'LinkedIn', 'base_url' => 'https://linkedin.com/in/'],
             ['name' => 'GitHub', 'base_url' => 'https://github.com/'],
-            ['name' => 'Twitter', 'base_url' => 'https://twitter.com/'],
-            ['name' => 'Portfolio', 'base_url' => null],
-            ['name' => 'Medium', 'base_url' => 'https://medium.com/@'],
-            ['name' => 'Dev.to', 'base_url' => 'https://dev.to/'],
+            ['name' => 'WhatsApp', 'base_url' => 'https://wa.me/'],
+            ['name' => 'Email', 'base_url' => null],
+            ['name' => 'Otros', 'base_url' => null],
         ];
 
         foreach ($platforms as $platform) {
-            DB::table('platform_network')->insert([
-                'name' => $platform['name'],
-                'base_url' => $platform['base_url'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            PlataformaRed::updateOrCreate(
+                ['name' => $platform['name']], // evita duplicados
+                ['base_url' => $platform['base_url']]
+            );
         }
     }
 }

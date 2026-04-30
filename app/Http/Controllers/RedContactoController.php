@@ -5,19 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RedProfesional;
+use App\Models\PlataformaRed;
 
 class RedContactoController extends Controller
 {
     public function index()
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $redes = RedProfesional::where('user_id', $user->id)
-            ->get()
-            ->keyBy('platform_id');
+    $redes = RedProfesional::where('user_id', $user->id)
+        ->get()
+        ->keyBy('platform_id');
 
-        return view('redes-contacto', compact('redes'));
-    }
+    $platforms = \App\Models\PlataformaRed::pluck('id', 'name');
+
+    return view('redes-contacto', compact('redes', 'platforms'));
+}
 
     public function store(Request $request)
     {
@@ -70,14 +73,30 @@ class RedContactoController extends Controller
 
         $user = Auth::user();
 
-        // CONFIGURACIÓN DE CAMPOS
-        $campos = [
-            1 => ['campo' => 'linkedin',      'is_primary' => 1],
-            2 => ['campo' => 'github',       'is_primary' => 0],
-            3 => ['campo' => 'whatsapp',     'is_primary' => 0],
-            4 => ['campo' => 'email_contacto','is_primary' => 0],
-            5 => ['campo' => 'otros',        'is_primary' => 0],
-        ];
+        // Crear plataformas si no existen
+        $defaultPlatforms = [
+            ['name' => 'LinkedIn', 'base_url' => 'https://linkedin.com/in/'],
+            ['name' => 'GitHub', 'base_url' => 'https://github.com/'],
+            ['name' => 'WhatsApp', 'base_url' => 'https://wa.me/'],
+            ['name' => 'Email', 'base_url' => 'mailto:'],
+            ['name' => 'Otros', 'base_url' => null],
+            ];
+            
+            foreach ($defaultPlatforms as $p) {
+                PlataformaRed::firstOrCreate(['name' => $p['name']], $p);
+            }
+            
+            // Obtener IDs reales
+            $platforms = PlataformaRed::pluck('id', 'name')->toArray();
+            
+            // Configuración SIN IDs fijos
+            $campos = [
+                $platforms['LinkedIn'] => ['campo' => 'linkedin', 'is_primary' => 1],
+                $platforms['GitHub'] => ['campo' => 'github', 'is_primary' => 0],
+                $platforms['WhatsApp'] => ['campo' => 'whatsapp', 'is_primary' => 0],
+                $platforms['Email'] => ['campo' => 'email_contacto', 'is_primary' => 0],
+                $platforms['Otros'] => ['campo' => 'otros', 'is_primary' => 0],
+            ];
 
         foreach ($campos as $platformId => $config) {
             $valor = $request->input($config['campo']);

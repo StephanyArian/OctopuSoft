@@ -75,7 +75,7 @@
                                         class="form-input"
                                         placeholder="Ej. https://linkedin.com/in/juan"
                                         pattern="https://(www\.)?linkedin\.com/.*"
-                                        value="{{ old('linkedin', $redes[1]->profile_url ?? '') }}"
+                                        value="{{ old('linkedin', $redes[$platforms['LinkedIn']]->profile_url ?? '') }}"
                                     >
                                 </div>
 
@@ -88,7 +88,7 @@
                                         class="form-input"
                                         placeholder="Ej. https://github.com/usuario"
                                         pattern="https://(www\.)?github\.com/.*"
-                                        value="{{ old('github', $redes[2]->profile_url ?? '') }}"
+                                        value="{{ old('github', $redes[$platforms['GitHub']]->profile_url ?? '') }}"
                                     >
                                 </div>
 
@@ -99,12 +99,12 @@
                                         type="text" 
                                         name="whatsapp"
                                         class="form-input"
-                                        placeholder="+591..."
+                                        placeholder=""
                                         pattern="^\+?[0-9]{8,15}$"
-                                        title="Solo números, entre 8 y 15 dígitos"
-                                        value="{{ old('whatsapp', isset($redes[3]) 
-                                            ? preg_replace('/https:\/\/wa\.me\//', '', $redes[3]->profile_url) 
-                                            : '') }}"
+                                        title="Solo inserte números, entre 8 y 15 dígitos"
+                                        value="{{ old('whatsapp', isset($redes[$platforms['WhatsApp']]) 
+    ? preg_replace('/https:\/\/wa\.me\//', '', $redes[$platforms['WhatsApp']]->profile_url) 
+    : '') }}"
                                     >
                                 </div>
 
@@ -117,7 +117,7 @@
                                         class="form-input"
                                         pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
                                         title="Solo correos Gmail"
-                                        value="{{ old('email_contacto', $redes[4]->profile_url ?? '') }}"
+                                        value="{{ old('email_contacto', $redes[$platforms['Email']]->profile_url ?? '') }}"
                                     >
                                 </div>
 
@@ -129,7 +129,7 @@
                                         name="otros"
                                         class="form-input"
                                         maxlength="50"
-                                        value="{{ old('otros', $redes[5]->profile_url ?? '') }}"
+                                        value="{{ old('otros', $redes[$platforms['Otros']]->profile_url ?? '') }}"
                                     >
                                 </div>
 
