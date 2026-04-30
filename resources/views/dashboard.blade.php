@@ -20,7 +20,7 @@
                 
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
-                    <div class="nav-tab muted">VER PERFIL</div>
+                    <a href="{{ url('/preview') }}" class="nav-tab muted" style="text-decoration: none; display: inline-block; color: inherit;">VER PERFIL</a>
                 </div>
                 <div class="body-row">
                     <div class="sidebar">

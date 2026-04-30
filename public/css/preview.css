@@ -1,0 +1,294 @@
+/* ============================================
+   COLORES OBLIGATORIOS DEL PROYECTO
+   ============================================ */
+:root {
+    --burg-deep:  #2d0a1e;
+    --burg-mid:   #4a1030;
+    --burg-soft:  #6b1f45;
+    --teal:       #0abf9e;
+    --teal-light: #1de8c0;
+    --teal-dim:   #07866e;
+    --white:      #ffffff;
+    --off:        #f5f6f8;
+    --gray-100:   #edf0f4;
+    --gray-300:   #c8cdd8;
+    --gray-500:   #7a8298;
+    --gray-700:   #3d4459;
+    --dark:       #111827;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--off);
+    color: var(--dark);
+    padding: 40px 20px;
+}
+
+.preview-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Cabecera */
+.profile-header {
+    background: linear-gradient(135deg, var(--burg-deep) 0%, var(--burg-mid) 50%, var(--burg-soft) 100%);
+    color: var(--white);
+    padding: 40px;
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    background: var(--white);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    color: var(--teal);
+    border: 4px solid var(--teal-light);
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.profile-header .title {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 12px;
+}
+
+.profile-header .location {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 16px;
+}
+
+.profile-header .bio {
+    font-size: 14px;
+    max-width: 600px;
+    margin: 0 auto;
+    opacity: 0.9;
+}
+
+/* Secciones */
+.section {
+    padding: 30px 40px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+
+.section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: var(--teal);
+    border-left: 4px solid var(--teal);
+    padding-left: 15px;
+}
+
+/* Tarjetas */
+.card {
+    background: var(--off);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border: 1px solid var(--gray-100);
+}
+
+.card:last-child {
+    margin-bottom: 0;
+}
+
+.card h3 {
+    color: var(--burg-deep);
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.card .subtitle {
+    color: var(--teal);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.card .date {
+    color: var(--gray-500);
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.card .description {
+    color: var(--gray-700);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Habilidades */
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.skill-tag {
+    background: var(--gray-100);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--dark);
+}
+
+.skill-tag.advanced {
+    background: var(--teal);
+    color: var(--white);
+}
+
+.skill-tag.intermediate {
+    background: var(--burg-soft);
+    color: var(--white);
+}
+
+.skill-tag.basic {
+    background: var(--gray-500);
+    color: var(--white);
+}
+
+.soft-skill-tag {
+    background: var(--burg-mid);
+    color: var(--white);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+/* Redes */
+.contact-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--off);
+    padding: 10px 18px;
+    border-radius: 30px;
+    border: 1px solid var(--gray-100);
+}
+
+.contact-item i {
+    width: 20px;
+    color: var(--teal);
+    font-size: 18px;
+}
+
+.contact-item span {
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+/* Botones */
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 30px 40px;
+    background: var(--off);
+    border-top: 1px solid var(--gray-100);
+}
+
+.btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-editar {
+    background: var(--white);
+    color: var(--teal);
+    border: 2px solid var(--teal);
+}
+
+.btn-editar:hover {
+    background: var(--teal);
+    color: var(--white);
+}
+
+.btn-publicar {
+    background: var(--teal);
+    color: var(--white);
+    border: 2px solid var(--teal);
+}
+
+.btn-publicar:hover {
+    background: var(--teal-dim);
+    border-color: var(--teal-dim);
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray-500);
+    font-style: italic;
+    background: var(--off);
+    border-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .section {
+        padding: 20px;
+    }
+    .buttons-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+    .btn {
+        justify-content: center;
+    }
+    .contact-grid {
+        flex-direction: column;
+    }
+    .profile-header {
+        padding: 20px;
+    }
+    .profile-header h1 {
+        font-size: 24px;
+    }
+}

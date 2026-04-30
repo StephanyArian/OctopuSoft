@@ -109,6 +109,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/proyectos/{proyectoId}/evidencias', [EvidenciaController::class, 'store'])->name('evidencias.store');
     Route::delete('/evidencias/{id}',                 [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
 
+    // VISTA Preview
+    Route::get('/preview', function () {
+        return view('Preview');
+    })->middleware(['auth'])->name('preview');
+
 });
 
 require __DIR__.'/auth.php';
