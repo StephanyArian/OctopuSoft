@@ -76,9 +76,6 @@ function renderProjectList(query) {
         </div>`;
     }).join('');
 }
-
-// ── Seleccionar proyecto del selector ─────────────────────────
-// Si la habilidad ya existe → llama API; si es nueva → guarda pendiente
  
 function selectProject(projectId, projectName) {
     if (currentContext === 'new-form' || !currentSkillId) {
@@ -105,8 +102,6 @@ function selectProject(projectId, projectName) {
         closeProjectSelector();
     });
 }
-
-// ── Vincular via API (habilidad existente) ────────────────────
  
 function attachProjectApi(skillId, projectId, projectName, onSuccess) {
     fetch(`/skills/${skillId}/projects`, {
@@ -123,7 +118,6 @@ function attachProjectApi(skillId, projectId, projectName, onSuccess) {
     });
 }
  
-// ── Chip en habilidad existente ───────────────────────────────
  
 function addChipToSkill(skillId, projectId, projectName, withRemove) {
     const container = document.getElementById('skill-projects-' + skillId);
@@ -139,7 +133,6 @@ function addChipToSkill(skillId, projectId, projectName, withRemove) {
     container.insertBefore(chip, addBtn);
 }
  
-// ── Chips pendientes (habilidad nueva) ───────────────────────
  
 function addPendingChip(projectId, projectName) {
     pendingProjects.push({ id: projectId, name: projectName });
@@ -147,7 +140,6 @@ function addPendingChip(projectId, projectName) {
     const container = document.getElementById('pending-projects-container');
     if (!container) return;
  
-    // Input oculto para enviar con el formulario
     const input = document.createElement('input');
     input.type  = 'hidden';
     input.name  = 'project_ids[]';
@@ -155,7 +147,7 @@ function addPendingChip(projectId, projectName) {
     input.id    = 'pending-input-' + projectId;
     container.appendChild(input);
  
-    // Chip visual
+    
     const chip = document.createElement('span');
     chip.className       = 'skill-project-chip';
     chip.id              = 'pending-chip-' + projectId;
@@ -171,9 +163,9 @@ function removePendingChip(projectId) {
     if (input) input.remove();
 }
  
-// ── Confirmar desvinculación (habilidad existente) ────────────
+
  
-let detachPending = null; // { skillId, projectId, btn }
+let detachPending = null; 
  
 function confirmDetach(skillId, projectId, btn) {
     if (detachPending && detachPending.projectId === projectId && detachPending.skillId === skillId) {
@@ -225,7 +217,7 @@ function executeDetach() {
             const banner = document.getElementById('detach-banner-' + skillId + '-' + projectId);
             if (banner) banner.remove();
 
-            // Eliminar chip de AMBOS contenedores
+            
             ['skill-projects-', 'edit-projects-'].forEach(prefix => {
                 const container = document.getElementById(prefix + skillId);
                 if (!container) return;
@@ -238,13 +230,10 @@ function executeDetach() {
     });
 }
  
-// ── Proyectos vinculados en la vista de edición ───────────────
-// Cuando se abre el formulario de edición (?edit=ID),
-// el botón + proyecto de ese formulario ya apunta al skillId correcto.
  
 function openProjectSelectorForEdit(skillId) {
     currentSkillId = skillId;
-    currentContext = 'edit-form';  // ← indica que venimos del formulario
+    currentContext = 'edit-form';  
     document.getElementById('project-search').value = '';
     renderProjectList('');
     document.getElementById('project-selector-modal').classList.add('active');
@@ -256,7 +245,7 @@ function openProjectSelectorNew() {
     renderProjectList('');
     document.getElementById('project-selector-modal').classList.add('active');
 } 
-// ── Helpers ───────────────────────────────────────────────────
+// Helpers 
  
 function getLinkedIds(skillId) {
     const ids = new Set();

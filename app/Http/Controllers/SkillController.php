@@ -167,8 +167,7 @@ class SkillController extends Controller
             'display_order' => $user->skills()->where('type', $type)->count(),
         ]);
 
-        // Vincular proyectos seleccionados al crear (HU-24)
-        // El formulario envía project_ids[] con los ids seleccionados
+        
         if ($type === 'technical' && $request->filled('project_ids')) {
             $portfolioId = $user->portfolio?->id;
             if ($portfolioId) {
