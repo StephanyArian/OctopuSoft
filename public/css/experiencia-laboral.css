@@ -524,3 +524,198 @@
     .page-title { font-size: 20px; }
     .historial-card { padding: 16px; }
 }
+
+/* =============================================================
+   AGREGAR al final de experiencia-laboral.css
+   Dropdown de cargos + historial mejorado (HU-12)
+   ============================================================= */
+
+/* ── Fila cargo en el formulario: dropdown + botón × ── */
+.cargo-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* ── Wrapper posicionado ── */
+.custom-dropdown {
+    position: relative;
+    flex: 1;
+}
+
+/* ── Toggle: replica .form-input ── */
+.custom-dropdown-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--white);
+    border: 1.5px solid var(--gray-100);
+    border-radius: 12px;
+    font-size: 14px;
+    color: var(--dark);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+.custom-dropdown-toggle:hover,
+.custom-dropdown.open .custom-dropdown-toggle {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(10,191,158,0.1);
+    outline: none;
+}
+
+.dropdown-label.muted { color: var(--gray-500); }
+
+.dropdown-arrow {
+    font-size: 0.62rem;
+    color: var(--gray-500);
+    margin-left: 8px;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+}
+.custom-dropdown.open .dropdown-arrow { color: var(--teal); }
+
+/* ── Menú flotante ── */
+.custom-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 200;
+    display: none;
+}
+.custom-dropdown.open .custom-dropdown-menu { display: block; }
+
+.custom-dropdown-menu li {
+    padding: 10px 16px;
+    font-size: 13.5px;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.custom-dropdown-menu li:hover { background: var(--gray-100); }
+.custom-dropdown-menu li.selected {
+    background: rgba(10,191,158,0.08);
+    color: var(--teal-dim);
+    font-weight: 600;
+}
+.custom-dropdown-menu li.placeholder-opt {
+    color: var(--teal-dim);
+    font-weight: 600;
+    border-bottom: 1px solid var(--gray-100);
+    margin-bottom: 2px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar { width: 5px; }
+.custom-dropdown-menu::-webkit-scrollbar-track { background: transparent; }
+.custom-dropdown-menu::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
+
+/* ── Botón × eliminar cargo ── */
+.btn-remove-cargo {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gray-100);
+    background: var(--white);
+    color: var(--danger);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+.btn-remove-cargo:hover:not(:disabled) {
+    background: var(--danger-bg);
+    border-color: rgba(231,76,60,0.3);
+    transform: translateY(-1px);
+}
+.btn-remove-cargo:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* ── Botón + Agregar otro cargo ── */
+.btn-add-cargo {
+    margin-top: 10px;
+    background: none;
+    border: 1.5px dashed var(--teal-dim);
+    color: var(--teal-dim);
+    border-radius: 40px;
+    padding: 7px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+.btn-add-cargo:hover {
+    background: rgba(10,191,158,0.06);
+    border-color: var(--teal);
+    color: var(--teal);
+    transform: translateY(-1px);
+}
+
+/* ── Hint (máx. 5) ── */
+.cargos-hint {
+    font-size: 11px;
+    color: var(--gray-500);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-left: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HISTORIAL — vista de cargos mejorada (letra más grande)
+   ═══════════════════════════════════════════════════════════ */
+
+.cargos-grupo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0 4px;
+}
+
+/* Fila de un cargo en modo VISTA */
+.cargo-fila-vista {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cargo-bullet-icon {
+    color: var(--teal);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Texto del cargo — tamaño visible */
+.cargo-nombre-vista {
+    font-size: 15px;          /* era 13px, ahora más legible */
+    font-weight: 600;
+    color: var(--gray-700);
+    letter-spacing: 0.1px;
+}
+
+/* ── Botones del historial con icono ── */
+.historial-actions .btn-sm {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;          /* ligeramente más grande que antes */
+    padding: 7px 18px;
+}

@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Experience;
-use Illuminate\Validation\Validator;
-use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Support\Facades\DB;
 
 class ExperienciaLaboralController extends Controller
 {
@@ -19,9 +18,9 @@ class ExperienciaLaboralController extends Controller
         return view('experiencia-laboral', compact('experiencias'));
     }
 
-    // Patrón de caracteres permitidos por campo
-    private const LETRAS       = 'a-zA-ZáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäëïöüÄËÏÖÜñÑ';
-    private const VOCALES      = 'aeiouáéíóúàèìòùäëïöüAEIOUÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ';
+    // ── Patrones de caracteres permitidos ──────────────────────────────────
+    private const LETRAS  = 'a-zA-ZáéíóúÁÉÍÓÚàèìòùÀÈÌÒÙäëïöüÄËÏÖÜñÑ';
+    private const VOCALES = 'aeiouáéíóúàèìòùäëïöüAEIOUÁÉÍÓÚÀÈÌÒÙÄËÏÖÜ';
 
     private function validarCampoTexto(string $valor, string $campo): ?string
     {
@@ -42,12 +41,10 @@ class ExperienciaLaboralController extends Controller
             'descripcion' => 'La descripción solo puede contener letras, números y puntuación común ( . , ; : ! ? - ( ) " \' )',
         ];
 
-        // Validar caracteres permitidos
         if (!preg_match($patrones[$campo], $valor)) {
             return $mensajesCaracteres[$campo];
         }
 
-        // Validar que tenga al menos una vocal (evita texto sin sentido)
         if (!preg_match("/[{$vocales}]/", $valor)) {
             $nombres = [
                 'empresa'     => 'El nombre de la empresa',
@@ -61,7 +58,8 @@ class ExperienciaLaboralController extends Controller
         return null;
     }
 
-    private function validarRequest(Request $request): array
+    // ── Validación de campos comunes (empresa, ubicación, descripción, fechas) ──
+    private function validarCamposComunes(Request $request): array
     {
         $errores = [];
 
@@ -75,18 +73,6 @@ class ExperienciaLaboralController extends Controller
         } else {
             $error = $this->validarCampoTexto($request->empresa, 'empresa');
             if ($error) $errores['empresa'] = $error;
-        }
-
-        // Cargo
-        if (empty(trim($request->cargo))) {
-            $errores['cargo'] = 'El cargo es obligatorio.';
-        } elseif (strlen($request->cargo) < 2) {
-            $errores['cargo'] = 'El cargo debe tener al menos 2 caracteres.';
-        } elseif (strlen($request->cargo) > 100) {
-            $errores['cargo'] = 'El cargo no puede superar los 100 caracteres.';
-        } else {
-            $error = $this->validarCampoTexto($request->cargo, 'cargo');
-            if ($error) $errores['cargo'] = $error;
         }
 
         // Ubicación (opcional)
@@ -114,12 +100,8 @@ class ExperienciaLaboralController extends Controller
         }
 
         // Fecha de inicio
-        if (empty($request->fecha_inicio_dia)) {
-            $errores['fecha_inicio_dia'] = 'El día de inicio es obligatorio.';
-        }
-        if (empty($request->fecha_inicio_mes)) {
-            $errores['fecha_inicio_mes'] = 'El mes de inicio es obligatorio.';
-        }
+        if (empty($request->fecha_inicio_dia))  $errores['fecha_inicio_dia']  = 'El día de inicio es obligatorio.';
+        if (empty($request->fecha_inicio_mes))  $errores['fecha_inicio_mes']  = 'El mes de inicio es obligatorio.';
         if (empty($request->fecha_inicio_anio)) {
             $errores['fecha_inicio_anio'] = 'El año de inicio es obligatorio.';
         } elseif ($request->fecha_inicio_anio < 1950 || $request->fecha_inicio_anio > date('Y')) {
@@ -127,24 +109,75 @@ class ExperienciaLaboralController extends Controller
         }
 
         // Fecha de fin (solo si no es trabajo actual)
-        if (!$request->trabajo_actual) {
-            if (!empty($request->fecha_fin_anio)) {
-                if ($request->fecha_fin_anio < 1950 || $request->fecha_fin_anio > date('Y')) {
-                    $errores['fecha_fin_anio'] = 'El año de fin debe estar entre 1950 y ' . date('Y') . '.';
-                }
+        if (!$request->trabajo_actual && !empty($request->fecha_fin_anio)) {
+            if ($request->fecha_fin_anio < 1950 || $request->fecha_fin_anio > date('Y')) {
+                $errores['fecha_fin_anio'] = 'El año de fin debe estar entre 1950 y ' . date('Y') . '.';
             }
         }
 
         return $errores;
     }
 
-    public function store(Request $request)
+    // ── Validación de la lista de cargos (HU-12) ──────────────────────────
+    private function validarCargos(Request $request): array
     {
-        $errores = $this->validarRequest($request);
-        if (!empty($errores)) {
-            return back()->withErrors($errores)->withInput();
+        $errores = [];
+        $cargos  = $request->input('cargos', []);
+
+        // Al menos uno
+        if (empty($cargos)) {
+            $errores['cargos'] = 'Debe registrar al menos un cargo.';
+            return $errores;
         }
 
+        // Máximo 5
+        if (count($cargos) > 5) {
+            $errores['cargos'] = 'No se pueden registrar más de 5 cargos por experiencia.';
+            return $errores;
+        }
+
+        $vistos = [];
+        foreach ($cargos as $i => $cargo) {
+            $cargo = trim($cargo ?? '');
+
+            // No vacío
+            if ($cargo === '') {
+                $errores["cargos.{$i}"] = 'El cargo #' . ($i + 1) . ' no puede estar vacío.';
+                continue;
+            }
+
+            // Longitudes
+            if (strlen($cargo) < 2) {
+                $errores["cargos.{$i}"] = 'El cargo #' . ($i + 1) . ' debe tener al menos 2 caracteres.';
+                continue;
+            }
+            if (strlen($cargo) > 100) {
+                $errores["cargos.{$i}"] = 'El cargo #' . ($i + 1) . ' no puede superar los 100 caracteres.';
+                continue;
+            }
+
+            // Caracteres y vocales
+            $textoError = $this->validarCampoTexto($cargo, 'cargo');
+            if ($textoError) {
+                $errores["cargos.{$i}"] = 'Cargo #' . ($i + 1) . ': ' . $textoError;
+                continue;
+            }
+
+            // Duplicados (insensible a mayúsculas)
+            $lower = mb_strtolower($cargo);
+            if (in_array($lower, $vistos, true)) {
+                $errores["cargos.{$i}"] = 'El cargo "' . $cargo . '" está duplicado.';
+                continue;
+            }
+            $vistos[] = $lower;
+        }
+
+        return $errores;
+    }
+
+    // ── Construcción de fechas ─────────────────────────────────────────────
+    private function construirFechas(Request $request): array
+    {
         $fechaInicio = $request->fecha_inicio_anio . '-'
                      . $request->fecha_inicio_mes  . '-'
                      . $request->fecha_inicio_dia;
@@ -158,32 +191,64 @@ class ExperienciaLaboralController extends Controller
             $fechaFin = $request->fecha_fin_anio . '-'
                       . $request->fecha_fin_mes   . '-'
                       . $request->fecha_fin_dia;
-
-            if (strtotime($fechaFin) < strtotime($fechaInicio)) {
-                return back()
-                    ->withErrors(['fecha_fin_dia' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'])
-                    ->withInput();
-            }
         }
 
-        Experience::create([
-            'user_id'       => auth()->id(),
-            'type'          => 'work',
-            'institution'   => $request->empresa,
-            'title'         => $request->cargo,
-            'location'      => $request->location,
-            'description'   => $request->descripcion,
-            'start_date'    => $fechaInicio,
-            'end_date'      => $fechaFin,
-            'is_current'    => $request->trabajo_actual ? true : false,
-            'is_visible'    => true,
-            'display_order' => 0,
-        ]);
+        return [$fechaInicio, $fechaFin];
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  STORE  —  guarda UNA fila por cargo dentro de una transacción (HU-12)
+    // ══════════════════════════════════════════════════════════════════════
+    public function store(Request $request)
+    {
+        // 1. Validar campos comunes
+        $errores = $this->validarCamposComunes($request);
+
+        // 2. Validar cargos
+        $erroresCargos = $this->validarCargos($request);
+        $errores = array_merge($errores, $erroresCargos);
+
+        if (!empty($errores)) {
+            return back()->withErrors($errores)->withInput();
+        }
+
+        // 3. Construir fechas y verificar coherencia
+        [$fechaInicio, $fechaFin] = $this->construirFechas($request);
+
+        if ($fechaFin && strtotime($fechaFin) < strtotime($fechaInicio)) {
+            return back()
+                ->withErrors(['fecha_fin_dia' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'])
+                ->withInput();
+        }
+
+        // 4. Guardar todos los cargos en transacción (V-05)
+        $cargos = array_filter(array_map('trim', $request->input('cargos', [])));
+
+        DB::transaction(function () use ($request, $cargos, $fechaInicio, $fechaFin) {
+            foreach ($cargos as $cargo) {
+                Experience::create([
+                    'user_id'       => auth()->id(),
+                    'type'          => 'work',
+                    'institution'   => $request->empresa,
+                    'title'         => $cargo,
+                    'location'      => $request->location,
+                    'description'   => $request->descripcion,
+                    'start_date'    => $fechaInicio,
+                    'end_date'      => $fechaFin,
+                    'is_current'    => $request->trabajo_actual ? true : false,
+                    'is_visible'    => true,
+                    'display_order' => 0,
+                ]);
+            }
+        });
 
         return redirect()->route('experiencia.laboral')
             ->with('success', 'Experiencia laboral guardada correctamente.');
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    //  UPDATE  —  edita un registro individual
+    // ══════════════════════════════════════════════════════════════════════
     public function update(Request $request, $id)
     {
         $experiencia = Experience::where('id', $id)
@@ -191,35 +256,35 @@ class ExperienciaLaboralController extends Controller
             ->where('type', 'work')
             ->firstOrFail();
 
-        $errores = $this->validarRequest($request);
+        // Para edición individual aceptamos el campo "cargo" (singular) o "cargos[0]"
+        // para mantener compatibilidad con el formulario inline del historial React.
+        if (!$request->has('cargos')) {
+            // Compatibilidad hacia atrás: el JSX envía "cargo"
+            $request->merge(['cargos' => [$request->input('cargo', '')]]);
+        }
+
+        $errores = $this->validarCamposComunes($request);
+        $erroresCargos = $this->validarCargos($request);
+        $errores = array_merge($errores, $erroresCargos);
+
         if (!empty($errores)) {
             return response()->json(['errors' => $errores], 422);
         }
 
-        $fechaInicio = $request->fecha_inicio_anio . '-'
-                     . $request->fecha_inicio_mes  . '-'
-                     . $request->fecha_inicio_dia;
+        [$fechaInicio, $fechaFin] = $this->construirFechas($request);
 
-        $fechaFin = null;
-        if (!$request->trabajo_actual
-            && $request->fecha_fin_dia
-            && $request->fecha_fin_mes
-            && $request->fecha_fin_anio
-        ) {
-            $fechaFin = $request->fecha_fin_anio . '-'
-                      . $request->fecha_fin_mes   . '-'
-                      . $request->fecha_fin_dia;
-
-            if (strtotime($fechaFin) < strtotime($fechaInicio)) {
-                return response()->json([
-                    'error' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'
-                ], 422);
-            }
+        if ($fechaFin && strtotime($fechaFin) < strtotime($fechaInicio)) {
+            return response()->json([
+                'error' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'
+            ], 422);
         }
+
+        // El cargo editado es siempre el primero del array (edición 1-a-1)
+        $cargo = trim($request->input('cargos.0') ?? $request->input('cargo', ''));
 
         $experiencia->update([
             'institution' => $request->empresa,
-            'title'       => $request->cargo,
+            'title'       => $cargo,
             'location'    => $request->location,
             'description' => $request->descripcion,
             'start_date'  => $fechaInicio,
@@ -230,6 +295,9 @@ class ExperienciaLaboralController extends Controller
         return response()->json($experiencia->fresh());
     }
 
+    // ══════════════════════════════════════════════════════════════════════
+    //  DESTROY  —  elimina TODAS las filas del mismo grupo empresa+fecha (HU-12 V-06)
+    // ══════════════════════════════════════════════════════════════════════
     public function destroy($id)
     {
         $experiencia = Experience::where('id', $id)
@@ -237,8 +305,13 @@ class ExperienciaLaboralController extends Controller
             ->where('type', 'work')
             ->firstOrFail();
 
-        $experiencia->delete();
+        // Eliminar todas las filas del mismo grupo (misma empresa + misma fecha de inicio)
+        Experience::where('user_id', auth()->id())
+            ->where('type', 'work')
+            ->where('institution', $experiencia->institution)
+            ->where('start_date',  $experiencia->start_date)
+            ->delete();
 
-        return response()->json(['message' => 'Experiencia eliminada correctamente.']);
+        return response()->json(['message' => 'Experiencia y todos sus cargos eliminados correctamente.']);
     }
 }

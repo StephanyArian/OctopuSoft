@@ -22,7 +22,7 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <a href="{{ route('proyectos') }}" class="sidebar-item" >Proyectos</a>  
+                        <a href="{{ route('proyectos') }}" class="sidebar-item">Proyectos</a>  
                         <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
 
@@ -38,7 +38,7 @@
                                 @csrf
                                 <div class="form-grid">
 
-                                    {{-- Empresa y Cargo --}}
+                                    {{-- Empresa --}}
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Empresa <span class="required">*</span></label>
@@ -46,13 +46,51 @@
                                                 placeholder="Ej. Google Bolivia" value="{{ old('empresa') }}">
                                             <div id="empresaError" class="error-message hidden">La empresa es obligatoria</div>
                                         </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Cargo <span class="required">*</span></label>
-                                            <input class="form-input" type="text" name="cargo" id="cargo"
-                                                placeholder="Ej. Desarrollador Backend" value="{{ old('cargo') }}">
-                                            <div id="cargoError" class="error-message hidden">El cargo es obligatorio</div>
-                                        </div>
                                     </div>
+
+                                    {{-- ── CARGOS con dropdown personalizado (HU-12) ── --}}
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Cargos <span class="required">*</span>
+                                            <span class="cargos-hint">(máx. 5)</span>
+                                        </label>
+
+                                        <div id="cargos-list">
+                                            <div class="cargo-item" data-index="0">
+                                                <div class="custom-dropdown">
+                                                    <button type="button" class="custom-dropdown-toggle" onclick="toggleDropdown(this)">
+                                                        <span class="dropdown-label muted">— Seleccionar cargo —</span>
+                                                        <span class="dropdown-arrow">▲</span>
+                                                    </button>
+                                                    <ul class="custom-dropdown-menu">
+                                                        <li data-value="" class="placeholder-opt selected">— Seleccionar cargo —</li>
+                                                        <li data-value="Frontend Developer">Frontend Developer</li>
+                                                        <li data-value="Backend Developer">Backend Developer</li>
+                                                        <li data-value="Full Stack Developer">Full Stack Developer</li>
+                                                        <li data-value="UI/UX Designer">UI/UX Designer</li>
+                                                        <li data-value="DevOps Engineer">DevOps Engineer</li>
+                                                        <li data-value="Mobile Developer">Mobile Developer</li>
+                                                        <li data-value="Project Manager">Project Manager</li>
+                                                        <li data-value="QA Tester">QA Tester</li>
+                                                        <li data-value="Database Administrator">Database Administrator</li>
+                                                        <li data-value="Technical Leader">Technical Leader</li>
+                                                        <li data-value="Data Analyst">Data Analyst</li>
+                                                        <li data-value="Scrum Master">Scrum Master</li>
+                                                        <li data-value="Product Owner">Product Owner</li>
+                                                    </ul>
+                                                    <input type="hidden" name="cargos[]" value="{{ old('cargos.0', '') }}">
+                                                </div>
+                                                <button type="button" class="btn-remove-cargo" onclick="removeCargo(this)" disabled title="Eliminar cargo">×</button>
+                                            </div>
+                                        </div>
+
+                                        <div id="cargosError" class="error-message hidden"></div>
+
+                                        <button type="button" id="btnAgregarCargo" class="btn-add-cargo" onclick="agregarCargo()">
+                                            + Agregar otro cargo
+                                        </button>
+                                    </div>
+                                    {{-- ── FIN CARGOS ── --}}
 
                                     {{-- Ubicación --}}
                                     <div class="form-row">
@@ -63,7 +101,7 @@
                                         </div>
                                     </div>
 
-                                    {{-- Fecha de inicio: día, mes, año --}}
+                                    {{-- Fecha de inicio --}}
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Fecha de inicio <span class="required">*</span></label>
@@ -91,7 +129,6 @@
                                             <div id="fechaInicioError" class="error-message hidden">La fecha de inicio es obligatoria</div>
                                         </div>
 
-                                        {{-- Fecha de fin: día, mes, año --}}
                                         <div class="form-group" id="fechaFinGroup">
                                             <label class="form-label">Fecha de fin</label>
                                             <div style="display:flex; gap:8px;">
@@ -145,9 +182,9 @@
 
                         <div id="historial-laboral-react" data-experiencias="{{ json_encode($experiencias) }}"></div>
 
-                    </div>{{-- /main --}}
-                </div>{{-- /body-row --}}
-            </div>{{-- /shell --}}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
