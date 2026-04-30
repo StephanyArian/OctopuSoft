@@ -81,4 +81,9 @@ class User extends Authenticatable
     {
         $this->attributes['country'] = $value ? substr($value, 0, 30) : null;
     }
+
+    public function portfolio()
+    {
+        return $this->hasOne(\App\Models\Portfolio::class);
+    }
 }

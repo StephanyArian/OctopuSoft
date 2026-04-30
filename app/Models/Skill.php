@@ -63,4 +63,12 @@ class Skill extends Model
             default => 33,
         };
     }
+
+    public function projects()
+    {
+        return $this->belongsToMany(
+            \App\Models\Project::class,
+            'project_skill' 
+        );
+    }
 }

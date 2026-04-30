@@ -87,9 +87,19 @@ class SkillController extends Controller
         $skills = Auth::user()->skills()
             ->where('type', 'technical')
             ->orderBy('display_order')
+            ->with('projects')
             ->get();
+        
+        $userProjects = Auth::user()
+            ->portfolio
+            ?->projects()
+            ->orderBy('name')
+            ->with('technologies')
+            ->get() ?? collect();
 
-        return view('habilidades-tecnicas', compact('skills'));
+        
+
+        return view('habilidades-tecnicas', compact('skills', 'userProjects'));
     }
 
     public function blandas()
@@ -150,12 +160,28 @@ class SkillController extends Controller
                 ->withInput();
         }
 
-        $user->skills()->create([
+        $skill = $user->skills()->create([
             'type'          => $type,
             'name'          => $request->name,
             'level'         => $type === 'technical' ? $request->level : 1,
             'display_order' => $user->skills()->where('type', $type)->count(),
         ]);
+
+        // Vincular proyectos seleccionados al crear (HU-24)
+        // El formulario envía project_ids[] con los ids seleccionados
+        if ($type === 'technical' && $request->filled('project_ids')) {
+            $portfolioId = $user->portfolio?->id;
+            if ($portfolioId) {
+               // Validar que los proyectos pertenezcan al usuario
+                $validIds = \App\Models\Project::where('portfolio_id', $portfolioId)
+                    ->whereIn('id', $request->project_ids)
+                    ->pluck('id')
+                    ->toArray();
+                if (!empty($validIds)) {
+                    $skill->projects()->syncWithoutDetaching($validIds);
+                }
+            }
+        }
 
         $route = $type === 'technical' ? 'skills.tecnicas' : 'skills.blandas';
         return redirect()->route($route)->with('success', 'Habilidad guardada correctamente.');
@@ -212,5 +238,45 @@ class SkillController extends Controller
 
         $route = $type === 'technical' ? 'skills.tecnicas' : 'skills.blandas';
         return redirect()->route($route)->with('success', 'Habilidad eliminada correctamente.');
+    }
+
+    // Vincular proyecto a una habilidad
+    public function attachProject(Request $request, Skill $skill)
+    {
+        $this->authorize('update', $skill);
+
+        $request->validate([
+            'project_id' => 'required|integer|exists:projects,id',
+        ]);
+
+       // Verificar que el proyecto pertenezca al usuario
+        $projectBelongsToUser = Auth::user()
+            ->portfolio
+            ?->projects()
+            ->where('id', $request->project_id)
+            ->exists();
+
+        if (!$projectBelongsToUser) {
+            return response()->json(['error' => 'Proyecto no encontrado.'], 403);
+        }
+
+        $skill->projects()->syncWithoutDetaching([$request->project_id]);
+
+        $project = $skill->projects()->find($request->project_id);
+
+        return response()->json([
+            'ok'      => true,
+            'project' => ['id' => $project->id, 'name' => $project->name],
+        ]);
+    }
+
+    // Desvincular proyecto de una habilidad
+    public function detachProject(Skill $skill, $projectId)
+    {
+        $this->authorize('update', $skill);
+
+        $skill->projects()->detach($projectId);
+
+        return response()->json(['ok' => true]);
     }
 }

@@ -316,3 +316,233 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
 }
+
+/* ── HU-24: Chips de proyectos vinculados ───────────────────── */
+.skill-projects {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.skill-project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    background: #ebf5fb;
+    border: 1px solid #aed6f1;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a5276;
+}
+
+.chip-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    color: #7fb3d3;
+    padding: 0;
+    transition: color 0.2s;
+}
+.chip-remove:hover { color: #e74c3c; }
+
+.chip-add {
+    background: none;
+    border: 1px dashed #aed6f1;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2e86c1;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.chip-add:hover {
+    background: #ebf5fb;
+    border-style: solid;
+}
+
+/* ── Modal selector de proyectos ────────────────────────────── */
+.project-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    transition: all 0.2s;
+}
+.project-option:hover {
+    background: #ebf5fb;
+    border-color: #aed6f1;
+}
+
+.project-option-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1D9E75;
+    flex-shrink: 0;
+}
+
+/* ── HU-24: Agregar al final de tu skills.css ─────────────────────── */
+
+/* Contenedor de chips dentro del formulario */
+.skill-projects-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-height: 44px;
+}
+
+/* Chip de proyecto (historial y formulario) */
+.skill-project-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #e6f9f4;
+    color: #085041;
+    border: 1px solid #5dcaa5;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+/* Chip marcado para desvincular */
+.skill-project-chip.chip-confirming {
+    background: #fcebeb;
+    color: #791f1f;
+    border-color: #e24b4a;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* Botón × dentro del chip */
+.chip-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #1d9e75;
+    font-size: 15px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+}
+.chip-remove:hover { color: #a32d2d; }
+
+/* Botón "+ proyecto" / "+ Agregar proyecto" */
+.chip-add {
+    background: transparent;
+    border: 1px dashed #cbd5e1;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 12px;
+    color: #1abc9c;
+    cursor: pointer;
+    font-weight: 500;
+    transition: border-color 0.15s, background 0.15s;
+}
+.chip-add:hover {
+    background: #e6f9f4;
+    border-color: #1abc9c;
+}
+
+/* Banner de confirmación de desvinculación */
+.detach-confirm-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: #fcebeb;
+    border: 1px solid #f09595;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #791f1f;
+    flex-wrap: wrap;
+}
+
+.btn-detach-confirm {
+    background: #e24b4a;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.btn-detach-confirm:hover { background: #c0302f; }
+
+.btn-detach-cancel {
+    background: transparent;
+    border: 1px solid #f09595;
+    border-radius: 20px;
+    padding: 5px 13px;
+    font-size: 12px;
+    color: #791f1f;
+    cursor: pointer;
+}
+.btn-detach-cancel:hover { background: #fdd; }
+
+/* Opciones dentro del selector de proyectos */
+.project-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.12s;
+    border: 1px solid transparent;
+}
+.project-option:hover {
+    background: #e6f9f4;
+    border-color: #5dcaa5;
+}
+.project-option-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #1abc9c;
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+.project-option-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a2e;
+}
+.project-option-techs {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.skill-project-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+.skill-project-link:hover {
+    background: #c8f0e4;
+    border-color: #1abc9c;
+}

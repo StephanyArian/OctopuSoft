@@ -83,6 +83,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/skills',              [SkillController::class, 'store'])->name('skills.store');
     Route::put('/skills/{skill}',       [SkillController::class, 'update'])->name('skills.update');
     Route::delete('/skills/{skill}',    [SkillController::class, 'destroy'])->name('skills.destroy');
+    //Evidencia de los skill con proyectos 
+    Route::post('/skills/{skill}/projects',           [SkillController::class, 'attachProject'])->name('skills.projects.attach');
+    Route::delete('/skills/{skill}/projects/{project}', [SkillController::class, 'detachProject'])->name('skills.projects.detach');
 
     // REDES
     Route::get('/redes-contacto',  [RedContactoController::class, 'index'])->name('redes.index');

@@ -51,4 +51,13 @@ class Project extends Model
     {
         return $this->hasMany(ProjectEvidencia::class, 'project_id');
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(
+            \App\Models\Skill::class,
+            'project_skill'
+        );
+    }
+
 }
