@@ -28,7 +28,6 @@
     const inputCliente = document.getElementById('proyCliente');
     const grid = document.getElementById('proyGrid');
     const tecCountBadge = document.getElementById('tecCountBadge');
-    const evWrapper = document.getElementById('evSectionWrapper');
     const btnEvidencias = document.getElementById('proyBtnEvidencias');
     const evTriggerCount = document.getElementById('evTriggerCount');
     const contadorDesc = document.getElementById('contadorDesc');
@@ -496,10 +495,16 @@
             });
             if (!response.ok) { const error = await response.json(); throw new Error(error.message || 'Error al guardar'); }
             const resultado = await response.json();
-            window._proyectoParaEvidencias = resultado;
-            mostrarToast(editandoId ? '✅ Proyecto actualizado' : '✅ Proyecto creado');
-            ocultarForm();
-            await cargarProyectos();
+window._proyectoParaEvidencias = resultado;
+
+// ✅ CLAVE: subir evidencias pendientes con el id real
+if (!editandoId && typeof window.evSubirPendientes === 'function') {
+    await window.evSubirPendientes(resultado.id);
+}
+
+mostrarToast(editandoId ? '✅ Proyecto actualizado' : '✅ Proyecto creado');
+ocultarForm();
+await cargarProyectos();
         } catch (error) { mostrarToast(error.message || 'Error al guardar proyecto', 'error'); } finally { mostrarLoading(false); }
     }
 
@@ -759,24 +764,39 @@
         toggleGrid(true);
         window._proyectoParaEvidencias = proyecto;
         if (formCard) formCard.classList.remove('open');
-        if (evWrapper) evWrapper.style.display = 'block';
         if (typeof window.evInit === 'function') window.evInit(proyecto);
         else mostrarToast('Error al cargar evidencias', 'error');
     }
 
-    if (btnEvidencias) {
-        btnEvidencias.addEventListener('click', () => {
-            if (!window._proyectoParaEvidencias && !editandoId) { mostrarToast('❌ Primero guarda el proyecto para agregar evidencias', 'error'); return; }
-            const proyectoActual = window._proyectoParaEvidencias || (editandoId ? proyectos.find(p => p.id === editandoId) : null);
+   if (btnEvidencias) {
+    btnEvidencias.addEventListener('click', () => {
+        // Si estamos editando un proyecto existente → flujo normal con backend
+        if (editandoId) {
+            const proyectoActual = proyectos.find(p => p.id === editandoId);
             if (proyectoActual) abrirEvidencias(proyectoActual);
-            else mostrarToast('❌ Primero guarda el proyecto para agregar evidencias', 'error');
-        });
-    }
+            return;
+        }
+        // Si es proyecto NUEVO → expandir panel inline sin backend
+        const evInlineBody = document.getElementById('evInlineBody');
+        const evInlineHeader = document.getElementById('evInlineHeader');
+        const evInlineSection = document.getElementById('evInlineSection');
+        if (!evInlineSection) {
+            mostrarToast('❌ Panel de evidencias no encontrado', 'error');
+            return;
+        }
+        evInlineSection.classList.toggle('open');
+        // Inicializar evidencia.js en modo pendiente (sin proyecto)
+        if (evInlineSection.classList.contains('open')) {
+            if (typeof window.evResetearPendientes === 'function') window.evResetearPendientes();
+        }
+        const arrow = btnEvidencias.querySelector('.ev-trigger-arrow');
+        if (arrow) arrow.style.transform = evInlineSection.classList.contains('open') ? 'rotate(90deg)' : '';
+    });
+}
 
     document.addEventListener('ev:volver', () => {
         toggleProyHeader(false);
         toggleGrid(false);
-        if (evWrapper) evWrapper.style.display = 'none';
         cargarProyectos();
     });
 
@@ -845,7 +865,12 @@
     if (limpiarFiltrosBtn) limpiarFiltrosBtn.addEventListener('click', resetearFiltros);
 
     // ========== EVENTOS PRINCIPALES ==========
-    if (btnMostrarForm) btnMostrarForm.addEventListener('click', () => { limpiarForm(); mostrarForm(); });
+if (btnMostrarForm) btnMostrarForm.addEventListener('click', () => {
+    limpiarForm();
+    mostrarForm();
+    // Resetear evidencias pendientes de un formulario anterior
+    if (typeof window.evResetearPendientes === 'function') window.evResetearPendientes();
+});
     if (btnCancelarForm) btnCancelarForm.addEventListener('click', ocultarForm);
     if (btnGuardarForm) btnGuardarForm.addEventListener('click', guardarProyectoBD);
 

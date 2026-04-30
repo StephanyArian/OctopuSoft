@@ -6,6 +6,7 @@
         let archivosNuevos = [];
         let filtroActivo   = 'todos';
         let busqueda       = '';
+        
 
         const CSRF        = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
         const formCard    = document.getElementById('evFormCard');
@@ -118,100 +119,86 @@
         // ── Guardar ───────────────────────────────────────────────
         btnGuardar?.addEventListener('click', guardarEvidencia);
 
-        async function guardarEvidencia() {
+        
+async function guardarEvidencia() {
+    limpiarErrores();
 
-            if (!proyectoActual && window._proyectoParaEvidencias) {
-                proyectoActual = window._proyectoParaEvidencias;
-                console.log('🟢 Recuperado proyectoActual desde global:', proyectoActual);
-            }
-
-            console.log('🟢 guardarEvidencia() fue llamada');
-            console.log('Tipo activo:', tipoActivo);
-            console.log('Proyecto actual:', proyectoActual);
-            console.log('Proyecto actual ID:', proyectoActual?.id);
-            console.log('Archivos nuevos:', archivosNuevos.length);
-
-            limpiarErrores();
-            if (!proyectoActual) {
-                console.error('❌ No hay proyecto seleccionado'); 
-                toast('❌ No hay proyecto seleccionado', 'error'); return; }
-                let isValid = true;
-
-            if (tipoActivo === 'imagen') {
-                const nombre = document.getElementById('evImgNombre').value.trim();
-                if (!nombre) { setErr('evImgNombre', 'evErrImgNombre'); isValid = false; }
-                if (archivosNuevos.length === 0) { document.getElementById('evErrImgFile').classList.add('visible'); isValid = false; }
-                if (!isValid) return;
-                btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-                const fd = new FormData();
-                fd.append('tipo', 'imagen'); fd.append('nombre', nombre); fd.append('project_id', proyectoActual.id);
-                archivosNuevos.forEach(f => fd.append('imagenes[]', f));
-                await enviar(fd);
-
-            } else if (tipoActivo === 'enlace') {
-                const nombre = document.getElementById('evLinkNombre').value.trim();
-                const url    = document.getElementById('evLinkUrl').value.trim();
-                const desc   = document.getElementById('evLinkDesc').value.trim();
-                if (!nombre) { setErr('evLinkNombre', 'evErrLinkNombre'); isValid = false; }
-                if (!url || !isValidUrl(url)) { setErr('evLinkUrl', 'evErrLinkUrl'); isValid = false; }
-                if (!isValid) return;
-                btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-                const fd = new FormData();
-                fd.append('tipo', 'enlace'); fd.append('etiqueta', nombre); fd.append('url', url);
-                fd.append('descripcion', desc); fd.append('project_id', proyectoActual.id);
-                await enviar(fd);
-
-            } else {
-                const nombre     = document.getElementById('evRepoNombre').value.trim();
-                const url        = document.getElementById('evRepoUrl').value.trim();
-                const plataforma = document.getElementById('evRepoPlataforma').value;
-                const desc       = document.getElementById('evRepoDesc').value.trim();
-                if (!nombre) { setErr('evRepoNombre', 'evErrRepoNombre'); isValid = false; }
-                if (!url || !isValidUrl(url)) { setErr('evRepoUrl', 'evErrRepoUrl'); isValid = false; }
-                if (!isValid) return;
-                btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-                const fd = new FormData();
-                fd.append('tipo', 'repositorio'); fd.append('etiqueta', nombre); fd.append('url', url);
-                fd.append('plataforma', plataforma); fd.append('descripcion', desc); fd.append('project_id', proyectoActual.id);
-                await enviar(fd);
-            }
+    // ── Sin proyecto: guardar en lista temporal ──────────────
+    if (!proyectoActual) {
+        let isValid = true;
+        if (tipoActivo === 'imagen') {
+            const nombre = document.getElementById('evImgNombre').value.trim();
+            if (!nombre) { setErr('evImgNombre','evErrImgNombre'); isValid = false; }
+            if (archivosNuevos.length === 0) { document.getElementById('evErrImgFile').classList.add('visible'); isValid = false; }
+            if (!isValid) return;
+            evidenciasPendientes.push({ tipo:'imagen', nombre, archivos:[...archivosNuevos],
+                previews:[...newPreviews.querySelectorAll('img')].map(i=>i.src) });
+        } else if (tipoActivo === 'enlace') {
+            const nombre = document.getElementById('evLinkNombre').value.trim();
+            const url    = document.getElementById('evLinkUrl').value.trim();
+            const desc   = document.getElementById('evLinkDesc').value.trim();
+            if (!nombre) { setErr('evLinkNombre','evErrLinkNombre'); isValid = false; }
+            if (!url||!isValidUrl(url)) { setErr('evLinkUrl','evErrLinkUrl'); isValid = false; }
+            if (!isValid) return;
+            evidenciasPendientes.push({ tipo:'enlace', nombre, url, desc });
+        } else {
+            const nombre     = document.getElementById('evRepoNombre').value.trim();
+            const url        = document.getElementById('evRepoUrl').value.trim();
+            const plataforma = document.getElementById('evRepoPlataforma').value;
+            const desc       = document.getElementById('evRepoDesc').value.trim();
+            if (!nombre) { setErr('evRepoNombre','evErrRepoNombre'); isValid = false; }
+            if (!url||!isValidUrl(url)) { setErr('evRepoUrl','evErrRepoUrl'); isValid = false; }
+            if (!isValid) return;
+            evidenciasPendientes.push({ tipo:'repositorio', nombre, url, plataforma, desc });
         }
+        // Actualizar badge del botón en proyectos
+        const countEl = document.getElementById('evTriggerCount');
+        if (countEl) countEl.textContent = evidenciasPendientes.length;
+        toast(`✅ Evidencia añadida (${evidenciasPendientes.length})`);
+        ocultarForm();
+        renderizarPendientes();
+        return;
+    }
 
-        async function enviar(fd) {
-            try {
-                const res  = await fetch(`/proyectos/${proyectoActual.id}/evidencias`, {
-                    method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-                    body: fd,
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    const errs = data.errors ? Object.values(data.errors).flat() : [data.message || 'Error'];
-                    toast('❌ ' + errs[0], 'error'); return;
-                }
-                
-                if (data.evidencias && Array.isArray(data.evidencias)) {
-                    evidencias.push(...data.evidencias);
-                } else if (data.evidencia) {
-                    evidencias.push(data.evidencia);
-                } else if (data.id) {
-                    evidencias.push(data);
-                }
-
-
-                toast('✅ Evidencia guardada');
-                ocultarForm();
-                renderizar();
-            } catch {
-                toast('❌ Error de conexión', 'error');
-            } finally {
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = '<i class="fas fa-save"></i> Guardar evidencia';
-            }
-        }
+    // ── Con proyecto: subir directo al backend (tu código original) ──
+    let isValid = true;
+    if (tipoActivo === 'imagen') {
+        const nombre = document.getElementById('evImgNombre').value.trim();
+        if (!nombre) { setErr('evImgNombre','evErrImgNombre'); isValid = false; }
+        if (archivosNuevos.length === 0) { document.getElementById('evErrImgFile').classList.add('visible'); isValid = false; }
+        if (!isValid) return;
+        btnGuardar.disabled = true; btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        const fd = new FormData();
+        fd.append('tipo','imagen'); fd.append('nombre',nombre); fd.append('project_id',proyectoActual.id);
+        archivosNuevos.forEach(f => fd.append('imagenes[]', f));
+        await enviar(fd);
+    } else if (tipoActivo === 'enlace') {
+        const nombre = document.getElementById('evLinkNombre').value.trim();
+        const url    = document.getElementById('evLinkUrl').value.trim();
+        const desc   = document.getElementById('evLinkDesc').value.trim();
+        if (!nombre) { setErr('evLinkNombre','evErrLinkNombre'); isValid = false; }
+        if (!url||!isValidUrl(url)) { setErr('evLinkUrl','evErrLinkUrl'); isValid = false; }
+        if (!isValid) return;
+        btnGuardar.disabled = true; btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        const fd = new FormData();
+        fd.append('tipo','enlace'); fd.append('etiqueta',nombre); fd.append('url',url);
+        fd.append('descripcion',desc); fd.append('project_id',proyectoActual.id);
+        await enviar(fd);
+    } else {
+        const nombre     = document.getElementById('evRepoNombre').value.trim();
+        const url        = document.getElementById('evRepoUrl').value.trim();
+        const plataforma = document.getElementById('evRepoPlataforma').value;
+        const desc       = document.getElementById('evRepoDesc').value.trim();
+        if (!nombre) { setErr('evRepoNombre','evErrRepoNombre'); isValid = false; }
+        if (!url||!isValidUrl(url)) { setErr('evRepoUrl','evErrRepoUrl'); isValid = false; }
+        if (!isValid) return;
+        btnGuardar.disabled = true; btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+        const fd = new FormData();
+        fd.append('tipo','repositorio'); fd.append('etiqueta',nombre); fd.append('url',url);
+        fd.append('plataforma',plataforma); fd.append('descripcion',desc); fd.append('project_id',proyectoActual.id);
+        await enviar(fd);
+    }
+}
 
         // ── Eliminar ──────────────────────────────────────────────
         async function eliminarEvidencia(id) {
@@ -247,13 +234,7 @@
         async function cargarEvidencias() {
             console.log('📌 cargarEvidencias llamado');
             console.log('📌 proyectoActual:', proyectoActual);
-            console.log('📌 proyectoActual.id:', proyectoActual?.id);
-            
-            if (!proyectoActual) {
-                console.error('❌ cargarEvidencias: proyectoActual es null');
-                return;
-            }
-            
+            console.log('📌 proyectoActual.id:', proyectoActual?.id);        
             const url = `/proyectos/${proyectoActual.id}/evidencias`;
             console.log('📌 Fetching URL:', url);
             
@@ -420,7 +401,112 @@
             poblarBanner();
             cargarEvidencias();
         };
+     // Muestra lista temporal en el grid (sin backend)
+function renderizarPendientes() {
+    if (!grid) return;
+    if (evidenciasPendientes.length === 0) {
+        grid.innerHTML = `<div class="ev-empty">
+            <div class="ev-empty-icon">📎</div>
+            <h3>Aún no has añadido evidencias.</h3>
+            <p>Se guardarán junto al proyecto.</p>
+        </div>`;
+        return;
+    }
+    grid.innerHTML = '';
+    evidenciasPendientes.forEach((ev, idx) => {
+        const card = document.createElement('div');
+        card.className = 'ev-card';
+        if (ev.tipo === 'imagen') {
+            const imgSrc = ev.previews?.[0] || '';
+            card.innerHTML = `
+                <div class="ev-card-band ev-card-band-img"></div>
+                ${imgSrc ? `<div class="ev-card-img-wrap"><img src="${imgSrc}"></div>` : ''}
+                <div class="ev-card-body">
+                    <span class="ev-card-type-badge ev-badge-img"><i class="fas fa-image"></i> Imagen</span>
+                    <div class="ev-card-nombre">${esc(ev.nombre)}</div>
+                    <div class="ev-card-meta">
+                        <span style="color:#94a3b8">${ev.archivos.length} archivo(s) — pendiente</span>
+                        <button class="ev-icon-btn danger btn-rm-pend" data-idx="${idx}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+        } else if (ev.tipo === 'enlace') {
+            card.innerHTML = `
+                <div class="ev-card-band ev-card-band-link"></div>
+                <div class="ev-card-link-icon">🔗</div>
+                <div class="ev-card-body">
+                    <span class="ev-card-type-badge ev-badge-link"><i class="fas fa-link"></i> Enlace</span>
+                    <div class="ev-card-nombre">${esc(ev.nombre)}</div>
+                    <a class="ev-card-url" href="${esc(ev.url)}" target="_blank">${esc(ev.url)}</a>
+                    <div class="ev-card-meta">
+                        <span style="color:#94a3b8">pendiente</span>
+                        <button class="ev-icon-btn danger btn-rm-pend" data-idx="${idx}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+        } else {
+            card.innerHTML = `
+                <div class="ev-card-band ev-card-band-repo"></div>
+                <div class="ev-card-link-icon"><i class="fab fa-github" style="font-size:32px"></i></div>
+                <div class="ev-card-body">
+                    <span class="ev-card-type-badge ev-badge-repo"><i class="fab fa-github"></i> ${esc(ev.plataforma||'Repo')}</span>
+                    <div class="ev-card-nombre">${esc(ev.nombre)}</div>
+                    <a class="ev-card-url" href="${esc(ev.url)}" target="_blank">${esc(ev.url)}</a>
+                    <div class="ev-card-meta">
+                        <span style="color:#94a3b8">pendiente</span>
+                        <button class="ev-icon-btn danger btn-rm-pend" data-idx="${idx}"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>`;
+        }
+        card.querySelector('.btn-rm-pend').addEventListener('click', () => {
+            evidenciasPendientes.splice(idx, 1);
+            const countEl = document.getElementById('evTriggerCount');
+            if (countEl) countEl.textContent = evidenciasPendientes.length;
+            renderizarPendientes();
+        });
+        grid.appendChild(card);
+    });
+}
 
+window.evSubirPendientes = async function(proyectoId) {
+    if (evidenciasPendientes.length === 0) return;
+    proyectoActual = { id: proyectoId };
+    const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    
+    for (const ev of evidenciasPendientes) {
+        const fd = new FormData();
+        fd.append('project_id', proyectoId);
+        if (ev.tipo === 'imagen') {
+            fd.append('tipo','imagen'); fd.append('nombre', ev.nombre);
+            ev.archivos.forEach(f => fd.append('imagenes[]', f));
+        } else if (ev.tipo === 'enlace') {
+            fd.append('tipo','enlace'); fd.append('etiqueta', ev.nombre);
+            fd.append('url', ev.url); fd.append('descripcion', ev.desc||'');
+        } else {
+            fd.append('tipo','repositorio'); fd.append('etiqueta', ev.nombre);
+            fd.append('url', ev.url); fd.append('plataforma', ev.plataforma||'GitHub');
+            fd.append('descripcion', ev.desc||'');
+        }
+        // fetch directo en vez de enviar()
+        try {
+            await fetch(`/proyectos/${proyectoId}/evidencias`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                body: fd,
+            });
+        } catch(e) { console.error('Error subiendo evidencia pendiente:', e); }
+    }
+    evidenciasPendientes = [];
+    const countEl = document.getElementById('evTriggerCount');
+    if (countEl) countEl.textContent = '0';
+};
+
+// Resetear al abrir nuevo proyecto
+window.evResetearPendientes = function() {
+    evidenciasPendientes = [];
+    proyectoActual = null;
+    renderizarPendientes();
+    const countEl = document.getElementById('evTriggerCount');
+    if (countEl) countEl.textContent = '0';
+};
         init();
     })();
     

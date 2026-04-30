@@ -654,7 +654,20 @@
 .ev-trigger-count { background: var(--teal); color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; display: none; }
 .ev-trigger-count.visible { display: inline-flex; }
 .ev-trigger-arrow { color: #94a3b8; font-size: 13px; }
-
+.ev-inline-section {
+    display: none;
+    margin-top: 12px;
+}
+.ev-inline-section.open {
+    display: block;
+}
+.ev-trigger-arrow {
+    transition: transform 0.2s ease;
+}
+.ev-inline-section.open ~ * .ev-trigger-arrow,
+#proyBtnEvidencias .ev-trigger-arrow {
+    /* se rota con JS abajo */
+}
 /* ══ MINI DROPDOWN CANDADO ══ */
 .vis-toggle-wrap { position: relative; }
 
@@ -1088,3 +1101,11 @@ html, body { height: 100%; }
 .shell { min-height: 100vh !important; }
 .body-row { min-height: 100vh !important; }
 .main-panel { min-height: 100vh !important; }
+
+.ev-inline-section {
+    display: none;
+    margin-top: 12px;
+}
+.ev-inline-section.open {
+    display: block;
+}

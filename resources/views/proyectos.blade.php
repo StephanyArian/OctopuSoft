@@ -237,21 +237,28 @@
                                 </div>
                             </div>
 
-                            <div class="ev-trigger-wrap">
-                                <button type="button" class="ev-trigger-btn" id="proyBtnEvidencias">
-                                    <div class="ev-trigger-left">
-                                        <div class="ev-trigger-icon-box">📎</div>
-                                        <div class="ev-trigger-texts">
-                                            <strong>Agregar Evidencias</strong>
-                                            <span>Imágenes, enlaces y repositorios del proyecto</span>
-                                        </div>
-                                    </div>
-                                    <div class="ev-trigger-right">
-                                        <span class="ev-trigger-count" id="evTriggerCount">0</span>
-                                        <i class="fas fa-chevron-right ev-trigger-arrow"></i>
-                                    </div>
-                                </button>
-                            </div>
+                      <div class="ev-trigger-wrap">
+                          <button type="button" class="ev-trigger-btn" id="proyBtnEvidencias">
+                             <div class="ev-trigger-left">
+                                <div class="ev-trigger-icon-box">📎</div>
+                                <div class="ev-trigger-texts">
+                                   <strong>Agregar Evidencias</strong>
+                                   <span>Imágenes, enlaces y repositorios del proyecto</span>
+                              </div>
+                       </div>
+                       <div class="ev-trigger-right">
+                            <span class="ev-trigger-count" id="evTriggerCount">0</span>
+                            <i class="fas fa-chevron-right ev-trigger-arrow"></i>
+                       </div>
+                 </button>
+
+                  {{-- Panel inline que se expande al hacer clic --}}
+                 <div class="ev-inline-section" id="evInlineSection">
+                     <div class="ev-inline-body" id="evInlineBody">
+                        @include('secciones.evidencia')
+                  </div>
+              </div>
+           </div>
 
                             <div class="proy-form-actions">
                                 <button class="proy-btn-cancel" id="proyBtnCancelarForm">Cancelar</button>
@@ -264,11 +271,6 @@
 
                         {{-- PÁGINA DE VISTA PREVIA (TIPO DOCUMENTO) --}}
                         <div class="preview-page" id="previewPage"></div>
-
-                        {{-- EVIDENCIAS --}}
-                        <div id="evSectionWrapper" style="display:none">
-                            @include('secciones.evidencia')
-                        </div>
                     </div>
                 </div>
             </div>

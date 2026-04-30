@@ -30,8 +30,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-
-
         // =====================================================
         // 3. USERS
         // =====================================================
@@ -53,32 +51,34 @@ return new class extends Migration
             $table->timestamp('registered_at')->useCurrent();
             $table->rememberToken();
             $table->timestamps();
-            
-            // Índices
+
             $table->index('profession_id');
             $table->index('is_active');
             $table->index('email');
         });
 
         // =====================================================
-// 4. SESSIONS (Estructura estándar de Laravel)
-// =====================================================
-Schema::create('sessions', function (Blueprint $table) {
-    $table->string('id')->primary();
-    $table->foreignId('user_id')->nullable()->index();
-    $table->string('ip_address', 45)->nullable();
-    $table->text('user_agent')->nullable();
-    $table->longText('payload');
-    $table->integer('last_activity')->index();
-    $table->timestamps();
-});
+        // 4. SESSIONS
+        // =====================================================
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+            $table->timestamps();
+        });
 
-//RECUPERAR CONTRASEÑA
-Schema::create('password_reset_tokens', function (Blueprint $table) {
-    $table->string('email')->primary();
-    $table->string('token');
-    $table->timestamp('created_at')->nullable();
-});
+        // =====================================================
+        // RECUPERAR CONTRASEÑA
+        // =====================================================
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
         // =====================================================
         // 5. PROFESSIONAL_NETWORKS
         // =====================================================
@@ -92,8 +92,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->boolean('is_primary')->default(false);
             $table->integer('display_order')->default(0);
             $table->timestamps();
-            
-            // Índices y unique
+
             $table->unique(['user_id', 'platform_id']);
             $table->index('user_id');
             $table->index('platform_id');
@@ -112,8 +111,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->boolean('show_email')->default(false);
             $table->boolean('show_phone')->default(false);
             $table->timestamps();
-            
-            // Índices
+
             $table->index('user_id');
             $table->index('is_public');
             $table->index('slug');
@@ -131,8 +129,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->boolean('is_visible')->default(true);
             $table->integer('display_order')->default(0);
             $table->timestamps();
-            
-            // Índices y unique
+
             $table->unique(['user_id', 'type', 'name']);
             $table->index('user_id');
         });
@@ -154,8 +151,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->boolean('is_visible')->default(true);
             $table->integer('display_order')->default(0);
             $table->timestamps();
-            
-            // Índices
+
             $table->index('user_id');
             $table->index('is_visible');
             $table->index('start_date');
@@ -175,8 +171,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->boolean('is_visible')->default(true);
             $table->integer('display_order')->default(0);
             $table->timestamps();
-            
-            // Índices
+
             $table->index('user_id');
             $table->index('experience_id');
             $table->index('is_visible');
@@ -210,8 +205,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->boolean('is_visible')->default(true);
             $table->integer('display_order')->default(0);
             $table->timestamps();
-            
-            // Índices
+
             $table->index('portfolio_id');
             $table->index('is_visible');
             $table->index('is_featured');
@@ -219,32 +213,31 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
         });
 
         // =====================================================
-        // 12. PROJECT_SKILL (Pivot table)
+        // 12. PROJECT_SKILL (Pivot)
         // =====================================================
         Schema::create('project_skill', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
             $table->timestamps();
-            
-            // Unique composite key
+
             $table->unique(['project_id', 'skill_id']);
         });
 
         // =====================================================
-        // 13. PROJECT_TECHNOLOGY (Pivot table)
+        // 13. PROJECT_TECHNOLOGY (Pivot)
         // =====================================================
         Schema::create('project_technology', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->foreignId('technology_id')->constrained('technologies')->onDelete('cascade');
             $table->timestamps();
-            
-            // Unique composite key
+
             $table->unique(['project_id', 'technology_id']);
         });
+
         // =====================================================
-        // 14. CACHE (para rate limiting y caché de Laravel)
+        // 14. CACHE
         // =====================================================
         Schema::create('cache', function (Blueprint $table) {
             $table->string('key')->primary();
@@ -253,7 +246,7 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
         });
 
         // =====================================================
-        // 15. CACHE_LOCKS (para bloques de caché)
+        // 15. CACHE_LOCKS
         // =====================================================
         Schema::create('cache_locks', function (Blueprint $table) {
             $table->string('key')->primary();
@@ -261,18 +254,23 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->integer('expiration');
         });
 
-         Schema::create('project_evidencias', function (Blueprint $table) {
+        // =====================================================
+        // 16. PROJECT_EVIDENCIAS
+        //     — incluye descripcion y plataforma desde el inicio
+        // =====================================================
+        Schema::create('project_evidencias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade');
             $table->enum('tipo', ['imagen', 'enlace', 'repositorio']);
             $table->string('titulo', 150)->nullable();
             $table->string('url', 500)->nullable();
             $table->string('imagen_path', 500)->nullable();
+            $table->string('descripcion', 300)->nullable();   // ← agregado
+            $table->string('plataforma', 50)->nullable();     // ← agregado
             $table->timestamps();
+
+            $table->index('project_id');
         });
-
-
-
     }
 
     /**
@@ -280,8 +278,9 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
      */
     public function down(): void
     {
-        // Eliminar en orden inverso (respetando dependencias)
         Schema::dropIfExists('project_evidencias');
+        Schema::dropIfExists('cache_locks');
+        Schema::dropIfExists('cache');
         Schema::dropIfExists('project_technology');
         Schema::dropIfExists('project_skill');
         Schema::dropIfExists('projects');
@@ -296,7 +295,5 @@ Schema::create('password_reset_tokens', function (Blueprint $table) {
         Schema::dropIfExists('users');
         Schema::dropIfExists('platform_network');
         Schema::dropIfExists('professions');
-        Schema::dropIfExists('cache_locks');
-        Schema::dropIfExists('cache');
     }
 };
