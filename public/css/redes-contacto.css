@@ -1,52 +1,376 @@
-.section-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+/* =====================================================
+   FORM GROUP HEADER — Switch alineado en fila
+   ===================================================== */
+.form-group {
+    margin-bottom: 1.1rem;
 }
 
-.page-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.section-subtitle {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-/* FILAS */
-.field-row {
+.form-group-header {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 18px;
+    justify-content: space-between;
+    margin-bottom: 6px;
 }
 
-/* ICONOS */
-.field-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: #4b0f2f;
+.form-group-header label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a0a2e;
+    margin: 0;
 }
 
-/* INPUT */
-.field-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
+.switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
-/* BOTÓN */
-.btn-save {
-    background: #1abc9c;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: none;
+.switch-label-text {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.switch-label-text.visible { color: #1abc9c; }
+.switch-label-text.hidden  { color: #aaa; }
+
+/* =====================================================
+   SWITCH TOGGLE
+   ===================================================== */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.switch-slider {
+    position: absolute;
+    inset: 0;
+    background: #ddd;
+    border-radius: 20px;
     cursor: pointer;
+    transition: background 0.2s;
+}
+
+.switch-slider::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+.switch input:checked + .switch-slider {
+    background: #1abc9c;
+}
+
+.switch input:checked + .switch-slider::before {
+    transform: translateX(16px);
+}
+
+/* =====================================================
+   PRIVACY HINT
+   ===================================================== */
+.privacy-hint {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    line-height: 1.4;
+}
+
+.privacy-hint.hint-visible { color: #1abc9c; }
+
+/* =====================================================
+   CAMPO OCULTO
+   ===================================================== */
+.field-hidden {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* =====================================================
+   FORM INPUT
+   ===================================================== */
+.form-input {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 13px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    color: #1a0a2e;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.form-input:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 0 2px rgba(26,188,156,0.1);
+}
+
+.form-input::placeholder { color: #ccc; }
+
+/* =====================================================
+   SEPARADOR DE SECCIÓN
+   ===================================================== */
+.section-separator {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 1.5rem 0 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* =====================================================
+   FILA DE DIRECCIÓN (input + botón)
+   ===================================================== */
+.addr-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.addr-row > div:first-child {
+    flex: 1;
+    position: relative;
+}
+
+/* =====================================================
+   BOTONES
+   ===================================================== */
+.btn {
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: #fff;
+    color: #1a0a2e;
+    line-height: 1.4;
+}
+
+.btn.primary {
+    background: #1abc9c;
+    color: #fff;
+    border-color: #1abc9c;
+}
+
+.btn.primary:hover { background: #17a589; }
+
+.btn-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f5f5f5;
+}
+
+/* =====================================================
+   AUTOCOMPLETADO DE BÚSQUEDA
+   ===================================================== */
+#search-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    z-index: 999;
+    overflow: hidden;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.search-dropdown-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #333;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #f5f5f5;
+    line-height: 1.4;
+}
+
+.search-dropdown-item:last-child { border-bottom: none; }
+
+.search-dropdown-item:hover {
+    background: #f0fdf9;
+    color: #0e6655;
+}
+
+/* =====================================================
+   TOOLBAR DEL MAPA
+   ===================================================== */
+.map-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+    margin-top: 10px;
+}
+
+.btn-expand {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #1abc9c;
+    background: #eafaf5;
+    border: 1px solid #a9dfca;
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-expand:hover {
+    background: #1abc9c;
+    color: #fff;
+    border-color: #1abc9c;
+}
+
+/* =====================================================
+   MAPA — PLACEHOLDER Y LEAFLET
+   ===================================================== */
+.map-container {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    background: #f9f9f9;
+}
+
+.map-placeholder {
+    height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #f9f9f9;
+}
+
+.map-placeholder-icon {
+    width: 36px;
+    height: 36px;
+    color: #ccc;
+}
+
+.map-placeholder-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #888;
+}
+
+.map-placeholder-sub {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    max-width: 220px;
+    line-height: 1.5;
+}
+
+/* CRÍTICO: Leaflet necesita altura explícita */
+#leaflet-map {
+    height: 260px;
+    width: 100%;
+    min-height: 260px;
+    display: none;
+}
+
+#leaflet-map-modal {
+    height: 100%;
+    min-height: 460px;
+    width: 100%;
+    flex: 1;
+    display: block;
+}
+
+/* =====================================================
+   MODAL MAPA GRANDE
+   ===================================================== */
+#map-modal {
+    display: none;
+}
+
+.map-modal-inner {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 820px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.map-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0;
+}
+
+.map-modal-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a0a2e;
+}
+
+.map-modal-hint {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+}
+
+.btn-close-modal {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    background: #f9f9f9;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.btn-close-modal:hover {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #e74c3c;
 }

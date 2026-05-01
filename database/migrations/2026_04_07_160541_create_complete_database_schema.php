@@ -98,6 +98,18 @@ return new class extends Migration
             $table->index('platform_id');
         });
 
+         // database/migrations/xxxx_create_user_locations_table.php
+      Schema::create('user_locations', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    $table->string('address', 300)->nullable();
+    $table->decimal('latitude', 10, 7)->nullable();   // geocodificado (T7)
+    $table->decimal('longitude', 10, 7)->nullable();  // geocodificado (T7)
+    $table->boolean('show_location')->default(false); // privacidad (T1)
+    $table->timestamps();
+    $table->unique('user_id');
+    $table->index('user_id');
+});
         // =====================================================
         // 6. PORTFOLIOS
         // =====================================================

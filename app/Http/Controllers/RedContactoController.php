@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\RedProfesional;
 use App\Models\PlataformaRed;
+use App\Models\UserLocation;
 
 class RedContactoController extends Controller
 {
@@ -18,8 +19,10 @@ class RedContactoController extends Controller
         ->keyBy('platform_id');
 
     $platforms = \App\Models\PlataformaRed::pluck('id', 'name');
+    
+    $location = UserLocation::firstOrNew(['user_id' => $user->id]);
 
-    return view('redes-contacto', compact('redes', 'platforms'));
+    return view('redes-contacto', compact('redes', 'platforms', 'location'));
 }
 
     public function store(Request $request)
@@ -70,7 +73,11 @@ class RedContactoController extends Controller
                 'email_contacto.regex' => 'Solo se permiten correos @gmail.com',
             ]
         );
-
+        $request->validate([
+        'address'       => ['nullable', 'string', 'max:300'],
+        'show_location' => ['nullable', 'boolean'],
+        ]);
+        
         $user = Auth::user();
 
         // Crear plataformas si no existen
@@ -122,7 +129,15 @@ class RedContactoController extends Controller
                     ->delete();
             }
         }
-
+         UserLocation::updateOrCreate(
+        ['user_id' => $user->id],
+        [
+            'address'       => $request->address,
+            'show_location' => $request->boolean('show_location'),
+            // latitude/longitude las llenas en T7 con geocodificación
+        ]
+    );   
+    
         return back()->with('success', 'Datos guardados correctamente.');
     }
 }
