@@ -177,20 +177,24 @@
     // 4. GEOCODIFICACIÓN INVERSA
     //    — usa photon.komoot.io (no bloqueado, sin CORS)
     // -----------------------------------------------
-    function reverseGeocode(lat, lng, callback) {
-        // Photon no tiene reverse, usamos Nominatim con timeout largo
-        // Si falla silenciosamente, no bloqueamos la UI
-        var url = 'https://nominatim.openstreetmap.org/reverse'
-                + '?format=jsonv2&lat=' + lat + '&lon=' + lng
-                + '&accept-language=es';
-        fetch(url, {
-            headers: { 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(5000)
-        })
-        .then(function (r) { return r.json(); })
-        .then(function (d) { callback(d && d.display_name ? d.display_name : null); })
-        .catch(function () { callback(null); }); // falla silenciosamente
-    }
+   function reverseGeocode(lat, lng, callback) {
+    var url = 'https://nominatim.openstreetmap.org/reverse'
+            + '?format=jsonv2'
+            + '&lat='             + lat
+            + '&lon='             + lng
+            + '&accept-language=es'
+            + '&addressdetails=1';
+    fetch(url, {
+        headers: { 'Accept': 'application/json' },
+        signal: AbortSignal.timeout(6000)
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+        if (d && d.display_name) callback(formatAddress(d));
+        else callback(null);
+    })
+    .catch(function () { callback(null); });
+}
 
     // -----------------------------------------------
     // 5. BÚSQUEDA CON AUTOCOMPLETADO
@@ -253,32 +257,135 @@
             goToResult(results[0]);
         });
     }
+function doSearch(q, callback) {
+    var query = q.trim();
+    var queryBolivia = query;
 
-    // ---- Photon API (Komoot) — sin bloqueo CORS, gratis ----
-    function doSearch(q, callback) {
-        // Bias hacia Bolivia/Cochabamba con bbox
-        var query = encodeURIComponent(q);
-        // lat/lon bias centrado en Bolivia
-        var url = 'https://photon.komoot.io/api/?q=' + query
-                + '&limit=5&lang=es'
-                + '&lat=-17.3895&lon=-66.1568';  // bias Cochabamba
-        fetch(url, { headers: { 'Accept': 'application/json' } })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-            var results = (data.features || []).map(function (f) {
+// Detecta si es intersección: "heroinas y ayacucho", "heroinas & ayacucho", "heroinas esq ayacucho"
+var interseccionMatch = query.match(
+    /^(.+?)\s+(?:y|&|esq\.?|esquina)\s+(.+)$/i
+);
+
+if (interseccionMatch) {
+    // Forma la query como "Calle1 & Calle2, Bolivia"
+    var calle1 = interseccionMatch[1].trim();
+    var calle2 = interseccionMatch[2].trim();
+    queryBolivia = calle1 + ' & ' + calle2 + ', Bolivia';
+} else if (query.toLowerCase().indexOf('bolivia') === -1) {
+    queryBolivia = query + ', Bolivia';
+}
+
+    var photonUrl = 'https://photon.komoot.io/api/?q='
+    + encodeURIComponent(queryBolivia)
+    + '&limit=6&lang=es';
+    var nominatimUrl = 'https://nominatim.openstreetmap.org/search?format=json'
+        + '&q='             + encodeURIComponent(queryBolivia)
+        + '&limit=6&countrycodes=bo&accept-language=es&addressdetails=1';
+
+    // Lanza ambas en paralelo, usa la primera que traiga resultados
+    Promise.allSettled([
+        fetch(photonUrl,    { headers: { 'Accept': 'application/json' } }).then(r => r.json()),
+        fetch(nominatimUrl, { headers: { 'Accept': 'application/json' } }).then(r => r.json())
+    ]).then(function (results) {
+
+        var photonData    = results[0].status === 'fulfilled' ? results[0].value : null;
+        var nominatimData = results[1].status === 'fulfilled' ? results[1].value : null;
+
+        var combined = [];
+
+        // Resultados de Photon
+        if (photonData && photonData.features && photonData.features.length) {
+            photonData.features.forEach(function (f) {
                 var p    = f.properties;
-                var name = [p.name, p.street, p.city, p.state, p.country]
+                var name = [p.name, p.street, p.housenumber, p.city, p.county, p.state, p.country]
                            .filter(Boolean).join(', ');
-                return {
+                combined.push({
                     display_name: name,
+                    raw_name:     name,
                     lat: f.geometry.coordinates[1],
                     lon: f.geometry.coordinates[0]
-                };
+                });
             });
-            callback(results);
-        })
-        .catch(function () { callback([]); });
+        }
+
+        // Resultados de Nominatim (evita duplicados por coordenadas)
+        if (nominatimData && nominatimData.length) {
+            nominatimData.forEach(function (r) {
+                var alreadyIn = combined.some(function (c) {
+                    return Math.abs(parseFloat(c.lat) - parseFloat(r.lat)) < 0.001
+                        && Math.abs(parseFloat(c.lon) - parseFloat(r.lon)) < 0.001;
+                });
+                if (!alreadyIn) {
+                    combined.push({
+                        display_name: formatAddress(r),
+                        raw_name:     r.display_name,
+                        lat: r.lat,
+                        lon: r.lon
+                    });
+                }
+            });
+        }
+
+        callback(combined);
+    });
+}
+
+// Fallback con Photon si Nominatim no responde
+function doSearchPhoton(q, callback) {
+    var url = 'https://photon.komoot.io/api/'
+            + '?q='    + encodeURIComponent(q)
+            + '&limit=6&lang=es'
+            + '&lat=-17.3895&lon=-66.1568';
+    fetch(url, { headers: { 'Accept': 'application/json' } })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+        var results = (data.features || []).map(function (f) {
+            var p    = f.properties;
+            var name = [p.name, p.street, p.housenumber, p.city, p.state, p.country]
+                       .filter(Boolean).join(', ');
+            return {
+                display_name: name,
+                raw_name:     name,
+                lat: f.geometry.coordinates[1],
+                lon: f.geometry.coordinates[0]
+            };
+        });
+        callback(results);
+    })
+    .catch(function () { callback([]); });
+}
+// Formatea la dirección de forma legible para mostrar en dropdown
+function formatAddress(r) {
+    var a = r.address || {};
+    var parts = [];
+
+    // Nombre del lugar si existe
+    if (r.name && r.name !== a.road) parts.push(r.name);
+
+    // Calle + número
+    if (a.road) {
+        parts.push(a.house_number ? a.road + ' ' + a.house_number : a.road);
     }
+
+    // Barrio o zona
+    if (a.neighbourhood || a.suburb) {
+        parts.push(a.neighbourhood || a.suburb);
+    }
+
+    // Ciudad
+    if (a.city || a.town || a.village || a.municipality) {
+        parts.push(a.city || a.town || a.village || a.municipality);
+    }
+
+    // Departamento
+    if (a.state) parts.push(a.state);
+
+    // País
+    if (a.country) parts.push(a.country);
+
+    return parts.filter(Boolean).join(', ') || r.display_name;
+}
+
 
     function showDropdown(results, input, dropdown) {
         if (!dropdown || !results || !results.length) { hideDropdown(); return; }
@@ -307,15 +414,16 @@
         dropdown.style.display = 'block';
     }
 
-    function showNoResults() {
-        var dropdown = document.getElementById('search-dropdown');
-        if (!dropdown) return;
-        dropdown.innerHTML =
-            '<div style="padding:12px 14px;font-size:12px;color:#999;text-align:center;">' +
-            'No se encontraron resultados. Intenta con más detalle.' +
-            '</div>';
-        dropdown.style.display = 'block';
-    }
+  function showNoResults() {
+    var dropdown = document.getElementById('search-dropdown');
+    if (!dropdown) return;
+    dropdown.innerHTML =
+        '<div style="padding:12px 14px;font-size:12px;color:#999;text-align:center;line-height:1.6">' +
+        '⚠ No se encontraron resultados.<br>' +
+        '<span style="font-size:11px">Intenta: "Av. Heroínas, Cochabamba" o arrastra el pin en el mapa</span>' +
+        '</div>';
+    dropdown.style.display = 'block';
+}
 
     function escapeHtml(str) {
         var d = document.createElement('div');
@@ -328,32 +436,38 @@
         if (d) d.style.display = 'none';
     }
 
-    function goToResult(r) {
-        var lat = parseFloat(r.lat);
-        var lng = parseFloat(r.lon);
-        var swAddr = document.getElementById('sw-addr');
+   function goToResult(r) {
+    var lat = parseFloat(r.lat);
+    var lng = parseFloat(r.lon);
+    var swAddr = document.getElementById('sw-addr');
 
-        if (swAddr && !swAddr.checked) {
-            swAddr.checked = true;
-            updateFieldState(swAddr);
-        }
-
-        if (map) { map.remove(); map = null; marker = null; }
-        toggleMap(true);
-        setTimeout(function () {
-            setAddress(r.display_name);
-            updateCoords(lat, lng);
-            if (map && marker) {
-                map.setView([lat, lng], 16);
-                marker.setLatLng([lat, lng]);
-            }
-            if (mapModal && markerModal) {
-                mapModal.setView([lat, lng], 16);
-                markerModal.setLatLng([lat, lng]);
-            }
-        }, 500);
+    if (swAddr && !swAddr.checked) {
+        swAddr.checked = true;
+        updateFieldState(swAddr);
     }
 
+    if (map) { map.remove(); map = null; marker = null; }
+    toggleMap(true);
+
+    setTimeout(function () {
+        // Muestra el nombre limpio en el input visible
+        setAddress(r.display_name);
+
+        // Guarda el nombre completo correcto en un campo oculto para el backend
+        var rawInput = document.getElementById('input-address-raw');
+        if (rawInput) rawInput.value = r.raw_name || r.display_name;
+
+        updateCoords(lat, lng);
+        if (map && marker) {
+            map.setView([lat, lng], 16);
+            marker.setLatLng([lat, lng]);
+        }
+        if (mapModal && markerModal) {
+            mapModal.setView([lat, lng], 16);
+            markerModal.setLatLng([lat, lng]);
+        }
+    }, 500);
+}
     // -----------------------------------------------
     // 6. MODAL MAPA GRANDE
     // -----------------------------------------------

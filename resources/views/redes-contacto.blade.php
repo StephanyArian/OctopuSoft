@@ -225,7 +225,9 @@
                                     {{-- Coordenadas ocultas --}}
                                     <input type="hidden" id="input-lat" name="latitude"  value="{{ $location->latitude  ?? '' }}">
                                     <input type="hidden" id="input-lng" name="longitude" value="{{ $location->longitude ?? '' }}">
-
+                                   {{-- Nombre completo de la dirección para guardar correctamente --}}
+                                    <input type="hidden" id="input-address-raw" name="address_raw"
+                                           value="{{ old('address_raw', $location->address ?? '') }}">
                                     <div class="privacy-hint {{ ($location->show_location ?? false) ? 'hint-visible' : '' }}" id="hint-addr">
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none">
                                             <path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="currentColor" stroke-width="1.2"/>
