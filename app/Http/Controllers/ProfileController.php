@@ -131,4 +131,31 @@ class ProfileController extends Controller
         
         return redirect()->route('dashboard')->with('success', 'Foto eliminada exitosamente');
     }
+
+    public function publish(Request $request): RedirectResponse
+{
+    $user = $request->user();
+    
+    // Verificar si el usuario tiene un portafolio
+    if ($user->portfolio) {
+        $user->portfolio->update(['is_public' => true]);
+        
+        return redirect()
+            ->route('preview')
+            ->with('success', '✅ ¡Perfil publicado exitosamente! Ahora es visible para todos.');
+    }
+    
+    // Si no tiene portafolio, crear uno
+    $portfolio = $user->portfolio()->create([
+        'slug' => \Illuminate\Support\Str::slug($user->first_name . '-' . $user->last_name . '-' . $user->id),
+        'title' => 'Portafolio de ' . $user->first_name . ' ' . $user->last_name,
+        'description' => $user->biography ?? '',
+        'is_public' => true
+    ]);
+    
+    return redirect()
+        ->route('preview')
+        ->with('success', '✅ ¡Perfil publicado exitosamente!');
+}
+
 }

@@ -86,4 +86,17 @@ class User extends Authenticatable
     {
         return $this->hasOne(\App\Models\Portfolio::class);
     }
+
+    public function experiences()
+    {
+        return $this->hasMany(Experience::class);
+    }
+
+    /**
+     * Relación con redes profesionales (usando tu modelo RedProfesional)
+     */
+    public function professionalNetworks()
+    {
+        return $this->hasMany(RedProfesional::class);
+    }
 }

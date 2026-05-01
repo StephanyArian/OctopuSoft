@@ -12,6 +12,7 @@ use App\Http\Controllers\RedContactoController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvidenciaController;
 
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -113,10 +114,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/evidencias/{id}',                 [EvidenciaController::class, 'destroy'])->name('evidencias.destroy');
 
     // VISTA Preview
-    Route::get('/preview', function () {
-        return view('Preview');
-    })->middleware(['auth'])->name('preview');
+    Route::get('/preview', [App\Http\Controllers\PreviewController::class, 'preview'])
+    ->middleware(['auth'])
+    ->name('preview');
 
+    Route::post('/perfil/publicar', [ProfileController::class, 'publish'])->name('perfil.publicar');
 });
 
 require __DIR__.'/auth.php';
