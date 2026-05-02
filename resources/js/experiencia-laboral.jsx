@@ -224,6 +224,15 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             if (!c.value) { setError('Debes seleccionar un cargo en cada campo.'); return; }
         }
 
+        // Validar que no haya cargos duplicados
+        const valores = cargos.map(c => c.value.toLowerCase());
+        const duplicado = valores.find((v, i) => valores.indexOf(v) !== i);
+        if (duplicado) {
+            const nombreDup = cargos.find(c => c.value.toLowerCase() === duplicado).value;
+            setError(`El cargo "${nombreDup}" está duplicado. Cada cargo debe ser único.`);
+            return;
+        }
+
         const trabajoActual = form.trabajo_actual.checked;
         const inicioDia  = form.fecha_inicio_dia.value;
         const inicioMes  = form.fecha_inicio_mes.value;
