@@ -188,7 +188,7 @@
                                                 </div>
  
                                                 {{-- Sección evidencia con proyectos (crear) --}}
-                                                @if($userProjects->count() > 0)
+                                                
                                                     <div class="form-group" style="margin-top:12px;">
                                                         <label class="form-label">Evidencia con proyectos <span style="font-weight:400;color:#aaa;">(opcional)</span></label>
                                                         {{-- Chips pendientes + inputs ocultos se inyectan aquí desde JS --}}
@@ -198,11 +198,18 @@
                                                                 + Agregar proyecto
                                                             </button>
                                                         </div>
-                                                        <p style="font-size:11px;color:#aaa;margin:4px 0 0;">
+                                                        @if($userProjects->count() > 0)
+                                                    
+                                                            <p style="font-size:11px;color:#aaa;margin:4px 0 0;">
                                                             Puedes vincular proyectos ahora o hacerlo después desde el historial.
-                                                        </p>
+                                                            </p>
+                                                        @else
+                                                            <p style="font-size:11px;color:#aaa;margin:4px 0 0;">
+                                                               Aun no tienes proyectos registrados.Agrega un proyecto para poder vincularlo
+                                                            </p>
+                                                         @endif
                                                     </div>
-                                                @endif
+                                               
  
                                                 <div class="btn-row">
                                                     <button type="submit" class="btn primary">Guardar habilidad</button>
