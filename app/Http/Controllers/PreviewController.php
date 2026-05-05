@@ -27,8 +27,8 @@ class PreviewController extends Controller
         $habilidadesTecnicas = $user->skills->where('type', 'technical')->map(function($skill) {
             // Convertir nivel numérico (1-5) a texto
             $nivel = '';
-            if ($skill->level >= 4) $nivel = 'Avanzado';
-            elseif ($skill->level >= 2) $nivel = 'Intermedio';
+            if ($skill->level ==3) $nivel = 'Avanzado';
+            elseif ($skill->level == 2) $nivel = 'Intermedio';
             else $nivel = 'Básico';
             
             return (object) [
