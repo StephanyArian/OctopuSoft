@@ -641,6 +641,7 @@ await cargarProyectos();
         proyectosFiltrados.forEach(p => {
             const card = document.createElement('div');
             card.className = 'proy-card';
+            card.id = 'proyecto-' + p.id;
 
             const candadoAbiertoSVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>`;
             const candadoCerradoSVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="3" y1="3" x2="21" y2="21"/></svg>`;

@@ -258,7 +258,7 @@
                                         {{-- Proyectos vinculados (HU-24) --}}
                                        <div class="skill-projects" id="skill-projects-{{ $skill->id }}">
                                            @foreach($skill->projects as $project)
-                                               <a href="{{ route('proyectos') }}#proyecto-{{ $project->id }}"
+                                               <a href="{{ route('proyectos') }}?preview={{ $project->id }}"
                                                   class="skill-project-chip skill-project-link"
                                                   data-skill="{{ $skill->id }}"
                                                   data-project="{{ $project->id }}"
