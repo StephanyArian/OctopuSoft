@@ -286,10 +286,10 @@
             const previewId = params.get('preview');
             if (!previewId) return;
 
-            // Espera a que proyectos.js cargue los proyectos y renderice
+
             let intentos = 0;
             const intervalo = setInterval(function () {
-                // abrirPreview está dentro del IIFE, necesitamos otro enfoque
+                
                 const card = document.getElementById('proyecto-' + previewId);
                 if (card) {
                     clearInterval(intervalo);
