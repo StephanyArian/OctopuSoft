@@ -198,35 +198,37 @@ class ExperienciaLaboralController extends Controller
 
     // ══════════════════════════════════════════════════════════════════════
     //  STORE  —  guarda UNA fila por cargo dentro de una transacción (HU-12)
+    //  Acepta form POST (formulario principal) y JSON (edición React)
     // ══════════════════════════════════════════════════════════════════════
     public function store(Request $request)
     {
-        // 1. Validar campos comunes
-        $errores = $this->validarCamposComunes($request);
+        $isJson = $request->expectsJson() || $request->isJson();
 
-        // 2. Validar cargos
+        $errores       = $this->validarCamposComunes($request);
         $erroresCargos = $this->validarCargos($request);
-        $errores = array_merge($errores, $erroresCargos);
+        $errores       = array_merge($errores, $erroresCargos);
 
         if (!empty($errores)) {
-            return back()->withErrors($errores)->withInput();
+            return $isJson
+                ? response()->json(['errors' => $errores], 422)
+                : back()->withErrors($errores)->withInput();
         }
 
-        // 3. Construir fechas y verificar coherencia
         [$fechaInicio, $fechaFin] = $this->construirFechas($request);
 
         if ($fechaFin && strtotime($fechaFin) < strtotime($fechaInicio)) {
-            return back()
-                ->withErrors(['fecha_fin_dia' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'])
-                ->withInput();
+            $msg = ['fecha_fin_dia' => 'La fecha de fin no puede ser anterior a la fecha de inicio.'];
+            return $isJson
+                ? response()->json(['errors' => $msg], 422)
+                : back()->withErrors($msg)->withInput();
         }
 
-        // 4. Guardar todos los cargos en transacción (V-05)
-        $cargos = array_filter(array_map('trim', $request->input('cargos', [])));
+        $cargos  = array_filter(array_map('trim', $request->input('cargos', [])));
+        $creados = [];
 
-        DB::transaction(function () use ($request, $cargos, $fechaInicio, $fechaFin) {
+        DB::transaction(function () use ($request, $cargos, $fechaInicio, $fechaFin, &$creados) {
             foreach ($cargos as $cargo) {
-                Experience::create([
+                $creados[] = Experience::create([
                     'user_id'       => auth()->id(),
                     'type'          => 'work',
                     'institution'   => $request->empresa,
@@ -242,8 +244,9 @@ class ExperienciaLaboralController extends Controller
             }
         });
 
-        return redirect()->route('experiencia.laboral')
-            ->with('success', 'Experiencia laboral guardada correctamente.');
+        return $isJson
+            ? response()->json($creados, 201)
+            : redirect()->route('experiencia.laboral')->with('success', 'Experiencia laboral guardada correctamente.');
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -298,20 +301,25 @@ class ExperienciaLaboralController extends Controller
     // ══════════════════════════════════════════════════════════════════════
     //  DESTROY  —  elimina TODAS las filas del mismo grupo empresa+fecha (HU-12 V-06)
     // ══════════════════════════════════════════════════════════════════════
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         $experiencia = Experience::where('id', $id)
             ->where('user_id', auth()->id())
             ->where('type', 'work')
             ->firstOrFail();
 
-        // Eliminar todas las filas del mismo grupo (misma empresa + misma fecha de inicio)
-        Experience::where('user_id', auth()->id())
-            ->where('type', 'work')
-            ->where('institution', $experiencia->institution)
-            ->where('start_date',  $experiencia->start_date)
-            ->delete();
+        // ?grupo=1  →  eliminar todo el grupo (empresa + fecha de inicio)  — botón "Eliminar experiencia"
+        // sin parámetro  →  eliminar solo este registro individual          — edición de cargo
+        if ($request->query('grupo') === '1') {
+            Experience::where('user_id', auth()->id())
+                ->where('type', 'work')
+                ->where('institution', $experiencia->institution)
+                ->where('start_date',  $experiencia->start_date)
+                ->delete();
+            return response()->json(['message' => 'Experiencia y todos sus cargos eliminados correctamente.']);
+        }
 
-        return response()->json(['message' => 'Experiencia y todos sus cargos eliminados correctamente.']);
+        $experiencia->delete();
+        return response()->json(['message' => 'Cargo eliminado correctamente.']);
     }
 }
