@@ -326,6 +326,7 @@
         toggleGrid(false);
         toggleProyHeader(false);
         cargarProyectos();
+        
     }
 
     // ========== DROPDOWNS FORMULARIO ==========
@@ -495,12 +496,13 @@
             });
             if (!response.ok) { const error = await response.json(); throw new Error(error.message || 'Error al guardar'); }
             const resultado = await response.json();
-window._proyectoParaEvidencias = resultado;
+            window._proyectoParaEvidencias = resultado;
+            sessionStorage.setItem('ultimo_proyecto_activo', JSON.stringify(resultado));
 
-// ✅ CLAVE: subir evidencias pendientes con el id real
-if (!editandoId && typeof window.evSubirPendientes === 'function') {
-    await window.evSubirPendientes(resultado.id);
-}
+            // ✅ CLAVE: subir evidencias pendientes con el id real
+            if (!editandoId && typeof window.evSubirPendientes === 'function') {
+                await window.evSubirPendientes(resultado.id);
+            }
 
 mostrarToast(editandoId ? '✅ Proyecto actualizado' : '✅ Proyecto creado');
 ocultarForm();
@@ -715,7 +717,14 @@ await cargarProyectos();
     function editarProyecto(id) {
         const p = proyectos.find(p => p.id === id);
         if (!p) return;
+
+        // ✅ NUEVO: Guardar proyecto para evidencias ANTES de todo
         window._proyectoParaEvidencias = p;
+        sessionStorage.setItem('ultimo_proyecto_activo', JSON.stringify(p));
+        
+        
+        
+
         editandoId = id;
         inputNombre.value = p.nombre;
         inputDesc.value = p.descripcion;
@@ -737,6 +746,34 @@ await cargarProyectos();
         actualizarContador();
         formTitle.innerHTML = '✏️ Editar Proyecto';
         mostrarForm();
+
+        setTimeout(() => {
+        if (typeof window.evInit === 'function') {
+            window.evInit(p);
+            console.log('✅ Evidencias inicializadas para edición:', p.nombre);
+        }
+        
+        const evInlineSection = document.getElementById('evInlineSection');
+    if (evInlineSection && !evInlineSection.classList.contains('open')) {
+        evInlineSection.classList.add('open');
+        console.log('✅ Panel de evidencias abierto');
+    }
+    
+    // También forzar que el grid de evidencias se vea
+    const evGrid = document.getElementById('evGrid');
+    if (evGrid) {
+        evGrid.style.display = 'grid';
+    }
+    
+    // Asegurar que el formulario de evidencias está visible
+    const evFormCard = document.getElementById('evFormCard');
+    if (evFormCard && evFormCard.classList.contains('open')) {
+        // Ya está abierto, bien
+        console.log('✅ Formulario de evidencias ya abierto');
+    }
+}, 500); 
+
+
     }
 
     function resetearFiltros() {
@@ -763,38 +800,68 @@ await cargarProyectos();
         if (!proyecto || !proyecto.id) { mostrarToast('Error: Proyecto no válido', 'error'); return; }
         toggleProyHeader(true);
         toggleGrid(true);
-        window._proyectoParaEvidencias = proyecto;
-        if (formCard) formCard.classList.remove('open');
-        if (typeof window.evInit === 'function') window.evInit(proyecto);
-        else mostrarToast('Error al cargar evidencias', 'error');
-    }
 
-   if (btnEvidencias) {
+        window._proyectoParaEvidencias = proyecto;
+        sessionStorage.setItem('ultimo_proyecto_activo', JSON.stringify(proyecto));
+        if (formCard) formCard.classList.remove('open');
+        if (typeof window.evInit === 'function') {
+            window.evInit(proyecto);
+            console.log('✅ Evidencias inicializadas para proyecto:', proyecto.nombre);
+        }else{
+            mostrarToast('Error al cargar evidencias', 'error');
+        }
+    }
+    if (btnEvidencias) {
     btnEvidencias.addEventListener('click', () => {
-        // Si estamos editando un proyecto existente → flujo normal con backend
+        // Si estamos editando un proyecto existente
         if (editandoId) {
-            const proyectoActual = proyectos.find(p => p.id === editandoId);
-            if (proyectoActual) abrirEvidencias(proyectoActual);
+            const proyectoActualEdit = proyectos.find(p => p.id === editandoId);
+            if (proyectoActualEdit) {
+                // Forzar guardado y apertura
+                window._proyectoParaEvidencias = proyectoActualEdit;
+                sessionStorage.setItem('ultimo_proyecto_activo', JSON.stringify(proyectoActualEdit));
+                
+                if (typeof window.evInit === 'function') {
+                    window.evInit(proyectoActualEdit);
+                }
+                
+                // Abrir el panel inline
+                const evInlineSection = document.getElementById('evInlineSection');
+                if (evInlineSection) {
+                    evInlineSection.classList.add('open');
+                }
+                
+                // Abrir el formulario de evidencias
+                const evFormCard = document.getElementById('evFormCard');
+                if (evFormCard) {
+                    evFormCard.classList.add('open');
+                }
+            }
             return;
         }
+        
         // Si es proyecto NUEVO → expandir panel inline sin backend
-        const evInlineBody = document.getElementById('evInlineBody');
-        const evInlineHeader = document.getElementById('evInlineHeader');
         const evInlineSection = document.getElementById('evInlineSection');
         if (!evInlineSection) {
             mostrarToast('❌ Panel de evidencias no encontrado', 'error');
             return;
         }
         evInlineSection.classList.toggle('open');
+        
         // Inicializar evidencia.js en modo pendiente (sin proyecto)
         if (evInlineSection.classList.contains('open')) {
-            if (typeof window.evResetearPendientes === 'function') window.evResetearPendientes();
+            if (typeof window.evResetearPendientes === 'function') {
+                window.evResetearPendientes();
+            }
         }
+        
         const arrow = btnEvidencias.querySelector('.ev-trigger-arrow');
-        if (arrow) arrow.style.transform = evInlineSection.classList.contains('open') ? 'rotate(90deg)' : '';
+        if (arrow) {
+            arrow.style.transform = evInlineSection.classList.contains('open') ? 'rotate(90deg)' : '';
+        }
     });
 }
-
+  
     document.addEventListener('ev:volver', () => {
         toggleProyHeader(false);
         toggleGrid(false);

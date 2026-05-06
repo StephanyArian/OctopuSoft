@@ -60,7 +60,8 @@ class EvidenciaController extends Controller
                 'titulo'     => $request->input('etiqueta'),
                 'url'        => $request->input('url'),
                 'imagen_path'=> null,
-            ]);
+                'descripcion' => $request->input('descripcion'),
+                ]);
             return response()->json(['evidencia' => $this->formato($ev)], 201);
         }
 
@@ -79,6 +80,8 @@ class EvidenciaController extends Controller
                 'titulo'     => $request->input('etiqueta'),
                 'url'        => $request->input('url'),
                 'imagen_path'=> null,
+                'plataforma'  => $request->input('plataforma'),  // ✅ AGREGAR
+                'descripcion' => $request->input('descripcion'),
             ]);
             return response()->json(['evidencia' => $this->formato($ev)], 201);
         }
