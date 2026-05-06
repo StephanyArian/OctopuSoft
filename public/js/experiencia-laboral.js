@@ -19,6 +19,12 @@ const CARGO_OPTIONS = [
     'Data Analyst',
     'Scrum Master',
     'Product Owner',
+    'Business Analyst',
+    'Security Engineer',
+    'Data Engineer',
+    'Cloud Engineer',
+    'AI Engineer',
+    'Systems Analyst',
 ];
 
 /* ── Generador de HTML para un dropdown de cargo ── */

@@ -25,6 +25,12 @@ const CARGO_OPTIONS = [
     'Data Analyst',
     'Scrum Master',
     'Product Owner',
+    'Business Analyst',
+    'Security Engineer',
+    'Data Engineer',
+    'Cloud Engineer',
+    'AI Engineer',
+    'Systems Analyst',
 ];
 
 /* ── Iconos Bootstrap como SVG inline ─────────────────────
@@ -203,43 +209,65 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
    de un grupo en un solo formulario
    ══════════════════════════════════════════════════════════ */
 function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
-    const [error, setError] = useState('');
+    const [error,           setError]           = useState('');
+    const [guardando,       setGuardando]        = useState(false);
+    const [confirmEliminar, setConfirmEliminar] = useState(null);
 
-    // Estado para cada cargo del grupo
+    /*
+     * deleted: true  → marcado para eliminar, solo se aplica al guardar
+     * id: null       → cargo nuevo, se creará con POST al guardar
+     */
     const [cargos, setCargos] = useState(
-        grupo.items.map(exp => ({ id: exp.id, value: exp.title || '' }))
+        grupo.items.map(exp => ({ id: exp.id, tempId: null, value: exp.title || '', deleted: false }))
     );
 
-    function setCargo(id, val) {
-        setCargos(prev => prev.map(c => c.id === id ? { ...c, value: val } : c));
+    const cargosVisibles = cargos.filter(c => !c.deleted);
+
+    function getKey(c) { return c.id ?? c.tempId; }
+
+    function setCargo(key, val) {
+        setCargos(prev => prev.map(c => getKey(c) === key ? { ...c, value: val } : c));
+    }
+
+    function agregarNuevoCargo() {
+        if (cargosVisibles.length >= 5) return;
+        setCargos(prev => [...prev, { id: null, tempId: 'new_' + Date.now(), value: '', deleted: false }]);
+    }
+
+    function marcarEliminado(key) {
+        if (cargosVisibles.length <= 1) return;
+        setCargos(prev => prev.map(c => getKey(c) === key ? { ...c, deleted: true } : c));
+        setConfirmEliminar(null);
+    }
+
+    function desmarcarEliminado(key) {
+        setCargos(prev => prev.map(c => getKey(c) === key ? { ...c, deleted: false } : c));
     }
 
     async function handleSubmit(e) {
         e.preventDefault();
         setError('');
-        const form = e.target;
 
-        // Validar que todos los cargos estén seleccionados
-        for (const c of cargos) {
+        // Validar cargos visibles
+        for (const c of cargosVisibles) {
             if (!c.value) { setError('Debes seleccionar un cargo en cada campo.'); return; }
         }
-
-        // Validar que no haya cargos duplicados
-        const valores = cargos.map(c => c.value.toLowerCase());
+        const valores = cargosVisibles.map(c => c.value.toLowerCase());
         const duplicado = valores.find((v, i) => valores.indexOf(v) !== i);
         if (duplicado) {
-            const nombreDup = cargos.find(c => c.value.toLowerCase() === duplicado).value;
-            setError(`El cargo "${nombreDup}" está duplicado. Cada cargo debe ser único.`);
+            const nombre = cargosVisibles.find(c => c.value.toLowerCase() === duplicado).value;
+            setError(`El cargo "${nombre}" está duplicado. Cada cargo debe ser único.`);
             return;
         }
 
+        const form        = e.target;
         const trabajoActual = form.trabajo_actual.checked;
-        const inicioDia  = form.fecha_inicio_dia.value;
-        const inicioMes  = form.fecha_inicio_mes.value;
-        const inicioAnio = form.fecha_inicio_anio.value;
-        const finDia     = form.fecha_fin_dia?.value;
-        const finMes     = form.fecha_fin_mes?.value;
-        const finAnio    = form.fecha_fin_anio?.value;
+        const inicioDia   = form.fecha_inicio_dia.value;
+        const inicioMes   = form.fecha_inicio_mes.value;
+        const inicioAnio  = form.fecha_inicio_anio.value;
+        const finDia      = form.fecha_fin_dia?.value;
+        const finMes      = form.fecha_fin_mes?.value;
+        const finAnio     = form.fecha_fin_anio?.value;
 
         if (!inicioDia || !inicioMes || !inicioAnio) {
             setError('La fecha de inicio es obligatoria.'); return;
@@ -250,41 +278,83 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             if (fin < ini) { setError('La fecha de fin no puede ser anterior a la de inicio.'); return; }
         }
 
-        // Actualizar cada cargo con PUT individual
-        const empresa    = form.empresa.value;
-        const location   = form.location.value;
+        const empresa     = form.empresa.value;
+        const location    = form.location.value;
         const descripcion = form.descripcion.value;
 
+        const payload = {
+            empresa, location, descripcion,
+            fecha_inicio_dia:  inicioDia,
+            fecha_inicio_mes:  inicioMes,
+            fecha_inicio_anio: inicioAnio,
+            fecha_fin_dia:     trabajoActual ? null : finDia,
+            fecha_fin_mes:     trabajoActual ? null : finMes,
+            fecha_fin_anio:    trabajoActual ? null : finAnio,
+            trabajo_actual:    trabajoActual,
+        };
+
+        setGuardando(true);
         try {
-            const resultados = await Promise.all(
-                cargos.map(c =>
-                    fetch(`/experiencia-laboral/${c.id}`, {
-                        method:  'PUT',
-                        headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            empresa,
-                            cargo:             c.value,
-                            location,
-                            descripcion,
-                            fecha_inicio_dia:  inicioDia,
-                            fecha_inicio_mes:  inicioMes,
-                            fecha_inicio_anio: inicioAnio,
-                            fecha_fin_dia:     trabajoActual ? null : finDia,
-                            fecha_fin_mes:     trabajoActual ? null : finMes,
-                            fecha_fin_anio:    trabajoActual ? null : finAnio,
-                            trabajo_actual:    trabajoActual,
-                        }),
-                    }).then(r => r.ok ? r.json() : r.json().then(d => Promise.reject(d)))
-                )
-            );
-            onGuardado(resultados);
+            const idsEliminados = new Set();
+
+            // 1. Eliminar los marcados (solo los que tienen id real en BD)
+            const aEliminar = cargos.filter(c => c.deleted && c.id);
+            for (const c of aEliminar) {
+                const res = await fetch(`/experiencia-laboral/${c.id}`, {
+                    method:  'DELETE',
+                    headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+                });
+                // 404 = ya no existe, igual lo marcamos como eliminado del estado
+                idsEliminados.add(c.id);
+            }
+
+            // 2. PUT a los existentes visibles (tienen id real)
+            const existentes  = cargosVisibles.filter(c => c.id);
+            const putResults  = [];
+            for (const c of existentes) {
+                const res = await fetch(`/experiencia-laboral/${c.id}`, {
+                    method:  'PUT',
+                    headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...payload, cargo: c.value }),
+                });
+                if (res.ok) {
+                    putResults.push(await res.json());
+                } else {
+                    const d = await res.json().catch(() => ({}));
+                    throw d;
+                }
+            }
+
+            // 3. POST para los nuevos (no tienen id) — uno solo por cada nuevo
+            const nuevos     = cargosVisibles.filter(c => !c.id);
+            const postResults = [];
+            for (const c of nuevos) {
+                const res = await fetch('/experiencia-laboral', {
+                    method:  'POST',
+                    headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...payload, cargos: [c.value] }),
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    // store devuelve array de objetos creados
+                    postResults.push(...(Array.isArray(data) ? data : [data]));
+                } else {
+                    const d = await res.json().catch(() => ({}));
+                    throw d;
+                }
+            }
+
+            onGuardado([...putResults, ...postResults], idsEliminados);
+
         } catch (err) {
-            if (err.errors) setError(Object.values(err.errors).join(' — '));
-            else setError(err.error || 'Error al guardar los cambios.');
+            if (err && err.errors) setError(Object.values(err.errors).join(' — '));
+            else setError((err && err.error) || 'Error al guardar los cambios.');
+        } finally {
+            setGuardando(false);
         }
     }
 
-    const rep = grupo.items[0]; // representante para fechas y datos comunes
+    const rep = grupo.items[0];
 
     return (
         <form onSubmit={handleSubmit} className="edit-form-wrap">
@@ -298,25 +368,72 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 </div>
             </div>
 
-            {/* Cargos — uno por fila */}
+            {/* Cargos */}
             <div className="form-group" style={{ marginBottom: '14px' }}>
                 <label className="form-label">
                     Cargos <span className="required">*</span>
+                    <span className="cargos-hint">(máx. 5)</span>
                 </label>
-                {cargos.map((c, idx) => (
-                    <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '12px', color: 'var(--gray-500)', minWidth: '20px' }}>
-                            {idx + 1}.
-                        </span>
-                        <div style={{ flex: 1 }}>
-                            <CargoDropdown
-                                value={c.value}
-                                onChange={val => setCargo(c.id, val)}
-                                name={`cargo_${c.id}`}
-                            />
+
+                {cargos.map((c) => {
+                    const key = getKey(c);
+                    if (c.deleted) {
+                        return (
+                            <div key={key} className="cargo-deleted-row">
+                                <span className="cargo-deleted-label">
+                                    <IconTrash /> {c.value || 'Cargo sin seleccionar'} — se eliminará al guardar
+                                </span>
+                                <button type="button" className="btn-sm" onClick={() => desmarcarEliminado(key)}
+                                    style={{ fontSize: '11px', padding: '3px 10px' }}>
+                                    Deshacer
+                                </button>
+                            </div>
+                        );
+                    }
+                    const idxVisible = cargosVisibles.findIndex(v => getKey(v) === key);
+                    return (
+                        <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '12px', color: 'var(--gray-500)', minWidth: '20px' }}>
+                                {idxVisible + 1}.
+                            </span>
+                            <div style={{ flex: 1 }}>
+                                <CargoDropdown
+                                    value={c.value}
+                                    onChange={val => setCargo(key, val)}
+                                    name={`cargo_${key}`}
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                className="btn-remove-cargo"
+                                disabled={cargosVisibles.length <= 1}
+                                title={cargosVisibles.length <= 1 ? 'Debe haber al menos un cargo' : 'Quitar este cargo'}
+                                onClick={() => setConfirmEliminar(key)}>
+                                <IconTrash />
+                            </button>
+                        </div>
+                    );
+                })}
+
+                {confirmEliminar && (
+                    <div className="confirm-cargo-inline">
+                        <span>¿Quitar este cargo? Se eliminará al guardar los cambios.</span>
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                            <button type="button" className="btn-sm danger" onClick={() => marcarEliminado(confirmEliminar)}>
+                                <IconTrash /> Sí, quitar
+                            </button>
+                            <button type="button" className="btn-sm" onClick={() => setConfirmEliminar(null)}>
+                                <IconX /> Cancelar
+                            </button>
                         </div>
                     </div>
-                ))}
+                )}
+
+                {cargosVisibles.length < 5 && (
+                    <button type="button" className="btn-add-cargo" onClick={agregarNuevoCargo}>
+                        + Agregar otro cargo
+                    </button>
+                )}
             </div>
 
             {/* Ubicación */}
@@ -328,14 +445,12 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 </div>
             </div>
 
-            {/* Fechas + trabajo actual */}
             <ToggleActual
                 defaultChecked={grupo.is_current}
                 inicioDia={getDia(rep.start_date)}  inicioMes={getMes(rep.start_date)}  inicioAnio={getAnio(rep.start_date)}
                 finDia={getDia(rep.end_date)}        finMes={getMes(rep.end_date)}        finAnio={getAnio(rep.end_date)}
             />
 
-            {/* Descripción */}
             <div className="form-group" style={{ marginBottom: '14px' }}>
                 <label className="form-label">Descripción</label>
                 <textarea name="descripcion" defaultValue={grupo.description}
@@ -343,16 +458,17 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             </div>
 
             <div className="btn-row" style={{ marginTop: 0 }}>
-                <button type="submit" className="btn-sm primary">
-                    <IconCheck /> Guardar cambios
+                <button type="submit" className="btn-sm primary" disabled={guardando}>
+                    <IconCheck /> {guardando ? 'Guardando...' : 'Guardar cambios'}
                 </button>
-                <button type="button" className="btn-sm" onClick={onCancelar}>
+                <button type="button" className="btn-sm" onClick={onCancelar} disabled={guardando}>
                     <IconX /> Cancelar
                 </button>
             </div>
         </form>
     );
 }
+
 
 /* ══════════════════════════════════════════════════════════
    Componente principal
@@ -366,7 +482,7 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
 
     /* Eliminar grupo completo */
     async function eliminarGrupo(idRep) {
-        const res = await fetch(`/experiencia-laboral/${idRep}`, {
+        const res = await fetch(`/experiencia-laboral/${idRep}?grupo=1`, {
             method:  'DELETE',
             headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
         });
@@ -381,14 +497,21 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
         }
     }
 
-    /* Recibir array de registros actualizados (uno por cargo) */
-    function handleGuardado(actualizados) {
-        setExperiencias(prev =>
-            prev.map(e => {
+    /* Recibir resultados del guardado: actualizados + nuevos, e ids eliminados */
+    function handleGuardado(actualizados, idsEliminados) {
+        setExperiencias(prev => {
+            // Quitar los eliminados
+            let siguiente = prev.filter(e => !idsEliminados.has(e.id));
+            // Actualizar los existentes
+            siguiente = siguiente.map(e => {
                 const match = actualizados.find(a => a.id === e.id);
                 return match ?? e;
-            })
-        );
+            });
+            // Agregar los nuevos (no estaban en prev)
+            const idsExistentes = new Set(prev.map(e => e.id));
+            const nuevos = actualizados.filter(a => !idsExistentes.has(a.id));
+            return [...siguiente, ...nuevos];
+        });
         setEditandoGrupo(null);
     }
 

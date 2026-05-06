@@ -177,7 +177,7 @@
 
 /* Barra de progreso (solo técnicas) */
 .skill-progress {
-    height: 5px;
+    height: 7px;
     border-radius: 99px;
     background: var(--gray-100);
     overflow: hidden;
@@ -190,9 +190,9 @@
     transition: width 0.4s ease;
 }
 
-.skill-progress-fill.basico     { width: 33%; background: #3498db; }
-.skill-progress-fill.intermedio { width: 66%; background: #e6a82a; }
-.skill-progress-fill.avanzado   { width: 100%; background: var(--teal); }
+.skill-progress-fill.basico     { width: 33%; background: #2980b9; }
+.skill-progress-fill.intermedio { width: 66%; background: #d4a017; }
+.skill-progress-fill.avanzado   { width: 100%; background: #9a0219d2; }
 
 /* Badges de nivel */
 .badge-nivel {
@@ -206,9 +206,9 @@
     flex-shrink: 0;
 }
 
-.badge-basico     { background: #ebf5fb; color: #1a5276; }
-.badge-intermedio { background: #fef9ec; color: #7d5a0a; }
-.badge-avanzado   { background: rgba(10,191,158,0.1); color: var(--teal-dim); }
+.badge-basico     { background: #d6eaf8; color: #1a5276; border: 1px solid #2980b9; }
+.badge-intermedio { background: #fdebd0; color: #7d5a0a; border: 1px solid #d4a017; }
+.badge-avanzado   { background: #cd9ca6; color: #50081e; border: 1px solid #9a0219d2; }
 
 /* Pills (habilidades blandas) */
 .soft-pills-wrap {

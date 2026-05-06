@@ -77,6 +77,12 @@
                                                         <li data-value="Data Analyst">Data Analyst</li>
                                                         <li data-value="Scrum Master">Scrum Master</li>
                                                         <li data-value="Product Owner">Product Owner</li>
+                                                        <li data-value="Business Analyst">Business Analyst</li>
+                                                        <li data-value="Security Engineer">Security Engineer</li>
+                                                        <li data-value="Data Engineer">Data Engineer</li>
+                                                        <li data-value="Cloud Engineer">Cloud Engineer</li>
+                                                        <li data-value="AI Engineer">AI Engineer</li>
+                                                        <li data-value="Systems Analyst">Systems Analyst</li>
                                                     </ul>
                                                     <input type="hidden" name="cargos[]" value="{{ old('cargos.0', '') }}">
                                                 </div>

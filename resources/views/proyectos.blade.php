@@ -279,4 +279,24 @@
 
     <script src="{{ asset('js/proyectos.js') }}"></script>
     <script src="{{ asset('js/evidencia.js') }}"></script>
+    {{-- Scroll al proyecto desde habilidades técnicas (HU-24) --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const params = new URLSearchParams(window.location.search);
+            const previewId = params.get('preview');
+            if (!previewId) return;
+
+
+            let intentos = 0;
+            const intervalo = setInterval(function () {
+                
+                const card = document.getElementById('proyecto-' + previewId);
+                if (card) {
+                    clearInterval(intervalo);
+                    setTimeout(() => card.click(), 100); // simula click en la tarjeta
+                }
+                if (++intentos > 20) clearInterval(intervalo);
+            }, 100);
+        });
+    </script>
 </x-app-layout>
