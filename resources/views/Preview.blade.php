@@ -123,28 +123,72 @@
             @endforelse
         </div>
 
-        <!-- REDES Y CONTACTO -->
+       <!-- REDES Y CONTACTO -->
         <div class="section">
             <h2><i class="fas fa-share-alt"></i> Redes y contacto</h2>
             <div class="contact-grid">
                 @if($redes['linkedin'])
-                    <div class="contact-item"><i class="fab fa-linkedin"></i> <span>{{ $redes['linkedin'] }}</span></div>
+                    <div class="contact-item">
+                        <i class="fab fa-linkedin"></i>
+                        <a href="{{ $redes['linkedin'] }}" target="_blank" rel="noopener noreferrer">
+                            LinkedIn
+                        </a>
+                    </div>
                 @endif
+                
                 @if($redes['github'])
-                    <div class="contact-item"><i class="fab fa-github"></i> <span>{{ $redes['github'] }}</span></div>
+                    <div class="contact-item">
+                        <i class="fab fa-github"></i>
+                        <a href="{{ $redes['github'] }}" target="_blank" rel="noopener noreferrer">
+                            GitHub
+                        </a>
+                    </div>
                 @endif
+                
+                <!-- WhatsApp: Mostrar el número -->
                 @if($redes['whatsapp'])
-                    <div class="contact-item"><i class="fab fa-whatsapp"></i> <span>{{ $redes['whatsapp'] }}</span></div>
+                    <div class="contact-item">
+                        <i class="fab fa-whatsapp"></i>
+                        @php
+                            // Limpiar el número (solo dígitos)
+                            $whatsappNumber = preg_replace('/[^0-9]/', '', $redes['whatsapp']);
+                            $whatsappUrl = 'https://wa.me/' . $whatsappNumber;
+                        @endphp
+                        <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer">
+                            WhatsApp: {{ $redes['whatsapp'] }}
+                        </a>
+                    </div>
                 @endif
+                
                 @if($redes['correo'])
-                    <div class="contact-item"><i class="fas fa-envelope"></i> <span>{{ $redes['correo'] }}</span></div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:{{ $redes['correo'] }}">
+                            {{ $redes['correo'] }}
+                        </a>
+                    </div>
                 @endif
+                
                 @if($redes['otros'])
-                    <div class="contact-item"><i class="fas fa-link"></i> <span>{{ $redes['otros'] }}</span></div>
+                    <div class="contact-item">
+                        <i class="fas fa-link"></i>
+                        <a href="{{ $redes['otros'] }}" target="_blank" rel="noopener noreferrer">
+                            Otra red profesional
+                        </a>
+                    </div>
                 @endif
+
+                @if($redes['ubicacion'])
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ $redes['ubicacion'] }}</span>
+                    </div>
+                @endif
+                
                 @if(empty(array_filter($redes)))
                     <div class="empty-message">No hay redes de contacto registradas</div>
                 @endif
+
             </div>
         </div>
 

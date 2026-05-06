@@ -374,3 +374,49 @@
     color: #fff;
     border-color: #e74c3c;
 }
+
+/* =====================================================
+   ALERTAS
+   ===================================================== */
+   .alert-skill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.alert-skill.success {
+    background: #eafaf5;
+    border-left: 4px solid #1abc9c;
+    color: #0e6655;
+}
+
+.alert-skill.error {
+    background: #fdf2f2;
+    border-left: 4px solid #e74c3c;
+    color: #922b21;
+}
+
+.alert-skill.warning {
+    background: #fff8e1;
+    border-left: 4px solid #f0ad4e;
+    color: #856404;
+}
+
+.alert-skill-icon {
+    font-size: 15px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.field-warning {
+    font-size: 11px;
+    color: #e67e22;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}

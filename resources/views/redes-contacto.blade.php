@@ -41,7 +41,7 @@
                                 Usa el switch de cada campo para controlar su visibilidad en tu portafolio público.
                             </div>
 
-                            {{-- MENSAJES --}}
+                                 {{-- MENSAJES --}}
                             @if(session('success'))
                                 <div class="alert-skill success">
                                     <div class="alert-skill-icon">✓</div>
@@ -60,6 +60,7 @@
                                 </div>
                             @endif
 
+                            
                             {{-- FORMULARIO --}}
                             <form method="POST" action="{{ route('redes.store') }}">
                                 @csrf
@@ -68,6 +69,7 @@
                                 <div class="form-group">
                                     <div class="form-group-header">
                                         <label for="input-linkedin">LinkedIn</label>
+
                                         <div class="switch-wrapper">
                                             <span class="switch-label-text {{ ($redes[$platforms['LinkedIn']]->is_visible ?? false) ? 'visible' : 'hidden' }}" id="lbl-linkedin">
                                                 {{ ($redes[$platforms['LinkedIn']]->is_visible ?? false) ? 'Visible' : 'Oculto' }}
@@ -84,9 +86,15 @@
                                            placeholder="Ej. https://linkedin.com/in/usuario"
                                            value="{{ old('linkedin', $redes[$platforms['LinkedIn']]->profile_url ?? '') }}">
                                     <div class="privacy-hint" id="hint-linkedin">
+                                        
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="#999" stroke-width="1.2"/><path d="M8 7v5M8 5v.5" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
                                         Este campo es visible en tu portafolio público
                                     </div>
+                                    
+                                    @if(session('warning_linkedin'))
+                                        <p class="field-warning">{{ session('warning_linkedin') }}</p>
+                                    @endif
+                                    
                                 </div>
 
                                 {{-- GitHub --}}
@@ -112,6 +120,10 @@
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="#999" stroke-width="1.2"/><path d="M8 7v5M8 5v.5" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
                                         Este campo es visible en tu portafolio público
                                     </div>
+                                    @if(session('warning_github'))
+                                        <p class="field-warning"> {{ session('warning_github') }}</p>
+                                    @endif
+                                    
                                 </div>
 
                                 {{-- WhatsApp --}}
@@ -137,6 +149,10 @@
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="#999" stroke-width="1.2"/><path d="M8 7v5M8 5v.5" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
                                         Este campo es visible en tu portafolio público
                                     </div>
+                                    @if(session('warning_whatsapp'))
+                                        <p class="field-warning"> {{ session('warning_whatsapp') }}</p>
+                                    @endif
+                                    
                                 </div>
 
                                 {{-- Correo --}}
@@ -162,6 +178,11 @@
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="#999" stroke-width="1.2"/><path d="M8 7v5M8 5v.5" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
                                         Este campo está oculto — solo tú puedes verlo
                                     </div>
+
+                                    @if(session('warning_email_contacto'))
+                                        <p class="field-warning">{{ session('warning_email_contacto') }}</p>
+                                    @endif
+                                    
                                 </div>
 
                                 {{-- Otros --}}
@@ -187,6 +208,8 @@
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="#999" stroke-width="1.2"/><path d="M8 7v5M8 5v.5" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
                                         Este campo está oculto — solo tú puedes verlo
                                     </div>
+
+
                                 </div>
 
                                 {{-- UBICACIÓN FÍSICA --}}

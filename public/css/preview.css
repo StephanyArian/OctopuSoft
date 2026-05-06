@@ -291,4 +291,27 @@ body {
     .profile-header h1 {
         font-size: 24px;
     }
+
+    .contact-item a {
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .contact-item a {
+        color: var(--teal);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-item a:hover {
+        color: var(--teal-dim);
+        text-decoration: underline;
+    }
 }

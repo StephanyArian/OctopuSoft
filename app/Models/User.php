@@ -99,4 +99,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(RedProfesional::class);
     }
+
+        // En app/Models/User.php
+    public function location()
+    {
+        return $this->hasOne(UserLocation::class);
+    }
 }

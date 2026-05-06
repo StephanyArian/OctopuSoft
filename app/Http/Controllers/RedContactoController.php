@@ -105,30 +105,70 @@ class RedContactoController extends Controller
                 $platforms['Otros'] => ['campo' => 'otros', 'is_primary' => 0],
             ];
 
-        foreach ($campos as $platformId => $config) {
-            $valor = $request->input($config['campo']);
+            
 
+            $user = Auth::user();
+
+            // ACTUALIZAR TAMBIÉN EL CAMPO PHONE EN LA TABLA USERS
+            if ($request->has('whatsapp') && $request->whatsapp) {
+                $user->phone = $request->whatsapp;
+                $user->save();
+            } elseif ($request->whatsapp === null || $request->whatsapp === '') {
+                // Opcional: Si envían vacío, limpiar el campo
+                $user->phone = null;
+                $user->save();
+            }
+
+            $visibleValues = [];
+            foreach ($campos as $platformId => $config) {
+
+                $campo = $config['campo'];
+
+                $switchName = match($config['campo']) {
+                    'linkedin' => 'visible_linkedin',
+                    'github' => 'visible_github',
+                    'whatsapp' => 'visible_whatsapp',
+                    'email_contacto' => 'visible_email',
+                    'otros' => 'visible_otros',
+                    default => 'visible_' . $config['campo']
+                };
+               
+            
+
+             $visibleValues[$platformId] = $request->input($switchName, 0) ? 1 : 0;
+
+            }
+
+            foreach ($campos as $platformId => $config) {
+            $valor = $request->input($config['campo']);
+            $isVisible = $visibleValues[$platformId] ?? 0; 
             if ($valor) {
-                // CREA O ACTUALIZA
+                $existente = RedProfesional::where('user_id', $user->id)
+                    ->where('platform_id', $platformId)
+                    ->first();
+            
                 RedProfesional::updateOrCreate(
-                    [
-                        'user_id'     => $user->id,
-                        'platform_id' => $platformId
-                    ],
+                    ['user_id' => $user->id, 'platform_id' => $platformId],
                     [
                         'profile_url'   => $valor,
-                        'is_visible'    => 1,
+                        'is_visible'    => $isVisible,
                         'is_primary'    => $config['is_primary'],
                         'display_order' => $platformId,
                     ]
                 );
+            
+                // Reemplaza las líneas de session()->push('warnings'...) por esto:
+                if ($existente && $existente->profile_url !== $valor) {
+                    session()->put('warning_' . $config['campo'], 'El enlace fue actualizado.');
+                } elseif ($existente && $existente->profile_url === $valor) {
+                    session()->put('warning_' . $config['campo'], 'Este enlace ya estaba registrado.');
+                }
             } else {
-                // ELIMINA SI ESTÁ VACÍO
                 RedProfesional::where('user_id', $user->id)
                     ->where('platform_id', $platformId)
                     ->delete();
             }
-        }
+            }
          UserLocation::updateOrCreate(
         ['user_id' => $user->id],
         [
@@ -138,6 +178,7 @@ class RedContactoController extends Controller
         ]
     );   
     
-        return back()->with('success', 'Datos guardados correctamente.');
+    
+    return back()->with('success', 'Datos guardados correctamente.');
     }
 }

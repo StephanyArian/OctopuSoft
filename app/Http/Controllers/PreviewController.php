@@ -18,7 +18,8 @@ class PreviewController extends Controller
             'skills',                               // habilidades del usuario
             'experiences',                          // experiencias del usuario
             'portfolio.projects',                   // portafolio y sus proyectos
-            'professionalNetworks.platform'         // redes profesionales con plataforma
+            'professionalNetworks.platform',         // redes profesionales con plataforma
+            'location'
         ]);
         
         // ==========================================
@@ -97,13 +98,17 @@ class PreviewController extends Controller
         $redes = [
             'linkedin' => null,
             'github' => null,
-            'whatsapp' => $user->phone,
-            'correo' => $user->email,
-            'otros' => null
+            'whatsapp' => null,
+            'correo' => null,
+            'otros' => null,
+            'ubicacion' => null 
         ];
         
         // Cargar redes desde professional_networks
         foreach ($user->professionalNetworks as $network) {
+            if (!$network->is_visible) {
+                continue;  
+            }
             $platformName = $network->platform->name ?? '';
             $profileUrl = $network->profile_url;
             
@@ -111,17 +116,54 @@ class PreviewController extends Controller
                 $redes['linkedin'] = $profileUrl;
             } elseif (stripos($platformName, 'github') !== false) {
                 $redes['github'] = $profileUrl;
+            } elseif (stripos($platformName, 'whatsapp') !== false) {  
+                $redes['whatsapp'] = $profileUrl;
             } else {
                 $redes['otros'] = $profileUrl;
             }
         }
+
         
+        if ($user->location && $user->location->address && $user->location->show_location) {
+            $redes['ubicacion'] = $user->location->address;
+        }
+
+
         // ==========================================
-        // UBICACIÓN (opcional)
-        // ==========================================
-        // Si tienes user_locations:
-        // $ubicacion = $user->location;
-        
+// LIMPIAR Y VALIDAR URLs
+// ==========================================
+
+        // 1. Limpiar 'otros' si no es una URL válida
+        if (isset($redes['otros']) && $redes['otros'] && !filter_var($redes['otros'], FILTER_VALIDATE_URL)) {
+            $redes['otros'] = null;
+        }
+
+        // 2. Limpiar ubicación si parece una URL
+        if (isset($redes['ubicacion']) && $redes['ubicacion'] && preg_match('/^https?:\/\//', $redes['ubicacion'])) {
+            $redes['ubicacion'] = null;
+        }
+
+        // 3. Agregar protocolo solo a URLs que sean válidas
+        foreach ($redes as $key => $url) {
+            if ($url && !in_array($key, ['correo', 'whatsapp', 'ubicacion'])) {
+                // Si ya tiene protocolo, está bien
+                if (preg_match('/^https?:\/\//', $url)) {
+                    continue;
+                }
+                // Si no tiene protocolo pero parece una URL válida, agregar https://
+                if (filter_var('https://' . $url, FILTER_VALIDATE_URL)) {
+                    $redes[$key] = 'https://' . $url;
+                } else {
+                    // No es una URL válida, poner null
+                    $redes[$key] = null;
+                }
+            }
+        }
+
+         
+    
+    
+
         return view('Preview', compact(
             'user',
             'habilidadesTecnicas',
@@ -132,4 +174,6 @@ class PreviewController extends Controller
             'redes'
         ));
     }
+
+        
 }
