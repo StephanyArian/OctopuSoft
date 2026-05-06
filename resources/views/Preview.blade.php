@@ -181,7 +181,11 @@
                 @if($redes['ubicacion'])
                     <div class="contact-item">
                         <i class="fas fa-map-marker-alt"></i>
-                        <span>{{ $redes['ubicacion'] }}</span>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($redes['ubicacion']) }}" 
+                        target="_blank" 
+                        rel="noopener noreferrer">
+                             {{ $redes['ubicacion'] }}
+                        </a>
                     </div>
                 @endif
                 
