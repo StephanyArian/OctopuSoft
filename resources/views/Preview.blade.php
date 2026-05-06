@@ -116,11 +116,22 @@
         </div>
 
         <!-- PROYECTOS -->
+        <!-- PROYECTOS -->
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
             @forelse($proyectos as $proyecto)
                 <div class="card">
-                    <h3>{{ $proyecto->nombre }}</h3>
+                    <h3 style="cursor:pointer; color:#1abc9c;" onclick="abrirModal({{ json_encode([
+                        'nombre'      => $proyecto->nombre,
+                        'descripcion' => $proyecto->descripcion,
+                        'fecha_inicio'=> optional($proyecto->fecha_inicio)->format('d/m/Y'),
+                        'fecha_fin'   => optional($proyecto->fecha_fin)->format('d/m/Y'),
+                        'estado'      => $proyecto->estado,
+                        'rol'         => $proyecto->rol,
+                        'cliente'     => $proyecto->cliente,
+                        'tecnologias' => $proyecto->tecnologias,
+                        'evidencias'  => $proyecto->evidencias,
+                    ]) }})">{{ $proyecto->nombre }}</h3>
                     <div class="description">{{ $proyecto->descripcion }}</div>
                     <div class="date">
                         {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
@@ -133,6 +144,13 @@
                         Rol: {{ $proyecto->rol ?? '' }}
                         @if($proyecto->cliente) | Cliente: {{ $proyecto->cliente }} @endif
                     </div>
+                    @if(!empty($proyecto->tecnologias))
+                        <div class="proyecto-tecnologias">
+                            @foreach($proyecto->tecnologias as $tec)
+                                <span class="tec-badge">{{ $tec }}</span>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @empty
                 <div class="empty-message">No hay proyectos registrados</div>
@@ -212,6 +230,37 @@
             </div>
         </div>
 
+        {{-- ↓ PEGA EL MODAL AQUÍ ↓ --}}
+        <div id="modal-proyecto" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#fff; border-radius:12px; max-width:680px; width:90%; max-height:88vh; overflow-y:auto; position:relative;">
+                <div style="padding:24px 28px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <h2 id="modal-nombre" style="color:#1a0a2e; font-size:22px; margin:0 0 10px;"></h2>
+                        <div id="modal-badges" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                    </div>
+                    <button onclick="cerrarModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#888;">✕</button>
+                </div>
+                <div id="modal-fechas" style="padding:12px 28px; background:#f9f9f9; border-bottom:1px solid #f0f0f0; font-size:13px; color:#666; display:flex; gap:20px;"></div>
+                <div style="padding:24px 28px;">
+                    <div style="margin-bottom:20px;">
+                        <div style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Descripción</div>
+                        <p id="modal-descripcion" style="color:#444; font-size:14px; line-height:1.6; margin:0;"></p>
+                    </div>
+                    <div id="modal-tec-section" style="margin-bottom:20px;">
+                        <div style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Stack Tecnológico</div>
+                        <div id="modal-tecnologias" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                    </div>
+                    <div id="modal-evidencias" style="display:none;">
+                        <div style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; padding-top:16px; border-top:1px solid #f0f0f0;">
+                            Evidencias <span id="modal-ev-count" style="color:#1abc9c;"></span>
+                        </div>
+                        <div id="modal-evidencias-lista" style="display:flex; flex-direction:column; gap:10px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
         <!-- BOTONES -->
         <div class="buttons-container">
             <a href="javascript:history.back()" class="btn btn-editar">
@@ -227,10 +276,77 @@
     </div>
 
     <script>
-        document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
-            if(!confirm('¿Estás segura de que quieres publicar tu perfil? Una vez publicado, será visible para todos.')) {
-                e.preventDefault();
-            }
-        });
-    </script>
+    document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
+        if(!confirm('¿Estás segura de que quieres publicar tu perfil? Una vez publicado, será visible para todos.')) {
+            e.preventDefault();
+        }
+    });
+
+    function abrirModal(data) {
+        document.getElementById('modal-nombre').textContent = data.nombre;
+
+        let badgesDiv = document.getElementById('modal-badges');
+        badgesDiv.innerHTML = '';
+        const badge = (texto, bg, color) => `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};">${texto}</span>`;
+
+        if (data.estado) {
+            let bg = data.estado === 'Completado' ? '#d1fae5' : data.estado === 'En curso' ? '#fef3c7' : '#f1f5f9';
+            let color = data.estado === 'Completado' ? '#065f46' : data.estado === 'En curso' ? '#92400e' : '#64748b';
+            badgesDiv.innerHTML += badge(data.estado, bg, color);
+        }
+        if (data.rol) badgesDiv.innerHTML += badge('👤 ' + data.rol, '#ede9fe', '#5b21b6');
+        if (data.cliente) badgesDiv.innerHTML += badge('🏢 ' + data.cliente, '#f1f5f9', '#475569');
+
+        let fechasDiv = document.getElementById('modal-fechas');
+        fechasDiv.innerHTML = '';
+        if (data.fecha_inicio) fechasDiv.innerHTML += `<span>📅 Inicio: <strong>${data.fecha_inicio}</strong></span>`;
+        if (data.fecha_fin) fechasDiv.innerHTML += `<span>📅 Fin: <strong>${data.fecha_fin}</strong></span>`;
+
+        document.getElementById('modal-descripcion').textContent = data.descripcion ?? '';
+
+        let tecDiv = document.getElementById('modal-tecnologias');
+        let tecSection = document.getElementById('modal-tec-section');
+        tecDiv.innerHTML = '';
+        if (data.tecnologias && data.tecnologias.length) {
+            tecSection.style.display = 'block';
+            data.tecnologias.forEach(t => {
+                tecDiv.innerHTML += `<span class="tec-badge">${t}</span>`;
+            });
+        } else {
+            tecSection.style.display = 'none';
+        }
+
+        let evDiv = document.getElementById('modal-evidencias-lista');
+        let evSec = document.getElementById('modal-evidencias');
+        evDiv.innerHTML = '';
+        if (data.evidencias && data.evidencias.length) {
+            evSec.style.display = 'block';
+            document.getElementById('modal-ev-count').textContent = '(' + data.evidencias.length + ')';
+            data.evidencias.forEach(ev => {
+                let item = document.createElement('div');
+                item.style.cssText = 'padding:12px;border:1px solid #eee;border-radius:8px;background:#fafafa;';
+                if (ev.tipo === 'imagen' && ev.imagen) {
+                    item.innerHTML = `<p style="font-size:12px;color:#888;margin:0 0 8px;">🖼️ ${ev.titulo}</p><img src="${ev.imagen}" style="width:100%;border-radius:6px;max-height:220px;object-fit:cover;">`;
+                } else if (ev.tipo === 'enlace') {
+                    item.innerHTML = `<p style="font-size:12px;color:#888;margin:0 0 4px;">🔗 ${ev.titulo}</p><a href="${ev.url}" target="_blank" style="color:#1abc9c;font-size:13px;word-break:break-all;">${ev.url}</a>`;
+                } else if (ev.tipo === 'repositorio') {
+                    item.innerHTML = `<p style="font-size:12px;color:#888;margin:0 0 4px;">📦 ${ev.titulo}</p><a href="${ev.url}" target="_blank" style="color:#1abc9c;font-size:13px;word-break:break-all;">${ev.url}</a>`;
+                }
+                evDiv.appendChild(item);
+            });
+        } else {
+            evSec.style.display = 'none';
+        }
+
+        document.getElementById('modal-proyecto').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+        document.getElementById('modal-proyecto').style.display = 'none';
+    }
+
+    document.getElementById('modal-proyecto').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModal();
+    });
+</script>
 @endsection

@@ -106,13 +106,23 @@ class PreviewController extends Controller
         if ($user->portfolio) {
             $proyectos = $user->portfolio->projects->where('is_visible', true)->map(function($project) {
                 return (object) [
+                    'id' => $project->id,
                     'nombre' => $project->name,
                     'descripcion' => $project->description,
                     'fecha_inicio' => $project->start_date,
                     'fecha_fin' => $project->end_date,
                     'estado' => $project->status,
                     'rol' => $project->role,
-                    'cliente' => null  // Tu tabla no tiene campo cliente
+                    'cliente' => $project->company ?? null,  
+                    'tecnologias' => $project->technologies->pluck('name')->toArray(),
+                    'evidencias' => $project->evidencias->map(function($ev) {
+                        return (object) [
+                            'tipo'   => $ev->tipo,
+                            'titulo' => $ev->titulo ?? '',
+                            'url'    => $ev->url ?? null,
+                            'imagen' => $ev->imagen_path ? asset('storage/' . $ev->imagen_path) : null,
+                        ];
+                    })->toArray(),
                 ];
             });
         }
