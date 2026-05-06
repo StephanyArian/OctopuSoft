@@ -48,17 +48,42 @@ class PreviewController extends Controller
         // ==========================================
         // EXPERIENCIAS LABORALES (type = 'work')
         // ==========================================
-        $experiencias = $user->experiences->where('type', 'work')->map(function($exp) {
+        $experiencias = $user->experiences
+        ->where('type', 'work')
+        ->where('is_visible', true)
+        ->groupBy('institution')  // Agrupar por empresa
+        ->map(function($grupo) {
+
+            $primera = $grupo->first();
+
+           
+            
+            // Listar todos los roles de esta empresa
+            $roles = $grupo->map(function($exp) {
+                return $exp->title;
+            })->implode(' / ');
+            
+            // Obtener fechas (tomar la más temprana y más reciente)
+            $fecha_inicio = $grupo->min('start_date');
+            $fecha_fin = $grupo->contains('is_current', true) ? null : $grupo->max('end_date');
+            $trabajo_actual = $grupo->contains('is_current', true);
+            
+            // Combinar descripciones
+            $descripcion = $grupo->map(function($exp) {
+                return $exp->description;
+            })->filter()->implode("\n\n");
+            
             return (object) [
-                'empresa' => $exp->institution,
-                'cargo' => $exp->title,
-                'ubicacion' => $exp->location,
-                'fecha_inicio' => $exp->start_date,
-                'fecha_fin' => $exp->end_date,
-                'trabajo_actual' => $exp->is_current,
-                'descripcion' => $exp->description
+                'empresa' => $primera->institution,
+                'cargo' => $roles,
+                'ubicacion' => $primera->location,
+                'fecha_inicio' => $fecha_inicio,
+                'fecha_fin' => $fecha_fin,
+                'trabajo_actual' => $trabajo_actual,
+                'descripcion' => $descripcion
             ];
-        });
+        })
+        ->values();
         
         // ==========================================
         // INFORMACIÓN ACADÉMICA (type = 'education')
@@ -79,7 +104,7 @@ class PreviewController extends Controller
         // ==========================================
         $proyectos = collect();
         if ($user->portfolio) {
-            $proyectos = $user->portfolio->projects->map(function($project) {
+            $proyectos = $user->portfolio->projects->where('is_visible', true)->map(function($project) {
                 return (object) [
                     'nombre' => $project->name,
                     'descripcion' => $project->description,
@@ -118,6 +143,8 @@ class PreviewController extends Controller
                 $redes['github'] = $profileUrl;
             } elseif (stripos($platformName, 'whatsapp') !== false) {  
                 $redes['whatsapp'] = $profileUrl;
+            } elseif (stripos($platformName, 'email') !== false) {  
+                $redes['correo'] = $profileUrl;
             } else {
                 $redes['otros'] = $profileUrl;
             }

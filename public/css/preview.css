@@ -314,4 +314,26 @@ body {
         color: var(--teal-dim);
         text-decoration: underline;
     }
+
+    .roles-list {
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+    
+    .roles-list li {
+        font-size: 14px;
+        color: var(--teal);
+        margin-bottom: 4px;
+    }
+    
+    .roles-list li::marker {
+        color: var(--teal);
+    }
+
+    .role-single {
+        font-size: 14px;
+        color: var(--teal);
+        font-weight: 500;
+        margin: 8px 0;
+    }
 }

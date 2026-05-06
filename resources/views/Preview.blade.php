@@ -29,19 +29,35 @@
         <div class="section">
             <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
             @forelse($experiencias as $exp)
-                <div class="card">
-                    <h3>{{ $exp->empresa }}</h3>
-                    <div class="subtitle">{{ $exp->cargo }} {{ $exp->ubicacion ? '| ' . $exp->ubicacion : '' }}</div>
-                    <div class="date">
-                        {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d F Y') }}
-                        @if($exp->fecha_fin)
-                            — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d F Y') }}
-                        @elseif($exp->trabajo_actual)
-                            — Actualidad
-                        @endif
-                    </div>
-                    <div class="description">{{ $exp->descripcion }}</div>
+            <div class="card">
+                <h3>{{ $exp->empresa }}</h3>
+                <div class="subtitle">
+                    @if($exp->ubicacion)
+                        {{ $exp->ubicacion }}
+                    @endif
                 </div>
+                
+                <!-- Mostrar roles como viñetas si contiene "/" -->
+                @if(str_contains($exp->cargo, ' / '))
+                    <ul class="roles-list">
+                        @foreach(explode(' / ', $exp->cargo) as $rol)
+                            <li>{{ $rol }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    <div class="role-single">{{ $exp->cargo }}</div>
+                @endif
+                
+                <div class="date">
+                    {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d F Y') }}
+                    @if($exp->fecha_fin)
+                        — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d F Y') }}
+                    @elseif($exp->trabajo_actual)
+                        — Actualidad
+                    @endif
+                </div>
+                <div class="description">{{ $exp->descripcion }}</div>
+            </div>
             @empty
                 <div class="empty-message">No hay experiencias laborales registradas</div>
             @endforelse
@@ -198,7 +214,7 @@
 
         <!-- BOTONES -->
         <div class="buttons-container">
-            <a href="{{ url('/dashboard') }}" class="btn btn-editar">
+            <a href="javascript:history.back()" class="btn btn-editar">
                 <i class="fas fa-edit"></i> Continuar editando
             </a>
             <form action="{{ route('perfil.publicar') }}" method="POST" style="margin: 0;" id="formPublicar">

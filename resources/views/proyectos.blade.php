@@ -11,7 +11,7 @@
             <div class="shell">
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
-                    <div class="nav-tab muted">VER PERFIL</div>
+                    <a href="{{ route('preview') }}" class="nav-tab muted">VER PERFIL</a>
                 </div>
 
                 <div class="body-row">
