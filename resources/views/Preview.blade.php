@@ -9,7 +9,6 @@
         
         <!-- CABECERA CON DATOS PERSONALES -->
         <div class="profile-header">
-    <!-- Lado izquierdo: datos -->
             <div class="profile-info">
                 <h1>{{ $user->first_name ?? 'Usuario' }} {{ $user->last_name ?? '' }}</h1>
                 <div class="title">{{ $user->profession->name ?? 'Profesional' }}</div>
@@ -99,7 +98,6 @@
                     @endif
                 </div>
                 
-                <!-- Mostrar roles como viñetas si contiene "/" -->
                 @if(str_contains($exp->cargo, ' / '))
                     <ul class="roles-list">
                         @foreach(explode(' / ', $exp->cargo) as $rol)
@@ -147,18 +145,30 @@
             @endforelse
         </div>
 
-        <!-- HABILIDADES TÉCNICAS -->
+        <!-- HABILIDADES TÉCNICAS CON BARRAS CORTAS AMARILLAS -->
         <div class="section">
             <h2><i class="fas fa-code"></i> Habilidades técnicas</h2>
-            <div class="skills-container">
+            <div class="tech-skills-grid">
                 @forelse($habilidadesTecnicas as $skill)
-                    <span class="skill-tag 
-                        @if($skill->nivel == 'Avanzado') advanced
-                        @elseif($skill->nivel == 'Intermedio') intermediate
-                        @else basic
-                        @endif">
-                        {{ $skill->nombre }} - {{ $skill->nivel }}
-                    </span>
+                    @php
+                        $nivel = $skill->nivel ?? 'Intermedio';
+                        if ($nivel == 'Avanzado') {
+                            $claseNivel = 'advanced';
+                        } elseif ($nivel == 'Intermedio') {
+                            $claseNivel = 'intermediate';
+                        } else {
+                            $claseNivel = 'basic';
+                        }
+                    @endphp
+                    <div class="tech-skill-item">
+                        <div class="tech-skill-header">
+                            <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                            <span class="tech-skill-level">{{ $nivel }}</span>
+                        </div>
+                        <div class="tech-skill-bar-bg">
+                            <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
+                        </div>
+                    </div>
                 @empty
                     <div class="empty-message">No hay habilidades técnicas registradas</div>
                 @endforelse
@@ -170,14 +180,13 @@
             <h2><i class="fas fa-heart"></i> Habilidades blandas</h2>
             <div class="skills-container">
                 @forelse($habilidadesBlandas as $skill)
-                    <span class="soft-skill-tag">{{ $skill->nombre }}</span>
+                    <span class="soft-skill-tag">⭐{{ $skill->nombre }}</span>
                 @empty
                     <div class="empty-message">No hay habilidades blandas registradas</div>
                 @endforelse
             </div>
         </div>
 
-        <!-- PROYECTOS -->
         <!-- PROYECTOS -->
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
@@ -219,7 +228,7 @@
             @endforelse
         </div>
 
-       <!-- REDES Y CONTACTO -->
+        <!-- REDES Y CONTACTO -->
         <div class="section">
             <h2><i class="fas fa-share-alt"></i> Redes y contacto</h2>
             <div class="contact-grid">
@@ -241,12 +250,10 @@
                     </div>
                 @endif
                 
-                <!-- WhatsApp: Mostrar el número -->
                 @if($redes['whatsapp'])
                     <div class="contact-item">
                         <i class="fab fa-whatsapp"></i>
                         @php
-                            // Limpiar el número (solo dígitos)
                             $whatsappNumber = preg_replace('/[^0-9]/', '', $redes['whatsapp']);
                             $whatsappUrl = 'https://wa.me/' . $whatsappNumber;
                         @endphp
@@ -288,11 +295,10 @@
                 @if(empty(array_filter($redes)))
                     <div class="empty-message">No hay redes de contacto registradas</div>
                 @endif
-
             </div>
         </div>
 
-        {{-- ↓ PEGA EL MODAL AQUÍ ↓ --}}
+        <!-- MODAL PROYECTO -->
         <div id="modal-proyecto" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
             <div style="background:#fff; border-radius:12px; max-width:680px; width:90%; max-height:88vh; overflow-y:auto; position:relative;">
                 <div style="padding:24px 28px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:flex-start;">
@@ -321,7 +327,6 @@
                 </div>
             </div>
         </div>
-        
 
         <!-- BOTONES -->
         <div class="buttons-container">
@@ -410,5 +415,5 @@
     document.getElementById('modal-proyecto').addEventListener('click', function(e) {
         if (e.target === this) cerrarModal();
     });
-</script>
+    </script>
 @endsection
