@@ -74,8 +74,11 @@ class RedContactoController extends Controller
             ]
         );
         $request->validate([
-        'address'       => ['nullable', 'string', 'max:300'],
-        'show_location' => ['nullable', 'boolean'],
+           'address'       => ['nullable', 'string', 'max:300'],
+    'address_raw'   => ['nullable', 'string', 'max:300'],
+    'show_location' => ['nullable', 'boolean'],
+    'latitude'      => ['nullable', 'numeric', 'between:-90,90'],
+    'longitude'     => ['nullable', 'numeric', 'between:-180,180'],
         ]);
         
         $user = Auth::user();
@@ -174,6 +177,9 @@ class RedContactoController extends Controller
         [
             'address'       => $request->address,
             'show_location' => $request->boolean('show_location'),
+            'latitude'  => $request->input('latitude'),
+            'longitude' => $request->input('longitude'),
+            'address'   => $request->input('address'),
             // latitude/longitude las llenas en T7 con geocodificación
         ]
     );   
