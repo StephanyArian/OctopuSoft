@@ -9,20 +9,82 @@
         
         <!-- CABECERA CON DATOS PERSONALES -->
         <div class="profile-header">
-            <div class="profile-avatar">
+    <!-- Lado izquierdo: datos -->
+            <div class="profile-info">
+                <h1>{{ $user->first_name ?? 'Usuario' }} {{ $user->last_name ?? '' }}</h1>
+                <div class="title">{{ $user->profession->name ?? 'Profesional' }}</div>
+
+                <div class="profile-contact-list">
+                    @if($user->city || $user->country)
+                    <div class="contact-row">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>{{ $user->city ?? '' }}{{ $user->country ? ', ' . $user->country : '' }}</span>
+                    </div>
+                    @endif
+
+                    @if($redes['correo'])
+                    <div class="contact-row">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ $redes['correo'] }}</span>
+                    </div>
+                    @endif
+
+                    @if($redes['whatsapp'])
+                    <div class="contact-row">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>{{ $redes['whatsapp'] }}</span>
+                    </div>
+                    @endif
+
+                    @if($user->biography)
+                    <div class="contact-row">
+                        <i class="fas fa-quote-left"></i>
+                        <span>{{ $user->biography }}</span>
+                    </div>
+                    @endif
+                </div>
+
+                <!-- Iconos de redes sociales -->
+                <div class="profile-social-icons">
+                    @if($redes['linkedin'])
+                        <a href="{{ $redes['linkedin'] }}" target="_blank" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    @endif
+                    @if($redes['github'])
+                        <a href="{{ $redes['github'] }}" target="_blank" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    @endif
+                    @if($redes['whatsapp'])
+                        @php $wpNum = preg_replace('/[^0-9]/', '', $redes['whatsapp']); @endphp
+                        <a href="https://wa.me/{{ $wpNum }}" target="_blank" title="WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    @endif
+                    @if($redes['correo'])
+                        <a href="mailto:{{ $redes['correo'] }}" title="Email">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    @endif
+                    @if($redes['otros'])
+                        <a href="{{ $redes['otros'] }}" target="_blank" title="Otro">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Lado derecho: foto -->
+            <div class="profile-avatar-side">
                 @if($user->photo_base64)
-                    <img src="{{ $user->photo_base64 }}" alt="Foto perfil" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                    <img src="{{ $user->photo_base64 }}" alt="Foto de perfil">
                 @else
-                    <i class="fas fa-user-circle"></i>
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
                 @endif
             </div>
-            <h1>{{ $user->first_name ?? 'Usuario' }} {{ $user->last_name ?? '' }}</h1>
-            <div class="title">{{ $user->profession->name ?? 'Profesional' }}</div>
-            <div class="location">
-                <i class="fas fa-map-marker-alt"></i> 
-                {{ $user->city ?? '' }}{{ $user->country ? ', ' . $user->country : '' }}
-            </div>
-            <div class="bio">{{ $user->biography ?? 'Sin biografía' }}</div>
         </div>
 
         <!-- EXPERIENCIA LABORAL -->
