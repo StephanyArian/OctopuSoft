@@ -2,6 +2,9 @@
 {{-- HU-10: Gestionar proyectos | HU-22: Tecnologías | Filtros | Rol | Empresa --}}
 
 <x-app-layout>
+    {{-- QuillJS Editor --}}
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/proyectos.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -26,7 +29,6 @@
                     </div>
 
                     <div class="main-panel" id="mainPanel">
-                        {{-- HEADER CON TOOLBAR COMPACTO --}}
                         <div class="proy-header" id="proyHeader">
                             <div class="proy-title-wrap">
                                 <h2>Mis Proyectos</h2>
@@ -121,40 +123,27 @@
                         {{-- FORMULARIO --}}
                         <div class="proy-form-card" id="proyFormCard">
                             <div class="proy-form-title" id="proyFormTitle">➕ Nuevo Proyecto</div>
-
                             <div class="proy-form-grid">
                                 <div class="proy-field-full">
                                     <label>Nombre del proyecto <span>*</span></label>
                                     <input type="text" id="proyNombre" class="proy-inp" placeholder="Ej: Portafolio Web Personal" maxlength="100">
                                     <span class="proy-err-msg" id="proyErrNombre">El nombre es obligatorio</span>
                                 </div>
-
                                 <div class="proy-field-full">
                                     <label>Descripción <span>*</span></label>
                                     <div class="textarea-wrapper">
-                                        <textarea id="proyDesc" class="proy-textarea" placeholder="Describe brevemente el proyecto, sus objetivos y tu aporte..." maxlength="2500"></textarea>
+                                        <div id="quillEditor" style="min-height: 150px; background: white; border-radius: 12px;"></div>
+                                        <textarea id="proyDesc" style="display:none;"></textarea>
                                         <span class="word-count" id="contadorDesc">0/500 palabras</span>
                                     </div>
                                     <span class="proy-err-msg" id="proyErrDesc">La descripción es obligatoria</span>
                                 </div>
-
-                                <div class="proy-field">
-                                    <label>Fecha de inicio</label>
-                                    <input type="date" id="proyFecha" class="proy-inp">
-                                </div>
-
-                                <div class="proy-field">
-                                    <label>Fecha de fin</label>
-                                    <input type="date" id="proyFechaFin" class="proy-inp">
-                                </div>
-
+                                <div class="proy-field"><label>Fecha de inicio</label><input type="date" id="proyFecha" class="proy-inp"></div>
+                                <div class="proy-field"><label>Fecha de fin</label><input type="date" id="proyFechaFin" class="proy-inp"></div>
                                 <div class="proy-field">
                                     <label>Estado</label>
                                     <div class="custom-dropdown" id="dropdownEstado">
-                                        <button type="button" class="custom-dropdown-btn" id="btnEstado">
-                                            <span id="btnEstadoText">En curso</span>
-                                            <span class="custom-dropdown-arrow">▾</span>
-                                        </button>
+                                        <button type="button" class="custom-dropdown-btn" id="btnEstado"><span id="btnEstadoText">En curso</span><span class="custom-dropdown-arrow">▾</span></button>
                                         <ul class="custom-dropdown-menu" id="menuEstado">
                                             <li data-value="En curso" class="selected">En curso</li>
                                             <li data-value="Completado">Completado</li>
@@ -163,14 +152,10 @@
                                         <input type="hidden" id="proyEstado" value="En curso">
                                     </div>
                                 </div>
-
                                 <div class="proy-field">
                                     <label>Mi rol en el proyecto</label>
                                     <div class="custom-dropdown" id="dropdownRol">
-                                        <button type="button" class="custom-dropdown-btn" id="btnRol">
-                                            <span id="btnRolText">— Seleccionar rol —</span>
-                                            <span class="custom-dropdown-arrow">▾</span>
-                                        </button>
+                                        <button type="button" class="custom-dropdown-btn" id="btnRol"><span id="btnRolText">— Seleccionar rol —</span><span class="custom-dropdown-arrow">▾</span></button>
                                         <ul class="custom-dropdown-menu" id="menuRol">
                                             <li data-value="">— Seleccionar rol —</li>
                                             <li data-value="Frontend Developer">Frontend Developer</li>
@@ -190,75 +175,29 @@
                                         <input type="hidden" id="proyRol" value="">
                                     </div>
                                 </div>
-
-                                <div class="proy-field">
-                                    <label>Empresa / Cliente</label>
-                                    <input type="text" id="proyCliente" class="proy-inp" placeholder="Ej: Google, Freelance, Proyecto personal...">
-                                </div>
+                                <div class="proy-field"><label>Empresa / Cliente</label><input type="text" id="proyCliente" class="proy-inp" placeholder="Ej: Google, Freelance, Proyecto personal..."></div>
                             </div>
 
-                            {{-- TECNOLOGÍAS - BADGES IZQUIERDA + BUSCADOR DERECHA --}}
+                            {{-- TECNOLOGÍAS --}}
                             <div class="tec-section">
-                                <div class="tec-header">
-                                    <div class="tec-header-left">
-                                        <span class="tec-icon">🛠️</span>
-                                        <span class="tec-title">Stack Tecnológico</span>
-                                    </div>
-                                    <div class="tec-badge-count" id="tecCountBadge">0</div>
-                                </div>
-
+                                <div class="tec-header"><div class="tec-header-left"><span class="tec-icon">🛠️</span><span class="tec-title">Stack Tecnológico</span></div><div class="tec-badge-count" id="tecCountBadge">0</div></div>
                                 <div class="tec-content-row">
-                                    <div id="tecBadgesContainer" class="tec-badges-col">
-                                        <div class="tec-empty-state">
-                                            <div class="tec-empty-icon">🔧</div>
-                                            <div class="tec-empty-text">Aún no hay tecnologías</div>
-                                        </div>
-                                    </div>
-
+                                    <div id="tecBadgesContainer" class="tec-badges-col"><div class="tec-empty-state"><div class="tec-empty-icon">🔧</div><div class="tec-empty-text">Aún no hay tecnologías</div></div></div>
                                     <div class="stack-dropdown" id="stackDropdown">
-                                        <div class="stack-input-wrapper" id="stackInputWrapper">
-                                            <input 
-                                                type="text" 
-                                                class="stack-search" 
-                                                id="stackSearch"
-                                                placeholder="Agregar tecnología..." 
-                                                autocomplete="off"
-                                            >
-                                            <span class="stack-arrow">▾</span>
-                                        </div>
-                                        <div class="stack-menu" id="stackMenu">
-                                            <div class="stack-list" id="stackList"></div>
-                                        </div>
+                                        <div class="stack-input-wrapper" id="stackInputWrapper"><input type="text" class="stack-search" id="stackSearch" placeholder="Agregar tecnología..." autocomplete="off"><span class="stack-arrow">▾</span></div>
+                                        <div class="stack-menu" id="stackMenu"><div class="stack-list" id="stackList"></div></div>
                                     </div>
                                 </div>
-
-                                <div class="tec-footer">
-                                    💡 Escribe para buscar o presiona Enter para agregar
-                                </div>
+                                <div class="tec-footer">💡 Escribe para buscar o presiona Enter para agregar</div>
                             </div>
 
-                      <div class="ev-trigger-wrap">
-                          <button type="button" class="ev-trigger-btn" id="proyBtnEvidencias">
-                             <div class="ev-trigger-left">
-                                <div class="ev-trigger-icon-box">📎</div>
-                                <div class="ev-trigger-texts">
-                                   <strong>Agregar Evidencias</strong>
-                                   <span>Imágenes, enlaces y repositorios del proyecto</span>
-                              </div>
-                       </div>
-                       <div class="ev-trigger-right">
-                            <span class="ev-trigger-count" id="evTriggerCount">0</span>
-                            <i class="fas fa-chevron-right ev-trigger-arrow"></i>
-                       </div>
-                 </button>
-
-                  {{-- Panel inline que se expande al hacer clic --}}
-                 <div class="ev-inline-section" id="evInlineSection">
-                     <div class="ev-inline-body" id="evInlineBody">
-                        @include('secciones.evidencia')
-                  </div>
-              </div>
-           </div>
+                            <div class="ev-trigger-wrap">
+                                <button type="button" class="ev-trigger-btn" id="proyBtnEvidencias">
+                                    <div class="ev-trigger-left"><div class="ev-trigger-icon-box">📎</div><div class="ev-trigger-texts"><strong>Agregar Evidencias</strong><span>Imágenes, enlaces y repositorios del proyecto</span></div></div>
+                                    <div class="ev-trigger-right"><span class="ev-trigger-count" id="evTriggerCount">0</span><i class="fas fa-chevron-right ev-trigger-arrow"></i></div>
+                                </button>
+                                <div class="ev-inline-section" id="evInlineSection"><div class="ev-inline-body" id="evInlineBody">@include('secciones.evidencia')</div></div>
+                            </div>
 
                             <div class="proy-form-actions">
                                 <button class="proy-btn-cancel" id="proyBtnCancelarForm">Cancelar</button>
@@ -268,8 +207,7 @@
 
                         {{-- GRID --}}
                         <div class="proy-grid" id="proyGrid"></div>
-
-                        {{-- PÁGINA DE VISTA PREVIA (TIPO DOCUMENTO) --}}
+                        {{-- VISTA PREVIA --}}
                         <div class="preview-page" id="previewPage"></div>
                     </div>
                 </div>
@@ -279,22 +217,15 @@
 
     <script src="{{ asset('js/proyectos.js') }}"></script>
     <script src="{{ asset('js/evidencia.js') }}"></script>
-    {{-- Scroll al proyecto desde habilidades técnicas (HU-24) --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const params = new URLSearchParams(window.location.search);
             const previewId = params.get('preview');
             if (!previewId) return;
-
-
             let intentos = 0;
             const intervalo = setInterval(function () {
-                
                 const card = document.getElementById('proyecto-' + previewId);
-                if (card) {
-                    clearInterval(intervalo);
-                    setTimeout(() => card.click(), 100); // simula click en la tarjeta
-                }
+                if (card) { clearInterval(intervalo); setTimeout(() => card.click(), 100); }
                 if (++intentos > 20) clearInterval(intervalo);
             }, 100);
         });
