@@ -1,9 +1,49 @@
+let estadoInicialProyectos = [];
 
 function toggleForm(show) {
     document.getElementById('skill-form-wrap').style.display = show ? 'block' : 'none';
 }
 
 function cancelForm() {
+
+    const editSkillId = new URLSearchParams(window.location.search).get('edit');
+    
+    if (editSkillId) {
+        const container = document.getElementById('edit-projects-' + editSkillId);
+        if (container) {
+            const estadoActual = Array.from(
+                container.querySelectorAll('.skill-project-chip[data-project]')
+            ).map(chip => parseInt(chip.dataset.project));
+
+            const estadoInicial = estadoInicialProyectos.map(p => p.id);
+
+            const vinculadosDemas = estadoActual.filter(id => !estadoInicial.includes(id));
+            const desvinculadosDemas = estadoInicial.filter(id => !estadoActual.includes(id));
+
+            const csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+            // Revertir vínculos agregados
+            vinculadosDemas.forEach(projectId => {
+                fetch(`/skills/${editSkillId}/projects/${projectId}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': csrf }
+                });
+            });
+
+            // Revertir desvinculaciones
+            desvinculadosDemas.forEach(project => {
+                fetch(`/skills/${editSkillId}/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf
+                    },
+                    body: JSON.stringify({ project_id: project })
+                });
+            });
+        }
+    }
+
     window.location.href = window.location.pathname;
 }
 
@@ -19,7 +59,7 @@ document.getElementById('delete-modal').addEventListener('click', function(e) {
     if (e.target === this) closeDeleteModal();
 });
 
-// ── HU-24: Vincular proyectos a habilidades ──────────────────
+//  HU-24: Vincular proyectos a habilidades 
 
 let currentSkillId = null;
 let currentContext  = null;
@@ -53,7 +93,7 @@ function renderProjectList(query) {
     // Obtener ids ya vinculados a esta skill
     const linkedIds = currentSkillId
         ? getLinkedIds(currentSkillId)          // habilidad existente
-        : pendingProjects.map(p => p.id);       // habilidad nueva (pendientes)
+        : pendingProjects.map(p => p.id);       // habilidad nueva 
 
     const filtered = (window.userProjects || []).filter(p =>
         p.name.toLowerCase().includes(q) && !linkedIds.includes(p.id)
@@ -84,9 +124,11 @@ function selectProject(projectId, projectName) {
         return;
     }
     attachProjectApi(currentSkillId, projectId, projectName, () => {
-        // Agregar al historial siempre
-        addChipToSkill(currentSkillId, projectId, projectName, true);
-        // Si venimos del formulario de edición, agregar también ahí
+        
+        if (currentContext !== 'edit-form') {
+            addChipToSkill(currentSkillId, projectId, projectName, true);
+        }
+        
         if (currentContext === 'edit-form') {
             const editContainer = document.getElementById('edit-projects-' + currentSkillId);
             if (editContainer && !editContainer.querySelector(`[data-project="${projectId}"]`)) {
@@ -163,7 +205,6 @@ function removePendingChip(projectId) {
     if (input) input.remove();
 }
  
-
  
 let detachPending = null; 
  
@@ -218,18 +259,28 @@ function executeDetach() {
             if (banner) banner.remove();
 
             
-            ['skill-projects-', 'edit-projects-'].forEach(prefix => {
-                const container = document.getElementById(prefix + skillId);
-                if (!container) return;
-                const chip = container.querySelector(`[data-project="${projectId}"]`);
-                if (chip) chip.remove();
-            });
+            const enModoEdicion = document.getElementById('edit-projects-' + skillId) !== null;
+
+            if (enModoEdicion) {
+            // Solo actualiza el formulario de edición
+                const editContainer = document.getElementById('edit-projects-' + skillId);
+                if (editContainer) {
+                    const chip = editContainer.querySelector(`[data-project="${projectId}"]`);
+                    if (chip) chip.remove();
+                }
+            } else {
+            // Solo actualiza el historial
+                const histContainer = document.getElementById('skill-projects-' + skillId);
+                if (histContainer) {
+                    const chip = histContainer.querySelector(`[data-project="${projectId}"]`);
+                    if (chip) chip.remove();
+                }
+            }
 
             detachPending = null;
         }
     });
 }
- 
  
 function openProjectSelectorForEdit(skillId) {
     currentSkillId = skillId;
@@ -268,3 +319,19 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const editSkillId = new URLSearchParams(window.location.search).get('edit');
+    if (editSkillId) {
+        const container = document.getElementById('edit-projects-' + editSkillId);
+        if (container) {
+            estadoInicialProyectos = Array.from(
+                container.querySelectorAll('.skill-project-chip[data-project]')
+            ).map(chip => ({
+                id: parseInt(chip.dataset.project),
+                name: chip.childNodes[0].textContent.trim()
+            }));
+        }
+    }
+});
