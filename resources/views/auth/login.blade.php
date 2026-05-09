@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de Sesión | Portafolio</title>
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    
 </head>
 <body>
     <div class="login-container">
@@ -36,9 +37,12 @@
                 <label>Correo electrónico <span class="required">*</span></label>
                 <div class="input-wrapper" id="emailWrapper">
                     <span class="input-icon">✉</span>
+                    
                     <input type="email" name="email" id="email"
-                        value="{{ old('email') }}" placeholder="tu@email.com">
+                        value="{{ old('email') }}" placeholder="tu@email.com"  maxlength="30">
                 </div>
+
+
                 <div class="field-error" id="emailError"></div>
             </div>
 
@@ -46,9 +50,12 @@
                 <label>Contraseña <span class="required">*</span></label>
                 <div class="input-wrapper" id="passwordWrapper">
                     <span class="input-icon">🔒</span>
-                    <input type="password" name="password" id="password" placeholder="••••••••">
+                        
+
+                    <input type="password" name="password" id="password" placeholder="••••••••"  maxlength="50">
                     <button type="button" class="eye-btn" id="eyeBtn">👁</button>
                 </div>
+                
                 <div class="field-error" id="passwordError"></div>
                 <div class="forgot-link">
                     <a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
@@ -74,6 +81,47 @@
             input.type = isText ? 'password' : 'text';
             this.textContent = isText ? '👁' : '🙈';
         });
+
+            // ========== ✅ NUEVO: CONTADOR DE CARACTERES EN VIVO ==========
+            function setupCharCounter(inputId, counterId, maxLength) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            
+            if (!input || !counter) return;
+            
+            function updateCounter() {
+                const current = input.value.length;
+                counter.textContent = `${current} / ${maxLength} caracteres`;
+                
+                // Cambiar color según se acerque al límite
+                counter.classList.remove('warning', 'danger');
+                if (current >= maxLength) {
+                    counter.classList.add('danger');
+                } else if (current >= maxLength - 10) {
+                    counter.classList.add('warning');
+                }
+            }
+            
+            input.addEventListener('input', updateCounter);
+            updateCounter(); // Inicializar
+        }
+        
+        
+        
+        
+        document.querySelectorAll('.input-wrapper input').forEach(input => {
+            
+            input.addEventListener('input', function() {
+                this.scrollLeft = this.scrollWidth;
+            });
+            
+            
+            input.addEventListener('focus', function() {
+                this.scrollLeft = this.scrollWidth;
+            });
+        });
+
+
 
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             if (blocked) { e.preventDefault(); return; }

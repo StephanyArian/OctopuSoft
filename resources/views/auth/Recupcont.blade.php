@@ -75,8 +75,9 @@
             @endif
 
             {{-- Formulario --}}
-            <form class="forgot-form" id="resetForm" method="POST" action="{{ route('password.update') }}" novalidate>
+            <form class="forgot-form" id="resetForm" method="POST" action="{{ route('password.store') }}" novalidate>
                 @csrf
+                
 
                 {{-- Token oculto --}}
                 <input type="hidden" name="token" value="{{ $token }}">

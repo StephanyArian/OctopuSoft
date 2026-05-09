@@ -35,6 +35,6 @@ class PasswordController extends Controller
         // T11 — Enviar correo de notificación de cambio de contraseña
         $request->user()->notify(new PasswordChangedNotification());
 
-        return back()->with('status', 'password-updated');
+        return back()->with('status', 'password.reset.store');
     }
 }

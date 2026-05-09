@@ -684,21 +684,6 @@
                     <a href="#beneficios">Beneficios</a>
                     <a href="#como-funciona">Cómo funciona</a>
                 </div>
-                <div class="footer-links">
-                    <h4>Legal</h4>
-                    <a href="#">Contacto</a>
-                    <a href="#">Términos</a>
-                    <a href="#">Privacidad</a>
-                </div>
-                <div class="footer-links">
-                    <h4>Redes Sociales</h4>
-                    <div class="social-links">
-                        <a href="https://facebook.com/tu-perfil" target="_blank"><i class="fab fa-facebook"></i></a>
-                        <a href="https://instagram.com/tu-perfil" target="_blank"><i class="fab fa-instagram"></i></a>
-                        <a href="mailto:tucorreo@gmail.com"><i class="fas fa-envelope"></i></a>
-                        <a href="https://wa.me/tu-numero" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
             </div>
             <div class="footer-bottom">
                 <p>© 2026 Generador de Portafolios Digitales. Todos los derechos reservados.</p>

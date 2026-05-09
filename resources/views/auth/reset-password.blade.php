@@ -178,7 +178,7 @@
             <h1>Restablecer contraseña</h1>
             <p>Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta.</p>
 
-            <form method="POST" action="{{ route('password.update') }}">
+            <form method="POST" action="{{ route('password.store') }}">
                 @csrf
                 <input type="hidden" name="token" value="{{ $token }}">
 
