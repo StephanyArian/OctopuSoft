@@ -542,3 +542,20 @@
     background: #c8f0e4;
     border-color: #1abc9c;
 }
+
+.ver-mas-skill-btn {
+    width: 100%;
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    background: transparent;
+    border: 0.5px dashed var(--color-border-tertiary);
+    border-radius: var(--border-radius-md);
+    padding: 6px 0;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: color 0.15s, border-color 0.15s;
+}
+.ver-mas-skill-btn:hover {
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-secondary);
+}

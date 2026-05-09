@@ -16,10 +16,8 @@ function cancelForm() {
             ).map(chip => parseInt(chip.dataset.project));
 
             const estadoInicial = estadoInicialProyectos.map(p => p.id);
-
             const vinculadosDemas = estadoActual.filter(id => !estadoInicial.includes(id));
             const desvinculadosDemas = estadoInicial.filter(id => !estadoActual.includes(id));
-
             const csrf = document.querySelector('meta[name="csrf-token"]').content;
 
             // Revertir vínculos agregados
@@ -123,8 +121,7 @@ function selectProject(projectId, projectName) {
         closeProjectSelector();
         return;
     }
-    attachProjectApi(currentSkillId, projectId, projectName, () => {
-        
+    attachProjectApi(currentSkillId, projectId, projectName, () => {       
         if (currentContext !== 'edit-form') {
             addChipToSkill(currentSkillId, projectId, projectName, true);
         }
@@ -178,7 +175,6 @@ function addChipToSkill(skillId, projectId, projectName, withRemove) {
  
 function addPendingChip(projectId, projectName) {
     pendingProjects.push({ id: projectId, name: projectName });
- 
     const container = document.getElementById('pending-projects-container');
     if (!container) return;
  
@@ -321,6 +317,108 @@ function escapeHtml(str) {
 }
 
 
+//  Historial con categorías y ver más
+
+const CATEGORY_META = {
+    frontend: { label: 'Frontend',      color: '#E6F1FB', textColor: '#185FA5' },
+    backend:  { label: 'Backend',       color: '#EAF3DE', textColor: '#3B6D11' },
+    '':       { label: 'Sin categoría', color: '#F1EFE8', textColor: '#6B7280' },
+};
+
+const VISIBLE_COUNT = 3;
+const expandedCats  = {};
+
+function sortAndGroup(sortMode) {
+    const container = document.getElementById('skills-list-container');
+    if (!container) return;
+
+    const cards = Array.from(container.querySelectorAll('.skill-card'));
+    if (!cards.length) return;
+
+    // Ordenar
+    cards.sort((a, b) => {
+        if (sortMode === 'alpha')
+            return a.dataset.name.localeCompare(b.dataset.name);
+        if (sortMode === 'level')
+            return parseInt(b.dataset.level) - parseInt(a.dataset.level);
+       return parseInt(b.dataset.order) - parseInt(a.dataset.order);
+    });
+
+    // Limpiar separadores y botones ver-más anteriores
+    container.querySelectorAll('.category-divider, .ver-mas-skill-btn').forEach(el => el.remove());
+
+    // Ocultar todas las cards
+    cards.forEach(c => c.style.display = 'none');
+
+    // Agrupar
+    const catOrder = ['frontend', 'backend', ''];
+    const grouped  = {};
+    catOrder.forEach(k => grouped[k] = []);
+    cards.forEach(c => grouped[c.dataset.category || ''].push(c));
+
+    let globalIdx = 1;
+
+    catOrder.forEach(cat => {
+        const list = grouped[cat];
+        if (!list.length) return;
+
+        const meta     = CATEGORY_META[cat];
+        const isExpand = expandedCats[cat] || false;
+        const visible  = isExpand ? list : list.slice(0, VISIBLE_COUNT);
+        const hiddenN  = list.length - VISIBLE_COUNT;
+
+        // Separador
+        const divider = document.createElement('div');
+        divider.className    = 'category-divider';
+        divider.style.cssText = 'display:flex;align-items:center;gap:8px;margin:18px 0 8px;';
+        divider.innerHTML = `
+            <span style="font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+                         padding:2px 10px;border-radius:99px;white-space:nowrap;
+                         background:${meta.color};color:${meta.textColor};">
+                ${meta.label}
+            </span>
+            <div style="flex:1;height:.5px;background:var(--color-border-tertiary);"></div>`;
+        container.appendChild(divider);
+
+        // Cards visibles
+        visible.forEach(card => {
+            const indexEl = card.querySelector('.skill-card-index');
+            if (indexEl) indexEl.textContent = String(globalIdx++).padStart(2, '0');
+            card.style.display = '';
+            container.appendChild(card);
+        });
+
+        // Botón ver más / ocultar
+        if (hiddenN > 0 && !isExpand) {
+            const btn = document.createElement('button');
+            btn.className   = 'ver-mas-skill-btn';
+            btn.textContent = `+ ${hiddenN} más en ${meta.label}`;
+            btn.onclick     = () => toggleCat(cat);
+            container.appendChild(btn);
+        } else if (isExpand && list.length > VISIBLE_COUNT) {
+            list.slice(VISIBLE_COUNT).forEach(card => {
+                const indexEl = card.querySelector('.skill-card-index');
+                if (indexEl) indexEl.textContent = String(globalIdx++).padStart(2, '0');
+                card.style.display = '';
+                container.appendChild(card);
+            });
+            const btn = document.createElement('button');
+            btn.className   = 'ver-mas-skill-btn';
+            btn.textContent = `▲ Ocultar ${meta.label}`;
+            btn.onclick     = () => toggleCat(cat);
+            container.appendChild(btn);
+        }
+    });
+}
+
+function toggleCat(cat) {
+    expandedCats[cat] = !expandedCats[cat];
+    const sort = document.getElementById('skills-sort');
+    sortAndGroup(sort ? sort.value : 'order');
+}
+
+// ── DOMContentLoaded (único) ─────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', function () {
     const editSkillId = new URLSearchParams(window.location.search).get('edit');
     if (editSkillId) {
@@ -329,9 +427,11 @@ document.addEventListener('DOMContentLoaded', function () {
             estadoInicialProyectos = Array.from(
                 container.querySelectorAll('.skill-project-chip[data-project]')
             ).map(chip => ({
-                id: parseInt(chip.dataset.project),
+                id:   parseInt(chip.dataset.project),
                 name: chip.childNodes[0].textContent.trim()
             }));
         }
     }
+
+    sortAndGroup('order');
 });

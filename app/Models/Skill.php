@@ -12,6 +12,7 @@ class Skill extends Model
         'type',
         'name',
         'level',
+        'category',
         'is_visible',
         'display_order',
     ];

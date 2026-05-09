@@ -120,6 +120,7 @@ class SkillController extends Controller
         $rules = [
            'type' => 'required|in:technical,soft',
            'name' => 'required|string|min:2|max:50',
+           'category' => 'nullable|in:frontend,backend',
         ];
 
         if ($type === 'technical') {
@@ -164,6 +165,7 @@ class SkillController extends Controller
             'type'          => $type,
             'name'          => $request->name,
             'level'         => $type === 'technical' ? $request->level : 1,
+            'category'      => $type === 'technical' ? $request->input('category') : null,
             'display_order' => $user->skills()->where('type', $type)->count(),
         ]);
 
@@ -194,6 +196,7 @@ class SkillController extends Controller
         $type = $skill->type;
         $rules = [
             'name' => 'required|string|min:2|max:50',
+            'category' => 'nullable|in:frontend,backend'
         ];
 
         if ($type === 'technical') {
@@ -221,6 +224,7 @@ class SkillController extends Controller
         $skill->update([
             'name'  => $request->name,
             'level' => $type === 'technical' ? $request->level : 1,
+            'category' => $type === 'technical' ? $request->input('category') : null,
         ]);
 
         $route = $type === 'technical' ? 'skills.tecnicas' : 'skills.blandas';

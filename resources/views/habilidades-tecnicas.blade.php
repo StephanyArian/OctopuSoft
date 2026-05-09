@@ -118,6 +118,18 @@
                                                             <span class="error-message">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
+                                                    {{-- CATEGORÍA --}} 
+                                                    <div class="form-group">
+                                                        <label class="form-label">
+                                                            Categoría <span style="font-weight:400;color:#aaa;">(opcional)</span>
+                                                        </label>
+                                                        <select name="category" class="form-input">
+                                                            <option value="">Sin categoría</option>
+                                                            <option value="frontend" {{ old('category', $editSkill->category) === 'frontend' ? 'selected' : '' }}>Frontend</option>
+                                                            <option value="backend"  {{ old('category', $editSkill->category) === 'backend'  ? 'selected' : '' }}>Backend</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
  
                                                 {{-- Sección evidencia con proyectos (edición) --}}
@@ -151,7 +163,7 @@
                                             </form>
  
                                         @else
-                                            {{-- ── FORMULARIO CREAR ── --}}
+                                            {{--  FORMULARIO CREAR--}}
                                             <form action="{{ route('skills.store') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="_action" value="store">
@@ -185,6 +197,18 @@
                                                             <span class="error-message">{{ $message }}</span>
                                                         @enderror
                                                     </div>
+
+                                                    {{--SELECT CATEGORÍA--}}
+                                                        <div class="form-group">
+                                                            <label class="form-label">
+                                                                Categoría <span style="font-weight:400;color:#aaa;">(opcional)</span>
+                                                            </label>
+                                                            <select name="category" class="form-input">
+                                                                <option value="">Sin categoría</option>
+                                                                <option value="frontend" {{ old('category') === 'frontend' ? 'selected' : '' }}>Frontend</option>
+                                                                <option value="backend"  {{ old('category') === 'backend'  ? 'selected' : '' }}>Backend</option>
+                                                            </select>
+                                                        </div>
                                                 </div>
  
                                                 {{-- Sección evidencia con proyectos (crear) --}}
@@ -229,79 +253,92 @@
                             @endif
 
                             {{-- Contador + historial --}}
-                            <div style="margin-top:28px;">
+                            {{-- Contador + historial --}}
+                            <div style="display:flex;align-items:center;gap:10px;margin-top:28px;flex-wrap:wrap;">
                                 @if($total > 0)
-                                    <div class="skills-counter">
-                                        <div class="historial-divider" style="flex:1;margin:0;">
-                                            <span>Historial</span>
-                                        </div>
-                                        <span class="skills-counter-badge {{ $atLimit ? 'full' : 'ok' }}" style="margin-left:14px;">
-                                            {{ $total }} / 20
-                                        </span>
+                                    <div class="historial-divider" style="flex:1;margin:0;">
+                                        <span>Historial</span>
                                     </div>
+                                    <span class="skills-counter-badge {{ $atLimit ? 'full' : 'ok' }}" style="margin-left:14px;">
+                                        {{ $total }} / 20
+                                    </span>
+                                    <select id="skills-sort" class="form-input"
+                                            style="width:auto;font-size:12px;padding:4px 10px;"
+                                            onchange="sortAndGroup(this.value)">
+                                        <option value="alpha">Alfabético</option>
+                                        <option value="level">Nivel (mayor a menor)</option>
+                                    </select>
                                 @else
-                                    <div class="historial-divider"><span>Historial</span></div>
+                                    <div class="historial-divider" style="flex:1;margin:0;">
+                                        <span>Historial</span>
+                                    </div>
                                 @endif
                             </div>
 
-                            {{-- Lista --}}
-                            @forelse($skills as $index => $skill)
-                                <div class="skill-card" id="skill-card-{{ $skill->id }}">
-                                    <span class="skill-card-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                            {{-- Separadores de categoría inyectados por JS, cards siguen siendo Blade --}}
+                            <div id="skills-list-container">
+                               {{-- El @forelse va aquí adentro, sin cambios --}}
+                               @forelse($skills as $index => $skill)
+                                   <div class="skill-card" 
+                                        id="skill-card-{{ $skill->id }}"
+                                        data-category="{{ $skill->category ?? '' }}"
+                                        data-name="{{ $skill->name }}"
+                                        data-level="{{ $skill->level }}"
+                                        data-order="{{ $index }}">
 
-                                    <div class="skill-card-info">
-                                        <div class="skill-card-name">{{ $skill->name }}</div>
-                                        <div class="skill-progress">
-                                            <div class="skill-progress-fill {{ $skill->levelBadgeClass() }}"></div>
+                                        <span class="skill-card-index">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+
+                                        <div class="skill-card-info">
+                                            <div class="skill-card-name">{{ $skill->name }}</div>
+                                            <div class="skill-progress">
+                                                <div class="skill-progress-fill {{ $skill->levelBadgeClass() }}"></div>
+                                            </div>
+                                            <div class="skill-projects" id="skill-projects-{{ $skill->id }}">
+                                                @foreach($skill->projects as $project)
+                                                    <a href="{{ route('proyectos') }}?preview={{ $project->id }}"
+                                                       class="skill-project-chip skill-project-link"
+                                                       data-skill="{{ $skill->id }}"
+                                                       data-project="{{ $project->id }}"
+                                                       title="Ver proyecto: {{ $project->name }}">
+                                                        {{ $project->name }} →
+                                                    </a>
+                                                @endforeach
+                                            </div>
                                         </div>
 
-                                        {{-- Proyectos vinculados (HU-24) --}}
-                                       <div class="skill-projects" id="skill-projects-{{ $skill->id }}">
-                                           @foreach($skill->projects as $project)
-                                               <a href="{{ route('proyectos') }}?preview={{ $project->id }}"
-                                                  class="skill-project-chip skill-project-link"
-                                                  data-skill="{{ $skill->id }}"
-                                                  data-project="{{ $project->id }}"
-                                                  title="Ver proyecto: {{ $project->name }}">
-                                                   {{ $project->name }} →
-                                               </a>
-                                           @endforeach
-                                       </div>
-                                    </div>{{-- /skill-card-info --}}
-                      
-                                    <span class="badge-nivel badge-{{ $skill->levelBadgeClass() }}">
-                                        {{ $skill->levelLabel() }}
-                                    </span>
+                                        <span class="badge-nivel badge-{{ $skill->levelBadgeClass() }}">
+                                            {{ $skill->levelLabel() }}
+                                        </span>
 
-                                    <div class="skill-actions">
-                                        <a href="{{ route('skills.tecnicas') }}?edit={{ $skill->id }}" class="btn-sm">
-                                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                                                <path d="M9.5 1.5l2 2-7 7H2.5v-2l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                                            </svg>
-                                            Editar
-                                        </a>
-                                        <button class="btn-sm danger"
-                                                onclick="openDeleteModal('{{ $skill->id }}', '{{ addslashes($skill->name) }}')">
-                                            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                                                <path d="M2 3.5h9M5 3.5V2.5h3v1M4.5 3.5l.5 7M8.5 3.5l-.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                                            </svg>
-                                            Eliminar
-                                        </button>
+                                        <div class="skill-actions">
+                                            <a href="{{ route('skills.tecnicas') }}?edit={{ $skill->id }}" class="btn-sm">
+                                                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                                                    <path d="M9.5 1.5l2 2-7 7H2.5v-2l7-7z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                                                </svg>
+                                                Editar
+                                            </a>
+                                            <button class="btn-sm danger"
+                                                    onclick="openDeleteModal('{{ $skill->id }}', '{{ addslashes($skill->name) }}')">
+                                                <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                                                    <path d="M2 3.5h9M5 3.5V2.5h3v1M4.5 3.5l.5 7M8.5 3.5l-.5 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                                                </svg>
+                                                Eliminar
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>{{-- /skill-card --}}
 
-                            @empty
-                                <div class="skills-empty">
-                                    <div class="skills-empty-icon">
-                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                            <circle cx="10" cy="10" r="8" stroke="#c8cdd8" stroke-width="1.5"/>
-                                            <path d="M10 7v4M10 13v.5" stroke="#c8cdd8" stroke-width="1.5" stroke-linecap="round"/>
-                                        </svg>
+                                @empty
+                                    <div class="skills-empty">
+                                        <div class="skills-empty-icon">
+                                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                                <circle cx="10" cy="10" r="8" stroke="#c8cdd8" stroke-width="1.5"/>
+                                                <path d="M10 7v4M10 13v.5" stroke="#c8cdd8" stroke-width="1.5" stroke-linecap="round"/>
+                                            </svg>
+                                        </div>
+                                        Aún no has agregado habilidades técnicas.
                                     </div>
-                                    Aún no has agregado habilidades técnicas.
-                                </div>
-                            @endforelse
-
+                                @endforelse
+                            </div>
                         </div>{{-- /section-card --}}
                     </div>{{-- /main --}}
                 </div>{{-- /body-row --}}
