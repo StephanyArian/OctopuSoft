@@ -755,3 +755,39 @@
     text-decoration: line-through;
     opacity: 0.8;
 }
+
+/* ── Date picker nativo ── */
+.date-picker {
+    cursor: pointer;
+    color-scheme: light;
+}
+.date-picker::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+    filter: invert(48%) sepia(60%) saturate(400%) hue-rotate(130deg);
+}
+.date-picker::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+/* ── Contador de caracteres ── */
+.char-counter {
+    font-size: 11px;
+    color: var(--gray-500);
+    text-align: right;
+    margin-top: 3px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+/* ── Botón Ver más / Ver menos ── */
+.btn-ver-mas {
+    background: none;
+    border: none;
+    color: var(--teal-dim);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 4px;
+    text-decoration: underline;
+    font-family: inherit;
+}
+.btn-ver-mas:hover { color: var(--teal); }

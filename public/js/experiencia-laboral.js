@@ -184,23 +184,81 @@ function validarCargos() {
     return true;
 }
 
-/* ── Toggle fecha de fin ── */
+/* ── Sync date picker → hidden inputs para el controller ── */
+window.syncFechaInicio = function (val) {
+    const fullEl = document.getElementById('fechaInicioFull');
+    if (!val) {
+        ['fechaInicioDia','fechaInicioMes','fechaInicioAnio'].forEach(id => document.getElementById(id).value = '');
+        if (fullEl) fullEl.value = '';
+        return;
+    }
+    const [anio, mes, dia] = val.split('-');
+    if (parseInt(anio) < 1950) { document.getElementById('fechaInicioPicker').value = '1950-01-01'; return; }
+    document.getElementById('fechaInicioDia').value  = dia;
+    document.getElementById('fechaInicioMes').value  = mes;
+    document.getElementById('fechaInicioAnio').value = anio;
+    if (fullEl) fullEl.value = val;                     // fallback completo
+    const finPicker = document.getElementById('fechaFinPicker');
+    if (finPicker) finPicker.min = val;
+};
+
+window.syncFechaFin = function (val) {
+    const fullEl = document.getElementById('fechaFinFull');
+    if (!val) {
+        ['fechaFinDia','fechaFinMes','fechaFinAnio'].forEach(id => document.getElementById(id).value = '');
+        if (fullEl) fullEl.value = '';
+        return;
+    }
+    const [anio, mes, dia] = val.split('-');
+    document.getElementById('fechaFinDia').value  = dia;
+    document.getElementById('fechaFinMes').value  = mes;
+    document.getElementById('fechaFinAnio').value = anio;
+    if (fullEl) fullEl.value = val;                     // fallback completo
+};
+
+/* ── Toggle trabajo actual ── */
 window.toggleFechaFin = function (checkbox) {
-    const group = document.getElementById('fechaFinGroup');
-    const ids   = ['fechaFinDia', 'fechaFinMes', 'fechaFinAnio'];
-    ids.forEach(id => {
-        document.getElementById(id).disabled = checkbox.checked;
-        if (checkbox.checked) document.getElementById(id).value = '';
-    });
-    group.style.opacity = checkbox.checked ? '0.4' : '1';
+    const group     = document.getElementById('fechaFinGroup');
+    const picker    = document.getElementById('fechaFinPicker');
+    const required  = document.getElementById('fechaFinRequired');
+    const hiddens   = ['fechaFinDia','fechaFinMes','fechaFinAnio'];
+
+    if (checkbox.checked) {
+        picker.disabled = true;
+        picker.value = '';
+        hiddens.forEach(id => document.getElementById(id).value = '');
+        group.style.opacity = '0.4';
+        if (required) required.style.display = 'none';
+    } else {
+        picker.disabled = false;
+        group.style.opacity = '1';
+        if (required) required.style.display = '';
+    }
+};
+
+/* ── Contador de caracteres ── */
+window.updateCounter = function(inputId, counterId) {
+    const el  = document.getElementById(inputId) || document.querySelector(`[name="${inputId}"]`);
+    const cnt = document.getElementById(counterId);
+    if (el && cnt) cnt.textContent = el.value.length;
 };
 
 /* ── Reset completo del formulario ── */
 window.resetForm = function () {
     document.getElementById('experienciaForm').reset();
     document.getElementById('fechaFinGroup').style.opacity = '1';
-    ['fechaFinDia', 'fechaFinMes', 'fechaFinAnio'].forEach(id => {
-        document.getElementById(id).disabled = false;
+    const finPicker = document.getElementById('fechaFinPicker');
+    if (finPicker) { finPicker.disabled = false; finPicker.value = ''; }
+    const iniPicker = document.getElementById('fechaInicioPicker');
+    if (iniPicker) iniPicker.value = '';
+    ['fechaFinDia','fechaFinMes','fechaFinAnio','fechaInicioDia','fechaInicioMes','fechaInicioAnio'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.disabled = false; el.value = ''; }
+    });
+    // Reset counters
+    ['empresaCount','locationCount','descripcionCount'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '0';
     });
 
     // Restaurar lista a un solo dropdown vacío
@@ -238,18 +296,23 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
         fechaInicioError.classList.remove('hidden'); isValid = false;
     } else { fechaInicioError.classList.add('hidden'); }
 
-    // Fecha fin
+    // Fecha fin — obligatoria si no es trabajo actual
     const finDia        = document.getElementById('fechaFinDia').value;
     const finMes        = document.getElementById('fechaFinMes').value;
     const finAnio       = document.getElementById('fechaFinAnio').value;
     const actual        = document.getElementById('trabajoActual').checked;
     const fechaFinError = document.getElementById('fechaFinError');
 
-    if (!actual && finDia && finMes && finAnio && inicioDia && inicioMes && inicioAnio) {
+    if (!actual && (!finDia || !finMes || !finAnio)) {
+        fechaFinError.textContent = 'Selecciona la fecha de fin o marca "Trabajo actual".';
+        fechaFinError.classList.remove('hidden'); isValid = false;
+    } else if (!actual && finDia && finMes && finAnio && inicioDia && inicioMes && inicioAnio) {
         const inicio = new Date(inicioAnio, parseInt(inicioMes) - 1, parseInt(inicioDia));
         const fin    = new Date(finAnio,    parseInt(finMes) - 1,    parseInt(finDia));
-        if (fin < inicio) { fechaFinError.classList.remove('hidden'); isValid = false; }
-        else              { fechaFinError.classList.add('hidden'); }
+        if (fin < inicio) {
+            fechaFinError.textContent = 'La fecha de fin no puede ser anterior a la de inicio.';
+            fechaFinError.classList.remove('hidden'); isValid = false;
+        } else { fechaFinError.classList.add('hidden'); }
     } else { fechaFinError.classList.add('hidden'); }
 
     if (!isValid) e.preventDefault();
@@ -260,4 +323,28 @@ window.addEventListener('DOMContentLoaded', function () {
     const cb = document.getElementById('trabajoActual');
     if (cb && cb.checked) toggleFechaFin(cb);
     actualizarBotonesRemover();
+
+    // Sync date pickers from hidden values (old() on validation error)
+    ['empresa','location','descripcion'].forEach(name => {
+        const el  = document.querySelector(`[name="${name}"]`);
+        const map = { empresa:'empresaCount', location:'locationCount', descripcion:'descripcionCount' };
+        if (el && map[name]) {
+            const cnt = document.getElementById(map[name]);
+            if (cnt) cnt.textContent = el.value.length;
+        }
+    });
+    const iniAnio = document.getElementById('fechaInicioAnio')?.value;
+    const iniMes  = document.getElementById('fechaInicioMes')?.value;
+    const iniDia  = document.getElementById('fechaInicioDia')?.value;
+    if (iniAnio && iniMes && iniDia) {
+        const p = document.getElementById('fechaInicioPicker');
+        if (p) p.value = `${iniAnio}-${iniMes}-${iniDia}`;
+    }
+    const finAnio = document.getElementById('fechaFinAnio')?.value;
+    const finMes  = document.getElementById('fechaFinMes')?.value;
+    const finDia  = document.getElementById('fechaFinDia')?.value;
+    if (finAnio && finMes && finDia) {
+        const p = document.getElementById('fechaFinPicker');
+        if (p) p.value = `${finAnio}-${finMes}-${finDia}`;
+    }
 });

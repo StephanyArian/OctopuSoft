@@ -13,7 +13,7 @@
             
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
-                    <a href="{{ route('preview') }}" class="nav-tab muted">VER PERFIL</a>
+                    <div class="nav-tab muted">VER PERFIL</div>
                 </div>
                 <div class="body-row">
                     <div class="sidebar">
@@ -43,7 +43,9 @@
                                         <div class="form-group">
                                             <label class="form-label">Empresa <span class="required">*</span></label>
                                             <input class="form-input" type="text" name="empresa" id="empresa"
-                                                placeholder="Ej. Google Bolivia" value="{{ old('empresa') }}">
+                                                placeholder="Ej. Google Bolivia" value="{{ old('empresa') }}"
+                                                maxlength="100" oninput="updateCounter('empresa','empresaCount')">
+                                            <div class="char-counter"><span id="empresaCount">0</span>/100</div>
                                             <div id="empresaError" class="error-message hidden">La empresa es obligatoria</div>
                                         </div>
                                     </div>
@@ -103,7 +105,9 @@
                                         <div class="form-group">
                                             <label class="form-label">Ubicación</label>
                                             <input class="form-input" type="text" name="location"
-                                                placeholder="Ej. Cochabamba, Bolivia" value="{{ old('location') }}">
+                                                placeholder="Ej. Cochabamba, Bolivia" value="{{ old('location') }}"
+                                                maxlength="100" oninput="updateCounter('location','locationCount')">
+                                            <div class="char-counter"><span id="locationCount">0</span>/100</div>
                                         </div>
                                     </div>
 
@@ -111,54 +115,30 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Fecha de inicio <span class="required">*</span></label>
-                                            <div style="display:flex; gap:8px;">
-                                                <select name="fecha_inicio_dia" id="fechaInicioDia" class="form-input" style="width:80px;">
-                                                    <option value="">Día</option>
-                                                    @for($d = 1; $d <= 31; $d++)
-                                                        <option value="{{ str_pad($d, 2, '0', STR_PAD_LEFT) }}"
-                                                            {{ old('fecha_inicio_dia') == str_pad($d, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
-                                                            {{ $d }}
-                                                        </option>
-                                                    @endfor
-                                                </select>
-                                                <select name="fecha_inicio_mes" id="fechaInicioMes" class="form-input" style="flex:1;">
-                                                    <option value="">Mes</option>
-                                                    @foreach(['01'=>'Enero','02'=>'Febrero','03'=>'Marzo','04'=>'Abril','05'=>'Mayo','06'=>'Junio','07'=>'Julio','08'=>'Agosto','09'=>'Septiembre','10'=>'Octubre','11'=>'Noviembre','12'=>'Diciembre'] as $num => $nombre)
-                                                        <option value="{{ $num }}" {{ old('fecha_inicio_mes') == $num ? 'selected' : '' }}>{{ $nombre }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <input type="number" name="fecha_inicio_anio" id="fechaInicioAnio"
-                                                    class="form-input" style="width:90px;"
-                                                    placeholder="Año" min="1950" max="{{ date('Y') }}"
-                                                    value="{{ old('fecha_inicio_anio') }}">
-                                            </div>
+                                            <input type="date" id="fechaInicioPicker" class="form-input date-picker"
+                                                min="1950-01-01" max="{{ date('Y-m-d') }}"
+                                                value="{{ old('fecha_inicio_anio') && old('fecha_inicio_mes') && old('fecha_inicio_dia') ? old('fecha_inicio_anio').'-'.old('fecha_inicio_mes').'-'.old('fecha_inicio_dia') : '' }}"
+                                                onchange="syncFechaInicio(this.value)">
+                                            {{-- Hiddens separados + completo (fallback) --}}
+                                            <input type="hidden" name="fecha_inicio"      id="fechaInicioFull" value="">
+                                            <input type="hidden" name="fecha_inicio_dia"  id="fechaInicioDia"  value="{{ old('fecha_inicio_dia') }}">
+                                            <input type="hidden" name="fecha_inicio_mes"  id="fechaInicioMes"  value="{{ old('fecha_inicio_mes') }}">
+                                            <input type="hidden" name="fecha_inicio_anio" id="fechaInicioAnio" value="{{ old('fecha_inicio_anio') }}">
                                             <div id="fechaInicioError" class="error-message hidden">La fecha de inicio es obligatoria</div>
                                         </div>
 
                                         <div class="form-group" id="fechaFinGroup">
-                                            <label class="form-label">Fecha de fin</label>
-                                            <div style="display:flex; gap:8px;">
-                                                <select name="fecha_fin_dia" id="fechaFinDia" class="form-input" style="width:80px;">
-                                                    <option value="">Día</option>
-                                                    @for($d = 1; $d <= 31; $d++)
-                                                        <option value="{{ str_pad($d, 2, '0', STR_PAD_LEFT) }}"
-                                                            {{ old('fecha_fin_dia') == str_pad($d, 2, '0', STR_PAD_LEFT) ? 'selected' : '' }}>
-                                                            {{ $d }}
-                                                        </option>
-                                                    @endfor
-                                                </select>
-                                                <select name="fecha_fin_mes" id="fechaFinMes" class="form-input" style="flex:1;">
-                                                    <option value="">Mes</option>
-                                                    @foreach(['01'=>'Enero','02'=>'Febrero','03'=>'Marzo','04'=>'Abril','05'=>'Mayo','06'=>'Junio','07'=>'Julio','08'=>'Agosto','09'=>'Septiembre','10'=>'Octubre','11'=>'Noviembre','12'=>'Diciembre'] as $num => $nombre)
-                                                        <option value="{{ $num }}" {{ old('fecha_fin_mes') == $num ? 'selected' : '' }}>{{ $nombre }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <input type="number" name="fecha_fin_anio" id="fechaFinAnio"
-                                                    class="form-input" style="width:90px;"
-                                                    placeholder="Año" min="1950" max="{{ date('Y') }}"
-                                                    value="{{ old('fecha_fin_anio') }}">
-                                            </div>
-                                            <div id="fechaFinError" class="error-message hidden">La fecha de fin no puede ser anterior a la de inicio</div>
+                                            <label class="form-label">Fecha de fin <span id="fechaFinRequired" class="required">*</span></label>
+                                            <input type="date" id="fechaFinPicker" class="form-input date-picker"
+                                                min="1950-01-01" max="{{ date('Y-m-d') }}"
+                                                value="{{ old('fecha_fin_anio') && old('fecha_fin_mes') && old('fecha_fin_dia') ? old('fecha_fin_anio').'-'.old('fecha_fin_mes').'-'.old('fecha_fin_dia') : '' }}"
+                                                onchange="syncFechaFin(this.value)">
+                                            {{-- Hiddens separados + completo (fallback) --}}
+                                            <input type="hidden" name="fecha_fin"      id="fechaFinFull" value="">
+                                            <input type="hidden" name="fecha_fin_dia"  id="fechaFinDia"  value="{{ old('fecha_fin_dia') }}">
+                                            <input type="hidden" name="fecha_fin_mes"  id="fechaFinMes"  value="{{ old('fecha_fin_mes') }}">
+                                            <input type="hidden" name="fecha_fin_anio" id="fechaFinAnio" value="{{ old('fecha_fin_anio') }}">
+                                            <div id="fechaFinError" class="error-message hidden"></div>
                                         </div>
                                     </div>
 
@@ -173,8 +153,11 @@
                                     {{-- Descripción --}}
                                     <div class="form-group">
                                         <label class="form-label">Descripción</label>
-                                        <textarea class="form-textarea" name="descripcion"
+                                        <textarea class="form-textarea" name="descripcion" id="descripcion"
+                                            maxlength="500"
+                                            oninput="updateCounter('descripcion','descripcionCount')"
                                             placeholder="Describe brevemente tus responsabilidades y logros en este cargo...">{{ old('descripcion') }}</textarea>
+                                        <div class="char-counter"><span id="descripcionCount">0</span>/500</div>
                                     </div>
 
                                 </div>

@@ -173,31 +173,68 @@ function InputAnio({ name, defaultValue, disabled }) {
 }
 
 /* ── Toggle trabajo actual ──────────────────────────────── */
-function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia, finMes, finAnio }) {
-    const [actual, setActual] = useState(defaultChecked || false);
+function padZ(n) { return String(n).padStart(2, '0'); }
+function toDateVal(anio, mes, dia) {
+    if (!anio || !mes || !dia) return '';
+    return `${anio}-${padZ(mes)}-${padZ(dia)}`;
+}
+function fromDateVal(val) {
+    if (!val) return { dia: '', mes: '', anio: '' };
+    const [anio, mes, dia] = val.split('-');
+    return { dia, mes, anio };
+}
+
+function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia, finMes, finAnio, errorFin }) {
+    const [actual,     setActual]     = useState(defaultChecked || false);
+    const [inicioVal,  setInicioVal]  = useState(toDateVal(inicioAnio, inicioMes, inicioDia));
+    const [finVal,     setFinVal]     = useState(toDateVal(finAnio, finMes, finDia));
+    const today = new Date().toISOString().split('T')[0];
+
+    const inicioPartes = fromDateVal(inicioVal);
+    const finPartes    = fromDateVal(finVal);
+
     return (
         <>
+            {/* Hidden inputs para compatibilidad con el controller */}
+            <input type="hidden" name="fecha_inicio_dia"  value={inicioPartes.dia} />
+            <input type="hidden" name="fecha_inicio_mes"  value={inicioPartes.mes} />
+            <input type="hidden" name="fecha_inicio_anio" value={inicioPartes.anio} />
+            <input type="hidden" name="fecha_fin_dia"     value={actual ? '' : finPartes.dia} />
+            <input type="hidden" name="fecha_fin_mes"     value={actual ? '' : finPartes.mes} />
+            <input type="hidden" name="fecha_fin_anio"    value={actual ? '' : finPartes.anio} />
+
             <div className="form-checkbox-row" style={{ marginBottom: '14px' }}>
                 <input type="checkbox" name="trabajo_actual" checked={actual}
-                    onChange={e => setActual(e.target.checked)} />
+                    onChange={e => { setActual(e.target.checked); if (e.target.checked) setFinVal(''); }} />
                 <label>Trabajo actual</label>
             </div>
+
             <div className="form-row" style={{ marginBottom: '14px' }}>
                 <div className="form-group">
                     <label className="form-label">Fecha de inicio <span className="required">*</span></label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <SelectDia  name="fecha_inicio_dia"  defaultValue={inicioDia} />
-                        <SelectMes  name="fecha_inicio_mes"  defaultValue={inicioMes} />
-                        <InputAnio  name="fecha_inicio_anio" defaultValue={inicioAnio} />
-                    </div>
+                    <input
+                        type="date"
+                        className="form-input date-picker"
+                        value={inicioVal}
+                        min="1950-01-01"
+                        max={today}
+                        onChange={e => setInicioVal(e.target.value)}
+                    />
                 </div>
                 <div className="form-group" style={{ opacity: actual ? 0.4 : 1 }}>
-                    <label className="form-label">Fecha de fin</label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <SelectDia  name="fecha_fin_dia"  defaultValue={actual ? '' : finDia}  disabled={actual} />
-                        <SelectMes  name="fecha_fin_mes"  defaultValue={actual ? '' : finMes}  disabled={actual} />
-                        <InputAnio  name="fecha_fin_anio" defaultValue={actual ? '' : finAnio} disabled={actual} />
-                    </div>
+                    <label className="form-label">
+                        Fecha de fin {!actual && <span className="required">*</span>}
+                    </label>
+                    <input
+                        type="date"
+                        className={`form-input date-picker${errorFin ? ' is-invalid' : ''}`}
+                        value={finVal}
+                        min={inicioVal || "1950-01-01"}
+                        max={today}
+                        disabled={actual}
+                        onChange={e => setFinVal(e.target.value)}
+                    />
+                    {errorFin && <div className="error-message">{errorFin}</div>}
                 </div>
             </div>
         </>
@@ -210,8 +247,12 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
    ══════════════════════════════════════════════════════════ */
 function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
     const [error,           setError]           = useState('');
+    const [errorFin,        setErrorFin]        = useState('');
     const [guardando,       setGuardando]        = useState(false);
     const [confirmEliminar, setConfirmEliminar] = useState(null);
+    const [empresa,         setEmpresa]         = useState(grupo.institution || '');
+    const [ubicacion,       setUbicacion]       = useState(grupo.location || '');
+    const [descripcion,     setDescripcion]     = useState(grupo.description || '');
 
     /*
      * deleted: true  → marcado para eliminar, solo se aplica al guardar
@@ -260,6 +301,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             return;
         }
 
+        setErrorFin('');
         const form        = e.target;
         const trabajoActual = form.trabajo_actual.checked;
         const inicioDia   = form.fecha_inicio_dia.value;
@@ -272,15 +314,16 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
         if (!inicioDia || !inicioMes || !inicioAnio) {
             setError('La fecha de inicio es obligatoria.'); return;
         }
+        if (!trabajoActual && (!finDia || !finMes || !finAnio)) {
+            setErrorFin('Selecciona la fecha de fin o marca "Trabajo actual".'); return;
+        }
         if (!trabajoActual && finDia && finMes && finAnio) {
             const ini = new Date(parseInt(inicioAnio), parseInt(inicioMes)-1, parseInt(inicioDia));
             const fin = new Date(parseInt(finAnio),    parseInt(finMes)-1,    parseInt(finDia));
-            if (fin < ini) { setError('La fecha de fin no puede ser anterior a la de inicio.'); return; }
+            if (fin < ini) { setErrorFin('La fecha de fin no puede ser anterior a la de inicio.'); return; }
         }
 
-        const empresa     = form.empresa.value;
-        const location    = form.location.value;
-        const descripcion = form.descripcion.value;
+        const location = ubicacion;
 
         const payload = {
             empresa, location, descripcion,
@@ -364,7 +407,9 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             <div className="form-row" style={{ marginBottom: '14px' }}>
                 <div className="form-group">
                     <label className="form-label">Empresa <span className="required">*</span></label>
-                    <input name="empresa" defaultValue={grupo.institution} required className="form-input" />
+                    <input name="empresa" value={empresa} maxLength={100} required className="form-input"
+                        onChange={e => setEmpresa(e.target.value)} />
+                    <div className="char-counter">{empresa.length}/100</div>
                 </div>
             </div>
 
@@ -440,8 +485,10 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             <div className="form-row" style={{ marginBottom: '14px' }}>
                 <div className="form-group">
                     <label className="form-label">Ubicación</label>
-                    <input name="location" defaultValue={grupo.location || ''}
-                        placeholder="Ej. Cochabamba, Bolivia" className="form-input" />
+                    <input name="location" value={ubicacion} maxLength={100}
+                        placeholder="Ej. Cochabamba, Bolivia" className="form-input"
+                        onChange={e => setUbicacion(e.target.value)} />
+                    <div className="char-counter">{ubicacion.length}/100</div>
                 </div>
             </div>
 
@@ -449,12 +496,15 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 defaultChecked={grupo.is_current}
                 inicioDia={getDia(rep.start_date)}  inicioMes={getMes(rep.start_date)}  inicioAnio={getAnio(rep.start_date)}
                 finDia={getDia(rep.end_date)}        finMes={getMes(rep.end_date)}        finAnio={getAnio(rep.end_date)}
+                errorFin={errorFin}
             />
 
             <div className="form-group" style={{ marginBottom: '14px' }}>
                 <label className="form-label">Descripción</label>
-                <textarea name="descripcion" defaultValue={grupo.description}
-                    className="form-textarea" rows={3} />
+                <textarea name="descripcion" value={descripcion} maxLength={500}
+                    className="form-textarea" rows={3}
+                    onChange={e => setDescripcion(e.target.value)} />
+                <div className="char-counter">{descripcion.length}/500</div>
             </div>
 
             <div className="btn-row" style={{ marginTop: 0 }}>
@@ -469,6 +519,27 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
     );
 }
 
+
+/* ── Ver más / Ver menos en descripción ─────────────────── */
+const DESC_LIMIT = 120;
+function DescripcionExpandible({ texto }) {
+    const [expandida, setExpandida] = useState(false);
+    if (!texto) return null;
+    const corta = texto.length > DESC_LIMIT;
+    return (
+        <div className="historial-desc">
+            {corta && !expandida ? texto.slice(0, DESC_LIMIT) + '…' : texto}
+            {corta && (
+                <button
+                    type="button"
+                    className="btn-ver-mas"
+                    onClick={() => setExpandida(v => !v)}>
+                    {expandida ? ' Ver menos' : ' Ver más'}
+                </button>
+            )}
+        </div>
+    );
+}
 
 /* ══════════════════════════════════════════════════════════
    Componente principal
@@ -571,9 +642,7 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
                                 ))}
                             </div>
 
-                            {grupo.description && (
-                                <div className="historial-desc">{grupo.description}</div>
-                            )}
+                            <DescripcionExpandible texto={grupo.description} />
 
                             {/* Acciones: UN solo Editar + Eliminar con iconos */}
                             <div className="historial-actions">
