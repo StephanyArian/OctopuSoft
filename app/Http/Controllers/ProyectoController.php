@@ -48,7 +48,7 @@ class ProyectoController extends Controller
         try {
             $request->validate([
                 'nombre'       => 'required|string|max:255',
-                'descripcion'  => 'required|string|max:500',
+                'descripcion'  => 'required|string|max:5000',
                 'fecha'        => 'nullable|date',
                 'fecha_fin'    => 'nullable|date',
                 'estado'       => 'nullable|string|max:50',
@@ -93,7 +93,7 @@ class ProyectoController extends Controller
 
             $request->validate([
                 'nombre'       => 'required|string|max:255',
-                'descripcion'  => 'required|string|max:500',
+                'descripcion'  => 'required|string|max:5000',
                 'fecha'        => 'nullable|date',
                 'fecha_fin'    => 'nullable|date',
                 'estado'       => 'nullable|string|max:50',
