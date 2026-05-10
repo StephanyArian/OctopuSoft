@@ -260,6 +260,26 @@
     flex-shrink: 0;
 }
 
+.btn-sm {
+    padding: 6px 16px;
+    font-size: 12px;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1.5px solid var(--gray-100);
+    background: var(--white);
+    color: var(--gray-700);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-sm:hover { background: var(--off); border-color: var(--gray-300); transform: translateY(-1px); }
+
+.btn-sm.danger { color: #e74c3c; border-color: rgba(231,76,60,0.2); }
+.btn-sm.danger:hover { background: rgba(231,76,60,0.06); border-color: rgba(231,76,60,0.3); }
+
 /*  Modal de confirmación de eliminación  */
 .modal-backdrop {
     display: none;
