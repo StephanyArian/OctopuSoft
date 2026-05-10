@@ -93,8 +93,17 @@
             newPreviews?.appendChild(wrap);
         }
 
-        // ── Form mostrar / ocultar ────────────────────────────────
-        btnMostrar?.addEventListener('click',  () => formCard.classList.add('open'));
+btnMostrar?.addEventListener('click', () => {
+    if (!proyectoActual) {
+        // Es proyecto nuevo, limpiar todo
+        evidencias = [];
+        document.getElementById('evStatImgs').textContent = '0';
+        document.getElementById('evStatLinks').textContent = '0';
+        document.getElementById('evStatRepos').textContent = '0';
+    }
+    limpiarForm();
+    formCard.classList.add('open');
+});
         btnCancelar?.addEventListener('click', ocultarForm);
 
         function ocultarForm() { formCard.classList.remove('open'); limpiarForm(); }
@@ -402,25 +411,27 @@ async function guardarEvidencia() {
             setTimeout(() => el.remove(), 3200);
         }
 
-        window.evInit = function(proyecto) {
-            console.log('🟢 evInit recibió proyecto:', proyecto);
-            
-            if (!proyecto || !proyecto.id) {
-                console.error('❌ Proyecto inválido en evInit');
-                mostrarError('No se pudo cargar el proyecto');
-                return;
-            }
-            
-            proyectoActual = proyecto;
-            window._proyectoParaEvidencias = proyecto;  // ← IMPORTANTE: sincronizar
-            console.log('✅ proyectoActual asignado:', proyectoActual);
-            
-            limpiarForm();
-            ocultarForm();
-            poblarBanner();
-            cargarEvidencias();
-        };
-     // Muestra lista temporal en el grid (sin backend)
+window.evInit = function(proyecto) {
+    if (!proyecto || !proyecto.id) return;
+
+    evidencias = [];
+    filtroActivo = 'todos';
+    busqueda = '';
+    if (searchInp) searchInp.value = '';
+    document.querySelectorAll('.ev-filter-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+
+    proyectoActual = proyecto;
+    window._proyectoParaEvidencias = proyecto;
+    sessionStorage.setItem('ultimo_proyecto_activo', JSON.stringify(proyecto));
+    
+    window._esProyectoNuevo = !proyecto.tiene_evidencias; // ✅ bandera
+
+    ocultarForm();
+    poblarBanner();
+    renderizar();
+    cargarEvidencias();
+};
+        // Muestra lista temporal en el grid (sin backend)
 function renderizarPendientes() {
     if (!grid) return;
     if (evidenciasPendientes.length === 0) {
@@ -525,56 +536,20 @@ window.evResetearPendientes = function() {
     renderizarPendientes();
     const countEl = document.getElementById('evTriggerCount');
     if (countEl) countEl.textContent = '0';
+    
+    // ✅ Limpiar el banner
+    const bannerNombre = document.getElementById('evBannerNombre');
+    const bannerEstado = document.getElementById('evBannerEstado');
+    const bannerDesc = document.getElementById('evBannerDesc');
+    const breadcrumb = document.getElementById('evBreadcrumbNombre');
+    if (bannerNombre) bannerNombre.textContent = 'Nuevo proyecto';
+    if (bannerEstado) bannerEstado.textContent = '—';
+    if (bannerDesc) bannerDesc.textContent = 'Las evidencias se guardarán al crear el proyecto';
+    if (breadcrumb) breadcrumb.textContent = 'Evidencias';
 };
     if (window.location.pathname.includes('mis-evidencias')) {
         init();
     }
     })();
 
-    // ============================================
-// FIX PARA EDITAR PROYECTOS - AGREGADO MANUALMENTE
-// ============================================
-
-(function fixEdicionProyectos() {
-    // Función global para forzar recarga de evidencias
-    window.forzarRecargaEvidencias = function(proyecto) {
-        console.log('🔄 Forzando recarga:', proyecto);
-        
-        if (!proyecto || !proyecto.id) {
-            console.error('❌ Proyecto inválido');
-            return false;
-        }
-        
-        // Guardar proyecto
-        window._proyectoParaEvidencias = proyecto;
-        sessionStorage.setItem('ultimo_proyecto_activo', JSON.stringify(proyecto));
-        
-        // Recargar evidencias
-        if (typeof window.evInit === 'function') {
-            window.evInit(proyecto);
-        }
-        
-        return true;
-    };
-    
-    // Detectar cuando se abre el formulario de evidencias
-    document.addEventListener('click', function(e) {
-        // Si el clic es en el botón "Agregar Evidencia"
-        if (e.target.id === 'evBtnMostrarForm' || 
-            e.target.closest('#evBtnMostrarForm')) {
-            
-            // Recuperar proyecto del sessionStorage
-            const proyectoGuardado = sessionStorage.getItem('ultimo_proyecto_activo');
-            
-            if (proyectoGuardado && !window._proyectoParaEvidencias) {
-                const proyecto = JSON.parse(proyectoGuardado);
-                console.log('🔄 Recuperando proyecto guardado:', proyecto);
-                
-                if (typeof window.evInit === 'function') {
-                    window.evInit(proyecto);
-                }
-            }
-        }
-    });
-})();
-    
+ 
