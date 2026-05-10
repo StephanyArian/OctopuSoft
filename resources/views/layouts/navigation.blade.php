@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" style="background-color: #2d0a1e; border-bottom: 1px solid #4a1030;">
+<nav x-data="{ open: false }" style="background-color: #2d0a1e; border-bottom: 1px solid #4a1030; position: relative; z-index: 50;">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -66,36 +66,63 @@
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden" style="background-color: #2d0a1e;">
+    <!-- Menú móvil: overlay fijo que NO empuja el contenido -->
+    <div
+        x-show="open"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 -translate-y-2"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-2"
+        style="
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            background-color: #2d0a1e;
+            z-index: 49;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            max-height: calc(100vh - 64px);
+            overflow-y: auto;
+            border-bottom: 2px solid #0abf9e;
+        "
+        class="sm:hidden"
+    >
         <div class="pt-2 pb-3 space-y-1">
-        <x-responsive-nav-link :href="route('dashboard')" style="color: #ffffff;">
-            <i class="bi bi-house-fill"></i> {{ __('Mi portafolio') }}
-        </x-responsive-nav-link>
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 16px;"></div>
-        <x-responsive-nav-link :href="route('profile.create')" style="color: #1de8c0;">
-            <i class="bi bi-person-fill"></i> {{ __('Personal') }}
-        </x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('experiencia.laboral')" style="color: #1de8c0;">
-            <i class="bi bi-briefcase-fill"></i> {{ __('Experiencia laboral') }}
-        </x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('informacion.academica')" style="color: #1de8c0;">
-            <i class="bi bi-mortarboard-fill"></i> {{ __('Información académica') }}
-        </x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('skills.tecnicas')" style="color: #1de8c0;">
-            <i class="bi bi-cpu-fill"></i> {{ __('Habilidades técnicas') }}
-        </x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('skills.blandas')" style="color: #1de8c0;">
-            <i class="bi bi-heart-fill"></i> {{ __('Habilidades blandas') }}
-        </x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('proyectos')" style="color: #1de8c0;">
-            <i class="bi bi-kanban-fill"></i> {{ __('Proyectos') }}
-        </x-responsive-nav-link>
-        <x-responsive-nav-link :href="route('redes.index')" style="color: #1de8c0;">
-            <i class="bi bi-globe"></i> {{ __('Redes profesionales y contacto') }}
-        </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard')" style="color: #ffffff;">
+                <i class="bi bi-house-fill"></i> {{ __('Mi portafolio') }}
+            </x-responsive-nav-link>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 16px;"></div>
+            <x-responsive-nav-link :href="route('profile.create')" style="color: #1de8c0;">
+                <i class="bi bi-person-fill"></i> {{ __('Personal') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('experiencia.laboral')" style="color: #1de8c0;">
+                <i class="bi bi-briefcase-fill"></i> {{ __('Experiencia laboral') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('informacion.academica')" style="color: #1de8c0;">
+                <i class="bi bi-mortarboard-fill"></i> {{ __('Información académica') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('skills.tecnicas')" style="color: #1de8c0;">
+                <i class="bi bi-cpu-fill"></i> {{ __('Habilidades técnicas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('skills.blandas')" style="color: #1de8c0;">
+                <i class="bi bi-heart-fill"></i> {{ __('Habilidades blandas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('proyectos')" style="color: #1de8c0;">
+                <i class="bi bi-kanban-fill"></i> {{ __('Proyectos') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('redes.index')" style="color: #1de8c0;">
+                <i class="bi bi-globe"></i> {{ __('Redes profesionales y contacto') }}
+            </x-responsive-nav-link>
         </div>
-
-        
     </div>
+
+    <!-- Fondo semitransparente: al tocar fuera cierra el menú -->
+    <div
+        x-show="open"
+        @click="open = false"
+        style="position: fixed; inset: 0; top: 64px; background: rgba(0,0,0,0.4); z-index: 48;"
+        class="sm:hidden"
+    ></div>
 </nav>
