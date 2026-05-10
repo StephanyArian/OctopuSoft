@@ -69,33 +69,31 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden" style="background-color: #2d0a1e;">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color: #ffffff;">
-                {{ __('Mi portafolio') }}
-            </x-responsive-nav-link>
-            
-            <!-- Enlaces del Menú Lateral (Edición de Perfil) -->
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 16px;"></div>
-            <x-responsive-nav-link :href="route('profile.create')" :active="request()->routeIs('profile.create')" style="color: #1de8c0;">
-                {{ __('Personal') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('experiencia.laboral')" :active="request()->routeIs('experiencia.laboral')" style="color: #1de8c0;">
-                {{ __('Experiencia laboral') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('informacion.academica')" :active="request()->routeIs('informacion.academica')" style="color: #1de8c0;">
-                {{ __('Información académica') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('skills.tecnicas')" :active="request()->routeIs('skills.tecnicas')" style="color: #1de8c0;">
-                {{ __('Habilidades técnicas') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('skills.blandas')" :active="request()->routeIs('skills.blandas')" style="color: #1de8c0;">
-                {{ __('Habilidades blandas') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('proyectos')" :active="request()->routeIs('proyectos')" style="color: #1de8c0;">
-                {{ __('Proyectos') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('redes.index')" :active="request()->routeIs('redes.index')" style="color: #1de8c0;">
-                {{ __('Redes profesionales y contacto') }}
-            </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('dashboard')" style="color: #ffffff;">
+            <i class="bi bi-house-fill"></i> {{ __('Mi portafolio') }}
+        </x-responsive-nav-link>
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 16px;"></div>
+        <x-responsive-nav-link :href="route('profile.create')" style="color: #1de8c0;">
+            <i class="bi bi-person-fill"></i> {{ __('Personal') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('experiencia.laboral')" style="color: #1de8c0;">
+            <i class="bi bi-briefcase-fill"></i> {{ __('Experiencia laboral') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('informacion.academica')" style="color: #1de8c0;">
+            <i class="bi bi-mortarboard-fill"></i> {{ __('Información académica') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('skills.tecnicas')" style="color: #1de8c0;">
+            <i class="bi bi-cpu-fill"></i> {{ __('Habilidades técnicas') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('skills.blandas')" style="color: #1de8c0;">
+            <i class="bi bi-heart-fill"></i> {{ __('Habilidades blandas') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('proyectos')" style="color: #1de8c0;">
+            <i class="bi bi-kanban-fill"></i> {{ __('Proyectos') }}
+        </x-responsive-nav-link>
+        <x-responsive-nav-link :href="route('redes.index')" style="color: #1de8c0;">
+            <i class="bi bi-globe"></i> {{ __('Redes profesionales y contacto') }}
+        </x-responsive-nav-link>
         </div>
 
         <div class="pt-4 pb-1" style="border-top: 1px solid #4a1030;">

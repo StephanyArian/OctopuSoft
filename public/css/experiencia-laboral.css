@@ -791,3 +791,18 @@
     font-family: inherit;
 }
 .btn-ver-mas:hover { color: var(--teal); }
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+    .body-row {
+        flex-direction: column;
+    }
+    .mobile-menu-btn { display: block; }
+    .mobile-sidebar { display: flex; }
+    .main { padding: 24px; }
+    .section-card { padding: 20px; }
+    .page-title { font-size: 24px; }
+    .nav-tab { padding: 10px 16px; font-size: 11px; }
+}
