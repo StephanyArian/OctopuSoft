@@ -242,6 +242,23 @@ body {
     gap: 10px;
 }
 
+/* Cards Grid for 2 columns */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+.cards-grid .card {
+    margin-bottom: 0;
+    height: 100%;
+}
+@media (max-width: 768px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 /* Tarjetas */
 .card {
     background: var(--off);

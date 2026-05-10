@@ -85,64 +85,74 @@
                 @endif
             </div>
         </div>
-
+        
+        <!-- BOTÓN SUPERIOR DE EDICIÓN -->
+        <div style="display: flex; justify-content: flex-start; margin: 30px 0; padding: 0 40px;">
+            <a href="javascript:history.back()" class="btn btn-editar">
+                <i class="fas fa-edit"></i> Continuar editando
+            </a>
+        </div>
         <!-- EXPERIENCIA LABORAL -->
         <div class="section">
             <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
-            @forelse($experiencias as $exp)
-            <div class="card">
-                <h3>{{ $exp->empresa }}</h3>
-                <div class="subtitle">
-                    @if($exp->ubicacion)
-                        {{ $exp->ubicacion }}
+            <div class="cards-grid">
+                @forelse($experiencias as $exp)
+                <div class="card">
+                    <h3>{{ $exp->empresa }}</h3>
+                    <div class="subtitle">
+                        @if($exp->ubicacion)
+                            {{ $exp->ubicacion }}
+                        @endif
+                    </div>
+                    
+                    @if(str_contains($exp->cargo, ' / '))
+                        <ul class="roles-list">
+                            @foreach(explode(' / ', $exp->cargo) as $rol)
+                                <li>{{ $rol }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="role-single">{{ $exp->cargo }}</div>
                     @endif
+                    
+                    <div class="date">
+                        {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d F Y') }}
+                        @if($exp->fecha_fin)
+                            — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d F Y') }}
+                        @elseif($exp->trabajo_actual)
+                            — Actualidad
+                        @endif
+                    </div>
+                    <div class="description">{{ $exp->descripcion }}</div>
                 </div>
-                
-                @if(str_contains($exp->cargo, ' / '))
-                    <ul class="roles-list">
-                        @foreach(explode(' / ', $exp->cargo) as $rol)
-                            <li>{{ $rol }}</li>
-                        @endforeach
-                    </ul>
-                @else
-                    <div class="role-single">{{ $exp->cargo }}</div>
-                @endif
-                
-                <div class="date">
-                    {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d F Y') }}
-                    @if($exp->fecha_fin)
-                        — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d F Y') }}
-                    @elseif($exp->trabajo_actual)
-                        — Actualidad
-                    @endif
-                </div>
-                <div class="description">{{ $exp->descripcion }}</div>
+                @empty
+                    <div class="empty-message" style="grid-column: 1 / -1;">No hay experiencias laborales registradas</div>
+                @endforelse
             </div>
-            @empty
-                <div class="empty-message">No hay experiencias laborales registradas</div>
-            @endforelse
         </div>
 
         <!-- INFORMACIÓN ACADÉMICA -->
         <div class="section">
             <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
-            @forelse($academicas as $aca)
-                <div class="card">
-                    <h3>{{ $aca->institucion }}</h3>
-                    <div class="subtitle">{{ $aca->titulo }}</div>
-                    <div class="date">
-                        {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
-                        @if($aca->fecha_fin)
-                            — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
-                        @elseif($aca->estudio_actual)
-                            — Actualidad
-                        @endif
+            <div class="cards-grid">
+                @forelse($academicas as $aca)
+                    <div class="card">
+                        <h3>{{ $aca->institucion }}</h3>
+                        <div class="subtitle">{{ $aca->titulo }}</div>
+                        <div class="date">
+                            {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
+                            @if($aca->fecha_fin)
+                                — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
+                            @elseif($aca->estudio_actual)
+                                — Actualidad
+                            @endif
+                        </div>
+                        <div class="description">{{ $aca->descripcion }}</div>
                     </div>
-                    <div class="description">{{ $aca->descripcion }}</div>
-                </div>
-            @empty
-                <div class="empty-message">No hay información académica registrada</div>
-            @endforelse
+                @empty
+                    <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
+                @endforelse
+            </div>
         </div>
 
         <!-- HABILIDADES TÉCNICAS CON BARRAS CORTAS AMARILLAS -->
@@ -190,113 +200,47 @@
         <!-- PROYECTOS -->
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
-            @forelse($proyectos as $proyecto)
-                <div class="card">
-                    <h3 style="cursor:pointer; color:#1abc9c;" onclick="abrirModal({{ json_encode([
-                        'nombre'      => $proyecto->nombre,
-                        'descripcion' => $proyecto->descripcion,
-                        'fecha_inicio'=> optional($proyecto->fecha_inicio)->format('d/m/Y'),
-                        'fecha_fin'   => optional($proyecto->fecha_fin)->format('d/m/Y'),
-                        'estado'      => $proyecto->estado,
-                        'rol'         => $proyecto->rol,
-                        'cliente'     => $proyecto->cliente,
-                        'tecnologias' => $proyecto->tecnologias,
-                        'evidencias'  => $proyecto->evidencias,
-                    ]) }})">{{ $proyecto->nombre }}</h3>
-                    <div class="description">{{ $proyecto->descripcion }}</div>
-                    <div class="date">
-                        {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
-                        @if($proyecto->fecha_fin)
-                            — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }}
-                        @endif
-                        | {{ $proyecto->estado ?? 'En progreso' }}
-                    </div>
-                    <div class="description">
-                        Rol: {{ $proyecto->rol ?? '' }}
-                        @if($proyecto->cliente) | Cliente: {{ $proyecto->cliente }} @endif
-                    </div>
-                    @if(!empty($proyecto->tecnologias))
-                        <div class="proyecto-tecnologias">
-                            @foreach($proyecto->tecnologias as $tec)
-                                <span class="tec-badge">{{ $tec }}</span>
-                            @endforeach
+            <div class="cards-grid">
+                @forelse($proyectos as $proyecto)
+                    <div class="card">
+                        <h3 style="cursor:pointer; color:#1abc9c;" onclick="abrirModal({{ json_encode([
+                            'nombre'      => $proyecto->nombre,
+                            'descripcion' => $proyecto->descripcion,
+                            'fecha_inicio'=> optional($proyecto->fecha_inicio)->format('d/m/Y'),
+                            'fecha_fin'   => optional($proyecto->fecha_fin)->format('d/m/Y'),
+                            'estado'      => $proyecto->estado,
+                            'rol'         => $proyecto->rol,
+                            'cliente'     => $proyecto->cliente,
+                            'tecnologias' => $proyecto->tecnologias,
+                            'evidencias'  => $proyecto->evidencias,
+                        ]) }})">{{ $proyecto->nombre }}</h3>
+                        <div class="description">{{ $proyecto->descripcion }}</div>
+                        <div class="date">
+                            {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
+                            @if($proyecto->fecha_fin)
+                                — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }}
+                            @endif
+                            | {{ $proyecto->estado ?? 'En progreso' }}
                         </div>
-                    @endif
-                </div>
-            @empty
-                <div class="empty-message">No hay proyectos registrados</div>
-            @endforelse
-        </div>
-
-        <!-- REDES Y CONTACTO -->
-        <div class="section">
-            <h2><i class="fas fa-share-alt"></i> Redes y contacto</h2>
-            <div class="contact-grid">
-                @if($redes['linkedin'])
-                    <div class="contact-item">
-                        <i class="fab fa-linkedin"></i>
-                        <a href="{{ $redes['linkedin'] }}" target="_blank" rel="noopener noreferrer">
-                            LinkedIn
-                        </a>
+                        <div class="description">
+                            Rol: {{ $proyecto->rol ?? '' }}
+                            @if($proyecto->cliente) | Cliente: {{ $proyecto->cliente }} @endif
+                        </div>
+                        @if(!empty($proyecto->tecnologias))
+                            <div class="proyecto-tecnologias">
+                                @foreach($proyecto->tecnologias as $tec)
+                                    <span class="tec-badge">{{ $tec }}</span>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
-                @endif
-                
-                @if($redes['github'])
-                    <div class="contact-item">
-                        <i class="fab fa-github"></i>
-                        <a href="{{ $redes['github'] }}" target="_blank" rel="noopener noreferrer">
-                            GitHub
-                        </a>
-                    </div>
-                @endif
-                
-                @if($redes['whatsapp'])
-                    <div class="contact-item">
-                        <i class="fab fa-whatsapp"></i>
-                        @php
-                            $whatsappNumber = preg_replace('/[^0-9]/', '', $redes['whatsapp']);
-                            $whatsappUrl = 'https://wa.me/' . $whatsappNumber;
-                        @endphp
-                        <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer">
-                            WhatsApp: {{ $redes['whatsapp'] }}
-                        </a>
-                    </div>
-                @endif
-                
-                @if($redes['correo'])
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <a href="mailto:{{ $redes['correo'] }}">
-                            {{ $redes['correo'] }}
-                        </a>
-                    </div>
-                @endif
-                
-                @if($redes['otros'])
-                    <div class="contact-item">
-                        <i class="fas fa-link"></i>
-                        <a href="{{ $redes['otros'] }}" target="_blank" rel="noopener noreferrer">
-                            Otra red profesional
-                        </a>
-                    </div>
-                @endif
-
-                @if($redes['ubicacion'])
-                    <div class="contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($redes['ubicacion']) }}" 
-                        target="_blank" 
-                        rel="noopener noreferrer">
-                             {{ $redes['ubicacion'] }}
-                        </a>
-                    </div>
-                @endif
-                
-                @if(empty(array_filter($redes)))
-                    <div class="empty-message">No hay redes de contacto registradas</div>
-                @endif
+                @empty
+                    <div class="empty-message" style="grid-column: 1 / -1;">No hay proyectos registrados</div>
+                @endforelse
             </div>
         </div>
+
+
 
         <!-- MODAL PROYECTO -->
         <div id="modal-proyecto" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">

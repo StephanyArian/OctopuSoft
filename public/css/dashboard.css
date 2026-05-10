@@ -339,14 +339,8 @@
 
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        min-width: 100%;
-        border-right: none;
-        padding: 10px 0;
-        display: flex;
-        flex-wrap: wrap;
+        display: none;
     }
-    .sidebar-item { width: 50%; padding: 10px 16px; }
     .main { padding: 24px; }
     .section-card { padding: 20px; }
     .photo-box { width: 110px; height: 110px; }

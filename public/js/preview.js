@@ -245,27 +245,7 @@ function renderizarProyectos() {
     container.innerHTML = html;
 }
 
-function renderizarRedes() {
-    const container = document.getElementById('redes-container');
-    if (!container) return;
-    
-    const redes = datosUsuario.redes;
-    const tieneDatos = Object.values(redes).some(valor => valor && valor.trim() !== '');
-    
-    if (!tieneDatos) {
-        container.innerHTML = '<div class="empty-message">No hay redes de contacto registradas</div>';
-        return;
-    }
-    
-    let html = '';
-    if (redes.linkedin) html += `<div class="contact-item"><i class="fab fa-linkedin"></i> <span>${redes.linkedin}</span></div>`;
-    if (redes.github) html += `<div class="contact-item"><i class="fab fa-github"></i> <span>${redes.github}</span></div>`;
-    if (redes.whatsapp) html += `<div class="contact-item"><i class="fab fa-whatsapp"></i> <span>${redes.whatsapp}</span></div>`;
-    if (redes.correo) html += `<div class="contact-item"><i class="fas fa-envelope"></i> <span>${redes.correo}</span></div>`;
-    if (redes.otros) html += `<div class="contact-item"><i class="fas fa-link"></i> <span>${redes.otros}</span></div>`;
-    
-    container.innerHTML = html;
-}
+
 
 function renderizarPerfil() {
     const container = document.getElementById('previewContainer');
@@ -281,14 +261,20 @@ function renderizarPerfil() {
             <div class="bio">${datosUsuario.biografia}</div>
         </div>
 
+        <div style="display: flex; justify-content: flex-start; margin: 30px 0; padding: 0 40px;">
+            <a href="{{ url('/dashboard') }}" class="btn btn-editar">
+                <i class="fas fa-edit"></i> Continuar editando
+            </a>
+        </div>
+
         <div class="section">
             <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
-            <div id="experiencias-container"></div>
+            <div id="experiencias-container" class="cards-grid"></div>
         </div>
 
         <div class="section">
             <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
-            <div id="academica-container"></div>
+            <div id="academica-container" class="cards-grid"></div>
         </div>
 
         <div class="section">
@@ -303,13 +289,10 @@ function renderizarPerfil() {
 
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
-            <div id="proyectos-container"></div>
+            <div id="proyectos-container" class="cards-grid"></div>
         </div>
 
-        <div class="section">
-            <h2><i class="fas fa-share-alt"></i> Redes y contacto</h2>
-            <div class="contact-grid" id="redes-container"></div>
-        </div>
+
 
         <div class="buttons-container">
             <a href="{{ url('/dashboard') }}" class="btn btn-editar">
@@ -328,7 +311,7 @@ function renderizarPerfil() {
     renderizarHabilidadesTecnicas();
     renderizarHabilidadesBlandas();
     renderizarProyectos();
-    renderizarRedes();
+
 }
 
 function publicarPerfil() {
