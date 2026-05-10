@@ -96,25 +96,6 @@
         </x-responsive-nav-link>
         </div>
 
-        <div class="pt-4 pb-1" style="border-top: 1px solid #4a1030;">
-            <div class="px-4">
-                <div class="font-medium text-base" style="color: #ffffff;">
-                    {{ Auth::user()->first_name ?? Auth::user()->name ?? 'Usuario' }}
-                </div>
-                <div class="font-medium text-sm" style="color: #0abf9e;">
-                    {{ Auth::user()->email }}
-                </div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')" style="color: #ffffff;">
-                    {{ __('Configuracion') }}
-                </x-responsive-nav-link>
-
-                <x-responsive-nav-link :href="route('cerrar.sesion')" style="color: #ffffff;">
-                    {{ __('Cerrar Sesión') }}
-                </x-responsive-nav-link>
-            </div>
-        </div>
+        
     </div>
 </nav>
