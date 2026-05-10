@@ -9,10 +9,6 @@
             <p class="profile-page-subtitle">Administra tu información de cuenta y seguridad.</p>
 
             <div class="profile-card">
-                @include('profile.partials.update-profile-information-form')
-            </div>
-
-            <div class="profile-card">
                 @include('profile.partials.update-password-form')
             </div>
 

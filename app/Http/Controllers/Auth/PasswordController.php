@@ -4,37 +4,71 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Notifications\PasswordChangedNotification;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
 class PasswordController extends Controller
 {
-    /**
-     * Update the user's password.
-     */
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request)
     {
-        $validated = $request->validateWithBag('updatePassword', [
+        // Validación - campo password_confirmation es el que usa Laravel
+        $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
+            'password' => [
+                'required', 
+                'string',
+                'min:8',
+                'max:20',
+                'confirmed',  // ← Esto busca el campo "password_confirmation"
+            ],
+        ], [
+            'current_password.required' => 'La contraseña actual es obligatoria.',
+            'current_password.current_password' => 'La contraseña actual es incorrecta.',
+            'password.required' => 'La nueva contraseña es obligatoria.',
+            'password.min' => 'La nueva contraseña debe tener al menos 8 caracteres.',
+            'password.max' => 'La nueva contraseña no puede tener más de 20 caracteres.',
+            'password.confirmed' => 'Las contraseñas no coinciden.',
         ]);
 
-        // T7 — Evitar reutilización de contraseña anterior
-        if (Hash::check($validated['password'], $request->user()->password)) {
+        // Validación adicional de fortaleza
+        $password = $request->password;
+        if (!preg_match('/[A-Z]/', $password)) {
+            return back()->withErrors([
+                'password' => 'La contraseña debe incluir al menos una mayúscula.'
+            ], 'updatePassword');
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            return back()->withErrors([
+                'password' => 'La contraseña debe incluir al menos una minúscula.'
+            ], 'updatePassword');
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            return back()->withErrors([
+                'password' => 'La contraseña debe incluir al menos un número.'
+            ], 'updatePassword');
+        }
+        if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+            return back()->withErrors([
+                'password' => 'La contraseña debe incluir al menos un carácter especial.'
+            ], 'updatePassword');
+        }
+
+        // Verificar que la nueva contraseña no sea igual a la anterior
+        if (Hash::check($request->password, $request->user()->password)) {
             return back()->withErrors([
                 'password' => 'La nueva contraseña no puede ser igual a la anterior.'
             ], 'updatePassword');
         }
 
+        // Actualizar contraseña en la BD (columna "password")
         $request->user()->update([
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($request->password),
         ]);
 
-        // T11 — Enviar correo de notificación de cambio de contraseña
+        // Enviar notificación por correo
         $request->user()->notify(new PasswordChangedNotification());
 
-        return back()->with('status', 'password.reset.store');
+        return back()->with('status', 'password-updated');
     }
 }
