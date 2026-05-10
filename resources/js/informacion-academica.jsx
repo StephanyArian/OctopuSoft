@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
 function HistorialAcademico({ formaciones: initialFormaciones }) {
@@ -7,6 +7,46 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    useEffect(() => {
+        if (editando) {
+            // Configurar contador para descripción
+            const descripcion = document.querySelector(`#edit-descripcion-${editando}`);
+            const counterDesc = document.getElementById(`descripcionCounter_${editando}`);
+            
+            if (descripcion && counterDesc) {
+                const updateDesc = () => {
+                    counterDesc.textContent = `${descripcion.value.length} / 500`;
+                };
+                descripcion.addEventListener('input', updateDesc);
+                updateDesc();
+            }
+
+            // Configurar contador para institución
+            const institucion = document.querySelector(`input[name="institucion"]`);
+            const counterInst = document.getElementById(`institucionCounter_${editando}`);
+            
+            if (institucion && counterInst) {
+                const updateInst = () => {
+                    counterInst.textContent = `${institucion.value.length} / 60`;
+                };
+                institucion.addEventListener('input', updateInst);
+                updateInst();
+            }
+
+            // Configurar contador para título obtenido
+            const tituloObtenido = document.querySelector(`input[name="titulo_obtenido"]`);
+            const counterTit = document.getElementById(`tituloCounter_${editando}`);
+            
+            if (tituloObtenido && counterTit) {
+                const updateTit = () => {
+                    counterTit.textContent = `${tituloObtenido.value.length} / 30`;
+                };
+                tituloObtenido.addEventListener('input', updateTit);
+                updateTit();
+            }
+        }
+    }, [editando]);
 
     // ── ELIMINAR ──
     async function eliminar(id) {
@@ -74,34 +114,70 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Institución <span className="required">*</span></label>
-                                        <input className="form-input" name="institucion" defaultValue={f.institution} required />
+                                        <input className="form-input" name="institucion" defaultValue={f.institution} required maxLength= "30" />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Título obtenido <span className="required">*</span></label>
-                                        <input className="form-input" name="titulo_obtenido" defaultValue={f.title} required />
+                                        <input className="form-input" name="titulo_obtenido" defaultValue={f.title} required maxLength="30" />
+                                    </div>
+                                </div>
+
+                                <div className="form-row" style={{ marginBottom: '12px' }}>
+                                    <div className="form-group">
+                                        <label className="form-label">Título (Licenciatura, Maestría...)</label>
+                                        <input className="form-input" name="titulo" defaultValue={f.degree || ''} maxLength="30" />
+                                        
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Especialidad</label>
+                                        <input className="form-input" name="especialidad" defaultValue={f.specialty || ''} maxLength="30" />
+                                        
                                     </div>
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de inicio</label>
-                                        <input className="form-input" type="month" name="fecha_inicio"
-                                            defaultValue={f.start_date ? f.start_date.substring(0, 7) : ''} 
-                                            min="1950-01" max={new Date().toISOString().substring(0, 7)} required />
+                                        <input className="form-input" type="date" name="fecha_inicio"
+                                            defaultValue={f.start_date ? f.start_date.substring(0, 10) : ''} 
+                                            min="1950-01-01" max={new Date().toISOString().substring(0, 10)} required />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de fin</label>
-                                        <input className="form-input" type="month" name="fecha_fin"
-                                            defaultValue={f.end_date ? f.end_date.substring(0, 7) : ''} 
-                                            min="1950-01" max={new Date().toISOString().substring(0, 7)} />
+                                        <input className="form-input" type="date" name="fecha_fin"  id={`fechaFin_${f.id}`}
+                                            defaultValue={f.end_date ? f.end_date.substring(0, 10) : ''} 
+                                            min="1950-01-01" max={new Date().toISOString().substring(0, 10)} />
                                     </div>
                                 </div>
                                 <div className="form-checkbox-row" style={{ marginBottom: '12px' }}>
-                                    <input type="checkbox" name="estudio_actual" defaultChecked={f.is_current} />
+                                    <input 
+                                        type="checkbox" 
+                                        name="estudio_actual" 
+                                        defaultChecked={f.is_current}
+                                        onChange={(e) => {
+                                            // Usa el ID específico en lugar de querySelector
+                                            const fechaFinInput = document.getElementById(`fechaFin_${f.id}`);
+                                            if (fechaFinInput) {
+                                                if (e.target.checked) {
+                                                    fechaFinInput.value = '';
+                                                    fechaFinInput.disabled = true;
+                                                } else {
+                                                    fechaFinInput.disabled = false;
+                                                }
+                                            }
+                                        }}
+                                    />
                                     <label>Estudio actual</label>
                                 </div>
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label className="form-label">Descripción</label>
-                                    <textarea className="form-textarea" name="descripcion" defaultValue={f.description} />
+                                    <textarea className="form-textarea" name="descripcion"  id={`edit-descripcion-${f.id}`} defaultValue={f.description} maxLength="500" rows="4"
+                                        onInput={(e) => {
+                                            const counter = document.getElementById(`descripcionCounter_${f.id}`);
+                                            if (counter) counter.textContent = `${e.target.value.length} / 500`;
+                                        }} />
+                                    <div id={`descripcionCounter_${f.id}`} className="char-counter">
+                                        {f.description?.length || 0} / 500
+                                    </div>
                                 </div>
                                 <div className="historial-actions">
                                     <button type="submit" className="btn-sm" style={{ background: 'var(--teal)', color: 'white', border: 'none' }}>✔ Guardar</button>

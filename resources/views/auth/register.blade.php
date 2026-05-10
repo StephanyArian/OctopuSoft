@@ -13,20 +13,20 @@
             <div class="row-fields">
                 <div class="form-group">
                     <label for="first_name" class="form-label">Nombre</label>
-                    <input id="first_name" class="form-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus>
+                    <input id="first_name" class="form-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '')">
                     <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="last_name" class="form-label">Apellido</label>
-                    <input id="last_name" class="form-input" type="text" name="last_name" value="{{ old('last_name') }}" required>
+                    <input id="last_name" class="form-input" type="text" name="last_name" value="{{ old('last_name') }}" required maxlength="50"  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '')" >
                     <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="email" class="form-label">Correo</label>
-                <input id="email" class="form-input" type="email" name="email" value="{{ old('email') }}" required>
+                <input id="email" class="form-input" type="email" name="email" value="{{ old('email') }}" required maxlength="60">
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
@@ -34,7 +34,7 @@
             <div class="form-group">
                 <label for="password" class="form-label">Contraseña</label>
                 <div class="password-wrapper">
-                    <input id="password" class="form-input" type="password" name="password" required>
+                    <input id="password" class="form-input" type="password" name="password" required maxlength="30">
                     <button class="toggle-password" type="button" onclick="togglePw('password', this)">
                         <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
@@ -47,7 +47,7 @@
             <div class="form-group">
                 <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
                 <div class="password-wrapper">
-                    <input id="password_confirmation" class="form-input" type="password" name="password_confirmation" required>
+                    <input id="password_confirmation" class="form-input" type="password" name="password_confirmation" required maxlength="30">
                     <button class="toggle-password" type="button" onclick="togglePw('password_confirmation', this)">
                         <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>

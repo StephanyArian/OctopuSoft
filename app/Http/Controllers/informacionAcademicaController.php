@@ -24,11 +24,11 @@ class InformacionAcademicaController extends Controller
         $request->validate([
             'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'nullable|string|max:30|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
-            'fecha_inicio'    => 'required|date_format:Y-m|before_or_equal:today',
-            'fecha_fin'       => 'nullable|date_format:Y-m|after:fecha_inicio',
-            'descripcion'     => 'nullable|string|max:255|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,}).+$/u',
+            'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
+            'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
+            'descripcion'     => 'nullable|string|max:500|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,}).+$/u',
             'estudio_actual'  => 'nullable',
-            'especialidad'    => 'nullable|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'especialidad'    => 'nullable|string|max:50|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
 
          ], [
             'institucion.required'     => 'La institución es obligatoria',
@@ -53,11 +53,11 @@ class InformacionAcademicaController extends Controller
         }
 
         // Normalizar fechas
-        $startDate = Carbon::createFromFormat('Y-m', $request->fecha_inicio)->startOfMonth();
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->fecha_inicio)->startOfMonth();
         
         $endDate = null;
         if (!$request->has('estudio_actual') && $request->fecha_fin) {
-            $endDate = Carbon::createFromFormat('Y-m', $request->fecha_fin)->endOfMonth();
+            $endDate = Carbon::createFromFormat('Y-m-d', $request->fecha_fin)->endOfMonth();
         }
 
         Experience::create([
@@ -82,20 +82,20 @@ class InformacionAcademicaController extends Controller
         $request->validate([
             'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
-            'fecha_inicio'    => 'required|date_format:Y-m|before_or_equal:today',
-            'fecha_fin'       => 'nullable|date_format:Y-m|after:fecha_inicio',
-            'descripcion'     => 'nullable|string|max:1000',
+            'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
+            'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
+            'descripcion'     => 'nullable|string|max:500',
             'estudio_actual'  => 'nullable|boolean',
         ]);
         $formacion = Experience::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-            $startDate = Carbon::createFromFormat('Y-m', $request->fecha_inicio)->startOfMonth();
+            $startDate = Carbon::createFromFormat('Y-m-d', $request->fecha_inicio);
         
             $endDate = null;
             if (!$request->has('estudio_actual') && $request->fecha_fin) {
-                $endDate = Carbon::createFromFormat('Y-m', $request->fecha_fin)->endOfMonth();
+            $endDate = Carbon::parse($request->fecha_fin);   
             }   
 
         $formacion->update([

@@ -68,7 +68,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Título obtenido <span class="required">*</span></label>
                                             <input class="form-input" type="text" name="titulo_obtenido" id="tituloObtenido"
-                                                placeholder="Ej. Ingeniería de Sistemas" value="{{ old('titulo_obtenido') }}"  maxlength="30" >
+                                                placeholder="Ej. Ingeniería de Sistemas" value="{{ old('titulo_obtenido') }}"  maxlength ="30" >
                                             <div id="tituloObtenidoError" class="error-message hidden">El título obtenido es obligatorio</div>
                                             @error('titulo_obtenido')
                                                 <div class="error-message">{{ $message }}</div>
@@ -81,7 +81,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Título</label>
                                             <input class="form-input" type="text" name="titulo" id="titulo"
-                                                placeholder="Licenciatura, Maestría..." value="{{ old('titulo') }}">
+                                                placeholder="Licenciatura, Maestría..." value="{{ old('titulo') }}" maxlength ="30">
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Especialidad</label>
@@ -93,16 +93,16 @@
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Fecha de inicio <span class="required">*</span></label>
-                                            <input class="form-input" type="month" name="fecha_inicio" id="fechaInicio"
+                                            <input class="form-input" type="date" name="fecha_inicio" id="fechaInicio"
                                                 value="{{ old('fecha_inicio') }}"
-                                                min="1950-01" max="{{ date('Y-m') }}">
+                                                min="1950-01-01" max="{{ date('Y-m-d') }}">
                                             <div id="fechaInicioError" class="error-message hidden">La fecha de inicio es obligatoria</div>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Fecha de fin</label>
-                                            <input class="form-input" type="month" name="fecha_fin" id="fechaFin"
+                                            <input class="form-input" type="date" name="fecha_fin" id="fechaFin"
                                                 value="{{ old('fecha_fin') }}"
-                                                min="1950-01" max="{{ date('Y-m') }}">
+                                                min="1950-01-01" max="{{ date('Y-m-d') }}">
                                             <div id="fechaFinError" class="error-message hidden"></div>
                                         </div>
                                     </div>
@@ -116,8 +116,9 @@
  
                                     <div class="form-group">
                                         <label class="form-label">Descripción</label>
-                                        <textarea class="form-textarea" name="descripcion" id="descripcion"
-                                            placeholder="Describe brevemente tus logros, materias destacadas o proyectos en esta formación...">{{ old('descripcion') }}</textarea>
+                                        <textarea class="form-textarea" name="descripcion" id="descripcion" 
+                                            placeholder="Describe brevemente tus logros, materias destacadas o proyectos en esta formación..." maxlength="500" >{{ old('descripcion') }}</textarea>
+                                            <div class="char-counter" id="descripcionCounter">0 / 500</div>
                                     </div>
                                 </div>
  

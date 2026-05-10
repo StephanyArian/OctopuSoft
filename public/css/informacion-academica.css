@@ -109,3 +109,21 @@
     .btn { padding: 8px 20px; font-size: 12px; }
     .main { padding: 16px; }
 }
+
+
+.char-counter {
+    font-size: 11px;
+    color: var(--gray-500);
+    text-align: right;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.char-counter.warning {
+    color: #f39c12;
+}
+
+.char-counter.danger {
+    color: #e74c3c;
+    font-weight: 700;
+}

@@ -21,83 +21,32 @@
 }
 
 body {
+    font-family: 'Figtree', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #e0faf5, #b2f0e8, #e8f9ff);
     min-height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 70px 16px;
-    background:
-        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.22), transparent 28%),
-        radial-gradient(circle at 80% 18%, rgba(255, 255, 255, 0.10), transparent 22%),
-        radial-gradient(circle at 50% 50%, rgba(10, 191, 158, 0.08), transparent 30%),
-        linear-gradient(135deg, #c7e3dd 0%, #d8efea 50%, #cfe7e3 100%);
-    font-family: 'Figtree', 'Segoe UI', sans-serif;
-    position: relative;
-    overflow-x: hidden;
+    align-items: center;
+    padding: 20px;
 }
 
-body::before,
-body::after {
-    content: "";
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(70px);
-    pointer-events: none;
-    z-index: 0;
-}
 
-body::before {
-    width: 280px;
-    height: 280px;
-    background: rgba(10, 191, 158, 0.10);
-    top: 40px;
-    left: -80px;
-}
-
-body::after {
-    width: 260px;
-    height: 260px;
-    background: rgba(255, 255, 255, 0.18);
-    right: -60px;
-    bottom: 30px;
-}
 
 .register-container {
     position: relative;
     z-index: 1;
-    background:
-        linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%),
-        linear-gradient(180deg, rgba(74, 16, 48, 0.96) 0%, rgba(45, 10, 30, 0.98) 100%);
+    background: rgba(45, 10, 30, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 22px;
-    padding: 26px 28px;
+    border: 1px solid #2d0a1e;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(45, 10, 30, 0.6);
     width: 100%;
     max-width: 430px;
-    box-shadow:
-        0 24px 50px rgba(0, 0, 0, 0.35),
-        0 10px 24px rgba(0, 0, 0, 0.20),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    padding: 26px 28px;
 }
 
-.register-container::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 12%;
-    right: 12%;
-    height: 3px;
-    border-radius: 999px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(29, 232, 192, 0.15),
-        rgba(10, 191, 158, 0.9),
-        rgba(29, 232, 192, 0.15),
-        transparent
-    );
-}
+
 
 .register-title {
     color: var(--white);
