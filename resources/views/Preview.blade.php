@@ -123,7 +123,16 @@
                             — Actualidad
                         @endif
                     </div>
-                    <div class="description">{{ $exp->descripcion }}</div>
+                    @if($exp->descripcion)
+                    <div class="description-wrapper">
+                    <div class="description collapsed" id="desc-exp-{{ $loop->index }}">{{ $exp->descripcion }}</div>
+                        @if(strlen($exp->descripcion) > 150)
+                            <button class="ver-mas-btn" onclick="toggleDesc('desc-exp-{{ $loop->index }}', this)">Ver más</button>
+                        @endif
+
+                    
+                    </div>
+                    @endif
                 </div>
                 @empty
                     <div class="empty-message" style="grid-column: 1 / -1;">No hay experiencias laborales registradas</div>
@@ -147,7 +156,14 @@
                                 — Actualidad
                             @endif
                         </div>
-                        <div class="description">{{ $aca->descripcion }}</div>
+                        @if($aca->descripcion)
+                        <div class="description-wrapper">
+                        <div class="description collapsed" id="desc-aca-{{ $loop->index }}">{{ $aca->descripcion }}</div>
+                            @if(strlen($aca->descripcion) > 150)
+                                <button class="ver-mas-btn" onclick="toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
+                            @endif
+                        </div>
+                        @endif
                     </div>
                 @empty
                     <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
@@ -214,7 +230,16 @@
                             'tecnologias' => $proyecto->tecnologias,
                             'evidencias'  => $proyecto->evidencias,
                         ]) }})">{{ $proyecto->nombre }}</h3>
-                        <div class="description">{{ $proyecto->descripcion }}</div>
+                        
+                        @if($proyecto->descripcion)
+                        <div class="description-wrapper">
+                        <div class="description collapsed" id="desc-proy-{{ $loop->index }}">{!! strip_tags($proyecto->descripcion) !!}</div>
+                            @if(strlen($proyecto->descripcion) > 150)
+                                <button class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
+                            @endif
+                        </div>
+                        @endif
+
                         <div class="date">
                             {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
                             @if($proyecto->fecha_fin)
@@ -293,6 +318,19 @@
         }
     });
 
+    function toggleDesc(id, btn) {
+    const el = document.getElementById(id);
+    if (el.classList.contains('collapsed')) {
+        el.classList.remove('collapsed');
+        el.classList.add('expanded');
+        btn.textContent = 'Ver menos';
+    } else {
+        el.classList.remove('expanded');
+        el.classList.add('collapsed');
+        btn.textContent = 'Ver más';
+    }
+    }
+
     function abrirModal(data) {
         document.getElementById('modal-nombre').textContent = data.nombre;
 
@@ -313,8 +351,7 @@
         if (data.fecha_inicio) fechasDiv.innerHTML += `<span>📅 Inicio: <strong>${data.fecha_inicio}</strong></span>`;
         if (data.fecha_fin) fechasDiv.innerHTML += `<span>📅 Fin: <strong>${data.fecha_fin}</strong></span>`;
 
-        document.getElementById('modal-descripcion').textContent = data.descripcion ?? '';
-
+        document.getElementById('modal-descripcion').innerHTML = data.descripcion ?? '';
         let tecDiv = document.getElementById('modal-tecnologias');
         let tecSection = document.getElementById('modal-tec-section');
         tecDiv.innerHTML = '';
@@ -359,5 +396,10 @@
     document.getElementById('modal-proyecto').addEventListener('click', function(e) {
         if (e.target === this) cerrarModal();
     });
+
+    
+
     </script>
+
+
 @endsection

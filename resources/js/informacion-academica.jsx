@@ -1,6 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
+function DescripcionColapsable({ texto, limite = 150 }) {
+    const [expandido, setExpandido] = useState(false);
+    const esMuyLargo = texto.length > limite;
+
+    return (
+        <div>
+            <div className="historial-desc" style={{
+                display: '-webkit-box',
+                WebkitLineClamp: expandido ? 'unset' : 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: expandido ? 'visible' : 'hidden',
+            }}>
+                {texto}
+            </div>
+            {esMuyLargo && (
+                <button
+                    onClick={() => setExpandido(!expandido)}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--teal)',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        padding: '4px 0',
+                        fontWeight: '600',
+                    }}
+                >
+                    {expandido ? 'Ver menos' : 'Ver más'}
+                </button>
+            )}
+        </div>
+    );
+}
+
 function HistorialAcademico({ formaciones: initialFormaciones }) {
     const [formaciones, setFormaciones] = useState(initialFormaciones);
     const [editando, setEditando] = useState(null);
@@ -199,7 +233,9 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     </span>
                                     <span className="tag tag-gray">{f.is_current ? 'En curso' : 'Finalizado'}</span>
                                 </div>
-                                {f.description && <div className="historial-desc">{f.description}</div>}
+                                {f.description && (
+                                    <DescripcionColapsable texto={f.description} />
+                                )}
 
                                 {confirmDelete === f.id ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
@@ -221,6 +257,8 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
         </>
     );
 }
+
+
 
 // Montar el componente
 const el = document.getElementById('historial-react');

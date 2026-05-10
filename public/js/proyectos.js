@@ -93,6 +93,13 @@
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
+    function stripHtml(html) {
+        if (!html) return '';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.textContent || tmp.innerText || '';
+    }
+
     function getTecnologiaLogo(tecnologia) {
         const lowerTec = tecnologia.toLowerCase();
         const techMap = [
@@ -289,6 +296,7 @@
         if (formCard) formCard.classList.remove('open');
         if (!previewPage) return;
         previewPage.innerHTML = '';
+ 
         let evHTML = '';
         if (evs.length > 0) { evHTML = `<hr class="preview-divider"><div class="preview-section-title">Evidencias (${evs.length})</div><div class="preview-evidencias-list">${evs.map(ev => {
             if (ev.imagen_path) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgImagen} ${escapeHtml(ev.titulo||'Imagen')}</div><img src="/storage/${ev.imagen_path}" class="preview-evidencia-imagen" onerror="this.style.display='none'"></div>`;
@@ -296,12 +304,15 @@
             if (ev.repositorio) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgRepo} ${escapeHtml(ev.titulo||'Repositorio')}</div><div class="preview-evidencia-repo">${escapeHtml(ev.repositorio)}</div></div>`;
             return '';
         }).join('')}</div>`; }
+ 
         previewPage.innerHTML = `<div class="preview-doc">
             <button class="preview-back" id="previewBackBtn">${svgVolver} Volver a proyectos</button>
             <h1 class="preview-doc-title">${escapeHtml(p.nombre)}</h1>
             <div class="preview-doc-meta"><span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span>${p.is_visible ? `<span class="publico-badge">${svgCandadoAbierto} Público</span>` : `<span class="privado-badge">${svgCandadoCerrado} Privado</span>`}${p.rol ? `<span class="rol-badge"><i class="fas fa-user-check"></i> ${escapeHtml(p.rol)}</span>` : ''}${p.cliente ? `<span class="cliente-badge"><i class="fas fa-building"></i> ${escapeHtml(p.cliente)}</span>` : ''}</div>
             <div class="preview-doc-dates"><span><i class="far fa-calendar-alt"></i> Inicio: ${p.fecha || '—'}</span><span><i class="far fa-calendar-check"></i> Fin: ${p.fecha_fin || '—'}</span></div>
-            <hr class="preview-divider"><div class="preview-section-title">Descripción</div><div class="preview-doc-desc">${p.descripcion || ''}</div>
+            <hr class="preview-divider"><div class="preview-section-title">Descripción</div>
+            <div class="preview-doc-desc" id="previewDescEl">${p.descripcion || ''}</div>
+            <button class="ver-mas-preview" id="btnVerMasDesc" style="display:none">Ver más</button>
             ${(p.tecnologias||[]).length>0 ? `<hr class="preview-divider"><div class="preview-section-title">Stack Tecnológico</div><div class="preview-doc-tecs">${p.tecnologias.map(t=>`<span class="tec-mini">${getTecnologiaLogo(t)} ${escapeHtml(t)}</span>`).join('')}</div>` : ''}
             ${evHTML}
             <div class="preview-doc-actions">
@@ -309,6 +320,28 @@
                 <button class="preview-btn preview-btn-outline" id="previewEditBtn2">${svgEditar} Editar</button>
                 <button class="preview-btn preview-btn-outline" id="previewDeleteBtn" style="color:#ef4444;border-color:#fecaca;">${svgEliminar} Eliminar</button>
             </div></div>`;
+ 
+        // ── Ver más / Ver menos DESPUÉS de insertar el HTML ──
+        const descEl = previewPage.querySelector('#previewDescEl');
+        const btnVerMas = previewPage.querySelector('#btnVerMasDesc');
+        if (descEl && btnVerMas) {
+            const textoCompleto = stripHtml(p.descripcion || '');
+            if (textoCompleto.length > 200) {
+                btnVerMas.style.display = 'inline-block';
+                descEl.style.display = '-webkit-box';
+                descEl.style.webkitLineClamp = '4';
+                descEl.style.webkitBoxOrient = 'vertical';
+                descEl.style.overflow = 'hidden';
+                let expandido = false;
+                btnVerMas.addEventListener('click', () => {
+                    expandido = !expandido;
+                    descEl.style.webkitLineClamp = expandido ? 'unset' : '4';
+                    descEl.style.overflow = expandido ? 'visible' : 'hidden';
+                    btnVerMas.textContent = expandido ? 'Ver menos' : 'Ver más';
+                });
+            }
+        }
+ 
         previewPage.classList.add('open');
         previewPage.querySelector('#previewBackBtn')?.addEventListener('click', cerrarPreview);
         previewPage.querySelector('#previewEditBtn2')?.addEventListener('click', () => { cerrarPreview(); editarProyecto(id); });
@@ -477,7 +510,10 @@ if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSub
             const card=document.createElement('div');card.className='proy-card';card.id='proyecto-'+p.id;
             const vb=p.is_visible?`<span class="publico-badge">${svgCandadoAbierto} Público</span>`:`<span class="privado-badge">${svgCandadoCerrado} Privado</span>`;
             let rc='';if(p.rol||p.cliente){rc='<div class="proy-card-rol-cliente">';if(p.rol)rc+=`<span class="rol-badge"><i class="fas fa-user-check"></i> ${escapeHtml(p.rol)}</span>`;if(p.cliente)rc+=`<span class="cliente-badge"><i class="fas fa-building"></i> ${escapeHtml(p.cliente)}</span>`;rc+='</div>';}
-            const descripcionPreview = p.descripcion ? p.descripcion.substring(0, 200) : '';
+            const textoLimpio = stripHtml(p.descripcion);
+            const descripcionPreview = textoLimpio.length > 150
+                ? textoLimpio.substring(0, 150) + '...'
+                : textoLimpio;
             card.innerHTML=`<div class="proy-card-band"></div><div class="proy-card-top"><div class="proy-card-nombre">${escapeHtml(p.nombre)} ${vb}</div><div class="proy-card-actions"><div class="vis-toggle-wrap"><button class="proy-icon-btn btn-toggle-vis" data-id="${p.id}" onclick="toggleVisDropdown(event, ${p.id})">${p.is_visible?svgCandadoAbierto:svgCandadoCerrado}</button><div class="vis-mini-dropdown" data-proyecto-id="${p.id}"><div class="vis-mini-option ${p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},true)"><span class="vis-icon">${svgCandadoAbierto}</span><span>Visible para todos</span><span class="vis-check">✓</span></div><div class="vis-mini-option ${!p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},false)"><span class="vis-icon">${svgCandadoCerrado}</span><span>Solo para mí</span><span class="vis-check">✓</span></div></div></div><button class="proy-icon-btn btn-editar" data-id="${p.id}">${svgEditar}</button><button class="proy-icon-btn btn-eliminar" data-id="${p.id}">${svgEliminar}</button></div></div><div class="proy-card-body">${rc}<div class="proy-card-desc-preview">${descripcionPreview}</div><div class="proy-card-tec">${(p.tecnologias||[]).slice(0,4).map(t=>`<span class="tec-mini">${getTecnologiaLogo(t)} ${escapeHtml(t)}</span>`).join('')}${(p.tecnologias||[]).length>4?`<span class="tec-mini">+${p.tecnologias.length-4}</span>`:''}</div><div class="proy-card-footer"><span class="proy-card-fecha"><i class="far fa-calendar-alt"></i> ${p.fecha||'Sin fecha'}</span><span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span></div></div>`;
             grid.appendChild(card);
             card.addEventListener('click',(e)=>{if(e.target.closest('button')||e.target.closest('.vis-mini-dropdown'))return;abrirPreview(p.id);});

@@ -506,3 +506,35 @@ body {
     color: var(--burg-deep);
     font-weight: 500;
 }
+
+.description.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.description.expanded {
+    display: block;
+    overflow: visible;
+}
+
+.ver-mas-btn {
+    background: none;
+    border: none;
+    color: #1abc9c;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 0;
+    font-weight: 600;
+}
+
+.ver-mas-btn:hover {
+    text-decoration: underline;
+}
+
+.description.collapsed,
+.description.expanded {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
