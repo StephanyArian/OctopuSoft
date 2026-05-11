@@ -15,7 +15,7 @@ class PreviewController extends Controller
         // Cargar relaciones SEGÚN TU ESTRUCTURA DE BD
         $user->load([
             'profession',                           // profesión del usuario
-            'skills',                               // habilidades del usuario
+            'skills.projects',                      // habilidades del usuario + proyectos vinculados
             'experiences',                          // experiencias del usuario
             'portfolio.projects',                   // portafolio y sus proyectos
             'professionalNetworks.platform',         // redes profesionales con plataforma
@@ -25,7 +25,11 @@ class PreviewController extends Controller
         // ==========================================
         // HABILIDADES TÉCNICAS (type = 'technical')
         // ==========================================
-        $habilidadesTecnicas = $user->skills->where('type', 'technical')->map(function($skill) {
+        $habilidadesTecnicas = $user->skills
+            ->where('type', 'technical')
+            ->where('is_visible', true)
+            ->sortBy(fn ($s) => $s->display_order ?? 0)
+            ->map(function($skill) {
             // Convertir nivel numérico (1-5) a texto
             $nivel = '';
             if ($skill->level ==3) $nivel = 'Avanzado';
@@ -34,9 +38,23 @@ class PreviewController extends Controller
             
             return (object) [
                 'nombre' => $skill->name,
-                'nivel' => $nivel
+                'nivel' => $nivel,
+                'categoria' => $skill->category ?: null,
+                'proyectos' => ($skill->projects ?? collect())
+                    ->where('is_visible', true)
+                    ->map(fn ($p) => (object) ['id' => $p->id, 'nombre' => $p->name])
+                    ->values(),
             ];
         });
+
+        // Separar por categoría (Frontend / Backend)
+        $habilidadesTecnicasFrontend = $habilidadesTecnicas->filter(function ($s) {
+            return ($s->categoria ?? '') === 'frontend';
+        })->values();
+
+        $habilidadesTecnicasBackend = $habilidadesTecnicas->filter(function ($s) {
+            return ($s->categoria ?? '') === 'backend';
+        })->values();
         
         // ==========================================
         // HABILIDADES BLANDAS (type = 'soft')
@@ -204,6 +222,8 @@ class PreviewController extends Controller
         return view('Preview', compact(
             'user',
             'habilidadesTecnicas',
+            'habilidadesTecnicasFrontend',
+            'habilidadesTecnicasBackend',
             'habilidadesBlandas',
             'experiencias',
             'academicas',

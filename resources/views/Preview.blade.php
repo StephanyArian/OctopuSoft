@@ -168,34 +168,84 @@
             </div>
         </div>
 
-        <!-- HABILIDADES TÉCNICAS CON BARRAS CORTAS AMARILLAS -->
+        <!-- HABILIDADES TÉCNICAS (Frontend / Backend) -->
         <div class="section">
             <h2><i class="fas fa-code"></i> Habilidades técnicas</h2>
-            <div class="tech-skills-grid">
-                @forelse($habilidadesTecnicas as $skill)
-                    @php
-                        $nivel = $skill->nivel ?? 'Intermedio';
-                        if ($nivel == 'Avanzado') {
-                            $claseNivel = 'advanced';
-                        } elseif ($nivel == 'Intermedio') {
-                            $claseNivel = 'intermediate';
-                        } else {
-                            $claseNivel = 'basic';
-                        }
-                    @endphp
-                    <div class="tech-skill-item">
-                        <div class="tech-skill-header">
-                            <span class="tech-skill-name">{{ $skill->nombre }}</span>
-                            <span class="tech-skill-level">{{ $nivel }}</span>
-                        </div>
-                        <div class="tech-skill-bar-bg">
-                            <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
-                        </div>
+            @if(($habilidadesTecnicasFrontend ?? collect())->count() === 0 && ($habilidadesTecnicasBackend ?? collect())->count() === 0)
+                <div class="empty-message" style="margin:0 40px;">No hay habilidades técnicas registradas</div>
+            @else
+                @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0)
+                    <div class="tech-category-title">Frontend</div>
+                    <div class="tech-skills-grid">
+                        @foreach($habilidadesTecnicasFrontend as $skill)
+                            @php
+                                $nivel = $skill->nivel ?? 'Intermedio';
+                                if ($nivel == 'Avanzado') $claseNivel = 'advanced';
+                                elseif ($nivel == 'Intermedio') $claseNivel = 'intermediate';
+                                else $claseNivel = 'basic';
+                                $hasProjects = isset($skill->proyectos) && count($skill->proyectos) > 0;
+                            @endphp
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $nivel }}</span>
+                                </div>
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
+                                </div>
+                                @if($hasProjects)
+                                    <div class="tech-skill-projects">
+                                        @foreach($skill->proyectos as $p)
+                                            <a href="javascript:void(0)"
+                                               class="tech-skill-project-chip"
+                                               onclick="abrirModalPorId({{ $p->id }});"
+                                               title="Ver proyecto: {{ $p->nombre }}">
+                                                {{ $p->nombre }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                @empty
-                    <div class="empty-message">No hay habilidades técnicas registradas</div>
-                @endforelse
-            </div>
+                @endif
+
+                @if(($habilidadesTecnicasBackend ?? collect())->count() > 0)
+                    <div class="tech-category-title">Backend</div>
+                    <div class="tech-skills-grid">
+                        @foreach($habilidadesTecnicasBackend as $skill)
+                            @php
+                                $nivel = $skill->nivel ?? 'Intermedio';
+                                if ($nivel == 'Avanzado') $claseNivel = 'advanced';
+                                elseif ($nivel == 'Intermedio') $claseNivel = 'intermediate';
+                                else $claseNivel = 'basic';
+                                $hasProjects = isset($skill->proyectos) && count($skill->proyectos) > 0;
+                            @endphp
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $nivel }}</span>
+                                </div>
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
+                                </div>
+                                @if($hasProjects)
+                                    <div class="tech-skill-projects">
+                                        @foreach($skill->proyectos as $p)
+                                            <a href="javascript:void(0)"
+                                               class="tech-skill-project-chip"
+                                               onclick="abrirModalPorId({{ $p->id }});"
+                                               title="Ver proyecto: {{ $p->nombre }}">
+                                                {{ $p->nombre }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            @endif
         </div>
 
         <!-- HABILIDADES BLANDAS -->
@@ -215,7 +265,7 @@
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
             <div class="cards-grid">
                 @forelse($proyectos as $proyecto)
-                    <div class="card">
+                    <div class="card" id="project-card-{{ $proyecto->id }}">
                         <h3 style="cursor:pointer; color:#1abc9c;" onclick="abrirModal({{ json_encode([
                             'nombre'      => $proyecto->nombre,
                             'descripcion' => $proyecto->descripcion,
@@ -324,6 +374,33 @@
         el.classList.add('collapsed');
         btn.textContent = 'Ver más';
     }
+    }
+
+    // Mapa de proyectos para abrir por ID desde skills
+    window.previewProjectsById = {!! json_encode(
+        collect($proyectos)->keyBy('id')->map(function($p) {
+            return [
+                'id' => $p->id,
+                'nombre' => $p->nombre,
+                'descripcion' => $p->descripcion,
+                'fecha_inicio' => optional($p->fecha_inicio)->format('d/m/Y'),
+                'fecha_fin' => optional($p->fecha_fin)->format('d/m/Y'),
+                'estado' => $p->estado,
+                'rol' => $p->rol,
+                'cliente' => $p->cliente,
+                'tecnologias' => $p->tecnologias,
+                'evidencias' => $p->evidencias,
+            ];
+        })
+    ) !!};
+
+    function abrirModalPorId(projectId) {
+        const data = (window.previewProjectsById || {})[projectId];
+        if (!data) return;
+        // Scroll suave a sección proyectos
+        const target = document.getElementById('project-card-' + projectId);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        abrirModal(data);
     }
 
     function abrirModal(data) {

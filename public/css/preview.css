@@ -388,6 +388,48 @@ body {
 /* ============================================
    HABILIDADES TÉCNICAS
    ============================================ */
+.tech-category-title{
+    padding: 0 40px;
+    margin: 8px 0 10px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gray-500);
+}
+
+.tech-skill-projects{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:2px;
+}
+
+.tech-skill-project-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(10, 191, 158, 0.10);
+    border: 1px solid rgba(10, 191, 158, 0.28);
+    color: var(--teal-dim);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration:none;
+    cursor:pointer;
+    max-width: 100%;
+}
+.tech-skill-project-chip:hover{
+    background: rgba(10, 191, 158, 0.16);
+    border-color: rgba(10, 191, 158, 0.45);
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .tech-category-title{ padding: 0 20px; }
+}
+
 .tech-skills-grid {
     display: flex;
     flex-wrap: wrap;
