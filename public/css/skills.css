@@ -594,3 +594,72 @@
     .page-title { font-size: 24px; }
     .nav-tab { padding: 10px 16px; font-size: 11px; }
 }
+
+/* ─Responsivo móvil ── */
+@media (max-width: 768px) {
+    .skill-card {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .skill-card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .skill-card-name {
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .badge-nivel {
+        flex-shrink: 0;
+    }
+
+    .skill-actions {
+        width: 100%;
+        justify-content: flex-end;
+        border-top: 1px solid var(--gray-100);
+        padding-top: 10px;
+        margin-top: 4px;
+    }
+
+    .skill-projects {
+        flex-wrap: wrap;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .btn-agregar {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .skill-form-box {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .skill-card {
+        padding: 12px 14px;
+    }
+
+    .skill-card-index {
+        font-size: 10px;
+    }
+
+    .btn-sm {
+        font-size: 11px;
+        padding: 5px 12px;
+    }
+
+    .badge-nivel {
+        font-size: 10px;
+        padding: 2px 10px;
+    }
+}
