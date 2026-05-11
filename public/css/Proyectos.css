@@ -459,51 +459,97 @@ html, body { height: 100%; }
     .ev-trigger-texts strong { font-size: 12px; }
     .ev-trigger-texts span { font-size: 9px; }
 }
+
 /* ============================================
-   VIÑETAS Y ENUMERADOS - CORRECCIÓN FINAL
+   CORRECCIÓN FINAL: ELIMINAR DUPLICACIÓN Y SCROLL
    ============================================ */
-.preview-doc-desc ul,
-.proy-card-desc-preview ul {
-    display: block !important;
-    list-style-type: disc !important;
-    list-style: disc !important;
-    margin: 10px 0 10px 20px !important;
-    padding-left: 20px !important;
+
+/* Eliminar scroll innecesario */
+.preview-doc {
+    overflow: visible !important;
+    max-height: none !important;
 }
 
-.preview-doc-desc ul li,
-.proy-card-desc-preview ul li {
-    display: list-item !important;
-    list-style-type: disc !important;
-    list-style: disc !important;
-    margin: 4px 0 !important;
+.preview-doc-desc {
+    overflow: visible !important;
+    max-height: none !important;
 }
 
+/* Eliminar números y viñetas duplicadas en vista previa */
 .preview-doc-desc ol,
-.proy-card-desc-preview ol {
-    display: block !important;
-    list-style-type: decimal !important;
-    list-style: decimal !important;
-    margin: 10px 0 10px 20px !important;
-    padding-left: 20px !important;
+.preview-doc-desc ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .preview-doc-desc ol li,
-.proy-card-desc-preview ol li {
-    display: list-item !important;
-    list-style-type: decimal !important;
-    list-style: decimal !important;
-    margin: 4px 0 !important;
+.preview-doc-desc ul li {
+    display: block !important;
+    margin-bottom: 12px !important;
+}
+/* ============================================ */
+/* RESPONSIVE - OCULTAR SIDEBAR EN MÓVIL       */
+/* ============================================ */
+
+/* Ocultar sidebar en móvil por defecto */
+@media (max-width: 768px) {
+    .sidebar {
+        display: none !important;
+    }
+
+    /* Botón hamburguesa */
+    .menu-toggle-btn {
+        display: flex;
+        position: fixed;
+        top: 70px;
+        left: 15px;
+        z-index: 1001;
+        background: var(--teal);
+        border: none;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: white;
+        cursor: pointer;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Overlay para cerrar el menú */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 999;
+    }
+
+    .sidebar-overlay.open {
+        display: block;
+    }
+
+    /* Sidebar cuando está abierto */
+    .sidebar.open {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 80%;
+        max-width: 280px;
+        height: 100%;
+        background: #2d0a1e !important;
+        z-index: 1000;
+        overflow-y: auto;
+        padding-top: 60px;
+    }
 }
 
-/* Estilos adicionales para las cards */
-.proy-card-desc-preview ul,
-.proy-card-desc-preview ol {
-    margin: 5px 0 5px 15px !important;
-    padding-left: 15px !important;
-}
-
-.proy-card-desc-preview li {
-    margin: 2px 0 !important;
-    font-size: 11px !important;
+/* Botón hamburguesa oculto en escritorio */
+.menu-toggle-btn {
+    display: none;
 }
