@@ -580,43 +580,47 @@
     border-color: var(--color-border-secondary);
 }
 
-@media (max-width: 768px) {
-    .sidebar {
-        display: none;
-    }
+@media (min-width: 769px) and (max-width: 900px) {
     .body-row {
-        flex-direction: column;
+        flex-wrap: nowrap !important;
+        flex-direction: row !important;
     }
+    .sidebar {
+        width: 160px !important;
+        min-width: 160px !important;
+    }
+    .sidebar-item {
+        font-size: 11px;
+        padding: 10px 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .main {
+        flex: 1 !important;
+        min-width: 0 !important;
+        padding: 20px 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .body-row { flex-direction: column; }
     .mobile-menu-btn { display: block; }
     .mobile-sidebar { display: flex; }
     .main { padding: 24px; }
     .section-card { padding: 20px; }
     .page-title { font-size: 24px; }
     .nav-tab { padding: 10px 16px; font-size: 11px; }
-}
 
-/* ─Responsivo móvil ── */
-@media (max-width: 768px) {
     .skill-card {
         flex-wrap: wrap;
         gap: 10px;
         padding: 14px 16px;
     }
-
-    .skill-card-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .skill-card-name {
-        white-space: normal;
-        word-break: break-word;
-    }
-
-    .badge-nivel {
-        flex-shrink: 0;
-    }
-
+    .skill-card-info { flex: 1; min-width: 0; }
+    .skill-card-name { white-space: normal; word-break: break-word; }
+    .badge-nivel { flex-shrink: 0; }
     .skill-actions {
         width: 100%;
         justify-content: flex-end;
@@ -624,42 +628,15 @@
         padding-top: 10px;
         margin-top: 4px;
     }
-
-    .skill-projects {
-        flex-wrap: wrap;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .btn-agregar {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .skill-form-box {
-        padding: 16px;
-    }
+    .skill-projects { flex-wrap: wrap; }
+    .form-row { flex-direction: column; gap: 14px; }
+    .btn-agregar { width: 100%; justify-content: center; }
+    .skill-form-box { padding: 16px; }
 }
 
 @media (max-width: 480px) {
-    .skill-card {
-        padding: 12px 14px;
-    }
-
-    .skill-card-index {
-        font-size: 10px;
-    }
-
-    .btn-sm {
-        font-size: 11px;
-        padding: 5px 12px;
-    }
-
-    .badge-nivel {
-        font-size: 10px;
-        padding: 2px 10px;
-    }
+    .skill-card { padding: 12px 14px; }
+    .skill-card-index { font-size: 10px; }
+    .btn-sm { font-size: 11px; padding: 5px 12px; }
+    .badge-nivel { font-size: 10px; padding: 2px 10px; }
 }
