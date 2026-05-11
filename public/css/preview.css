@@ -371,6 +371,25 @@ body {
     overflow-wrap: break-word;
 }
 
+/* Descripción de proyecto (HTML de Quill) en tarjetas del preview */
+.card .proyecto-desc-wrap.description.collapsed {
+    display: block;
+    -webkit-line-clamp: unset;
+    max-height: 5.5em;
+    overflow: hidden;
+}
+.card .proyecto-desc-wrap.description.expanded {
+    max-height: none;
+    overflow: visible;
+}
+.card .proyecto-desc-wrap .ql-snow {
+    border: none !important;
+}
+.card .proyecto-desc-wrap .ql-editor {
+    padding: 0 !important;
+    min-height: 0 !important;
+}
+
 .ver-mas-btn {
     background: none;
     border: none;

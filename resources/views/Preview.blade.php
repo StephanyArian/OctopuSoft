@@ -3,7 +3,12 @@
 @section('content')
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
+@php
+    /** Misma salida que Quill, sin scripts/iframes (lista blanca). */
+    $allowedProjectHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
+@endphp
 <a href="javascript:history.back()" class="btn-flotante">
     <i class="fas fa-edit"></i> Continuar editando
 </a>
@@ -265,24 +270,29 @@
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
             <div class="cards-grid">
                 @forelse($proyectos as $proyecto)
-                    <div class="card" id="project-card-{{ $proyecto->id }}">
-                        <h3 style="cursor:pointer; color:#1abc9c;" onclick="abrirModal({{ json_encode([
-                            'nombre'      => $proyecto->nombre,
-                            'descripcion' => $proyecto->descripcion,
-                            'fecha_inicio'=> optional($proyecto->fecha_inicio)->format('d/m/Y'),
-                            'fecha_fin'   => optional($proyecto->fecha_fin)->format('d/m/Y'),
-                            'estado'      => $proyecto->estado,
-                            'rol'         => $proyecto->rol,
-                            'cliente'     => $proyecto->cliente,
+                    @php
+                        $modalProyectoPayload = [
+                            'nombre' => $proyecto->nombre,
+                            'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedProjectHtmlTags),
+                            'fecha_inicio' => optional($proyecto->fecha_inicio)->format('d/m/Y'),
+                            'fecha_fin' => optional($proyecto->fecha_fin)->format('d/m/Y'),
+                            'estado' => $proyecto->estado,
+                            'rol' => $proyecto->rol,
+                            'cliente' => $proyecto->cliente,
                             'tecnologias' => $proyecto->tecnologias,
-                            'evidencias'  => $proyecto->evidencias,
-                        ]) }})">{{ $proyecto->nombre }}</h3>
+                            'evidencias' => $proyecto->evidencias,
+                        ];
+                    @endphp
+                    <div class="card" id="project-card-{{ $proyecto->id }}">
+                        <h3 style="cursor:pointer; color:#1abc9c;" onclick='abrirModal(@json($modalProyectoPayload))'>{{ $proyecto->nombre }}</h3>
                         
                         @if($proyecto->descripcion)
                         <div class="description-wrapper">
-                        <div class="description collapsed" id="desc-proy-{{ $loop->index }}">{!! strip_tags($proyecto->descripcion) !!}</div>
-                            @if(strlen($proyecto->descripcion) > 150)
-                                <button class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
+                        <div class="description collapsed proyecto-desc-wrap" id="desc-proy-{{ $loop->index }}">
+                            <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedProjectHtmlTags) !!}</div></div>
+                        </div>
+                            @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
+                                <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
                             @endif
                         </div>
                         @endif
@@ -328,7 +338,9 @@
                 <div style="padding:24px 28px;">
                     <div style="margin-bottom:20px;">
                         <div style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Descripción</div>
-                        <p id="modal-descripcion" style="color:#444; font-size:14px; line-height:1.6; margin:0;"></p>
+                        <div class="ql-snow" style="border:none;padding:0;margin:0;">
+                            <div id="modal-descripcion" class="ql-editor" style="padding:0;min-height:0;color:#444;font-size:14px;line-height:1.6;"></div>
+                        </div>
                     </div>
                     <div id="modal-tec-section" style="margin-bottom:20px;">
                         <div style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;">Stack Tecnológico</div>
@@ -378,11 +390,11 @@
 
     // Mapa de proyectos para abrir por ID desde skills
     window.previewProjectsById = {!! json_encode(
-        collect($proyectos)->keyBy('id')->map(function($p) {
+        collect($proyectos)->keyBy('id')->map(function($p) use ($allowedProjectHtmlTags) {
             return [
                 'id' => $p->id,
                 'nombre' => $p->nombre,
-                'descripcion' => $p->descripcion,
+                'descripcion' => strip_tags($p->descripcion ?? '', $allowedProjectHtmlTags),
                 'fecha_inicio' => optional($p->fecha_inicio)->format('d/m/Y'),
                 'fecha_fin' => optional($p->fecha_fin)->format('d/m/Y'),
                 'estado' => $p->estado,
@@ -403,25 +415,31 @@
         abrirModal(data);
     }
 
+    function previewEscapeHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
     function abrirModal(data) {
         document.getElementById('modal-nombre').textContent = data.nombre;
 
         let badgesDiv = document.getElementById('modal-badges');
         badgesDiv.innerHTML = '';
         const badge = (texto, bg, color) => `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};">${texto}</span>`;
+        const badgeIcon = (iconClass, texto, bg, color) => `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};"><i class="${iconClass}" style="font-size:10px;opacity:.9;"></i>${texto}</span>`;
 
         if (data.estado) {
             let bg = data.estado === 'Completado' ? '#d1fae5' : data.estado === 'En curso' ? '#fef3c7' : '#f1f5f9';
             let color = data.estado === 'Completado' ? '#065f46' : data.estado === 'En curso' ? '#92400e' : '#64748b';
-            badgesDiv.innerHTML += badge(data.estado, bg, color);
+            badgesDiv.innerHTML += badge(previewEscapeHtml(data.estado), bg, color);
         }
-        if (data.rol) badgesDiv.innerHTML += badge('👤 ' + data.rol, '#ede9fe', '#5b21b6');
-        if (data.cliente) badgesDiv.innerHTML += badge('🏢 ' + data.cliente, '#f1f5f9', '#475569');
+        if (data.rol) badgesDiv.innerHTML += badgeIcon('fas fa-user-check', previewEscapeHtml(data.rol), '#ede9fe', '#5b21b6');
+        if (data.cliente) badgesDiv.innerHTML += badgeIcon('fas fa-building', previewEscapeHtml(data.cliente), '#f1f5f9', '#475569');
 
         let fechasDiv = document.getElementById('modal-fechas');
         fechasDiv.innerHTML = '';
-        if (data.fecha_inicio) fechasDiv.innerHTML += `<span>📅 Inicio: <strong>${data.fecha_inicio}</strong></span>`;
-        if (data.fecha_fin) fechasDiv.innerHTML += `<span>📅 Fin: <strong>${data.fecha_fin}</strong></span>`;
+        if (data.fecha_inicio) fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Inicio: <strong>${previewEscapeHtml(data.fecha_inicio)}</strong></span>`;
+        if (data.fecha_fin) fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Fin: <strong>${previewEscapeHtml(data.fecha_fin)}</strong></span>`;
 
         document.getElementById('modal-descripcion').innerHTML = data.descripcion ?? '';
         let tecDiv = document.getElementById('modal-tecnologias');
@@ -430,7 +448,7 @@
         if (data.tecnologias && data.tecnologias.length) {
             tecSection.style.display = 'block';
             data.tecnologias.forEach(t => {
-                tecDiv.innerHTML += `<span class="tec-badge">${t}</span>`;
+                tecDiv.innerHTML += `<span class="tec-badge">${previewEscapeHtml(t)}</span>`;
             });
         } else {
             tecSection.style.display = 'none';

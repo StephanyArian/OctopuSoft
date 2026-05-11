@@ -281,6 +281,13 @@
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
 }
+.proy-card-desc-preview .ql-snow { border: none !important; }
+.proy-card-desc-preview .ql-editor {
+    padding: 0 !important;
+    min-height: 0 !important;
+    font-size: 12px;
+    line-height: 1.45;
+}
 .proy-card-desc-preview ul, 
 .proy-card-desc-preview ol { 
     padding-left: 16px; 
