@@ -93,13 +93,6 @@
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-    function stripHtml(html) {
-        if (!html) return '';
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || '';
-    }
-
     function getTecnologiaLogo(tecnologia) {
         const lowerTec = tecnologia.toLowerCase();
         const techMap = [
@@ -296,7 +289,6 @@
         if (formCard) formCard.classList.remove('open');
         if (!previewPage) return;
         previewPage.innerHTML = '';
- 
         let evHTML = '';
         if (evs.length > 0) { evHTML = `<hr class="preview-divider"><div class="preview-section-title">Evidencias (${evs.length})</div><div class="preview-evidencias-list">${evs.map(ev => {
             if (ev.imagen_path) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgImagen} ${escapeHtml(ev.titulo||'Imagen')}</div><img src="/storage/${ev.imagen_path}" class="preview-evidencia-imagen" onerror="this.style.display='none'"></div>`;
@@ -304,15 +296,12 @@
             if (ev.repositorio) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgRepo} ${escapeHtml(ev.titulo||'Repositorio')}</div><div class="preview-evidencia-repo">${escapeHtml(ev.repositorio)}</div></div>`;
             return '';
         }).join('')}</div>`; }
- 
         previewPage.innerHTML = `<div class="preview-doc">
             <button class="preview-back" id="previewBackBtn">${svgVolver} Volver a proyectos</button>
             <h1 class="preview-doc-title">${escapeHtml(p.nombre)}</h1>
             <div class="preview-doc-meta"><span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span>${p.is_visible ? `<span class="publico-badge">${svgCandadoAbierto} Público</span>` : `<span class="privado-badge">${svgCandadoCerrado} Privado</span>`}${p.rol ? `<span class="rol-badge"><i class="fas fa-user-check"></i> ${escapeHtml(p.rol)}</span>` : ''}${p.cliente ? `<span class="cliente-badge"><i class="fas fa-building"></i> ${escapeHtml(p.cliente)}</span>` : ''}</div>
             <div class="preview-doc-dates"><span><i class="far fa-calendar-alt"></i> Inicio: ${p.fecha || '—'}</span><span><i class="far fa-calendar-check"></i> Fin: ${p.fecha_fin || '—'}</span></div>
-            <hr class="preview-divider"><div class="preview-section-title">Descripción</div>
-            <div class="preview-doc-desc" id="previewDescEl">${p.descripcion || ''}</div>
-            <button class="ver-mas-preview" id="btnVerMasDesc" style="display:none">Ver más</button>
+            <hr class="preview-divider"><div class="preview-section-title">Descripción</div><div class="preview-doc-desc">${p.descripcion || ''}</div>
             ${(p.tecnologias||[]).length>0 ? `<hr class="preview-divider"><div class="preview-section-title">Stack Tecnológico</div><div class="preview-doc-tecs">${p.tecnologias.map(t=>`<span class="tec-mini">${getTecnologiaLogo(t)} ${escapeHtml(t)}</span>`).join('')}</div>` : ''}
             ${evHTML}
             <div class="preview-doc-actions">
@@ -320,28 +309,6 @@
                 <button class="preview-btn preview-btn-outline" id="previewEditBtn2">${svgEditar} Editar</button>
                 <button class="preview-btn preview-btn-outline" id="previewDeleteBtn" style="color:#ef4444;border-color:#fecaca;">${svgEliminar} Eliminar</button>
             </div></div>`;
- 
-        // ── Ver más / Ver menos DESPUÉS de insertar el HTML ──
-        const descEl = previewPage.querySelector('#previewDescEl');
-        const btnVerMas = previewPage.querySelector('#btnVerMasDesc');
-        if (descEl && btnVerMas) {
-            const textoCompleto = stripHtml(p.descripcion || '');
-            if (textoCompleto.length > 200) {
-                btnVerMas.style.display = 'inline-block';
-                descEl.style.display = '-webkit-box';
-                descEl.style.webkitLineClamp = '4';
-                descEl.style.webkitBoxOrient = 'vertical';
-                descEl.style.overflow = 'hidden';
-                let expandido = false;
-                btnVerMas.addEventListener('click', () => {
-                    expandido = !expandido;
-                    descEl.style.webkitLineClamp = expandido ? 'unset' : '4';
-                    descEl.style.overflow = expandido ? 'visible' : 'hidden';
-                    btnVerMas.textContent = expandido ? 'Ver menos' : 'Ver más';
-                });
-            }
-        }
- 
         previewPage.classList.add('open');
         previewPage.querySelector('#previewBackBtn')?.addEventListener('click', cerrarPreview);
         previewPage.querySelector('#previewEditBtn2')?.addEventListener('click', () => { cerrarPreview(); editarProyecto(id); });
@@ -401,14 +368,7 @@
         if(!isValid)return;
         
         const proyectoData={nombre,descripcion,fecha:fecha||null,fecha_fin:fechaFin||null,estado,rol,cliente,visibilidad,tecnologias};
-        try{mostrarLoading(true);const url=editandoId?`/proyectos/${editandoId}`:'/proyectos';const method=editandoId?'PUT':'POST';const r=await fetch(url,{method,headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrfToken,'X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(proyectoData)});if(!r.ok){const err=await r.json();throw new Error(err.message||'Error');}
-       const resultado=await r.json();
-resultado.tiene_evidencias = false;
-window._proyectoParaEvidencias=resultado;
-sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(resultado));
-if(typeof window.evInit==='function'){window.evInit(resultado);}
-if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSubirPendientes(resultado.id);} 
-        mostrarToast(editandoId?'Proyecto actualizado':'Proyecto creado');ocultarForm();await cargarProyectos();}catch(e){mostrarToast(e.message||'Error al guardar','error');}finally{mostrarLoading(false);}
+        try{mostrarLoading(true);const url=editandoId?`/proyectos/${editandoId}`:'/proyectos';const method=editandoId?'PUT':'POST';const r=await fetch(url,{method,headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrfToken,'X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(proyectoData)});if(!r.ok){const err=await r.json();throw new Error(err.message||'Error');}const resultado=await r.json();window._proyectoParaEvidencias=resultado;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(resultado));if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSubirPendientes(resultado.id);}mostrarToast(editandoId?'Proyecto actualizado':'Proyecto creado');ocultarForm();await cargarProyectos();}catch(e){mostrarToast(e.message||'Error al guardar','error');}finally{mostrarLoading(false);}
     }
 
     async function eliminarProyectoBD(id){const p=proyectos.find(x=>x.id===id);if(!confirm(`¿Eliminar "${p.nombre}"?`))return;try{mostrarLoading(true);const r=await fetch(`/proyectos/${id}`,{method:'DELETE',headers:{'Accept':'application/json','X-CSRF-TOKEN':csrfToken,'X-Requested-With':'XMLHttpRequest'}});if(!r.ok)throw new Error('Error');mostrarToast('Proyecto eliminado');await cargarProyectos();if(editandoId===id)ocultarForm();}catch(e){mostrarToast('Error al eliminar','error');}finally{mostrarLoading(false);}}
@@ -510,10 +470,7 @@ if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSub
             const card=document.createElement('div');card.className='proy-card';card.id='proyecto-'+p.id;
             const vb=p.is_visible?`<span class="publico-badge">${svgCandadoAbierto} Público</span>`:`<span class="privado-badge">${svgCandadoCerrado} Privado</span>`;
             let rc='';if(p.rol||p.cliente){rc='<div class="proy-card-rol-cliente">';if(p.rol)rc+=`<span class="rol-badge"><i class="fas fa-user-check"></i> ${escapeHtml(p.rol)}</span>`;if(p.cliente)rc+=`<span class="cliente-badge"><i class="fas fa-building"></i> ${escapeHtml(p.cliente)}</span>`;rc+='</div>';}
-            const textoLimpio = stripHtml(p.descripcion);
-            const descripcionPreview = textoLimpio.length > 150
-                ? textoLimpio.substring(0, 150) + '...'
-                : textoLimpio;
+            const descripcionPreview = p.descripcion ? p.descripcion.substring(0, 200) : '';
             card.innerHTML=`<div class="proy-card-band"></div><div class="proy-card-top"><div class="proy-card-nombre">${escapeHtml(p.nombre)} ${vb}</div><div class="proy-card-actions"><div class="vis-toggle-wrap"><button class="proy-icon-btn btn-toggle-vis" data-id="${p.id}" onclick="toggleVisDropdown(event, ${p.id})">${p.is_visible?svgCandadoAbierto:svgCandadoCerrado}</button><div class="vis-mini-dropdown" data-proyecto-id="${p.id}"><div class="vis-mini-option ${p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},true)"><span class="vis-icon">${svgCandadoAbierto}</span><span>Visible para todos</span><span class="vis-check">✓</span></div><div class="vis-mini-option ${!p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},false)"><span class="vis-icon">${svgCandadoCerrado}</span><span>Solo para mí</span><span class="vis-check">✓</span></div></div></div><button class="proy-icon-btn btn-editar" data-id="${p.id}">${svgEditar}</button><button class="proy-icon-btn btn-eliminar" data-id="${p.id}">${svgEliminar}</button></div></div><div class="proy-card-body">${rc}<div class="proy-card-desc-preview">${descripcionPreview}</div><div class="proy-card-tec">${(p.tecnologias||[]).slice(0,4).map(t=>`<span class="tec-mini">${getTecnologiaLogo(t)} ${escapeHtml(t)}</span>`).join('')}${(p.tecnologias||[]).length>4?`<span class="tec-mini">+${p.tecnologias.length-4}</span>`:''}</div><div class="proy-card-footer"><span class="proy-card-fecha"><i class="far fa-calendar-alt"></i> ${p.fecha||'Sin fecha'}</span><span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span></div></div>`;
             grid.appendChild(card);
             card.addEventListener('click',(e)=>{if(e.target.closest('button')||e.target.closest('.vis-mini-dropdown'))return;abrirPreview(p.id);});
@@ -522,19 +479,15 @@ if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSub
         document.querySelectorAll('.btn-eliminar').forEach(b=>b.addEventListener('click',(e)=>{e.stopPropagation();eliminarProyectoBD(parseInt(b.dataset.id));}));
     }
 
-    function editarProyecto(id){const p=proyectos.find(x=>x.id===id);if(!p)return;window._proyectoParaEvidencias=p;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(p));editandoId=id;inputNombre.value=p.nombre;if(quill)quill.root.innerHTML=p.descripcion||'';if(inputDesc)inputDesc.value=p.descripcion||'';inputFecha.value=p.fecha||'';if(inputFechaFin)inputFechaFin.value=p.fecha_fin||'';if(selectEstado)selectEstado.value=p.estado;document.getElementById('btnEstadoText').textContent=p.estado;document.querySelectorAll('#menuEstado li').forEach(l=>l.classList.remove('selected'));document.querySelector(`#menuEstado li[data-value="${p.estado}"]`)?.classList.add('selected');if(selectRol)selectRol.value=p.rol||'';document.getElementById('btnRolText').textContent=p.rol||'— Seleccionar rol —';document.querySelectorAll('#menuRol li').forEach(l=>l.classList.remove('selected'));if(p.rol)document.querySelector(`#menuRol li[data-value="${p.rol}"]`)?.classList.add('selected');else document.querySelector('#menuRol li[data-value=""]')?.classList.add('selected');if(inputCliente)inputCliente.value=p.cliente||'';tecnologiasActuales=[...(p.tecnologias||[])];renderTecnologiasBadges();if(stackSearch)stackSearch.value='';actualizarContadorCaracteres();actualizarEstadoFechaFin();formTitle.innerHTML='Editar Proyecto';mostrarForm();setTimeout(()=>{
-       if(typeof window.evInit==='function'){window.evInit({...p, tiene_evidencias: true});}
-        const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection&&!evInlineSection.classList.contains('open')){evInlineSection.classList.add('open');}},500);}
+    function editarProyecto(id){const p=proyectos.find(x=>x.id===id);if(!p)return;window._proyectoParaEvidencias=p;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(p));editandoId=id;inputNombre.value=p.nombre;if(quill)quill.root.innerHTML=p.descripcion||'';if(inputDesc)inputDesc.value=p.descripcion||'';inputFecha.value=p.fecha||'';if(inputFechaFin)inputFechaFin.value=p.fecha_fin||'';if(selectEstado)selectEstado.value=p.estado;document.getElementById('btnEstadoText').textContent=p.estado;document.querySelectorAll('#menuEstado li').forEach(l=>l.classList.remove('selected'));document.querySelector(`#menuEstado li[data-value="${p.estado}"]`)?.classList.add('selected');if(selectRol)selectRol.value=p.rol||'';document.getElementById('btnRolText').textContent=p.rol||'— Seleccionar rol —';document.querySelectorAll('#menuRol li').forEach(l=>l.classList.remove('selected'));if(p.rol)document.querySelector(`#menuRol li[data-value="${p.rol}"]`)?.classList.add('selected');else document.querySelector('#menuRol li[data-value=""]')?.classList.add('selected');if(inputCliente)inputCliente.value=p.cliente||'';tecnologiasActuales=[...(p.tecnologias||[])];renderTecnologiasBadges();if(stackSearch)stackSearch.value='';actualizarContadorCaracteres();actualizarEstadoFechaFin();formTitle.innerHTML='Editar Proyecto';mostrarForm();setTimeout(()=>{if(typeof window.evInit==='function'){window.evInit(p);}const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection&&!evInlineSection.classList.contains('open')){evInlineSection.classList.add('open');}},500);}
 
     function resetearFiltros(){textoBusqueda='';filtroEstadoActual='todos';filtroRolActual='todos';filtroTecnologiaActual='todas';filtroVisibilidadActual='todos';ordenActual='fecha_desc';guardarFiltros();if(buscadorInput){buscadorInput.value='';if(limpiarBuscadorBtn)limpiarBuscadorBtn.style.display='none';}['ddFiltrar','ddOrdenar','ddTecnologia'].forEach(ddId=>{const dd=document.getElementById(ddId);if(dd)dd.querySelectorAll('.ft-dd-item').forEach(i=>i.classList.remove('selected'));});document.querySelector('#ddFiltrar .ft-dd-item[data-val="todos"]')?.classList.add('selected');document.querySelector('#ddOrdenar .ft-dd-item[data-val="fecha_desc"]')?.classList.add('selected');document.querySelector('#ddTecnologia .ft-dd-item[data-val="todas"]')?.classList.add('selected');poblarSelectsDinamicos();renderizar();mostrarToast('Filtros limpiados');}
 
     // ====================================================================
     // EVIDENCIAS
     // ====================================================================
-    function abrirEvidencias(proyecto){if(!proyecto||!proyecto.id){mostrarToast('Error: Proyecto no válido','error');return;}toggleProyHeader(true);toggleGrid(true);window._proyectoParaEvidencias=proyecto;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(proyecto));if(formCard)formCard.classList.remove('open');
-    if(typeof window.evInit==='function'){window.evInit({...proyecto, tiene_evidencias: true});}
-    else{mostrarToast('Error al cargar evidencias','error');}}
-    if(btnEvidencias){btnEvidencias.addEventListener('click',()=>{if(editandoId){const pa=proyectos.find(p=>p.id===editandoId);if(pa){window._proyectoParaEvidencias=pa;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(pa));if(typeof window.evInit==='function'){window.evInit({...pa, tiene_evidencias: true});}const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection){evInlineSection.classList.add('open');}}return;}const evInlineSection=document.getElementById('evInlineSection');if(!evInlineSection){mostrarToast('Panel de evidencias no encontrado','error');return;}evInlineSection.classList.toggle('open');if(evInlineSection.classList.contains('open')){if(typeof window.evResetearPendientes==='function'){window.evResetearPendientes();}}const arrow=btnEvidencias.querySelector('.ev-trigger-arrow');if(arrow){arrow.style.transform=evInlineSection.classList.contains('open')?'rotate(90deg)':'';}});}
+    function abrirEvidencias(proyecto){if(!proyecto||!proyecto.id){mostrarToast('Error: Proyecto no válido','error');return;}toggleProyHeader(true);toggleGrid(true);window._proyectoParaEvidencias=proyecto;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(proyecto));if(formCard)formCard.classList.remove('open');if(typeof window.evInit==='function'){window.evInit(proyecto);}else{mostrarToast('Error al cargar evidencias','error');}}
+    if(btnEvidencias){btnEvidencias.addEventListener('click',()=>{if(editandoId){const pa=proyectos.find(p=>p.id===editandoId);if(pa){window._proyectoParaEvidencias=pa;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(pa));if(typeof window.evInit==='function'){window.evInit(pa);}const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection){evInlineSection.classList.add('open');}}return;}const evInlineSection=document.getElementById('evInlineSection');if(!evInlineSection){mostrarToast('Panel de evidencias no encontrado','error');return;}evInlineSection.classList.toggle('open');if(evInlineSection.classList.contains('open')){if(typeof window.evResetearPendientes==='function'){window.evResetearPendientes();}}const arrow=btnEvidencias.querySelector('.ev-trigger-arrow');if(arrow){arrow.style.transform=evInlineSection.classList.contains('open')?'rotate(90deg)':'';}});}
     document.addEventListener('ev:volver',()=>{toggleProyHeader(false);toggleGrid(false);cargarProyectos();});
 
     // ====================================================================
