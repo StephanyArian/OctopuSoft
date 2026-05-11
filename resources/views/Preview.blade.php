@@ -4,7 +4,9 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
-
+<a href="javascript:history.back()" class="btn-flotante">
+    <i class="fas fa-edit"></i> Continuar editando
+</a>
     <div class="preview-container">
         
         <!-- CABECERA CON DATOS PERSONALES -->
@@ -86,12 +88,7 @@
             </div>
         </div>
         
-        <!-- BOTÓN SUPERIOR DE EDICIÓN -->
-        <div style="display: flex; justify-content: flex-start; margin: 30px 0; padding: 0 40px;">
-            <a href="javascript:history.back()" class="btn btn-editar">
-                <i class="fas fa-edit"></i> Continuar editando
-            </a>
-        </div>
+        
         <!-- EXPERIENCIA LABORAL -->
         <div class="section">
             <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
@@ -206,7 +203,7 @@
             <h2><i class="fas fa-heart"></i> Habilidades blandas</h2>
             <div class="skills-container">
                 @forelse($habilidadesBlandas as $skill)
-                    <span class="soft-skill-tag">⭐{{ $skill->nombre }}</span>
+                <span class="soft-skill-tag"><i class="fas fa-star" style="color:#0abf9e;"></i> {{ $skill->nombre }}</span>
                 @empty
                     <div class="empty-message">No hay habilidades blandas registradas</div>
                 @endforelse
@@ -299,9 +296,7 @@
 
         <!-- BOTONES -->
         <div class="buttons-container">
-            <a href="javascript:history.back()" class="btn btn-editar">
-                <i class="fas fa-edit"></i> Continuar editando
-            </a>
+            
             <form action="{{ route('perfil.publicar') }}" method="POST" style="margin: 0;" id="formPublicar">
                 @csrf
                 <button type="submit" class="btn btn-publicar">
