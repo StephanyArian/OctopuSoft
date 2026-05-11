@@ -311,18 +311,31 @@
     background: linear-gradient(135deg, var(--teal-light), var(--teal));
 }
 
+/* ══════════════════════════════════════════════════
+   Mensaje de éxito
+   ══════════════════════════════════════════════════ */
 .success-message {
-    background: linear-gradient(135deg, var(--teal), var(--teal-dim));
-    color: var(--white);
+    background: rgba(10, 191, 158, 0.10);
+    border: 1.5px solid rgba(10, 191, 158, 0.30);
+    color: var(--teal-dim);
     padding: 14px 20px;
     border-radius: 12px;
     margin-bottom: 20px;
     font-weight: 600;
     font-size: 14px;
-    box-shadow: 0 4px 15px rgba(10,191,158,0.2);
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.success-message::before {
+    content: '';
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center/14px no-repeat;
 }
 
 .error-alert {
@@ -448,6 +461,32 @@
 .btn-sm.danger { color: var(--danger); border-color: rgba(231,76,60,0.2); }
 .btn-sm.danger:hover { background: var(--danger-bg); border-color: rgba(231,76,60,0.3); }
 
+.btn-sm.danger-icon {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gray-100);
+    background: var(--white);
+    color: var(--danger);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    gap: 0;
+}
+.btn-sm.danger-icon:hover {
+    background: var(--danger-bg);
+    border-color: rgba(231,76,60,0.3);
+    transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════
+   Modal de confirmación
+   ══════════════════════════════════════════════════ */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -461,27 +500,74 @@
 .modal-box {
     background: var(--white);
     border-radius: 18px;
-    padding: 32px 28px;
-    width: 360px;
+    padding: 36px 32px 28px;
+    width: 380px;
+    max-width: 90vw;
     text-align: center;
     box-shadow: 0 25px 50px rgba(0,0,0,0.2);
     border: 1px solid var(--gray-100);
 }
 
-.modal-icon {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: var(--danger-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 22px;
+.modal-icon { display: none; }
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 12px;
 }
 
-.modal-title { font-size: 16px; font-weight: 800; color: var(--burg-deep); margin-bottom: 10px; }
-.modal-desc { font-size: 13px; color: var(--gray-500); margin-bottom: 24px; line-height: 1.7; }
-.modal-btns { display: flex; gap: 10px; justify-content: center; }
+.modal-desc {
+    font-size: 13.5px;
+    color: var(--gray-500);
+    margin-bottom: 28px;
+    line-height: 1.7;
+}
+
+.modal-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.modal-btns .btn-sm.danger-confirm {
+    padding: 11px 28px;
+    font-size: 14px;
+    border-radius: 40px;
+    font-weight: 700;
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(231,76,60,0.3);
+    gap: 6px;
+    display: flex;
+    align-items: center;
+    height: auto;
+    width: auto;
+}
+.modal-btns .btn-sm.danger-confirm:hover {
+    background: #c0392b;
+    border-color: #c0392b;
+    box-shadow: 0 6px 18px rgba(231,76,60,0.4);
+    transform: translateY(-1px);
+}
+
+.modal-btns .btn-sm.cancel-modal {
+    padding: 11px 28px;
+    font-size: 14px;
+    border-radius: 40px;
+    font-weight: 600;
+    background: var(--white);
+    border: 1.5px solid var(--gray-300);
+    color: var(--gray-700);
+    height: auto;
+    width: auto;
+}
+.modal-btns .btn-sm.cancel-modal:hover {
+    background: var(--off);
+    border-color: var(--gray-500);
+    transform: translateY(-1px);
+}
 
 .edit-form-wrap { background: var(--off); border-radius: 12px; padding: 20px; margin-top: 8px; }
 
@@ -506,30 +592,10 @@
     border-radius: 14px;
 }
 
-@media (max-width: 768px) {
-    .sidebar { width: 100%; min-width: 100%; border-right: none; padding: 10px 0; display: flex; flex-wrap: wrap; }
-    .sidebar-item { width: 50%; padding: 10px 16px; }
-    .main { padding: 24px; }
-    .section-card { padding: 20px; }
-    .page-title { font-size: 22px; }
-    .nav-tab { padding: 10px 16px; font-size: 11px; }
-    .form-row { flex-direction: column; gap: 16px; }
-    .historial-actions { flex-wrap: wrap; }
-    .modal-box { width: 90%; padding: 24px 20px; }
-}
-
-@media (max-width: 480px) {
-    .btn { padding: 8px 20px; font-size: 12px; }
-    .main { padding: 16px; }
-    .page-title { font-size: 20px; }
-    .historial-card { padding: 16px; }
-}
 /* =============================================================
-   AGREGAR al final de experiencia-laboral.css
-   Dropdown de cargos + historial mejorado (HU-12)
+   Dropdown de cargos
    ============================================================= */
 
-/* ── Fila cargo en el formulario: dropdown + botón × ── */
 .cargo-item {
     display: flex;
     align-items: center;
@@ -537,13 +603,11 @@
     margin-bottom: 8px;
 }
 
-/* ── Wrapper posicionado ── */
 .custom-dropdown {
     position: relative;
     flex: 1;
 }
 
-/* ── Toggle: replica .form-input ── */
 .custom-dropdown-toggle {
     width: 100%;
     display: flex;
@@ -578,7 +642,6 @@
 }
 .custom-dropdown.open .dropdown-arrow { color: var(--teal); }
 
-/* ── Menú flotante ── */
 .custom-dropdown-menu {
     position: absolute;
     top: calc(100% + 4px);
@@ -622,7 +685,6 @@
 .custom-dropdown-menu::-webkit-scrollbar-track { background: transparent; }
 .custom-dropdown-menu::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
 
-/* ── Botón × eliminar cargo ── */
 .btn-remove-cargo {
     flex-shrink: 0;
     width: 32px;
@@ -631,7 +693,7 @@
     border: 1.5px solid var(--gray-100);
     background: var(--white);
     color: var(--danger);
-    font-size: 1rem;
+    font-size: 0;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -645,7 +707,6 @@
 }
 .btn-remove-cargo:disabled { opacity: 0.3; cursor: not-allowed; }
 
-/* ── Botón + Agregar otro cargo ── */
 .btn-add-cargo {
     margin-top: 10px;
     background: none;
@@ -667,7 +728,6 @@
     transform: translateY(-1px);
 }
 
-/* ── Hint (máx. 5) ── */
 .cargos-hint {
     font-size: 11px;
     color: var(--gray-500);
@@ -678,7 +738,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════
-   HISTORIAL — vista de cargos mejorada (letra más grande)
+   HISTORIAL — vista de cargos
    ═══════════════════════════════════════════════════════════ */
 
 .cargos-grupo-list {
@@ -688,7 +748,6 @@
     margin: 8px 0 4px;
 }
 
-/* Fila de un cargo en modo VISTA */
 .cargo-fila-vista {
     display: flex;
     align-items: center;
@@ -702,24 +761,21 @@
     align-items: center;
 }
 
-/* Texto del cargo — tamaño visible */
 .cargo-nombre-vista {
-    font-size: 15px;          /* era 13px, ahora más legible */
+    font-size: 15px;
     font-weight: 600;
     color: var(--gray-700);
     letter-spacing: 0.1px;
 }
 
-/* ── Botones del historial con icono ── */
 .historial-actions .btn-sm {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;          /* ligeramente más grande que antes */
+    font-size: 13px;
     padding: 7px 18px;
 }
 
-/* ── Confirmación inline al eliminar un cargo en edición ── */
 .confirm-cargo-inline {
     background: var(--danger-bg);
     border: 1px solid rgba(231,76,60,0.2);
@@ -732,7 +788,6 @@
     margin-bottom: 8px;
 }
 
-/* ── Cargo marcado para eliminar (diferido) ── */
 .cargo-deleted-row {
     display: flex;
     align-items: center;
@@ -756,17 +811,62 @@
     opacity: 0.8;
 }
 
-/* ── Date picker nativo ── */
+/* ══════════════════════════════════════════════════
+   DATE PICKER — ícono de calendario personalizado
+   ══════════════════════════════════════════════════ */
+
+/* Wrapper posicionado que contiene el input y el ícono */
+.date-picker-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* El input ocupa todo el ancho, con padding derecho para el ícono */
+.date-picker-wrap .date-picker {
+    padding-right: 40px;
+    width: 100%;
+}
+
+/* Ícono SVG personalizado vía pseudo-elemento */
+.date-picker-wrap::after {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    right: 13px;
+    width: 16px;
+    height: 16px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23000000' viewBox='0 0 16 16'%3E%3Cpath d='M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z'/%3E%3Cpath d='M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: center;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.date-picker-wrap:hover::after,
+.date-picker-wrap:focus-within::after {
+    opacity: 1;
+}
+
+/* Ocultar el ícono nativo del browser (pero mantenerlo funcional para abrir el picker) */
 .date-picker {
     cursor: pointer;
     color-scheme: light;
 }
+
+.date-picker::-webkit-inner-spin-button { display: none; }
+.date-picker::-webkit-clear-button      { display: none; }
+
+/* Hacer el ícono nativo transparente (sigue siendo clickeable) */
 .date-picker::-webkit-calendar-picker-indicator {
-    opacity: 0.6;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 40px;
+    height: 100%;
     cursor: pointer;
-    filter: invert(48%) sepia(60%) saturate(400%) hue-rotate(130deg);
 }
-.date-picker::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
 /* ── Contador de caracteres ── */
 .char-counter {
@@ -805,4 +905,15 @@
     .section-card { padding: 20px; }
     .page-title { font-size: 24px; }
     .nav-tab { padding: 10px 16px; font-size: 11px; }
+    .form-row { flex-direction: column; gap: 16px; }
+    .historial-actions { flex-wrap: wrap; }
+    .modal-box { width: 90%; padding: 24px 20px; }
+}
+
+@media (max-width: 480px) {
+    .btn { padding: 8px 20px; font-size: 12px; }
+    .btn-sm { padding: 5px 12px; font-size: 11px; }
+    .main { padding: 16px; }
+    .page-title { font-size: 20px; }
+    .historial-card { padding: 16px; }
 }

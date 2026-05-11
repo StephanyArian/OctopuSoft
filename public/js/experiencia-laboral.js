@@ -27,6 +27,13 @@ const CARGO_OPTIONS = [
     'Systems Analyst',
 ];
 
+/* ── SVG del ícono de basurero ── */
+const TRASH_ICON = `
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+</svg>`;
+
 /* ── Generador de HTML para un dropdown de cargo ── */
 function crearDropdownHTML(index) {
     const opts = CARGO_OPTIONS.map(o =>
@@ -46,7 +53,9 @@ function crearDropdownHTML(index) {
                 </ul>
                 <input type="hidden" name="cargos[]" value="">
             </div>
-            <button type="button" class="btn-remove-cargo" onclick="removeCargo(this)" title="Eliminar cargo">×</button>
+            <button type="button" class="btn-remove-cargo" onclick="removeCargo(this)" title="Eliminar cargo">
+                ${TRASH_ICON}
+            </button>
         </div>`;
 }
 
@@ -197,7 +206,7 @@ window.syncFechaInicio = function (val) {
     document.getElementById('fechaInicioDia').value  = dia;
     document.getElementById('fechaInicioMes').value  = mes;
     document.getElementById('fechaInicioAnio').value = anio;
-    if (fullEl) fullEl.value = val;                     // fallback completo
+    if (fullEl) fullEl.value = val;
     const finPicker = document.getElementById('fechaFinPicker');
     if (finPicker) finPicker.min = val;
 };
@@ -213,7 +222,7 @@ window.syncFechaFin = function (val) {
     document.getElementById('fechaFinDia').value  = dia;
     document.getElementById('fechaFinMes').value  = mes;
     document.getElementById('fechaFinAnio').value = anio;
-    if (fullEl) fullEl.value = val;                     // fallback completo
+    if (fullEl) fullEl.value = val;
 };
 
 /* ── Toggle trabajo actual ── */
@@ -324,7 +333,11 @@ window.addEventListener('DOMContentLoaded', function () {
     if (cb && cb.checked) toggleFechaFin(cb);
     actualizarBotonesRemover();
 
-    // Sync date pickers from hidden values (old() on validation error)
+    // También actualizar el ícono del primer btn-remove-cargo que viene del blade
+    document.querySelectorAll('#cargos-list .btn-remove-cargo').forEach(btn => {
+        if (btn.textContent.trim() === '×') btn.innerHTML = TRASH_ICON;
+    });
+
     ['empresa','location','descripcion'].forEach(name => {
         const el  = document.querySelector(`[name="${name}"]`);
         const map = { empresa:'empresaCount', location:'locationCount', descripcion:'descripcionCount' };

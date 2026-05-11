@@ -5,10 +5,6 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            @if(session('success'))
-                <div class="success-message">{{ session('success') }}</div>
-            @endif
-
             <div class="shell">
             
                 <div class="navbar">
@@ -27,6 +23,12 @@
                     </div>
 
                     <div class="main">
+
+                        {{-- Mensaje de éxito --}}
+                        @if(session('success'))
+                            <div class="success-message">{{ session('success') }}</div>
+                        @endif
+
                         <div class="page-title">Experiencia laboral</div>
 
                         <div class="section-card">
@@ -50,7 +52,7 @@
                                         </div>
                                     </div>
 
-                                    {{-- ── CARGOS con dropdown personalizado (HU-12) ── --}}
+                                    {{-- Cargos --}}
                                     <div class="form-group">
                                         <label class="form-label">
                                             Cargos <span class="required">*</span>
@@ -88,7 +90,12 @@
                                                     </ul>
                                                     <input type="hidden" name="cargos[]" value="{{ old('cargos.0', '') }}">
                                                 </div>
-                                                <button type="button" class="btn-remove-cargo" onclick="removeCargo(this)" disabled title="Eliminar cargo">×</button>
+                                                <button type="button" class="btn-remove-cargo" onclick="removeCargo(this)" disabled title="Eliminar cargo">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -98,7 +105,6 @@
                                             + Agregar otro cargo
                                         </button>
                                     </div>
-                                    {{-- ── FIN CARGOS ── --}}
 
                                     {{-- Ubicación --}}
                                     <div class="form-row">
@@ -111,15 +117,17 @@
                                         </div>
                                     </div>
 
-                                    {{-- Fecha de inicio --}}
+                                    {{-- Fechas --}}
                                     <div class="form-row">
+                                        {{-- Fecha de inicio --}}
                                         <div class="form-group">
                                             <label class="form-label">Fecha de inicio <span class="required">*</span></label>
-                                            <input type="date" id="fechaInicioPicker" class="form-input date-picker"
-                                                min="1950-01-01" max="{{ date('Y-m-d') }}"
-                                                value="{{ old('fecha_inicio_anio') && old('fecha_inicio_mes') && old('fecha_inicio_dia') ? old('fecha_inicio_anio').'-'.old('fecha_inicio_mes').'-'.old('fecha_inicio_dia') : '' }}"
-                                                onchange="syncFechaInicio(this.value)">
-                                            {{-- Hiddens separados + completo (fallback) --}}
+                                            <div class="date-picker-wrap">
+                                                <input type="date" id="fechaInicioPicker" class="form-input date-picker"
+                                                    min="1950-01-01" max="{{ date('Y-m-d') }}"
+                                                    value="{{ old('fecha_inicio_anio') && old('fecha_inicio_mes') && old('fecha_inicio_dia') ? old('fecha_inicio_anio').'-'.old('fecha_inicio_mes').'-'.old('fecha_inicio_dia') : '' }}"
+                                                    onchange="syncFechaInicio(this.value)">
+                                            </div>
                                             <input type="hidden" name="fecha_inicio"      id="fechaInicioFull" value="">
                                             <input type="hidden" name="fecha_inicio_dia"  id="fechaInicioDia"  value="{{ old('fecha_inicio_dia') }}">
                                             <input type="hidden" name="fecha_inicio_mes"  id="fechaInicioMes"  value="{{ old('fecha_inicio_mes') }}">
@@ -127,13 +135,15 @@
                                             <div id="fechaInicioError" class="error-message hidden">La fecha de inicio es obligatoria</div>
                                         </div>
 
+                                        {{-- Fecha de fin --}}
                                         <div class="form-group" id="fechaFinGroup">
                                             <label class="form-label">Fecha de fin <span id="fechaFinRequired" class="required">*</span></label>
-                                            <input type="date" id="fechaFinPicker" class="form-input date-picker"
-                                                min="1950-01-01" max="{{ date('Y-m-d') }}"
-                                                value="{{ old('fecha_fin_anio') && old('fecha_fin_mes') && old('fecha_fin_dia') ? old('fecha_fin_anio').'-'.old('fecha_fin_mes').'-'.old('fecha_fin_dia') : '' }}"
-                                                onchange="syncFechaFin(this.value)">
-                                            {{-- Hiddens separados + completo (fallback) --}}
+                                            <div class="date-picker-wrap">
+                                                <input type="date" id="fechaFinPicker" class="form-input date-picker"
+                                                    min="1950-01-01" max="{{ date('Y-m-d') }}"
+                                                    value="{{ old('fecha_fin_anio') && old('fecha_fin_mes') && old('fecha_fin_dia') ? old('fecha_fin_anio').'-'.old('fecha_fin_mes').'-'.old('fecha_fin_dia') : '' }}"
+                                                    onchange="syncFechaFin(this.value)">
+                                            </div>
                                             <input type="hidden" name="fecha_fin"      id="fechaFinFull" value="">
                                             <input type="hidden" name="fecha_fin_dia"  id="fechaFinDia"  value="{{ old('fecha_fin_dia') }}">
                                             <input type="hidden" name="fecha_fin_mes"  id="fechaFinMes"  value="{{ old('fecha_fin_mes') }}">

@@ -33,8 +33,7 @@ const CARGO_OPTIONS = [
     'Systems Analyst',
 ];
 
-/* ── Iconos Bootstrap como SVG inline ─────────────────────
-   (no requiere ninguna dependencia extra)                   */
+/* ── Iconos ────────────────────────────────────────────── */
 const IconEdit = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{flexShrink:0}}>
         <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
@@ -56,7 +55,7 @@ const IconX = () => (
 
 const IconCheck = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{flexShrink:0}}>
-        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 1 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
     </svg>
 );
 
@@ -143,36 +142,7 @@ function CargoDropdown({ value, onChange, name }) {
     );
 }
 
-/* ── Selects de fecha ───────────────────────────────────── */
-function SelectDia({ name, defaultValue, disabled }) {
-    return (
-        <select name={name} defaultValue={defaultValue || ''} disabled={disabled}
-            className="form-input" style={{ width: '80px' }}>
-            <option value="">Día</option>
-            {DIAS.map(d => <option key={d} value={d}>{parseInt(d)}</option>)}
-        </select>
-    );
-}
-function SelectMes({ name, defaultValue, disabled }) {
-    return (
-        <select name={name} defaultValue={defaultValue || ''} disabled={disabled}
-            className="form-input" style={{ flex: 1 }}>
-            <option value="">Mes</option>
-            {Object.entries(MESES).map(([num, nom]) => (
-                <option key={num} value={num}>{nom}</option>
-            ))}
-        </select>
-    );
-}
-function InputAnio({ name, defaultValue, disabled }) {
-    return (
-        <input type="number" name={name} defaultValue={defaultValue || ''}
-            disabled={disabled} className="form-input" style={{ width: '90px' }}
-            placeholder="Año" min="1950" max={ANIO_MAX} />
-    );
-}
-
-/* ── Toggle trabajo actual ──────────────────────────────── */
+/* ── Helpers de fecha ───────────────────────────────────── */
 function padZ(n) { return String(n).padStart(2, '0'); }
 function toDateVal(anio, mes, dia) {
     if (!anio || !mes || !dia) return '';
@@ -184,10 +154,11 @@ function fromDateVal(val) {
     return { dia, mes, anio };
 }
 
+/* ── Toggle trabajo actual ──────────────────────────────── */
 function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia, finMes, finAnio, errorFin }) {
-    const [actual,     setActual]     = useState(defaultChecked || false);
-    const [inicioVal,  setInicioVal]  = useState(toDateVal(inicioAnio, inicioMes, inicioDia));
-    const [finVal,     setFinVal]     = useState(toDateVal(finAnio, finMes, finDia));
+    const [actual,    setActual]    = useState(defaultChecked || false);
+    const [inicioVal, setInicioVal] = useState(toDateVal(inicioAnio, inicioMes, inicioDia));
+    const [finVal,    setFinVal]    = useState(toDateVal(finAnio, finMes, finDia));
     const today = new Date().toISOString().split('T')[0];
 
     const inicioPartes = fromDateVal(inicioVal);
@@ -195,7 +166,6 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
 
     return (
         <>
-            {/* Hidden inputs para compatibilidad con el controller */}
             <input type="hidden" name="fecha_inicio_dia"  value={inicioPartes.dia} />
             <input type="hidden" name="fecha_inicio_mes"  value={inicioPartes.mes} />
             <input type="hidden" name="fecha_inicio_anio" value={inicioPartes.anio} />
@@ -210,30 +180,37 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
             </div>
 
             <div className="form-row" style={{ marginBottom: '14px' }}>
+                {/* ── Fecha de inicio ── */}
                 <div className="form-group">
                     <label className="form-label">Fecha de inicio <span className="required">*</span></label>
-                    <input
-                        type="date"
-                        className="form-input date-picker"
-                        value={inicioVal}
-                        min="1950-01-01"
-                        max={today}
-                        onChange={e => setInicioVal(e.target.value)}
-                    />
+                    <div className="date-picker-wrap">
+                        <input
+                            type="date"
+                            className="form-input date-picker"
+                            value={inicioVal}
+                            min="1950-01-01"
+                            max={today}
+                            onChange={e => setInicioVal(e.target.value)}
+                        />
+                    </div>
                 </div>
+
+                {/* ── Fecha de fin ── */}
                 <div className="form-group" style={{ opacity: actual ? 0.4 : 1 }}>
                     <label className="form-label">
                         Fecha de fin {!actual && <span className="required">*</span>}
                     </label>
-                    <input
-                        type="date"
-                        className={`form-input date-picker${errorFin ? ' is-invalid' : ''}`}
-                        value={finVal}
-                        min={inicioVal || "1950-01-01"}
-                        max={today}
-                        disabled={actual}
-                        onChange={e => setFinVal(e.target.value)}
-                    />
+                    <div className="date-picker-wrap">
+                        <input
+                            type="date"
+                            className={`form-input date-picker${errorFin ? ' is-invalid' : ''}`}
+                            value={finVal}
+                            min={inicioVal || "1950-01-01"}
+                            max={today}
+                            disabled={actual}
+                            onChange={e => setFinVal(e.target.value)}
+                        />
+                    </div>
                     {errorFin && <div className="error-message">{errorFin}</div>}
                 </div>
             </div>
@@ -242,22 +219,17 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
 }
 
 /* ══════════════════════════════════════════════════════════
-   FormEdicionGrupo — edita TODOS los cargos + datos comunes
-   de un grupo en un solo formulario
+   FormEdicionGrupo
    ══════════════════════════════════════════════════════════ */
 function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
-    const [error,           setError]           = useState('');
-    const [errorFin,        setErrorFin]        = useState('');
-    const [guardando,       setGuardando]        = useState(false);
+    const [error,           setError]          = useState('');
+    const [errorFin,        setErrorFin]       = useState('');
+    const [guardando,       setGuardando]      = useState(false);
     const [confirmEliminar, setConfirmEliminar] = useState(null);
-    const [empresa,         setEmpresa]         = useState(grupo.institution || '');
-    const [ubicacion,       setUbicacion]       = useState(grupo.location || '');
-    const [descripcion,     setDescripcion]     = useState(grupo.description || '');
+    const [empresa,         setEmpresa]        = useState(grupo.institution || '');
+    const [ubicacion,       setUbicacion]      = useState(grupo.location || '');
+    const [descripcion,     setDescripcion]    = useState(grupo.description || '');
 
-    /*
-     * deleted: true  → marcado para eliminar, solo se aplica al guardar
-     * id: null       → cargo nuevo, se creará con POST al guardar
-     */
     const [cargos, setCargos] = useState(
         grupo.items.map(exp => ({ id: exp.id, tempId: null, value: exp.title || '', deleted: false }))
     );
@@ -289,7 +261,6 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
         e.preventDefault();
         setError('');
 
-        // Validar cargos visibles
         for (const c of cargosVisibles) {
             if (!c.value) { setError('Debes seleccionar un cargo en cada campo.'); return; }
         }
@@ -302,14 +273,14 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
         }
 
         setErrorFin('');
-        const form        = e.target;
+        const form          = e.target;
         const trabajoActual = form.trabajo_actual.checked;
-        const inicioDia   = form.fecha_inicio_dia.value;
-        const inicioMes   = form.fecha_inicio_mes.value;
-        const inicioAnio  = form.fecha_inicio_anio.value;
-        const finDia      = form.fecha_fin_dia?.value;
-        const finMes      = form.fecha_fin_mes?.value;
-        const finAnio     = form.fecha_fin_anio?.value;
+        const inicioDia     = form.fecha_inicio_dia.value;
+        const inicioMes     = form.fecha_inicio_mes.value;
+        const inicioAnio    = form.fecha_inicio_anio.value;
+        const finDia        = form.fecha_fin_dia?.value;
+        const finMes        = form.fecha_fin_mes?.value;
+        const finAnio       = form.fecha_fin_anio?.value;
 
         if (!inicioDia || !inicioMes || !inicioAnio) {
             setError('La fecha de inicio es obligatoria.'); return;
@@ -323,10 +294,8 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             if (fin < ini) { setErrorFin('La fecha de fin no puede ser anterior a la de inicio.'); return; }
         }
 
-        const location = ubicacion;
-
         const payload = {
-            empresa, location, descripcion,
+            empresa, location: ubicacion, descripcion,
             fecha_inicio_dia:  inicioDia,
             fecha_inicio_mes:  inicioMes,
             fecha_inicio_anio: inicioAnio,
@@ -340,20 +309,17 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
         try {
             const idsEliminados = new Set();
 
-            // 1. Eliminar los marcados (solo los que tienen id real en BD)
             const aEliminar = cargos.filter(c => c.deleted && c.id);
             for (const c of aEliminar) {
-                const res = await fetch(`/experiencia-laboral/${c.id}`, {
+                await fetch(`/experiencia-laboral/${c.id}`, {
                     method:  'DELETE',
                     headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
                 });
-                // 404 = ya no existe, igual lo marcamos como eliminado del estado
                 idsEliminados.add(c.id);
             }
 
-            // 2. PUT a los existentes visibles (tienen id real)
-            const existentes  = cargosVisibles.filter(c => c.id);
-            const putResults  = [];
+            const existentes = cargosVisibles.filter(c => c.id);
+            const putResults = [];
             for (const c of existentes) {
                 const res = await fetch(`/experiencia-laboral/${c.id}`, {
                     method:  'PUT',
@@ -368,8 +334,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 }
             }
 
-            // 3. POST para los nuevos (no tienen id) — uno solo por cada nuevo
-            const nuevos     = cargosVisibles.filter(c => !c.id);
+            const nuevos      = cargosVisibles.filter(c => !c.id);
             const postResults = [];
             for (const c of nuevos) {
                 const res = await fetch('/experiencia-laboral', {
@@ -379,7 +344,6 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    // store devuelve array de objetos creados
                     postResults.push(...(Array.isArray(data) ? data : [data]));
                 } else {
                     const d = await res.json().catch(() => ({}));
@@ -492,6 +456,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 </div>
             </div>
 
+            {/* Fechas (con ícono de calendario personalizado vía ToggleActual) */}
             <ToggleActual
                 defaultChecked={grupo.is_current}
                 inicioDia={getDia(rep.start_date)}  inicioMes={getMes(rep.start_date)}  inicioAnio={getAnio(rep.start_date)}
@@ -499,6 +464,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 errorFin={errorFin}
             />
 
+            {/* Descripción */}
             <div className="form-group" style={{ marginBottom: '14px' }}>
                 <label className="form-label">Descripción</label>
                 <textarea name="descripcion" value={descripcion} maxLength={500}
@@ -509,18 +475,17 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
 
             <div className="btn-row" style={{ marginTop: 0 }}>
                 <button type="submit" className="btn-sm primary" disabled={guardando}>
-                    <IconCheck /> {guardando ? 'Guardando...' : 'Guardar cambios'}
+                    {guardando ? 'Guardando...' : 'Guardar cambios'}
                 </button>
                 <button type="button" className="btn-sm" onClick={onCancelar} disabled={guardando}>
-                    <IconX /> Cancelar
+                    Cancelar
                 </button>
             </div>
         </form>
     );
 }
 
-
-/* ── Ver más / Ver menos en descripción ─────────────────── */
+/* ── Ver más / Ver menos ────────────────────────────────── */
 const DESC_LIMIT = 120;
 function DescripcionExpandible({ texto }) {
     const [expandida, setExpandida] = useState(false);
@@ -530,10 +495,7 @@ function DescripcionExpandible({ texto }) {
         <div className="historial-desc">
             {corta && !expandida ? texto.slice(0, DESC_LIMIT) + '…' : texto}
             {corta && (
-                <button
-                    type="button"
-                    className="btn-ver-mas"
-                    onClick={() => setExpandida(v => !v)}>
+                <button type="button" className="btn-ver-mas" onClick={() => setExpandida(v => !v)}>
                     {expandida ? ' Ver menos' : ' Ver más'}
                 </button>
             )}
@@ -545,13 +507,12 @@ function DescripcionExpandible({ texto }) {
    Componente principal
    ══════════════════════════════════════════════════════════ */
 function ExperienciaLaboral({ experiencias: initialExperiencias }) {
-    const [experiencias,   setExperiencias]   = useState(initialExperiencias);
-    const [editandoGrupo,  setEditandoGrupo]  = useState(null); // key del grupo en edición
-    const [confirmDelete,  setConfirmDelete]  = useState(null);
+    const [experiencias,  setExperiencias]  = useState(initialExperiencias);
+    const [editandoGrupo, setEditandoGrupo] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(null);
 
     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    /* Eliminar grupo completo */
     async function eliminarGrupo(idRep) {
         const res = await fetch(`/experiencia-laboral/${idRep}?grupo=1`, {
             method:  'DELETE',
@@ -568,17 +529,13 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
         }
     }
 
-    /* Recibir resultados del guardado: actualizados + nuevos, e ids eliminados */
     function handleGuardado(actualizados, idsEliminados) {
         setExperiencias(prev => {
-            // Quitar los eliminados
             let siguiente = prev.filter(e => !idsEliminados.has(e.id));
-            // Actualizar los existentes
             siguiente = siguiente.map(e => {
                 const match = actualizados.find(a => a.id === e.id);
                 return match ?? e;
             });
-            // Agregar los nuevos (no estaban en prev)
             const idsExistentes = new Set(prev.map(e => e.id));
             const nuevos = actualizados.filter(a => !idsExistentes.has(a.id));
             return [...siguiente, ...nuevos];
@@ -597,14 +554,12 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
             {grupos.map((grupo, gi) => (
                 <div key={grupo.key} className="historial-card grupo-empresa">
 
-                    {/* Cabecera */}
                     <div className="historial-card-header">
                         <span className="historial-index">#{gi + 1}</span>
                         {grupo.is_current && <span className="badge-actual">Trabajo actual</span>}
                     </div>
 
                     {editandoGrupo === grupo.key ? (
-                        /* ── Modo edición ── */
                         <FormEdicionGrupo
                             grupo={grupo}
                             token={token}
@@ -612,7 +567,6 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
                             onCancelar={() => setEditandoGrupo(null)}
                         />
                     ) : (
-                        /* ── Modo vista ── */
                         <>
                             <div className="historial-title">{grupo.institution}</div>
 
@@ -628,7 +582,6 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
                                 </span>
                             </div>
 
-                            {/* Lista de cargos — solo lectura, sin botón Editar individual */}
                             <div className="cargos-grupo-list">
                                 {grupo.items.map(exp => (
                                     <div key={exp.id} className="cargo-fila-vista">
@@ -644,13 +597,13 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
 
                             <DescripcionExpandible texto={grupo.description} />
 
-                            {/* Acciones: UN solo Editar + Eliminar con iconos */}
                             <div className="historial-actions">
-                                <button className="btn-sm"
-                                    onClick={() => setEditandoGrupo(grupo.key)}>
+                                <button className="btn-sm" onClick={() => setEditandoGrupo(grupo.key)}>
                                     <IconEdit /> Editar
                                 </button>
-                                <button className="btn-sm danger"
+                                <button
+                                    className="btn-sm danger"
+                                    title="Eliminar experiencia"
                                     onClick={() => setConfirmDelete({ id: grupo.items[0].id })}>
                                     <IconTrash /> Eliminar
                                 </button>
@@ -660,23 +613,26 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
                 </div>
             ))}
 
-            {/* Modal de confirmación */}
+            {/* ── Modal de confirmación ── */}
             {confirmDelete && (
                 <div className="modal-overlay">
                     <div className="modal-box">
-                        <div className="modal-icon">
-                            <IconTrash />
-                        </div>
+                        <div className="modal-icon"><IconTrash /></div>
                         <div className="modal-title">¿Eliminar esta experiencia?</div>
                         <div className="modal-desc">
-                            Esta acción eliminará <strong>todos los cargos</strong> asociados a esta empresa. No se puede deshacer.
+                            Esta acción eliminará <strong>todos los cargos</strong> asociados a
+                            esta empresa. No se puede deshacer.
                         </div>
                         <div className="modal-btns">
-                            <button className="btn-sm" onClick={() => setConfirmDelete(null)}>
-                                <IconX /> Cancelar
+                            <button
+                                className="btn-sm danger-confirm"
+                                onClick={() => eliminarGrupo(confirmDelete.id)}>
+                                Sí, eliminar
                             </button>
-                            <button className="btn-sm danger" onClick={() => eliminarGrupo(confirmDelete.id)}>
-                                <IconTrash /> Sí, eliminar
+                            <button
+                                className="btn-sm cancel-modal"
+                                onClick={() => setConfirmDelete(null)}>
+                                Cancelar
                             </button>
                         </div>
                     </div>
