@@ -62,6 +62,11 @@
                             <i class="fab fa-github"></i>
                         </a>
                     @endif
+                    @if($redes['maps_url'])
+                        <a href="{{ $redes['maps_url'] }}" target="_blank" title="Ubicación en mapa">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </a>
+                    @endif
                     @if($redes['whatsapp'])
                         @php $wpNum = preg_replace('/[^0-9]/', '', $redes['whatsapp']); @endphp
                         <a href="https://wa.me/{{ $wpNum }}" target="_blank" title="WhatsApp">
