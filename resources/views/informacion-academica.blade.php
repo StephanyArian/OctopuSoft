@@ -131,7 +131,7 @@
  
 
 
-                        <div id="historial-react" data-formaciones="{{ json_encode($formaciones) }}"></div>
+                        <div id="historial-react" data-formaciones='@json($formaciones)'></div>
 
                     </div>{{-- /main --}}                         
                     </div>{{-- /main --}}

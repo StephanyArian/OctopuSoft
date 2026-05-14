@@ -296,6 +296,6 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
 // Montar el componente
 const el = document.getElementById('historial-react');
 if (el) {
-    const formaciones = JSON.parse(el.dataset.formaciones);
+    const formaciones = JSON.parse(el.dataset.formaciones || '[]');
     ReactDOM.createRoot(el).render(<HistorialAcademico formaciones={formaciones} />);
 }
