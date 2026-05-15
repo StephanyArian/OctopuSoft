@@ -1,5 +1,3 @@
-/* =======Archivo: public/js/welcome.js======= */
-
 document.addEventListener('DOMContentLoaded', () => {
 
     /* -------MENÚ HAMBURGUESA (móvil)----------- */
@@ -24,49 +22,101 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /* ------ CARRUSEL DE PORTAFOLIOS------- */
-    const track       = document.getElementById('carouselTrack');
-    const btnPrev     = document.getElementById('carouselPrev');
-    const btnNext     = document.getElementById('carouselNext');
+    /* ------ CARRUSEL DE PORTAFOLIOS RESPONSIVE------- */
+    const track   = document.getElementById('carouselTrack');
+    const btnPrev = document.getElementById('carouselPrev');
+    const btnNext = document.getElementById('carouselNext');
     const dotsWrapper = document.getElementById('carouselDots');
 
     if (!track) return;
 
-    const cards   = track.querySelectorAll('.portfolio-card');
-    const gap     = 24;   
-    const visible = window.innerWidth < 600 ? 1 
-              : window.innerWidth < 1024 ? 2 
-              : 3;
+    let currentIndex = 0;
+    let cardWidth = 300;
+    const gap = 24;
 
-    const total   = Math.max(1, cards.length - visible + 1);
-    let current   = 0;
-
-    /* Crear dots */
-    for (let i = 0; i < total; i++) {
-        const dot = document.createElement('button');
-        dot.className   = 'carousel-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', `Ir a portafolio ${i + 1}`);
-        dot.addEventListener('click', () => goTo(i));
-        dotsWrapper.appendChild(dot);
+    function updateCardWidth() {
+        const screenWidth = window.innerWidth;
+        
+        if (screenWidth < 600) {
+            cardWidth = screenWidth - 48;
+        } else if (screenWidth < 1024) {
+            cardWidth = 280;
+        } else {
+            cardWidth = 300;
+        }
+        return cardWidth;
     }
 
-    function goTo(index) {
-        current = Math.max(0, Math.min(index, total - 1));
-        const cardWidth = cards[0].offsetWidth + gap;
-        track.style.transform = `translateX(-${current * cardWidth}px)`;
-
-        dotsWrapper.querySelectorAll('.carousel-dot').forEach((d, i) => {
-            d.classList.toggle('active', i === current);
-        });
+    function getCardsPerView() {
+        const screenWidth = window.innerWidth;
+        if (screenWidth < 600) return 1;
+        if (screenWidth < 1024) return 2;
+        return 3;
     }
 
-    btnPrev.addEventListener('click', () => goTo(current - 1));
-    btnNext.addEventListener('click', () => goTo(current + 1));
+    function getTotalPages() {
+        const cards = track.children.length;
+        const perView = getCardsPerView();
+        return Math.ceil(cards / perView);
+    }
 
+    function updateDots() {
+        if (!dotsWrapper) return;
+        const totalPages = getTotalPages();
+        dotsWrapper.innerHTML = '';
+        
+        for (let i = 0; i < totalPages; i++) {
+            const dot = document.createElement('button');
+            dot.className = 'carousel-dot' + (i === currentIndex ? ' active' : '');
+            dot.setAttribute('aria-label', `Ir a página ${i + 1}`);
+            dot.addEventListener('click', () => goToPage(i));
+            dotsWrapper.appendChild(dot);
+        }
+    }
+
+    function goToPage(page) {
+        currentIndex = Math.max(0, Math.min(page, getTotalPages() - 1));
+        const offset = -currentIndex * (cardWidth + gap) * getCardsPerView();
+        track.style.transform = `translateX(${offset}px)`;
+        
+        if (dotsWrapper) {
+            const dots = dotsWrapper.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentIndex);
+            });
+        }
+    }
+
+    function next() {
+        if (currentIndex < getTotalPages() - 1) {
+            goToPage(currentIndex + 1);
+        }
+    }
+
+    function prev() {
+        if (currentIndex > 0) {
+            goToPage(currentIndex - 1);
+        }
+    }
+
+    function initCarousel() {
+        updateCardWidth();
+        goToPage(0);
+        updateDots();
+    }
+
+    if (btnPrev) btnPrev.addEventListener('click', prev);
+    if (btnNext) btnNext.addEventListener('click', next);
+
+    // Recargar carrusel al redimensionar la ventana
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => goTo(0), 200);
+        resizeTimer = setTimeout(() => {
+            updateCardWidth();
+            initCarousel();
+        }, 150);
     });
 
+    initCarousel();
 });

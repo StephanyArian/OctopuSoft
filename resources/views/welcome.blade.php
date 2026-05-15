@@ -48,7 +48,7 @@
         </div>
     </nav>
 
-    {{-- -----HERO —-----   --}}
+    {{-- HERO --}}
     <section id="inicio" class="hero">
         <div class="container hero-content">
             <h1>Crea tu Portafolio Digital y<br>Destaca tu Talento</h1>
@@ -124,7 +124,6 @@
         </div>
     </section>
 
-
     {{-- CÓMO FUNCIONA --}}
     <section id="como-funciona" class="section section-white">
         <div class="container">
@@ -156,7 +155,7 @@
         </div>
     </section>
 
-    
+    {{-- PORTAFOLIOS DESTACADOS (CARRUSEL DINÁMICO) --}}
     <section class="carousel-section">
         <div class="container">
 
@@ -169,186 +168,52 @@
 
             <div class="carousel-wrapper">
                 <div class="carousel-track" id="carouselTrack">
-
-                    {{--
-                        DATOS REALES — descomentar cuando el controlador esté listo.
-                        IMPORTANTE: al descomentar, eliminar las tarjetas de ejemplo de abajo
-                        y cambiar este bloque a sintaxis Blade (quitar los signos de comentario HTML).
-
-                        @foreach ($portfolios as $portfolio)
-                        <div class="portfolio-card">
-
-                            <div class="card-photo [avatar ? '' : 'no-photo ' . avatar_color]">
-                                [si tiene avatar]
-                                    <img src="[asset storage/avatar]" alt="Foto de [name]">
-                                [si no]
-                                    <div class="initials-circle">[initials]</div>
-                                [fin si]
-                            </div>
-
-                            <div class="card-body">
-                                <div class="card-name">[name]</div>
-
-                                <div class="card-professions">
-                                    <span class="card-profession-main">
-                                        [professions->first()->name ?? 'Profesional']
-                                    </span>
-                                    [si extra_professions > 0]
-                                        <span class="card-profession-extra">
-                                            +[extra_professions] más
-                                        </span>
-                                    [fin si]
-                                </div>
-
-                                [si bio]
-                                    <p class="card-bio">[bio]</p>
-                                [fin si]
-
-                                <div class="card-tags">
-                                    [foreach skills as skill]
-                                        <span class="card-tag">[skill]</span>
-                                    [endforeach]
-                                </div>
-
-                                <div class="card-footer-row">
-                                    <a href="[route portfolio.public slug]" class="card-link">
-                                        Ver portafolio <i class="fas fa-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                       @endforeach
-                    --}}
-
-                    {{-- ── TARJETAS DE EJEMPLO (reemplazar con @foreach arriba) ── --}}
-
-                    {{-- Tarjeta 1: CON foto de perfil, 1 sola profesión --}}
+                    @forelse($portfolios as $portfolio)
                     <div class="portfolio-card">
                         <div class="card-photo">
-                            <img src="{{ asset('imagenes/demo/avatar1.jpg') }}" alt="Andrea Morales">
+                            @if($portfolio->user->photo_base64)
+                                <img src="{{ $portfolio->user->photo_base64 }}" alt="{{ $portfolio->user->first_name }}">
+                            @else
+                                @php
+                                    $colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
+                                    $colorIndex = $loop->index % 5;
+                                @endphp
+                                <div class="no-photo {{ $colors[$colorIndex] }}">
+                                    <div class="initials-circle">
+                                        {{ strtoupper(substr($portfolio->user->first_name, 0, 1) . substr($portfolio->user->last_name, 0, 1)) }}
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         <div class="card-body">
-                            <div class="card-name">Andrea Morales</div>
+                            <div class="card-name">{{ $portfolio->user->first_name }} {{ $portfolio->user->last_name }}</div>
                             <div class="card-professions">
-                                <span class="card-profession-main">Diseñadora UX/UI</span>
-                                {{-- Sin badge porque solo tiene 1 profesión --}}
+                                <span class="card-profession-main">{{ $portfolio->user->profession->name ?? 'Profesional' }}</span>
+                                @php
+                                    $extraSkills = $portfolio->user->skills->where('type', 'technical')->count() - 1;
+                                @endphp
+                                @if($extraSkills > 0)
+                                    <span class="card-profession-extra">+{{ $extraSkills }} más</span>
+                                @endif
                             </div>
-                            <p class="card-bio">Creando experiencias digitales centradas en el usuario para productos modernos.</p>
+                            <p class="card-bio">{{ Str::limit($portfolio->user->biography ?? 'Sin biografía', 80) }}</p>
                             <div class="card-tags">
-                                <span class="card-tag">Figma</span>
-                                <span class="card-tag">Prototyping</span>
-                                <span class="card-tag">Research</span>
+                                @foreach($portfolio->user->skills->where('type', 'technical')->take(3) as $skill)
+                                    <span class="card-tag">{{ $skill->name }}</span>
+                                @endforeach
                             </div>
                             <div class="card-footer-row">
-                                <a href="#" class="card-link">
+                                <a href="{{ route('portafolio.public', $portfolio->slug) }}" class="card-link">
                                     Ver portafolio <i class="fas fa-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Tarjeta 2: CON foto, múltiples profesiones → muestra badge --}}
-                    <div class="portfolio-card">
-                        <div class="card-photo">
-                            <img src="{{ asset('imagenes/demo/avatar2.jpg') }}" alt="Carlos Ríos">
-                        </div>
-                        <div class="card-body">
-                            <div class="card-name">Carlos Ríos</div>
-                            <div class="card-professions">
-                                <span class="card-profession-main">Full Stack Developer</span>
-                                {{-- Tiene 2 profesiones más: badge "+2 más" --}}
-                                <span class="card-profession-extra">+2 más</span>
-                            </div>
-                            <p class="card-bio">Apasionado por construir aplicaciones web escalables con tecnologías modernas.</p>
-                            <div class="card-tags">
-                                <span class="card-tag">React</span>
-                                <span class="card-tag">Node.js</span>
-                                <span class="card-tag">PostgreSQL</span>
-                            </div>
-                            <div class="card-footer-row">
-                                <a href="#" class="card-link">
-                                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tarjeta 3: SIN foto → color-3 + iniciales --}}
-                    <div class="portfolio-card">
-                        <div class="card-photo no-photo color-3">
-                            <div class="initials-circle">LV</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-name">Lucía Vega</div>
-                            <div class="card-professions">
-                                <span class="card-profession-main">Data Scientist</span>
-                                {{-- Tiene 1 profesión adicional --}}
-                                <span class="card-profession-extra">+1 más</span>
-                            </div>
-                            <p class="card-bio">Transformando datos crudos en insights accionables mediante ML y analítica avanzada.</p>
-                            <div class="card-tags">
-                                <span class="card-tag">Python</span>
-                                <span class="card-tag">ML</span>
-                                <span class="card-tag">Tableau</span>
-                            </div>
-                            <div class="card-footer-row">
-                                <a href="#" class="card-link">
-                                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tarjeta 4: SIN foto → color-4 + iniciales, 1 profesión --}}
-                    <div class="portfolio-card">
-                        <div class="card-photo no-photo color-4">
-                            <div class="initials-circle">JP</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-name">Jorge Palacios</div>
-                            <div class="card-professions">
-                                <span class="card-profession-main">Ing. de Software</span>
-                            </div>
-                            <p class="card-bio">Especializado en arquitecturas backend robustas y servicios en la nube con AWS.</p>
-                            <div class="card-tags">
-                                <span class="card-tag">Java</span>
-                                <span class="card-tag">Spring</span>
-                                <span class="card-tag">AWS</span>
-                            </div>
-                            <div class="card-footer-row">
-                                <a href="#" class="card-link">
-                                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tarjeta 5: CON foto, múltiples profesiones --}}
-                    <div class="portfolio-card">
-                        <div class="card-photo">
-                            <img src="{{ asset('imagenes/demo/avatar3.jpg') }}" alt="María Paredes">
-                        </div>
-                        <div class="card-body">
-                            <div class="card-name">María Paredes</div>
-                            <div class="card-professions">
-                                <span class="card-profession-main">Diseñadora Gráfica</span>
-                                <span class="card-profession-extra">+1 más</span>
-                            </div>
-                            <p class="card-bio">Especialista en identidad visual y branding para marcas que quieren destacar.</p>
-                            <div class="card-tags">
-                                <span class="card-tag">Illustrator</span>
-                                <span class="card-tag">Branding</span>
-                                <span class="card-tag">Photoshop</span>
-                            </div>
-                            <div class="card-footer-row">
-                                <a href="#" class="card-link">
-                                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>{{-- /.carousel-track --}}
-            </div>{{-- /.carousel-wrapper --}}
+                    @empty
+                        <div style="text-align: center; padding: 40px;">No hay portafolios públicos disponibles</div>
+                    @endforelse
+                </div>
+            </div>
 
             <div class="carousel-controls">
                 <button class="carousel-btn" id="carouselPrev" aria-label="Anterior">
@@ -363,7 +228,7 @@
         </div>
     </section>
 
-    {{--CTA FINAL --}}
+    {{-- CTA FINAL --}}
     <div class="container">
         <div class="cta-section">
             <div class="cta-text">

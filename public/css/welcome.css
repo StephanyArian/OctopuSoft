@@ -1,5 +1,3 @@
-/* ---Archivo: public/css/welcome.css ---- */
-
 /* ---------- Variables ---------- */
 :root {
     --burg-deep:   #2d0a1e;
@@ -256,7 +254,6 @@ body {
     transition: color 0.3s ease;
 }
 
-/* Al hacer hover en la tarjeta, el icono cambia también */
 .benefit-card:hover .benefit-icon {
     background: var(--teal);
 }
@@ -264,7 +261,6 @@ body {
 .benefit-card:hover .benefit-icon i {
     color: var(--white);
 }
-.benefit-icon img { width: 32px; height: 32px; object-fit: contain; }
 .benefit-card h3  { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; color: var(--dark); }
 .benefit-card p   { color: var(--gray-500); line-height: 1.5; font-size: 0.95rem; }
 
@@ -294,46 +290,70 @@ body {
 .step h3  { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
 .step p   { color: var(--gray-500); font-size: 0.9rem; line-height: 1.5; }
 
-/* ----CARRUSEL DE PORTAFOLIOS ---- */
+/* ============================================ */
+/* CARRUSEL DE PORTAFOLIOS - RESPONSIVE        */
+/* ============================================ */
+
 .carousel-section { padding: 60px 0; background: var(--off); }
 
-.carousel-section > .container { padding: 0; }
+.carousel-section .container { padding: 0; }
 
 .carousel-section .section-header { padding: 0 20px; margin-bottom: 32px; }
 
-.carousel-wrapper { overflow: hidden; }
+.carousel-wrapper {
+    overflow: hidden;
+    position: relative;
+    padding: 8px 0;
+}
 
 .carousel-track {
     display: flex;
     gap: 24px;
-    padding: 8px 20px;          
     transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
 }
 
-/* ── Tarjeta ── */
+/* Tarjeta base */
 .portfolio-card {
-    flex: 0 0 360px;
+    flex: 0 0 300px;
+    width: 300px;
     background: var(--white);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0,0,0,0.07);
     border: 1px solid var(--gray-100);
-    cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
 .portfolio-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 16px 32px rgba(0,0,0,0.12);
 }
 
-/* ── Zona de foto / color ── */
+/* Responsive - Tablet (2 tarjetas) */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .portfolio-card {
+        flex: 0 0 280px;
+        width: 280px;
+    }
+}
+
+/* Responsive - Móvil (1 tarjeta, ocupa casi toda la pantalla) */
+@media (max-width: 600px) {
+    .portfolio-card {
+        flex: 0 0 calc(100vw - 48px);
+        width: calc(100vw - 48px);
+        margin: 0 4px;
+    }
+}
+
+/* Zona de foto */
 .card-photo {
     height: 220px;
     position: relative;
     overflow: hidden;
 }
 
-/* Con foto */
 .card-photo img {
     width: 100%;
     height: 100%;
@@ -369,7 +389,7 @@ body {
 .card-photo.color-4 { background: var(--burg-mid); }
 .card-photo.color-5 { background: #854F0B; }
 
-/* ── Cuerpo ── */
+/* Cuerpo de la tarjeta */
 .card-body { padding: 16px 18px 18px; }
 
 .card-name {
@@ -379,7 +399,7 @@ body {
     margin-bottom: 5px;
 }
 
-/* ── Profesiones ── */
+/* Profesiones */
 .card-professions {
     display: flex;
     align-items: center;
@@ -394,7 +414,6 @@ body {
     color: var(--teal);
 }
 
-/* Badge "+N más" — aparece solo si hay más de 1 profesión */
 .card-profession-extra {
     font-size: 0.72rem;
     font-weight: 600;
@@ -411,7 +430,6 @@ body {
     color: var(--gray-500);
     line-height: 1.55;
     margin-bottom: 12px;
-    /* Máximo 2 líneas */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -436,7 +454,6 @@ body {
     border: 1px solid var(--gray-100);
 }
 
-/* ── Botón "Ver portafolio" ── */
 .card-footer-row {
     display: flex;
     align-items: center;
@@ -458,7 +475,7 @@ body {
 }
 .card-link:hover { background: var(--teal); color: var(--white); }
 
-/* ── Controles ── */
+/* Controles del carrusel */
 .carousel-controls {
     display: flex;
     align-items: center;
@@ -499,7 +516,7 @@ body {
 }
 .carousel-dot.active { width: 22px; background: var(--teal); }
 
-/* ----CTA FINAL--- */
+/* CTA FINAL */
 .cta-section {
     background: linear-gradient(135deg, var(--burg-soft) 0%, var(--burg-deep) 100%);
     color: var(--white);
@@ -517,7 +534,7 @@ body {
 .cta-section .btn-primary { background: var(--white); color: var(--burg-soft); white-space: nowrap; flex-shrink: 0; }
 .cta-section .btn-primary:hover { background: var(--teal); color: var(--white); }
 
-/* ---FOOTER---- */
+/* FOOTER */
 footer { background: var(--burg-deep); color: var(--gray-300); }
 
 .footer-main {
@@ -540,7 +557,7 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
 .footer-bottom { padding: 12px 0; text-align: center; }
 .footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.22); }
 
-/* ---RESPONSIVE---- */
+/* RESPONSIVE GENERAL */
 @media (max-width: 768px) {
     .menu-toggle { display: block; }
 
@@ -570,20 +587,10 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
 
     .footer-main { flex-direction: column; align-items: flex-start; gap: 16px; }
     .footer-nav  { gap: 16px; }
-
-    /* ── Carrusel en tablet/móvil ── */
-    .portfolio-card { flex: 0 0 85vw; }   
-    .card-photo     { height: 200px; }
     
     .hero {
         background-position: 65% center;
     }
-}
-
-/* Tablet — muestra 2 tarjetas */
-@media (min-width: 600px) and (max-width: 1023px) {
-    .portfolio-card { flex: 0 0 300px; }
-    .card-photo     { height: 180px; }
 }
 
 @media (max-width: 480px) {

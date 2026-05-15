@@ -18,6 +18,17 @@ class Portfolio extends Model
         'show_phone',
     ];
 
+    /**
+     * Relación con el usuario (dueño del portafolio)
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relación con los proyectos del portafolio
+     */
     public function projects()
     {
         return $this->hasMany(Project::class);
