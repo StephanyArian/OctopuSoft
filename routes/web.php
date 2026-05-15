@@ -11,10 +11,20 @@ use App\Http\Controllers\SkillController;
 use App\Http\Controllers\RedContactoController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvidenciaController;
+use App\Models\Portfolio;
 
 
+// ============================================
+// RUTA PRINCIPAL (HOME) - CON PORTAFOLIOS
+// ============================================
 Route::get('/', function () {
-    return view('welcome');
+    $portfolios = Portfolio::where('is_public', true)
+        ->with(['user.skills', 'user.profession'])
+        ->orderBy('created_at', 'desc')
+        ->limit(10)
+        ->get();
+    
+    return view('welcome', compact('portfolios'));
 })->name('home');
 
 Route::get('/dashboard', function () {
@@ -42,7 +52,15 @@ Route::get('/reset-password/{token}', function ($token) {
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->middleware('guest')->name('password.store');
 
-// RUTAS PROTEGIDAS
+// ============================================
+// RUTAS PÚBLICAS - PORTAFOLIO (HU-16)
+// ============================================
+Route::get('/portafolio/{slug}', [App\Http\Controllers\PreviewController::class, 'publicShow'])
+    ->name('portafolio.public');
+
+// ============================================
+// RUTAS PROTEGIDAS (requieren autenticación)
+// ============================================
 Route::middleware('auth')->group(function () {
 
     // PERFIL
