@@ -1,20 +1,15 @@
-<nav x-data="{ open: false }" style="background-color: #2d0a1e; border-bottom: 1px solid #4a1030; position: relative; z-index: 50;">
+<nav x-data="{ open: false }" style="background-color: #2d0a1e; border-bottom: 1px solid #4a1030; position: sticky; top: 0; z-index: 1000;">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current" style="color: #0abf9e;" />
+                    <a href="{{ url('/') }}" style="text-decoration: none;">
+                        <div class="logo">
+                            <h2 style="color: #0abf9e; font-weight: 800; font-size: 1.5rem; font-family: 'Figtree', sans-serif; margin: 0; line-height: 1;">DevFolio</h2>
+                        </div>
                     </a>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class=" space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" style="color:  #0abf9e; font-weight: 900;font-size: 16px; letter-spacing: 1px;font-family: 'Arial Black', sans-serif;">
-                        {{ __('MI PORTAFOLIO') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -91,7 +86,7 @@
     >
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" style="color: #ffffff;">
-                <i class="bi bi-house-fill"></i> {{ __('Mi portafolio') }}
+                <i class="bi bi-house-fill"></i> {{ __('DevFolio') }}
             </x-responsive-nav-link>
             <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 8px 16px;"></div>
             <x-responsive-nav-link :href="route('profile.create')" style="color: #1de8c0;">

@@ -22,8 +22,10 @@
     {{-- NAVBAR --}}
     <nav class="navbar">
         <div class="nav-container">
+            
             <div class="logo">
-                <h2>PORTAFOLIO</h2>
+                
+                <h2>DevFolio</h2>
             </div>
 
             <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
@@ -381,7 +383,7 @@
         <div class="container">
             <div class="footer-main">
                 <div class="footer-brand">
-                    <div class="footer-logo-text">PORTAFOLIO</div>
+                    <div class="footer-logo-text">DevFolio</div>
                     <div class="footer-tagline">Crea. Comparte. Impacta.</div>
                 </div>
                 <nav class="footer-nav" aria-label="Links del footer">
@@ -392,7 +394,7 @@
                 </nav>
             </div>
             <div class="footer-bottom">
-                <p>© 2026 Generador de Portafolios Digitales. Todos los derechos reservados.</p>
+                <p>Todos los derechos estan reservados por la empresa de software OctopuSoft.</p>
             </div>
         </div>
     </footer>
