@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
+const MAX_SIZE_MB   = 2;
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+
 
 const IconEdit = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{flexShrink:0}}>
@@ -45,6 +48,146 @@ function DescripcionColapsable({ texto, limite = 150 }) {
                     {expandido ? 'Ver menos' : 'Ver más'}
                 </button>
             )}
+        </div>
+    );
+}
+
+function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
+    const [evidencias, setEvidencias]   = useState(evidenciasIniciales);
+    const [archivos, setArchivos]       = useState([]);   // archivos nuevos pendientes
+    const [errores, setErrores]         = useState([]);
+    const inputRef                      = useRef(null);
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    function validarArchivo(file) {
+        if (!ALLOWED_TYPES.includes(file.type))
+            return `"${file.name}" no es JPG, PNG ni PDF.`;
+        if (file.size > MAX_SIZE_MB * 1024 * 1024)
+            return `"${file.name}" supera los ${MAX_SIZE_MB} MB.`;
+        return null;
+    }
+
+    function sincronizarInput(lista) {
+        if (!inputRef.current) return;
+        const dt = new DataTransfer();
+        lista.forEach(a => dt.items.add(a.file));
+        inputRef.current.files = dt.files;
+    }
+    
+    function agregarArchivos(e) {
+        const nuevos = Array.from(e.target.files);
+        const errs = [];
+        const validos = [];
+        nuevos.forEach(f => {
+            const err = validarArchivo(f);
+            if (err) errs.push(err);
+            else validos.push({ file: f, preview: URL.createObjectURL(f) });
+        });
+        setErrores(errs);
+        setArchivos(prev => {
+            const actualizados = [...prev, ...validos];
+            sincronizarInput(actualizados);
+            return actualizados;
+        });
+        e.target.value = '';
+    }
+    
+    function quitarPendiente(idx) {
+        setArchivos(prev => {
+            const actualizados = prev.filter((_, i) => i !== idx);
+            sincronizarInput(actualizados);
+            return actualizados;
+        });
+    }
+
+    async function eliminarEvidencia(evidenciaId) {
+        const res = await fetch(`/evidencias/${evidenciaId}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
+        });
+        if (res.ok) setEvidencias(prev => prev.filter(e => e.id !== evidenciaId));
+    }
+
+    // Esta función la llama el form padre al hacer submit — devuelve los archivos pendientes
+    // para que guardarEdicion los adjunte al FormData
+    function getArchivosPendientes() {
+        return archivos.map(a => a.file);
+    }
+
+    // Exponer al padre vía ref (se usa con useImperativeHandle si quieres, o simplemente
+    // adjuntamos los archivos en el submit del form padre directamente desde `archivos`)
+    return (
+        <div style={{ marginBottom: '12px' }}>
+            <label className="form-label">Evidencias (JPG, PNG, PDF — máx. {MAX_SIZE_MB} MB c/u)</label>
+
+            {/* Evidencias ya guardadas */}
+            {evidencias.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    {evidencias.map(ev => (
+                        <div key={ev.id} style={{ position: 'relative', display: 'inline-block' }}>
+                            {ev.mime_type?.startsWith('image/') ? (
+                                <img src={ev.url} alt="evidencia"
+                                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} />
+                            ) : (
+                                <a href={ev.url} target="_blank" rel="noreferrer"
+                                    style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--teal)' }}>
+                                    📄 {ev.nombre || 'PDF'}
+                                </a>
+                            )}
+                            <button type="button"
+                                onClick={() => eliminarEvidencia(ev.id)}
+                                style={{
+                                    position: 'absolute', top: -6, right: -6,
+                                    background: '#e53e3e', color: '#fff', border: 'none',
+                                    borderRadius: '50%', width: 18, height: 18,
+                                    fontSize: 11, cursor: 'pointer', lineHeight: '18px', textAlign: 'center',
+                                }}>×</button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Archivos nuevos (pendientes de guardar) */}
+            {archivos.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    {archivos.map((a, i) => (
+                        <div key={i} style={{ position: 'relative', display: 'inline-block' }}>
+                            {a.file.type.startsWith('image/') ? (
+                                <img src={a.preview} alt="preview"
+                                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 6,
+                                             border: '2px dashed var(--teal)', opacity: 0.85 }} />
+                            ) : (
+                                <div style={{ fontSize: 12, color: '#555' }}>📄 {a.file.name}</div>
+                            )}
+                            <button type="button" onClick={() => quitarPendiente(i)}
+                                style={{
+                                    position: 'absolute', top: -6, right: -6,
+                                    background: '#718096', color: '#fff', border: 'none',
+                                    borderRadius: '50%', width: 18, height: 18,
+                                    fontSize: 11, cursor: 'pointer', lineHeight: '18px', textAlign: 'center',
+                                }}>×</button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {errores.length > 0 && (
+                <ul style={{ color: '#e53e3e', fontSize: 12, margin: '4px 0', paddingLeft: 16 }}>
+                    {errores.map((er, i) => <li key={i}>{er}</li>)}
+                </ul>
+            )}
+
+            
+
+            <input ref={inputRef} type="file" name="evidencias[]" multiple
+                accept=".jpg,.jpeg,.png,.pdf"
+                onChange={agregarArchivos}
+                style={{ display: 'none' }} />
+            <button type="button" className="btn-sm"
+                onClick={() => inputRef.current?.click()}
+                style={{ marginTop: 4 }}>
+                + Agregar archivo
+            </button>
         </div>
     );
 }
@@ -114,24 +257,19 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
     // ── EDITAR ──
     async function guardarEdicion(e, id) {
         e.preventDefault();
-        const form = new FormData(e.target);
-        const data = Object.fromEntries(form.entries());
+        
+        
 
+        const formData = new FormData(e.target);
+        formData.append('_method', 'PUT');
+    
         const res = await fetch(`/informacion-academica/${id}`, {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': token,
                 'Accept': 'application/json',
-                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                institucion:     data.institucion,
-                titulo_obtenido: data.titulo_obtenido,
-                fecha_inicio:    data.fecha_inicio,
-                fecha_fin:       data.fecha_fin || null,
-                estudio_actual:  data.estudio_actual ? 1 : 0,
-                descripcion:     data.descripcion,
-            }),
+            body: formData,
         });
 
         if (res.ok) {
@@ -158,7 +296,7 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                     <div key={f.id} className="historial-card">
                         {editando === f.id ? (
                             // ── MODO EDICIÓN ──
-                            <form onSubmit={(e) => guardarEdicion(e, f.id)}>
+                            <form onSubmit={(e) => guardarEdicion(e, f.id)} encType="multipart/form-data">
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Institución <span className="required">*</span></label>
@@ -227,6 +365,20 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                         {f.description?.length || 0} / 500
                                     </div>
                                 </div>
+                                <EvidenciasEditor
+                                     formacionId={f.id}
+                                     evidenciasIniciales={
+                                        f.evidence_url
+                                            ? JSON.parse(f.evidence_url).map((path, i) => ({
+                                                id: i,
+                                                url: `/storage/${path}`,
+                                                mime_type: path.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
+                                                nombre: path.split('/').pop(),
+                                            }))
+                                            : []
+                                    }
+                                />
+
                                 <div className="historial-actions">
                                     <button type="submit" className="btn-sm btn-guardar">
                                         Guardar cambios
@@ -254,6 +406,25 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 {f.description && (
                                     <DescripcionColapsable texto={f.description} />
                                 )}
+
+                                    {f.evidence_url && JSON.parse(f.evidence_url).length > 0 && (
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                                            {JSON.parse(f.evidence_url).map((path, i) => (
+                                                path.endsWith('.pdf') ? (
+                                                    <a key={i} href={`/storage/${path}`} target="_blank" rel="noreferrer"
+                                                        style={{ fontSize: 12, color: 'var(--teal)' }}>
+                                                        📄 {path.split('/').pop()}
+                                                    </a>
+                                                ) : (
+                                                    <a key={i} href={`/storage/${path}`} target="_blank" rel="noreferrer">
+                                                        <img src={`/storage/${path}`} alt="evidencia"
+                                                            style={{ width: 60, height: 60, objectFit: 'cover',
+                                                                    borderRadius: 6, border: '1px solid #ddd' }} />
+                                                    </a>
+                                                )
+                                            ))}
+                                        </div>
+                                    )}
 
                                 <div className="historial-actions">
                                     <button className="btn-sm" onClick={() => setEditando(f.id)}>

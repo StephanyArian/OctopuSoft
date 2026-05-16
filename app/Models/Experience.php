@@ -14,6 +14,7 @@ class Experience extends Model
         'institution',
         'title',
         'description',
+        'evidence_url', 
         'location',
         'start_date',
         'end_date',
