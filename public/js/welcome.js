@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    /* -------MENÚ HAMBURGUESA (móvil)----------- */
+    /* ── MENÚ HAMBURGUESA ── */
     const menuToggle = document.getElementById('menuToggle');
     const navLinks   = document.getElementById('navLinks');
 
@@ -16,107 +16,86 @@ document.addEventListener('DOMContentLoaded', () => {
         navLinks.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('active');
-                const icon = menuToggle.querySelector('i');
-                icon.classList.replace('fa-times', 'fa-bars');
+                menuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
             });
         });
     }
 
-    /* ------ CARRUSEL DE PORTAFOLIOS RESPONSIVE------- */
-    const track   = document.getElementById('carouselTrack');
-    const btnPrev = document.getElementById('carouselPrev');
-    const btnNext = document.getElementById('carouselNext');
+    /* ── CARRUSEL ── */
+    const track       = document.getElementById('carouselTrack');
+    const btnPrev     = document.getElementById('carouselPrev');
+    const btnNext     = document.getElementById('carouselNext');
     const dotsWrapper = document.getElementById('carouselDots');
 
     if (!track) return;
 
+    const cards = Array.from(track.querySelectorAll('.portfolio-card'));
+    if (cards.length === 0) return;
+
+    const GAP = 24;
     let currentIndex = 0;
-    let cardWidth = 300;
-    const gap = 24;
 
-    function updateCardWidth() {
-        const screenWidth = window.innerWidth;
-        
-        if (screenWidth < 600) {
-            cardWidth = screenWidth - 48;
-        } else if (screenWidth < 1024) {
-            cardWidth = 280;
-        } else {
-            cardWidth = 300;
-        }
-        return cardWidth;
-    }
-
-    function getCardsPerView() {
-        const screenWidth = window.innerWidth;
-        if (screenWidth < 600) return 1;
-        if (screenWidth < 1024) return 2;
+    /* Cuántas tarjetas se ven según el ancho de pantalla */
+    function getPerView() {
+        const w = window.innerWidth;
+        if (w < 600)  return 1;
+        if (w < 1024) return 2;
         return 3;
     }
 
-    function getTotalPages() {
-        const cards = track.children.length;
-        const perView = getCardsPerView();
-        return Math.ceil(cards / perView);
+    /* Ancho real de UNA tarjeta (leído del DOM, no hardcodeado) */
+    function getCardWidth() {
+        return cards[0].getBoundingClientRect().width;
     }
 
-    function updateDots() {
-        if (!dotsWrapper) return;
-        const totalPages = getTotalPages();
+    /* Total de posiciones de desplazamiento posibles
+       — CORREGIDO: usa cards individuales, no páginas,
+         así no queda espacio vacío al final             */
+    function getMaxIndex() {
+        return Math.max(0, cards.length - getPerView());
+    }
+
+    /* ── Dots ── */
+    function buildDots() {
         dotsWrapper.innerHTML = '';
-        
-        for (let i = 0; i < totalPages; i++) {
-            const dot = document.createElement('button');
-            dot.className = 'carousel-dot' + (i === currentIndex ? ' active' : '');
-            dot.setAttribute('aria-label', `Ir a página ${i + 1}`);
-            dot.addEventListener('click', () => goToPage(i));
-            dotsWrapper.appendChild(dot);
+        const max = getMaxIndex();
+        for (let i = 0; i <= max; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            btn.setAttribute('aria-label', `Ir a portafolio ${i + 1}`);
+            btn.addEventListener('click', () => goTo(i));
+            dotsWrapper.appendChild(btn);
         }
     }
 
-    function goToPage(page) {
-        currentIndex = Math.max(0, Math.min(page, getTotalPages() - 1));
-        const offset = -currentIndex * (cardWidth + gap) * getCardsPerView();
-        track.style.transform = `translateX(${offset}px)`;
-        
-        if (dotsWrapper) {
-            const dots = dotsWrapper.querySelectorAll('.carousel-dot');
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentIndex);
-            });
-        }
+    /* ── Ir a una posición ── */
+    function goTo(index) {
+        currentIndex = Math.max(0, Math.min(index, getMaxIndex()));
+
+        /* Desplazamiento exacto: (ancho tarjeta + gap) × índice */
+        const offset = currentIndex * (getCardWidth() + GAP);
+        track.style.transform = `translateX(-${offset}px)`;
+
+        /* Actualizar dots */
+        dotsWrapper.querySelectorAll('.carousel-dot').forEach((d, i) => {
+            d.classList.toggle('active', i === currentIndex);
+        });
     }
 
-    function next() {
-        if (currentIndex < getTotalPages() - 1) {
-            goToPage(currentIndex + 1);
-        }
-    }
+    btnPrev.addEventListener('click', () => goTo(currentIndex - 1));
+    btnNext.addEventListener('click', () => goTo(currentIndex + 1));
 
-    function prev() {
-        if (currentIndex > 0) {
-            goToPage(currentIndex - 1);
-        }
-    }
-
-    function initCarousel() {
-        updateCardWidth();
-        goToPage(0);
-        updateDots();
-    }
-
-    if (btnPrev) btnPrev.addEventListener('click', prev);
-    if (btnNext) btnNext.addEventListener('click', next);
-
-    // Recargar carrusel al redimensionar la ventana
+    /* Reiniciar al redimensionar */
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            updateCardWidth();
-            initCarousel();
+            buildDots();
+            goTo(0);
         }, 150);
     });
 
-    initCarousel();
+    /* Iniciar */
+    buildDots();
+    goTo(0);
 });

@@ -58,6 +58,9 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 Route::get('/portafolio/{slug}', [App\Http\Controllers\PreviewController::class, 'publicShow'])
     ->name('portafolio.public');
 
+Route::get('/portafolios', [App\Http\Controllers\PreviewController::class, 'explore'])
+    ->name('portafolio.explore');
+
 // ============================================
 // RUTAS PROTEGIDAS (requieren autenticación)
 // ============================================

@@ -401,4 +401,16 @@ class PreviewController extends Controller
             'portfolio'
         ));
     }
+
+    //Página de exploración — todos los portafolios públicos
+ 
+    public function explore()
+    {
+        $portfolios = \App\Models\Portfolio::where('is_public', true)
+            ->with(['user.skills', 'user.profession'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('portafolio.explore', compact('portfolios'));
+    }
 }

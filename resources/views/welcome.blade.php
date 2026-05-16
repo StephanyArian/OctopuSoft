@@ -172,21 +172,21 @@
                 <div class="carousel-track" id="carouselTrack">
                     @forelse($portfolios as $portfolio)
                     <div class="portfolio-card">
-                        <div class="card-photo">
-                            @if($portfolio->user->photo_base64)
+                        @php
+                            $colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
+                            $colorIndex = $loop->index % 5;
+                        @endphp
+                        @if($portfolio->user->photo_base64)
+                            <div class="card-photo">
                                 <img src="{{ $portfolio->user->photo_base64 }}" alt="{{ $portfolio->user->first_name }}">
-                            @else
-                                @php
-                                    $colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
-                                    $colorIndex = $loop->index % 5;
-                                @endphp
-                                <div class="no-photo {{ $colors[$colorIndex] }}">
-                                    <div class="initials-circle">
-                                        {{ strtoupper(substr($portfolio->user->first_name, 0, 1) . substr($portfolio->user->last_name, 0, 1)) }}
-                                    </div>
+                            </div>
+                        @else
+                            <div class="card-photo no-photo {{ $colors[$colorIndex] }}">
+                                <div class="initials-circle">
+                                    {{ strtoupper(substr($portfolio->user->first_name, 0, 1) . substr($portfolio->user->last_name, 0, 1)) }}
                                 </div>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
                         <div class="card-body">
                             <div class="card-name">{{ $portfolio->user->first_name }} {{ $portfolio->user->last_name }}</div>
                             <div class="card-professions">
@@ -226,7 +226,13 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-
+            
+            <div style="text-align:center; margin-top: 28px;">
+                <a href="{{ route('portafolio.explore') }}" class="btn-outline">
+                    Ver todos los portafolios &nbsp;<i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+    
         </div>
     </section>
 
