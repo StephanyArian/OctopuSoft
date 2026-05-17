@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Portfolio;
+use App\Models\Profession; // Suponiendo el nombre del modelo de categorías
+use App\Models\Skill;      // Para las tecnologías
 
 class PreviewController extends Controller
 {
@@ -404,13 +407,129 @@ class PreviewController extends Controller
 
     //Página de exploración — todos los portafolios públicos
  
-    public function explore()
+    /**
+     * Página de exploración unificada — Soporta carga normal y filtrado AJAX
+     */
+    public function explore(Request $request)
     {
-        $portfolios = \App\Models\Portfolio::where('is_public', true)
-            ->with(['user.skills', 'user.profession'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+    $categories = collect([
+    'Frontend Developer',
+    'Backend Developer',
+    'Full Stack Developer',
+    'UI/UX Designer',
+    'DevOps Engineer',
+    'Mobile Developer',
+    'Project Manager',
+    'QA Tester',
+    'Database Administrator',
+    'Technical Leader',
+    'Data Analyst',
+    'Scrum Master',
+    'Product Owner',
+    'Business Analyst',
+    'Security Engineer',
+    'Data Engineer',
+    'Cloud Engineer',
+    'AI Engineer',
+    'Systems Analyst',
+])->map(function ($name, $index) {
+    return (object) [
+        'id' => $name,
+        'name' => $name,
+    ];
+});
 
-        return view('portafolio.explore', compact('portfolios'));
+$skills = collect([
+    'Angular', 'AWS', 'Azure', 'Bootstrap', 'C#', 'Cassandra', 'Django',
+    'Docker', 'Express.js', 'Figma', 'Firebase', 'Flutter', 'Git', 'Go',
+    'GraphQL', 'Java', 'JavaScript', 'Jenkins', 'Kotlin', 'Kubernetes',
+    'Laravel', 'Linux', 'MongoDB', 'MySQL', 'Next.js', 'Node.js', 'PHP',
+    'PostgreSQL', 'Python', 'React', 'Redis', 'Redux', 'Ruby on Rails',
+    'Rust', 'Sass', 'Spring Boot', 'Supabase', 'Svelte', 'Swift',
+    'Tailwind CSS', 'TypeScript', 'Unity', 'Vue.js', 'Webpack', 'WordPress'
+])->map(function ($name) {
+    return (object) [
+        'name' => $name,
+    ];
+});
+
+    $query = Portfolio::where('is_public', true)
+        ->with(['user.profession', 'user.skills', 'projects.technologies']);
+
+    if ($request->filled('search')) {
+        $search = trim($request->input('search'));
+
+        $query->where(function ($q) use ($search) {
+            $q->whereHas('user', function ($u) use ($search) {
+                $u->where('first_name', 'LIKE', "%{$search}%")
+                  ->orWhere('last_name', 'LIKE', "%{$search}%")
+                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
+                  ->orWhere('biography', 'LIKE', "%{$search}%");
+            })
+            ->orWhereHas('user.profession', function ($p) use ($search) {
+                $p->where('name', 'LIKE', "%{$search}%");
+            })
+            ->orWhereHas('user.skills', function ($s) use ($search) {
+                $s->where('name', 'LIKE', "%{$search}%");
+            })
+
+            ->orWhereHas('projects.technologies', function ($t) use ($search) {
+                $t->where('name', 'LIKE', "%{$search}%");
+            })
+
+            ->orWhereHas('projects', function ($p) use ($search) {
+            $p->where('name', 'LIKE', "%{$search}%")
+              ->orWhere('description', 'LIKE', "%{$search}%")
+              ->orWhere('role', 'LIKE', "%{$search}%")
+              ->orWhere('company', 'LIKE', "%{$search}%");
+           });
+        });
     }
+
+    if ($request->filled('category')) {
+    $query->whereHas('user.profession', function ($q) use ($request) {
+        $q->where('name', $request->category);
+    });
+}
+
+    if ($request->filled('skills')) {
+    $skillsArray = array_filter((array) $request->input('skills'));
+
+    foreach ($skillsArray as $skillName) {
+        $query->where(function ($q) use ($skillName) {
+
+            // 1. Busca en tecnologías/habilidades que domina el usuario
+            $q->whereHas('user.skills', function ($s) use ($skillName) {
+                $s->where('name', $skillName)
+                  ->where('type', 'technical');
+            })
+
+            // 2. Busca también en tecnologías usadas dentro de proyectos
+            ->orWhereHas('projects.technologies', function ($t) use ($skillName) {
+                $t->where('name', $skillName);
+            });
+        });
+    }
+}
+    $sort = $request->input('sort', 'desc');
+    $sort = in_array($sort, ['asc', 'desc']) ? $sort : 'desc';
+
+    $query->orderBy('created_at', $sort);
+
+    if ($request->ajax()) {
+        $portfolios = $query->get();
+
+        return response()->json([
+            'html' => view('partials.portfolio_cards', [
+                'portfolios' => $portfolios,
+                'ajax' => true
+            ])->render(),
+            'count' => $portfolios->count()
+        ]);
+    }
+
+    $portfolios = $query->paginate(12);
+
+    return view('portafolio.explore', compact('portfolios', 'categories', 'skills'));
+   }
 }

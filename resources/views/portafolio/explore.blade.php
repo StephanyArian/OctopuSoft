@@ -65,11 +65,89 @@
             padding: 48px 0 60px;
         }
 
-        /* ── Grid: 3 columnas fijas en desktop, 1 en móvil ── */
-        .explore-grid {
+        /* Contenedor central de filtros y resultados */
+        .explore-container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+
+        /* Barra de Filtros Dinámica */
+        .filter-container {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            margin-bottom: 32px;
+        }
+        .search-bar-row {
+            margin-bottom: 16px;
+        }
+        .search-bar-row input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-bar-row input:focus {
+            border-color: var(--teal);
+        }
+        .filters-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filters-row select {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 16px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 10px;
+            background: var(--white);
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--dark);
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .filters-row select:focus {
+            border-color: var(--teal);
+        }
+        .btn-clean {
+            padding: 12px 24px;
+            border: 1.5px solid var(--teal);
+            background: transparent;
+            color: var(--teal);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-clean:hover {
+            background: rgba(10,191,158,0.08);
+        }
+
+        /* Contador de resultados */
+        .results-count {
+            font-size: 0.95rem;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .results-count span {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* ── Grid: 3 columnas fijas en desktop, 1 en móvil ── */
+        .explore-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 28px;
@@ -80,7 +158,7 @@
         }
         @media (max-width: 580px) {
             .explore-grid { grid-template-columns: 1fr; }
-    }
+        }
 
         /* ── Tarjeta uniforme ── */
         .explore-grid .portfolio-card {
@@ -147,9 +225,7 @@
 
         /* ── Paginación ── */
         .pagination-wrapper {
-            max-width: 1100px;
-            margin: 40px auto 0;
-            padding: 0 20px;
+            margin-top: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -259,7 +335,7 @@
         <div class="explore-hero-inner">
             <div class="explore-hero-text">
                 <h1>Portafolios de la comunidad</h1>
-                <p>{{ $portfolios->total() }} portafolios publicados</p>
+                <p><span id="totalResultsHero">{{ $portfolios->total() }}</span> portafolios publicados</p>
             </div>
             <a href="{{ route('home') }}" class="btn-back">
                 <i class="fas fa-arrow-left"></i> Volver al inicio
@@ -267,135 +343,88 @@
         </div>
     </div>
 
-    {{-- GRID DE PORTAFOLIOS --}}
+    {{-- CUERPO PRINCIPAL --}}
     <div class="explore-body">
+        <div class="explore-container">
 
-        @if($portfolios->isEmpty())
-            <div class="empty-state">
-                <i class="fas fa-folder-open"></i>
-                <h3>No hay portafolios aún</h3>
-                <p>Sé el primero en crear y publicar tu portafolio profesional.</p>
-                <br>
-                @if(Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn-primary">Crear mi portafolio</a>
+            {{-- Estructura de Filtros Interactiva --}}
+            <div class="filter-container">
+                <div class="search-bar-row">
+                    <input type="text" id="searchRepo" maxlength="50" placeholder="Buscar por nombre, tecnología o rol...">
+                </div>
+                
+                <div class="filters-row">
+                    <select id="filterCategory">
+                        <option value="">Todas las categorías</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <select id="filterSkills">
+                        <option value="">Todas las tecnologías</option>
+                        @foreach($skills as $skill)
+                            <option value="{{ $skill->name }}">{{ $skill->name }}</option>
+                        @endforeach
+                    </select>
+
+                    <select id="filterSort">
+                        <option value="desc">Más recientes</option>
+                        <option value="asc">Más antiguos</option>
+                    </select>
+
+                    <button id="btnClearFilters" class="btn-clean">Limpiar filtros</button>
+                </div>
+            </div>
+
+            {{-- Contador de resultados dinámico --}}
+            <div class="results-count">
+                <span id="totalResults">{{ $portfolios->total() }}</span> resultados encontrados
+            </div>
+
+            {{-- Grilla contenedora dinámica para peticiones AJAX --}}
+            <div id="portfoliosGrid" class="explore-grid">
+                @if($portfolios->isEmpty())
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>No hay portafolios aún</h3>
+                        <p>Sé el primero en crear y publicar tu portafolio profesional.</p>
+                        <br>
+                        @if(Route::has('register'))
+                            <a href="{{ route('register') }}" class="btn-primary">Crear mi portafolio</a>
+                        @endif
+                    </div>
+                @else
+                    @include('partials.portfolio_cards')
+
+                    {{-- PAGINACIÓN --}}
+                    @if($portfolios->hasPages())
+                        <div class="pagination-wrapper">
+                            @if($portfolios->onFirstPage())
+                                <span class="page-link disabled"><i class="fas fa-chevron-left"></i></span>
+                            @else
+                                <a href="{{ $portfolios->previousPageUrl() }}" class="page-link"><i class="fas fa-chevron-left"></i></a>
+                            @endif
+
+                            @foreach($portfolios->getUrlRange(1, $portfolios->lastPage()) as $page => $url)
+                                @if($page == $portfolios->currentPage())
+                                    <span class="page-link active">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}" class="page-link">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            @if($portfolios->hasMorePages())
+                                <a href="{{ $portfolios->nextPageUrl() }}" class="page-link"><i class="fas fa-chevron-right"></i></a>
+                            @else
+                                <span class="page-link disabled"><i class="fas fa-chevron-right"></i></span>
+                            @endif
+                        </div>
+                    @endif
                 @endif
             </div>
 
-        @else
-            <div class="explore-grid">
-                @foreach($portfolios as $portfolio)
-                <div class="portfolio-card">
-
-                    {{-- Foto o color + iniciales --}}
-                    @php
-                        $colorList = ['color-1','color-2','color-3','color-4','color-5'];
-                        $colorClass = $colorList[$loop->index % 5];
-                    @endphp
-
-                    @if($portfolio->user->photo_base64)
-                        <div class="card-photo">
-                            <img src="{{ $portfolio->user->photo_base64 }}"
-                                 alt="{{ $portfolio->user->first_name }}">
-                        </div>
-                    @else
-                        <div class="card-photo no-photo {{ $colorClass }}">
-                            <div class="initials-circle">
-                                {{ strtoupper(
-                                    substr($portfolio->user->first_name ?? '?', 0, 1) .
-                                    substr($portfolio->user->last_name  ?? '', 0, 1)
-                                ) }}
-                            </div>
-                        </div>
-                    @endif
-                    
-
-                    <div class="card-body">
-                        <div class="card-name">
-                            {{ $portfolio->user->first_name }} {{ $portfolio->user->last_name }}
-                        </div>
-
-                        {{-- Profesión principal + badge extras --}}
-                        <div class="card-professions">
-                            <span class="card-profession-main">
-                                {{ $portfolio->user->profession->name ?? 'Profesional' }}
-                            </span>
-                            @php
-                                $extraSkills = $portfolio->user->skills
-                                    ->where('type', 'technical')->count() - 1;
-                            @endphp
-                            @if($extraSkills > 0)
-                                <span class="card-profession-extra">+{{ $extraSkills }} más</span>
-                            @endif
-                        </div>
-
-                        <p class="card-bio">
-                            {{ Str::limit($portfolio->user->biography ?? 'Sin biografía', 80) }}
-                        </p>
-
-                        {{-- Tags de habilidades --}}
-                        <div class="card-tags">
-                            @foreach($portfolio->user->skills->where('type','technical')->take(3) as $skill)
-                                <span class="card-tag">{{ $skill->name }}</span>
-                            @endforeach
-                        </div>
-
-                        {{-- Botón ver portafolio --}}
-                        <div class="card-footer-row">
-                            @auth
-                                <a href="{{ route('portafolio.public', $portfolio->slug) }}"
-                                    class="card-link">
-                                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                                </a>
-                            @else
-                                <a href="{{ route('login') }}"
-                                    class="card-link"
-                                    onclick="return confirm('Debes iniciar sesión o registrarte para ver este portafolio.')">
-                                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                                </a>
-                            @endauth
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-
-            {{-- PAGINACIÓN --}}
-            @if($portfolios->hasPages())
-                <div class="pagination-wrapper">
-                    {{-- Anterior --}}
-                    @if($portfolios->onFirstPage())
-                        <span class="page-link disabled">
-                            <i class="fas fa-chevron-left"></i>
-                        </span>
-                    @else
-                        <a href="{{ $portfolios->previousPageUrl() }}" class="page-link">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                    @endif
-
-                    {{-- Números de página --}}
-                    @foreach($portfolios->getUrlRange(1, $portfolios->lastPage()) as $page => $url)
-                        @if($page == $portfolios->currentPage())
-                            <span class="page-link active">{{ $page }}</span>
-                        @else
-                            <a href="{{ $url }}" class="page-link">{{ $page }}</a>
-                        @endif
-                    @endforeach
-
-                    {{-- Siguiente --}}
-                    @if($portfolios->hasMorePages())
-                        <a href="{{ $portfolios->nextPageUrl() }}" class="page-link">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                    @else
-                        <span class="page-link disabled">
-                            <i class="fas fa-chevron-right"></i>
-                        </span>
-                    @endif
-                </div>
-            @endif
-
-        @endif
+        </div>
     </div>
 
     {{-- FOOTER --}}
@@ -419,8 +448,9 @@
         </div>
     </footer>
 
+    {{-- SCRIPTS INTERNOS Y AJAX --}}
     <script>
-        // Menú hamburguesa (mismo que welcome.js)
+        // Menú hamburguesa navbar
         const menuToggle = document.getElementById('menuToggle');
         const navLinks   = document.getElementById('navLinks');
         if (menuToggle && navLinks) {
@@ -433,24 +463,32 @@
             });
         }
     </script>
-    <script>
-        function toggleUserMenu() {
-            const menu     = document.getElementById('userMenu');
-            const chevron  = document.getElementById('dropdownChevron');
-            const isOpen   = menu.classList.contains('open');
-            menu.classList.toggle('open');
-            chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
 
-        // Cerrar al hacer clic fuera
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('userDropdown');
-            const menu     = document.getElementById('userMenu');
-            if (dropdown && !dropdown.contains(e.target)) {
-                menu.classList.remove('open');
-                document.getElementById('dropdownChevron').style.transform = 'rotate(0deg)';
-            }
-        });
-    </script>
+    <script>
+    function toggleUserMenu() {
+        const menu = document.getElementById('userMenu');
+        const chevron = document.getElementById('dropdownChevron');
+
+        if (!menu || !chevron) return;
+
+        const isOpen = menu.classList.contains('open');
+        menu.classList.toggle('open');
+        chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('userDropdown');
+        const menu = document.getElementById('userMenu');
+        const chevron = document.getElementById('dropdownChevron');
+
+        if (dropdown && menu && chevron && !dropdown.contains(e.target)) {
+            menu.classList.remove('open');
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    });
+</script>
+    
+    <script src="{{ asset('js/welcome.js') }}"></script>
+
 </body>
 </html>
