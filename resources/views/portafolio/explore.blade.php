@@ -235,6 +235,16 @@
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="btn-primary">Dashboard</a>
+                        <div class="nav-user-dropdown" id="userDropdown">
+                            <button class="nav-user-trigger" onclick="toggleUserMenu()">
+                                {{ Auth::user()->first_name ?? Auth::user()->name }}
+                                <i class="fas fa-chevron-down" id="dropdownChevron"></i>
+                            </button>
+                            <div class="nav-user-menu" id="userMenu">
+                                <a href="{{ route('profile.edit') }}">Configuración</a>
+                                <a href="{{ route('cerrar.sesion') }}">Cerrar sesión</a>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('login') }}"    class="btn-outline-nav">Iniciar sesión</a>
                         <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
@@ -331,10 +341,18 @@
 
                         {{-- Botón ver portafolio --}}
                         <div class="card-footer-row">
-                            <a href="{{ route('portafolio.public', $portfolio->slug) }}"
-                               class="card-link">
-                                Ver portafolio <i class="fas fa-arrow-right"></i>
-                            </a>
+                            @auth
+                                <a href="{{ route('portafolio.public', $portfolio->slug) }}"
+                                    class="card-link">
+                                    Ver portafolio <i class="fas fa-arrow-right"></i>
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="card-link"
+                                    onclick="return confirm('Debes iniciar sesión o registrarte para ver este portafolio.')">
+                                    Ver portafolio <i class="fas fa-arrow-right"></i>
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 </div>
@@ -415,6 +433,24 @@
             });
         }
     </script>
+    <script>
+        function toggleUserMenu() {
+            const menu     = document.getElementById('userMenu');
+            const chevron  = document.getElementById('dropdownChevron');
+            const isOpen   = menu.classList.contains('open');
+            menu.classList.toggle('open');
+            chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
 
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const menu     = document.getElementById('userMenu');
+            if (dropdown && !dropdown.contains(e.target)) {
+                menu.classList.remove('open');
+                document.getElementById('dropdownChevron').style.transform = 'rotate(0deg)';
+            }
+        });
+    </script>
 </body>
 </html>

@@ -24,7 +24,6 @@
         <div class="nav-container">
             
             <div class="logo">
-                
                 <h2>DevFolio</h2>
             </div>
 
@@ -41,6 +40,16 @@
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="btn-primary">Dashboard</a>
+                        <div class="nav-user-dropdown" id="userDropdown">
+                            <button class="nav-user-trigger" onclick="toggleUserMenu()">
+                                {{ Auth::user()->first_name ?? Auth::user()->name }}
+                                <i class="fas fa-chevron-down" id="dropdownChevron"></i>
+                            </button>
+                            <div class="nav-user-menu" id="userMenu">
+                                <a href="{{ route('profile.edit') }}">Configuración</a>
+                                <a href="{{ route('cerrar.sesion') }}">Cerrar sesión</a>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('login') }}"    class="btn-outline-nav">Iniciar sesión</a>
                         <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
@@ -59,12 +68,14 @@
                habilidades y experiencia al mundo.</p>
 
             <div class="hero-buttons">
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
-                @endif
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="btn-outline">Iniciar sesión</a>
-                @endif
+                @guest
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
+                    @endif
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}" class="btn-outline">Iniciar sesión</a>
+                    @endif
+                @endguest
             </div>
         </div>
     </section>
@@ -243,9 +254,11 @@
                 <h2>¿Listo para crear tu portafolio?</h2>
                 <p>Únete a miles de profesionales que ya destacan su talento</p>
             </div>
-            @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="btn-primary">Regístrate Gratis</a>
-            @endif
+            @guest
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="btn-primary">Regístrate Gratis</a>
+                @endif
+            @endguest
         </div>
     </div>
 
@@ -271,6 +284,24 @@
     </footer>
 
     <script src="{{ asset('js/welcome.js') }}"></script>
+    <script>
+        function toggleUserMenu() {
+            const menu     = document.getElementById('userMenu');
+            const chevron  = document.getElementById('dropdownChevron');
+            const isOpen   = menu.classList.contains('open');
+            menu.classList.toggle('open');
+            chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
 
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const menu     = document.getElementById('userMenu');
+            if (dropdown && !dropdown.contains(e.target)) {
+                menu.classList.remove('open');
+                document.getElementById('dropdownChevron').style.transform = 'rotate(0deg)';
+            }
+        });
+    </script>
 </body>
 </html>
