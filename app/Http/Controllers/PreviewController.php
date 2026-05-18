@@ -405,6 +405,8 @@ class PreviewController extends Controller
             }
             if ($user->location->latitude && $user->location->longitude) {
                 $redes['maps_url'] = "https://www.google.com/maps/search/?api=1&query={$user->location->latitude},{$user->location->longitude}";
+            } elseif ($user->location->address) {
+                $redes['maps_url'] = "https://www.google.com/maps/search/?api=1&query=" . urlencode($user->location->address);
             }
         }
         
