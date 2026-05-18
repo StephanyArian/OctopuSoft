@@ -70,7 +70,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ocultar mensajes de error
         document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.form-input, .form-textarea').forEach(el => el.classList.remove('error'));
-    };
+
+        archivosEvidencia = [];
+        const grid = document.getElementById('evidenciasGrid');
+        if (grid) grid.innerHTML = '';
+        const btnAdd = document.getElementById('ev-add-btn');
+        if (btnAdd) btnAdd.remove();
+        const uploadZone = document.getElementById('uploadZone');
+        if (uploadZone) uploadZone.style.display = 'block';
+        const errorEv = document.getElementById('evidenciasError');
+        if (errorEv) errorEv.classList.add('hidden');
+        };
     
     // ==========================================
     // VALIDACIÓN DEL FORMULARIO
@@ -151,3 +161,149 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ Script inicializado correctamente');
 });
+
+const MAX_SIZE_MB   = 2;
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+let archivosEvidencia = []; // Array de File objects
+
+function handleDrop(event) {
+    event.preventDefault();
+    const zone = document.getElementById('uploadZone');
+    zone.style.borderColor = 'var(--gray-300)';
+    zone.style.background  = 'var(--off)';
+    handleFiles(event.dataTransfer.files);
+}
+ 
+function handleFiles(files) {
+    const errorEl = document.getElementById('evidenciasError');
+    errorEl.classList.add('hidden');
+ 
+    Array.from(files).forEach(file => {
+        // Validar tipo
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            errorEl.textContent = `"${file.name}" — Formato no permitido. Use JPG, PNG o PDF`;
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        // Validar tamaño
+        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+            errorEl.textContent = `"${file.name}" — El archivo no puede superar los 2MB`;
+            errorEl.classList.remove('hidden');
+            return;
+        }
+        // Evitar duplicados
+        if (archivosEvidencia.find(f => f.name === file.name && f.size === file.size)) return;
+ 
+        archivosEvidencia.push(file);
+        renderEvidenciaCard(file, archivosEvidencia.length - 1);
+    });
+ 
+    actualizarInputFiles();
+    toggleUploadZone();
+}
+ 
+function renderEvidenciaCard(file, index) {
+    const grid = document.getElementById('evidenciasGrid');
+    const card = document.createElement('div');
+    card.id    = `ev-card-${index}`;
+    card.style.cssText = `
+        width:110px; border-radius:10px; overflow:hidden;
+        border:1px solid var(--gray-100); position:relative;
+        box-shadow:0 1px 4px rgba(0,0,0,0.06);
+    `;
+ 
+    const isPdf = file.type === 'application/pdf';
+ 
+    if (isPdf) {
+        card.innerHTML = `
+            <div style="width:110px; height:80px; background:linear-gradient(135deg,#fff3e0,#ffe0b2);
+                        display:flex; flex-direction:column; align-items:center;
+                        justify-content:center; gap:4px;">
+                <span style="font-size:24px;">📄</span>
+                <span style="font-size:10px; color:#e65100; font-weight:600;">PDF</span>
+            </div>
+            <div style="padding:5px 7px; background:#fff;">
+                <div style="font-size:10px; color:#6b6a66; white-space:nowrap;
+                            overflow:hidden; text-overflow:ellipsis;" title="${file.name}">
+                    ${file.name}
+                </div>
+            </div>
+        `;
+    } else {
+        const url = URL.createObjectURL(file);
+        card.innerHTML = `
+            <img src="${url}" alt="${file.name}"
+                 style="width:110px; height:80px; object-fit:cover; display:block;">
+            <div style="padding:5px 7px; background:#fff;">
+                <div style="font-size:10px; color:#6b6a66; white-space:nowrap;
+                            overflow:hidden; text-overflow:ellipsis;" title="${file.name}">
+                    ${file.name}
+                </div>
+            </div>
+        `;
+    }
+ 
+    // Botón eliminar
+    const btnRemove = document.createElement('div');
+    btnRemove.style.cssText = `
+        position:absolute; top:4px; right:4px; width:20px; height:20px;
+        background:rgba(61,10,30,0.85); color:#fff; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-size:11px; cursor:pointer; font-weight:700;
+    `;
+    btnRemove.textContent = '✕';
+    btnRemove.onclick = () => eliminarEvidencia(index);
+ 
+    card.appendChild(btnRemove);
+    grid.appendChild(card);
+}
+ 
+function eliminarEvidencia(index) {
+    archivosEvidencia.splice(index, 1);
+    // Re-renderizar todo el grid
+    const grid = document.getElementById('evidenciasGrid');
+    grid.innerHTML = '';
+    archivosEvidencia.forEach((file, i) => renderEvidenciaCard(file, i));
+    actualizarInputFiles();
+    toggleUploadZone();
+}
+ 
+function actualizarInputFiles() {
+    // Sincronizar el input con el array
+    const input    = document.getElementById('evidenciasInput');
+    const dataTransfer = new DataTransfer();
+    archivosEvidencia.forEach(f => dataTransfer.items.add(f));
+    input.files = dataTransfer.files;
+}
+ 
+function toggleUploadZone() {
+    // Siempre visible — el botón + está en el grid
+    // Solo agregar botón "+" si hay archivos
+    const grid   = document.getElementById('evidenciasGrid');
+    const btnAdd = document.getElementById('ev-add-btn');
+ 
+    if (archivosEvidencia.length > 0) {
+        if (!btnAdd) {
+            const btn = document.createElement('div');
+            btn.id    = 'ev-add-btn';
+            btn.style.cssText = `
+                width:110px; height:110px; border:2px dashed var(--gray-300);
+                border-radius:10px; display:flex; flex-direction:column;
+                align-items:center; justify-content:center; gap:6px;
+                cursor:pointer; background:var(--off); transition:all 0.2s;
+            `;
+            btn.innerHTML = `
+                <span style="font-size:22px; color:var(--teal); font-weight:300;">＋</span>
+                <span style="font-size:11px; color:var(--gray-500);">Agregar más</span>
+            `;
+            btn.onmouseenter = () => { btn.style.borderColor = 'var(--teal)'; btn.style.background = 'rgba(10,191,158,0.05)'; };
+            btn.onmouseleave = () => { btn.style.borderColor = 'var(--gray-300)'; btn.style.background = 'var(--off)'; };
+            btn.onclick = () => document.getElementById('evidenciasInput').click();
+            grid.appendChild(btn);
+        }
+        document.getElementById('uploadZone').style.display = 'none';
+    } else {
+        if (btnAdd) btnAdd.remove();
+        document.getElementById('uploadZone').style.display = 'block';
+    }
+}

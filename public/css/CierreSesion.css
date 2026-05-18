@@ -131,3 +131,183 @@ p {
 .bottom-text a:hover {
     color: #ffffff;
 }
+ .icon-wrap {
+    width: 86px;
+    height: 86px;
+    margin: 0 auto 26px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+ 
+.icon-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, rgba(24, 213, 191, 0.12), rgba(24, 213, 191, 0.04));
+    border: 1px solid rgba(24, 213, 191, 0.18);
+}
+ 
+.icon-wrap::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(24, 213, 191, 0.07);
+}
+ 
+.lock-svg {
+    width: 38px;
+    height: 38px;
+    position: relative;
+    z-index: 1;
+    animation: lockPulse 3s ease-in-out infinite;
+}
+ 
+@keyframes lockPulse {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(24, 213, 191, 0.3)); }
+    50%       { filter: drop-shadow(0 0 14px rgba(24, 213, 191, 0.65)); }
+}
+ 
+/* — Tipografía — */
+h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+}
+ 
+.subtitle {
+    font-size: 15px;
+    color: rgba(243, 217, 228, 0.65);
+    line-height: 1.65;
+    margin-bottom: 28px;
+    font-weight: 400;
+}
+ 
+.subtitle strong {
+    color: rgba(243, 217, 228, 0.88);
+    font-weight: 500;
+}
+ 
+/* — Botón principal — */
+.gradient-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(90deg, #12bdf0, #18d5b8);
+    color: #06131a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(18, 189, 178, 0.28);
+    margin-bottom: 12px;
+}
+ 
+.gradient-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(18, 189, 178, 0.38);
+}
+ 
+.gradient-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(18, 189, 178, 0.2);
+}
+ 
+/* — Botón cancelar — */
+.cancel-btn {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(243, 217, 228, 0.65);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+ 
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: rgba(243, 217, 228, 0.95);
+}
+ 
+.cancel-btn:active {
+    transform: scale(0.99);
+}
+ 
+/* — Divider — */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 26px 0 22px;
+}
+ 
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.07);
+}
+ 
+.divider-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+}
+ 
+/* — Bottom text — */
+.bottom-text {
+    font-size: 14px;
+    color: rgba(243, 217, 228, 0.5);
+    font-weight: 400;
+}
+ 
+.bottom-text a {
+    color: #18d5bf;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+ 
+.bottom-text a:hover {
+    color: #5de8d8;
+}
+ 
+/* — Badge de seguridad — */
+.security-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(24, 213, 191, 0.07);
+    border: 1px solid rgba(24, 213, 191, 0.14);
+    border-radius: 100px;
+    padding: 5px 14px 5px 10px;
+    margin-bottom: 26px;
+    font-size: 12px;
+    color: rgba(24, 213, 191, 0.75);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+}
+ 
+.security-badge svg {
+    flex-shrink: 0;
+}

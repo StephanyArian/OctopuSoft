@@ -29,6 +29,7 @@ class InformacionAcademicaController extends Controller
             'descripcion'     => 'nullable|string|max:500|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,}).+$/u',
             'estudio_actual'  => 'nullable',
             'especialidad'    => 'nullable|string|max:50|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
 
          ], [
             'institucion.required'     => 'La institución es obligatoria',
@@ -44,6 +45,8 @@ class InformacionAcademicaController extends Controller
             'fecha_fin.date_format'    => 'La fecha de fin debe tener formato Año-Mes (ej: 2024-12)',
             'especialidad.max'         => 'La especialidad no puede tener más de 30 caracteres',
             'especialidad.regex'       => 'La especialidad solo debe contener letras',
+            'evidencias.*.mimes'           => 'Solo se permiten archivos JPG, PNG o PDF',
+            'evidencias.*.max'             => 'Cada archivo no puede superar los 2MB',
          ]);
 
          if (!$request->has('estudio_actual') && empty($request->fecha_fin)) {
@@ -60,12 +63,21 @@ class InformacionAcademicaController extends Controller
             $endDate = Carbon::createFromFormat('Y-m-d', $request->fecha_fin)->endOfMonth();
         }
 
+        $evidenciasUrls = [];
+        if ($request->hasFile('evidencias')) {
+            foreach ($request->file('evidencias') as $archivo) {
+                $path = $archivo->store('evidencias', 'public');
+                $evidenciasUrls[] = $path;
+            }
+        }
+
         Experience::create([
             'user_id'     => auth()->id(),
             'type'        => 'education',
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
             'description' => $request->descripcion,
+            'evidence_url' => !empty($evidenciasUrls) ? json_encode($evidenciasUrls) : null,
             'start_date'  => $startDate,
             'end_date'    => $endDate,
             'is_current'  => $request->has('estudio_actual'),
@@ -85,7 +97,11 @@ class InformacionAcademicaController extends Controller
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
             'descripcion'     => 'nullable|string|max:500',
-            'estudio_actual'  => 'nullable|boolean',
+            'estudio_actual'  => 'nullable',
+            'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'evidencias_eliminar' => 'nullable|string',
+            'evidencias.*.mimes' => 'Solo se permiten archivos JPG, PNG o PDF',
+            'evidencias.*.max'   => 'Cada archivo no puede superar los 2MB',
         ]);
         $formacion = Experience::where('id', $id)
             ->where('user_id', auth()->id())
@@ -98,10 +114,34 @@ class InformacionAcademicaController extends Controller
             $endDate = Carbon::parse($request->fecha_fin);   
             }   
 
+            $evidenciasActuales = $formacion->evidence_url
+            ? json_decode($formacion->evidence_url, true)
+            : [];
+ 
+        // Eliminar las que se marcaron para borrar
+        if ($request->evidencias_eliminar) {
+            $aEliminar = explode(',', $request->evidencias_eliminar);
+            foreach ($aEliminar as $url) {
+                \Storage::disk('public')->delete(trim($url));
+                $evidenciasActuales = array_filter($evidenciasActuales, fn($e) => $e !== trim($url));
+            }
+        }
+ 
+        // Agregar nuevas evidencias
+        if ($request->hasFile('evidencias')) {
+            foreach ($request->file('evidencias') as $archivo) {
+                $path = $archivo->store('evidencias', 'public');
+                $evidenciasActuales[] = $path;
+            }
+        }
+ 
+        $evidenciasActuales = array_values($evidenciasActuales);
+
         $formacion->update([
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
             'description' => $request->descripcion,
+            'evidence_url' => !empty($evidenciasActuales) ? json_encode($evidenciasActuales) : null,
             'start_date'  => $startDate,
             'end_date'    => $endDate, 
             'is_current'  => $request->estudio_actual ? true : false,
@@ -115,6 +155,14 @@ class InformacionAcademicaController extends Controller
         $formacion = Experience::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
+
+            if ($formacion->evidence_url) {
+                $urls = json_decode($formacion->evidence_url, true);
+                foreach ($urls as $url) {
+                    \Storage::disk('public')->delete($url);
+                }
+            }
+     
 
         $formacion->delete();
 

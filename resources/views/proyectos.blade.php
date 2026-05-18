@@ -6,7 +6,7 @@
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/proyectos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Proyectos.css') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <div class="main-content">
@@ -24,6 +24,7 @@
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
                         <a href="{{ route('proyectos') }}" class="sidebar-item active">Proyectos</a>
+                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a>
                         <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
 

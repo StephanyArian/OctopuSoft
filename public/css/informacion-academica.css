@@ -284,3 +284,69 @@
     color: white;
     border: none;
 }
+
+/* ══════════════════════════════════════════
+   EVIDENCIAS — agregar al final del CSS existente
+══════════════════════════════════════════ */
+ 
+#uploadZone:hover {
+    border-color: var(--teal) !important;
+    background: rgba(10,191,158,0.05) !important;
+}
+ 
+#evidenciasGrid {
+    min-height: 0;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-group {
+        flex: none;
+        width: 100%;
+    }
+
+    .historial-card {
+        padding: 14px 16px;
+    }
+
+    .historial-actions {
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        font-size: 11px;
+        padding: 5px 12px;
+    }
+
+    .modal-box {
+        padding: 24px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 20px;
+    }
+
+    .section-card {
+        padding: 16px;
+    }
+
+    .historial-title {
+        font-size: 14px;
+    }
+
+    .btn-row {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}

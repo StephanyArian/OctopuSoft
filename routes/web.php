@@ -12,6 +12,7 @@ use App\Http\Controllers\RedContactoController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvidenciaController;
 use App\Models\Portfolio;
+use App\Http\Controllers\IdiomasController;
 
 
 // ============================================
@@ -58,6 +59,9 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 Route::get('/portafolio/{slug}', [App\Http\Controllers\PreviewController::class, 'publicShow'])
     ->name('portafolio.public');
 
+Route::get('/portafolios', [App\Http\Controllers\PreviewController::class, 'explore'])
+    ->name('portafolio.explore');
+
 // ============================================
 // RUTAS PROTEGIDAS (requieren autenticación)
 // ============================================
@@ -83,6 +87,7 @@ Route::middleware('auth')->group(function () {
     // INFORMACIÓN ACADÉMICA
     Route::get('/informacion-academica',         [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
     Route::post('/informacion-academica',        [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');
+    Route::post('/informacion-academica/{id}',   [InformacionAcademicaController::class, 'update']);
     Route::put('/informacion-academica/{id}',    [InformacionAcademicaController::class, 'update'])->name('informacion.academica.update');
     Route::delete('/informacion-academica/{id}', [InformacionAcademicaController::class, 'destroy'])->name('informacion.academica.destroy');
 
@@ -137,6 +142,12 @@ Route::middleware('auth')->group(function () {
     ->name('preview');
 
     Route::post('/perfil/publicar', [ProfileController::class, 'publish'])->name('perfil.publicar');
-});
+
+    // IDIOMAS
+    Route::get('/idiomas',         [IdiomasController::class, 'index'])->name('idiomas.index');
+    Route::post('/idiomas',        [IdiomasController::class, 'store'])->name('idiomas.store');
+    Route::put('/idiomas/{id}',    [IdiomasController::class, 'update'])->name('idiomas.update');
+    Route::delete('/idiomas/{id}', [IdiomasController::class, 'destroy'])->name('idiomas.destroy');
+    });
 
 require __DIR__.'/auth.php';

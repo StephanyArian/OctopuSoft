@@ -24,7 +24,6 @@
         <div class="nav-container">
             
             <div class="logo">
-                
                 <h2>DevFolio</h2>
             </div>
 
@@ -41,6 +40,16 @@
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="btn-primary">Dashboard</a>
+                        <div class="nav-user-dropdown" id="userDropdown">
+                            <button class="nav-user-trigger" onclick="toggleUserMenu()">
+                                {{ Auth::user()->first_name ?? Auth::user()->name }}
+                                <i class="fas fa-chevron-down" id="dropdownChevron"></i>
+                            </button>
+                            <div class="nav-user-menu" id="userMenu">
+                                <a href="{{ route('profile.edit') }}">Configuración</a>
+                                <a href="{{ route('cerrar.sesion') }}">Cerrar sesión</a>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('login') }}"    class="btn-outline-nav">Iniciar sesión</a>
                         <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
@@ -59,12 +68,14 @@
                habilidades y experiencia al mundo.</p>
 
             <div class="hero-buttons">
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
-                @endif
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="btn-outline">Iniciar sesión</a>
-                @endif
+                @guest
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
+                    @endif
+                    @if (Route::has('login'))
+                        <a href="{{ route('login') }}" class="btn-outline">Iniciar sesión</a>
+                    @endif
+                @endguest
             </div>
         </div>
     </section>
@@ -172,21 +183,21 @@
                 <div class="carousel-track" id="carouselTrack">
                     @forelse($portfolios as $portfolio)
                     <div class="portfolio-card">
-                        <div class="card-photo">
-                            @if($portfolio->user->photo_base64)
+                        @php
+                            $colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
+                            $colorIndex = $loop->index % 5;
+                        @endphp
+                        @if($portfolio->user->photo_base64)
+                            <div class="card-photo">
                                 <img src="{{ $portfolio->user->photo_base64 }}" alt="{{ $portfolio->user->first_name }}">
-                            @else
-                                @php
-                                    $colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
-                                    $colorIndex = $loop->index % 5;
-                                @endphp
-                                <div class="no-photo {{ $colors[$colorIndex] }}">
-                                    <div class="initials-circle">
-                                        {{ strtoupper(substr($portfolio->user->first_name, 0, 1) . substr($portfolio->user->last_name, 0, 1)) }}
-                                    </div>
+                            </div>
+                        @else
+                            <div class="card-photo no-photo {{ $colors[$colorIndex] }}">
+                                <div class="initials-circle">
+                                    {{ strtoupper(substr($portfolio->user->first_name, 0, 1) . substr($portfolio->user->last_name, 0, 1)) }}
                                 </div>
-                            @endif
-                        </div>
+                            </div>
+                        @endif
                         <div class="card-body">
                             <div class="card-name">{{ $portfolio->user->first_name }} {{ $portfolio->user->last_name }}</div>
                             <div class="card-professions">
@@ -226,7 +237,13 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-
+            
+            <div style="text-align:center; margin-top: 28px;">
+                <a href="{{ route('portafolio.explore') }}" class="btn-outline">
+                    Ver todos los portafolios &nbsp;<i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+    
         </div>
     </section>
 
@@ -237,9 +254,11 @@
                 <h2>¿Listo para crear tu portafolio?</h2>
                 <p>Únete a miles de profesionales que ya destacan su talento</p>
             </div>
-            @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="btn-primary">Regístrate Gratis</a>
-            @endif
+            @guest
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="btn-primary">Regístrate Gratis</a>
+                @endif
+            @endguest
         </div>
     </div>
 
@@ -265,6 +284,24 @@
     </footer>
 
     <script src="{{ asset('js/welcome.js') }}"></script>
+    <script>
+        function toggleUserMenu() {
+            const menu     = document.getElementById('userMenu');
+            const chevron  = document.getElementById('dropdownChevron');
+            const isOpen   = menu.classList.contains('open');
+            menu.classList.toggle('open');
+            chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
 
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const menu     = document.getElementById('userMenu');
+            if (dropdown && !dropdown.contains(e.target)) {
+                menu.classList.remove('open');
+                document.getElementById('dropdownChevron').style.transform = 'rotate(0deg)';
+            }
+        });
+    </script>
 </body>
 </html>

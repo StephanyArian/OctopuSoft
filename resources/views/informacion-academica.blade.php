@@ -39,6 +39,7 @@
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
                         <a href="{{ route('proyectos') }}" class="sidebar-item" >Proyectos</a>  
+                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a>
                         <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto  </a>
                     </div>
  
@@ -51,7 +52,7 @@
                                 Registra tus estudios con institución, título, período y descripción para enriquecer tu perfil.
                             </div>
  
-                            <form id="academicForm" action="{{ route('informacion.academica.store') }}" method="POST">
+                            <form id="academicForm" action="{{ route('informacion.academica.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-grid">
                                     <div class="form-row">
@@ -120,6 +121,51 @@
                                             placeholder="Describe brevemente tus logros, materias destacadas o proyectos en esta formación..." maxlength="500" >{{ old('descripcion') }}</textarea>
                                             <div class="char-counter" id="descripcionCounter">0 / 500</div>
                                     </div>
+                                </div>
+
+                                <div class="form-group" style="margin-top: 8px;">
+                                    <label class="form-label">
+                                        Evidencias
+                                        <span style="font-size:10px; font-weight:400; color:var(--gray-500); text-transform:none; margin-left:6px;">
+                                            Opcional — JPG, PNG o PDF, máx. 2MB por archivo
+                                        </span>
+                                    </label>
+                                
+                                    {{-- Grid de previsualizaciones --}}
+                                    <div id="evidenciasGrid" style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px;"></div>
+                                
+                                    {{-- Zona de arrastre (oculta al inicio si hay archivos) --}}
+                                    <div id="uploadZone"
+                                        style="border:2px dashed var(--gray-300); border-radius:12px; padding:20px;
+                                                text-align:center; cursor:pointer; background:var(--off); transition:all 0.2s;"
+                                        ondragover="event.preventDefault(); this.style.borderColor='var(--teal)'; this.style.background='rgba(10,191,158,0.05)'"
+                                        ondragleave="this.style.borderColor='var(--gray-300)'; this.style.background='var(--off)'"
+                                        ondrop="handleDrop(event)"
+                                        onclick="document.getElementById('evidenciasInput').click()">
+                                        <div style="font-size:28px; margin-bottom:6px;">📎</div>
+                                        <div style="font-size:13px; font-weight:600; color:var(--gray-700); margin-bottom:4px;">
+                                            Arrastra tu archivo aquí
+                                        </div>
+                                        <div style="font-size:12px; color:var(--gray-500); margin-bottom:10px;">
+                                            o haz clic para seleccionar
+                                        </div>
+                                        <span style="background:var(--burg-deep); color:#fff; font-size:11px;
+                                                    padding:6px 16px; border-radius:20px; cursor:pointer;">
+                                            Seleccionar archivo
+                                        </span>
+                                    </div>
+                                
+                                    {{-- Input oculto --}}
+                                    <input type="file" id="evidenciasInput" name="evidencias[]"
+                                        accept=".jpg,.jpeg,.png,.pdf" multiple
+                                        style="display:none" onchange="handleFiles(this.files)">
+                                
+                                    {{-- Mensaje de error --}}
+                                    <div id="evidenciasError" class="error-message hidden"></div>
+                                
+                                    @error('evidencias.*')
+                                        <div class="error-message">{{ $message }}</div>
+                                    @enderror
                                 </div>
  
                                 <div class="btn-row">

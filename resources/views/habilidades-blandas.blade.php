@@ -22,7 +22,8 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}"  class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}"  class="sidebar-item active">Habilidades blandas</a>
-                        <a href="{{ route('proyectos') }}" class="sidebar-item">Proyectos</a>  
+                        <a href="{{ route('proyectos') }}" class="sidebar-item">Proyectos</a> 
+                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a> 
                         <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto  </a>
                     </div>
 
