@@ -109,6 +109,11 @@
                         <i class="fab fa-whatsapp"></i>
                     </a>
                 @endif
+                @if($user->portfolio && $user->portfolio->is_public)
+                    <a href="javascript:void(0)" onclick="abrirModalCompartir()" title="Compartir Portafolio">
+                        <i class="fas fa-share-nodes"></i>
+                    </a>
+                @endif
                 @if($redes['correo'])
                     <a href="mailto:{{ $redes['correo'] }}" title="Email">
                         <i class="fas fa-envelope"></i>
@@ -392,6 +397,48 @@
         </div>
     </div>
 
+    <!-- MODAL COMPARTIR -->
+    <div id="modal-compartir" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(2px);">
+        <div style="background:#fff; border-radius:12px; width:450px; max-width:90%; position:relative; padding:24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:20px; font-weight:600; color:#333;">Compartir</h2>
+                <button onclick="cerrarModalCompartir()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#888; transition:color 0.2s;">✕</button>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; margin-bottom:24px; text-align:center;">
+                <a href="javascript:void(0)" style="text-decoration:none; color:#333; transition:transform 0.2s;" onclick="shareTo('whatsapp')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width:55px; height:55px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; color:white; font-size:26px;">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <span style="font-size:12px; font-weight:500;">WhatsApp</span>
+                </a>
+                <a href="javascript:void(0)" style="text-decoration:none; color:#333; transition:transform 0.2s;" onclick="shareTo('facebook')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width:55px; height:55px; border-radius:50%; background:#1877F2; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; color:white; font-size:26px;">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <span style="font-size:12px; font-weight:500;">Facebook</span>
+                </a>
+                <a href="javascript:void(0)" style="text-decoration:none; color:#333; transition:transform 0.2s;" onclick="shareTo('twitter')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width:55px; height:55px; border-radius:50%; background:#000000; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; color:white; font-size:26px;">
+                        <i class="fab fa-x-twitter"></i>
+                    </div>
+                    <span style="font-size:12px; font-weight:500;">X</span>
+                </a>
+                <a href="javascript:void(0)" style="text-decoration:none; color:#333; transition:transform 0.2s;" onclick="shareTo('email')" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="width:55px; height:55px; border-radius:50%; background:#7f8c8d; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; color:white; font-size:26px;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span style="font-size:12px; font-weight:500;">Correo</span>
+                </a>
+            </div>
+
+            <div style="display:flex; border:1px solid #e0e0e0; border-radius:8px; padding:6px; background:#f9f9f9; align-items:center; transition:border-color 0.2s;">
+                <input type="text" id="share-link-input" readonly value="{{ $user->portfolio ? url('/portafolio/' . $user->portfolio->slug) : '' }}" style="flex:1; border:none; background:transparent; padding:8px 12px; outline:none; color:#555; font-size:14px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">
+                <button onclick="copiarLinkPortafolio()" id="btn-copiar-link" style="background:white; border:1px solid #e0e0e0; border-radius:20px; padding:6px 18px; cursor:pointer; font-weight:600; font-size:14px; color:#333; transition:all 0.2s;" onmouseover="this.style.backgroundColor='#f0f0f0'" onmouseout="this.style.backgroundColor='white'">Copiar</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -504,6 +551,54 @@ function toggleDesc(id, btn) {
         el.classList.add('collapsed');
         btn.textContent = 'Ver más';
     }
+}
+
+// Compartir Modal Funciones
+function abrirModalCompartir() {
+    document.getElementById('modal-compartir').style.display = 'flex';
+}
+
+function cerrarModalCompartir() {
+    document.getElementById('modal-compartir').style.display = 'none';
+    document.getElementById('btn-copiar-link').textContent = 'Copiar';
+}
+
+document.getElementById('modal-compartir').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalCompartir();
+});
+
+function copiarLinkPortafolio() {
+    const input = document.getElementById('share-link-input');
+    input.select();
+    input.setSelectionRange(0, 99999); 
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('btn-copiar-link');
+        btn.textContent = '¡Copiado!';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+    });
+}
+
+function shareTo(platform) {
+    const link = encodeURIComponent(document.getElementById('share-link-input').value);
+    const text = encodeURIComponent('¡Mira mi portafolio profesional en DevFolio!');
+    let url = '';
+    
+    switch(platform) {
+        case 'whatsapp':
+            url = `https://api.whatsapp.com/send?text=${text} ${link}`;
+            break;
+        case 'facebook':
+            url = `https://www.facebook.com/sharer/sharer.php?u=${link}`;
+            break;
+        case 'twitter':
+            url = `https://twitter.com/intent/tweet?text=${text}&url=${link}`;
+            break;
+        case 'email':
+            url = `mailto:?subject=${text}&body=Puedes ver mi portafolio aquí: ${link}`;
+            break;
+    }
+    
+    if(url) window.open(url, '_blank', 'width=600,height=400');
 }
 </script>
 
