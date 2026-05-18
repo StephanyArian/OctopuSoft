@@ -12,6 +12,7 @@ use App\Http\Controllers\RedContactoController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvidenciaController;
 use App\Models\Portfolio;
+use App\Http\Controllers\IdiomasController;
 
 
 // ============================================
@@ -141,6 +142,12 @@ Route::middleware('auth')->group(function () {
     ->name('preview');
 
     Route::post('/perfil/publicar', [ProfileController::class, 'publish'])->name('perfil.publicar');
-});
+
+    // IDIOMAS
+    Route::get('/idiomas',         [IdiomasController::class, 'index'])->name('idiomas.index');
+    Route::post('/idiomas',        [IdiomasController::class, 'store'])->name('idiomas.store');
+    Route::put('/idiomas/{id}',    [IdiomasController::class, 'update'])->name('idiomas.update');
+    Route::delete('/idiomas/{id}', [IdiomasController::class, 'destroy'])->name('idiomas.destroy');
+    });
 
 require __DIR__.'/auth.php';

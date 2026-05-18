@@ -30,6 +30,7 @@
 <a href="{{ route('skills.tecnicas') }}" class="sidebar-item" id="habilidadesTecnicasLink" style="cursor: pointer; text-decoration: none;">Habilidades técnicas</a>
 <a href="{{ route('skills.blandas') }}" class="sidebar-item" id="habilidadesBlandasLink" style="cursor: pointer; text-decoration: none;">Habilidades blandas</a>
 <a href="{{ route('proyectos') }}" class="sidebar-item" style="text-decoration:none;">Proyectos</a>
+<a href="{{ route('idiomas.index') }}" class="sidebar-item" id="idiomasLink" style="cursor: pointer; text-decoration: none;">Idiomas</a>
 <a href="{{ route('redes.index') }}" class="sidebar-item" id="redesLink" style="cursor: pointer; text-decoration: none;">Redes profesionales y contacto</a>
                      
                     </div>
