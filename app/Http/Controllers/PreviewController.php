@@ -68,6 +68,34 @@ class PreviewController extends Controller
         $habilidadesBlandas = $user->skills->where('type', 'soft')->map(function($skill) {
             return (object) ['nombre' => $skill->name];
         });
+
+        // ==========================================
+        // IDIOMAS (type = 'language')
+        // ==========================================
+        $idiomas = $user->skills
+        ->where('type', 'language')
+        ->where('is_visible', true)
+        ->sortBy(fn($s) => $s->display_order ?? 0)
+        ->map(function($skill) {
+            $nivelesMap = [1=>'A1',2=>'A2',3=>'B1',4=>'B2',5=>'C1',6=>'C2',7=>'Nativo'];
+            $nivelesNombre = ['A1'=>'Principiante','A2'=>'Básico','B1'=>'Intermedio','B2'=>'Intermedio alto','C1'=>'Avanzado','C2'=>'Maestría','Nativo'=>'Nativo'];
+            $porcentaje = ['A1'=>15,'A2'=>30,'B1'=>50,'B2'=>65,'C1'=>80,'C2'=>95,'Nativo'=>100];
+            $banderas = ['inglés'=>'🇬🇧','español'=>'🇧🇴','portugués'=>'🇧🇷','francés'=>'🇫🇷','alemán'=>'🇩🇪','italiano'=>'🇮🇹','chino'=>'🇨🇳','japonés'=>'🇯🇵'];
+
+            $nivelLabel  = $nivelesMap[$skill->level] ?? 'A1';
+            $nivelNombre = $nivelesNombre[$nivelLabel] ?? '';
+            $pct         = $porcentaje[$nivelLabel] ?? 50;
+            $bandera     = $banderas[strtolower($skill->name)] ?? '🌐';
+
+            return (object) [
+                'nombre'       => $skill->name,
+                'nivel_label'  => $nivelLabel,
+                'nivel_nombre' => $nivelNombre,
+                'porcentaje'   => $pct,
+                'bandera'      => $bandera,
+                'certificado'  => $skill->evidence_url,
+            ];
+        })->values();
         
         // ==========================================
         // EXPERIENCIAS LABORALES (type = 'work')
@@ -215,6 +243,7 @@ class PreviewController extends Controller
             'habilidadesTecnicasFrontend',
             'habilidadesTecnicasBackend',
             'habilidadesBlandas',
+            'idiomas',
             'experiencias',
             'academicas',
             'proyectos',

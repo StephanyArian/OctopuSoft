@@ -275,6 +275,38 @@
             </div>
         </div>
 
+        <!-- IDIOMAS -->
+        <div class="section">
+            <h2><i class="fas fa-language"></i> Idiomas</h2>
+            @if($idiomas->isEmpty())
+                <div class="empty-message">No hay idiomas registrados</div>
+            @else
+                <div class="idiomas-preview-grid">
+                    @foreach($idiomas as $idioma)
+                    <div class="idioma-preview-card">
+                        <div class="idioma-preview-header">
+                            <div class="idioma-preview-left">
+                                <span class="idioma-bandera">{{ $idioma->bandera }}</span>
+                                <div class="idioma-preview-info">
+                                    <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
+                                    <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+                                </div>
+                            </div>
+                            @if($idioma->certificado)
+                            <a href="{{ asset('storage/' . $idioma->certificado) }}"
+                            target="_blank" class="idioma-cert-link">
+                                <i class="fas fa-certificate"></i> Cert.
+                            </a>
+                            @endif
+                        </div>
+                        <div class="idioma-barra-wrap">
+                            <div class="idioma-barra-fill" style="width: {{ $idioma->porcentaje }}%"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
         <!-- PROYECTOS -->
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>

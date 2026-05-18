@@ -107,6 +107,11 @@
             <x-responsive-nav-link :href="route('proyectos')" style="color: #1de8c0;">
                 <i class="bi bi-kanban-fill"></i> {{ __('Proyectos') }}
             </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('idiomas.index')" style="color: #1de8c0;">
+                <i class="bi bi-translate"></i> {{ __('Idiomas') }}
+            </x-responsive-nav-link>
+
             <x-responsive-nav-link :href="route('redes.index')" style="color: #1de8c0;">
                 <i class="bi bi-globe"></i> {{ __('Redes profesionales y contacto') }}
             </x-responsive-nav-link>
