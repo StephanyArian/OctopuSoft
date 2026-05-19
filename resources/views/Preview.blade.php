@@ -153,35 +153,73 @@
         </div>
 
         <!-- INFORMACIÓN ACADÉMICA -->
-        <div class="section">
-            <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
-            <div class="cards-grid">
-                @forelse($academicas as $aca)
-                    <div class="card">
-                        <h3>{{ $aca->institucion }}</h3>
-                        <div class="subtitle">{{ $aca->titulo }}</div>
-                        <div class="date">
-                            {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
-                            @if($aca->fecha_fin)
-                                — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
-                            @elseif($aca->estudio_actual)
-                                — Actualidad
+        
+            <div class="section">
+                <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
+                <div class="cards-grid">
+                    @forelse($academicas as $aca)
+                        <div class="card">
+                            <h3>{{ $aca->institucion }}</h3>
+                            <div class="subtitle">{{ $aca->titulo }}</div>
+                            
+                            @if(isset($aca->specialty) && $aca->specialty)
+                                <div class="specialty-badge">
+                                    <i class="fas fa-tag"></i> {{ $aca->specialty }}
+                                </div>
+                                @endif
+                            
+                            <div class="date">
+                                {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
+                                @if($aca->fecha_fin)
+                                    — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
+                                @elseif($aca->estudio_actual)
+                                    — Actualidad
+                                @endif
+                            </div>
+                            
+                            @if($aca->descripcion)
+                            <div class="description-wrapper">
+                                <div class="description collapsed" id="desc-aca-{{ $loop->index }}">{{ $aca->descripcion }}</div>
+                                @if(strlen($aca->descripcion) > 150)
+                                    <button class="ver-mas-btn" onclick="toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
+                                @endif
+                            </div>
+                            @endif
+                            
+                            <!-- MOSTRAR EVIDENCIAS ACADÉMICAS -->
+                            @if(isset($aca->evidence_url) && $aca->evidence_url)
+                                @php $evidencias = json_decode($aca->evidence_url, true); @endphp
+                                @if(!empty($evidencias))
+                                    <div class="academic-evidences">
+                                        <div class="evidences-title">
+                                            <i class="fas fa-paperclip"></i> Evidencias
+                                        </div>
+                                        <div class="evidences-grid-preview">
+                                            @foreach($evidencias as $evidencia)
+                                                @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
+                                                    <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="pdf-card-preview" title="{{ basename($evidencia) }}">
+                                                        <div class="pdf-icon-preview">
+                                                            <i class="fas fa-file-pdf"></i>
+                                                            <span>PDF</span>
+                                                        </div>
+                                                        <span class="pdf-name">{{ \Illuminate\Support\Str::limit(basename($evidencia), 20) }}</span>
+                                                    </a>
+                                                @else
+                                                    <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="img-card-preview">
+                                                        <img src="{{ asset('storage/' . $evidencia) }}" alt="Evidencia">
+                                                    </a>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                         </div>
-                        @if($aca->descripcion)
-                        <div class="description-wrapper">
-                        <div class="description collapsed" id="desc-aca-{{ $loop->index }}">{{ $aca->descripcion }}</div>
-                            @if(strlen($aca->descripcion) > 150)
-                                <button class="ver-mas-btn" onclick="toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
-                            @endif
-                        </div>
-                        @endif
-                    </div>
-                @empty
-                    <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
-                @endforelse
+                    @empty
+                        <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
+                    @endforelse
+                </div>
             </div>
-        </div>
 
         <!-- HABILIDADES TÉCNICAS (Frontend / Backend) -->
         <div class="section">

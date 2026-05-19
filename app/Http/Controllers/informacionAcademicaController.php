@@ -76,6 +76,8 @@ class InformacionAcademicaController extends Controller
             'type'        => 'education',
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
+            'specialty'    => $request->especialidad,  
+
             'description' => $request->descripcion,
             'evidence_url' => !empty($evidenciasUrls) ? json_encode($evidenciasUrls) : null,
             'start_date'  => $startDate,
@@ -94,6 +96,8 @@ class InformacionAcademicaController extends Controller
         $request->validate([
             'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'especialidad' => 'nullable|string|max:50', 
+
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
             'descripcion'     => 'nullable|string|max:500',
@@ -140,6 +144,7 @@ class InformacionAcademicaController extends Controller
         $formacion->update([
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
+            'specialty'    => $request->especialidad,  
             'description' => $request->descripcion,
             'evidence_url' => !empty($evidenciasActuales) ? json_encode($evidenciasActuales) : null,
             'start_date'  => $startDate,

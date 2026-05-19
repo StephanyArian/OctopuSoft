@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
+// Función para acortar nombres largos
+function acortarNombre(nombre) {
+    if (!nombre) return '';
+    if (nombre.length <= 25) return nombre;
+    return nombre.substring(0, 22) + '...';
+}
+
 const MAX_SIZE_MB   = 2;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
 
@@ -157,7 +164,9 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                                     style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 6,
                                              border: '2px dashed var(--teal)', opacity: 0.85 }} />
                             ) : (
-                                <div style={{ fontSize: 12, color: '#555' }}>📄 {a.file.name}</div>
+                                <div style={{ fontSize: 12, color: '#555' }}>
+                                    📄 {a.file.name.length > 30 ? a.file.name.substring(0, 27) + '...' : a.file.name}
+                                </div>
                             )}
                             <button type="button" onClick={() => quitarPendiente(i)}
                                 style={{
@@ -309,16 +318,13 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 </div>
 
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Título (Licenciatura, Maestría...)</label>
-                                        <input className="form-input" name="titulo" defaultValue={f.degree || ''} maxLength="30" />
-                                        
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Especialidad</label>
-                                        <input className="form-input" name="especialidad" defaultValue={f.specialty || ''} maxLength="30" />
-                                        
-                                    </div>
+                                    
+                                <div className="form-group">
+                                    <label className="form-label">Especialidad</label>
+                                    <input className="form-input" name="especialidad" defaultValue={f.specialty || ''} maxLength="30" />
+                                </div>
+    
+    
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
@@ -408,24 +414,33 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 )}
 
                                     {f.evidence_url && JSON.parse(f.evidence_url).length > 0 && (
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                                        <div className="evidencias-grid">
                                             {JSON.parse(f.evidence_url).map((path, i) => (
                                                 path.endsWith('.pdf') ? (
-                                                    <a key={i} href={`/storage/${path}`} target="_blank" rel="noreferrer"
-                                                        style={{ fontSize: 12, color: 'var(--teal)' }}>
-                                                        📄 {path.split('/').pop()}
+                                                    <a key={i} 
+                                                    href={`/storage/${path}`} 
+                                                    target="_blank" 
+                                                    rel="noreferrer"
+                                                    className="pdf-icon-only"
+                                                    title={path.split('/').pop()}
+                                                    >
+                                                        <span className="pdf-icon-custom"></span>
                                                     </a>
                                                 ) : (
-                                                    <a key={i} href={`/storage/${path}`} target="_blank" rel="noreferrer">
+                                                    <a key={i} 
+                                                    href={`/storage/${path}`} 
+                                                    target="_blank" 
+                                                    rel="noreferrer"
+                                                    className="img-link"
+                                                    >
                                                         <img src={`/storage/${path}`} alt="evidencia"
-                                                            style={{ width: 60, height: 60, objectFit: 'cover',
-                                                                    borderRadius: 6, border: '1px solid #ddd' }} />
+                                                            style={{ width: 70, height: 70, objectFit: 'cover',
+                                                                    borderRadius: 8, border: '1px solid #ddd' }} />
                                                     </a>
                                                 )
                                             ))}
                                         </div>
                                     )}
-
                                 <div className="historial-actions">
                                     <button className="btn-sm" onClick={() => setEditando(f.id)}>
                                         <IconEdit /> Editar

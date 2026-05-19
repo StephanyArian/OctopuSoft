@@ -144,10 +144,12 @@ class PreviewController extends Controller
             return (object) [
                 'institucion' => $edu->institution,
                 'titulo' => $edu->title,
+                'specialty'      => $edu->specialty,
                 'fecha_inicio' => $edu->start_date,
                 'fecha_fin' => $edu->end_date,
                 'estudio_actual' => $edu->is_current,
-                'descripcion' => $edu->description
+                'descripcion' => $edu->description,
+                'evidence_url'   => $edu->evidence_url,
             ];
         });
         

@@ -13,6 +13,7 @@ class Experience extends Model
         'type',
         'institution',
         'title',
+        'specialty',   
         'description',
         'evidence_url', 
         'location',

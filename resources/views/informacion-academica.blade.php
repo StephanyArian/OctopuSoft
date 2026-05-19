@@ -63,34 +63,34 @@
                                                 style="resize: none;">{{ old('institucion') }}</textarea>
                                             <div id="institucionError" class="error-message hidden">La institución es obligatoria</div>
                                             @error('institucion')
-                                                 <div class="error-message">{{ $message }}</div>
+                                                <div class="error-message">{{ $message }}</div>
                                             @enderror     
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label">Título obtenido <span class="required">*</span></label>
                                             <input class="form-input" type="text" name="titulo_obtenido" id="tituloObtenido"
-                                                placeholder="Ej. Ingeniería de Sistemas" value="{{ old('titulo_obtenido') }}"  maxlength ="30" >
+                                                placeholder="Ej. Ingeniería de Sistemas" value="{{ old('titulo_obtenido') }}" maxlength="30">
                                             <div id="tituloObtenidoError" class="error-message hidden">El título obtenido es obligatorio</div>
                                             @error('titulo_obtenido')
                                                 <div class="error-message">{{ $message }}</div>
                                             @enderror
-
                                         </div>
                                     </div>
- 
+
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label">Título</label>
-                                            <input class="form-input" type="text" name="titulo" id="titulo"
-                                                placeholder="Licenciatura, Maestría..." value="{{ old('titulo') }}" maxlength ="30">
+                                            <label class="form-label">Especialidad (opcional)</label>
+                                            <input class="form-input" type="text" name="especialidad" id="especialidad"
+                                                placeholder="Ej. Inteligencia Artificial, Redes, Desarrollo Web, QA, DevOps"
+                                                value="{{ old('especialidad') }}" maxlength="50">
+                                            <div id="especialidadError" class="error-message hidden"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">Especialidad</label>
-                                            <input class="form-input" type="text" name="especialidad" id="especialidad"
-                                                placeholder="Campo de estudio" value="{{ old('especialidad') }}"  maxlength="30" >
+                                            <label class="form-label">&nbsp;</label>
+                                            <div style="visibility: hidden;">&nbsp;</div>
                                         </div>
                                     </div>
- 
+
                                     <div class="form-row">
                                         <div class="form-group">
                                             <label class="form-label">Fecha de inicio <span class="required">*</span></label>
@@ -107,22 +107,28 @@
                                             <div id="fechaFinError" class="error-message hidden"></div>
                                         </div>
                                     </div>
- 
-                                    <div class="form-checkbox-row">
-                                        <input type="checkbox" name="estudio_actual" id="estudioActual" value="1"
-                                            {{ old('estudio_actual') ? 'checked' : '' }}
-                                            onchange="toggleFechaFin(this)">
-                                        <label for="estudioActual">Estudio actual</label>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <div class="form-checkbox-row" style="margin-top: 24px;">
+                                                <input type="checkbox" name="estudio_actual" id="estudioActual" value="1"
+                                                    {{ old('estudio_actual') ? 'checked' : '' }}
+                                                    onchange="toggleFechaFin(this)">
+                                                <label for="estudioActual">Estudio actual</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            {{-- Espacio vacío --}}
+                                        </div>
                                     </div>
- 
+
                                     <div class="form-group">
                                         <label class="form-label">Descripción</label>
                                         <textarea class="form-textarea" name="descripcion" id="descripcion" 
-                                            placeholder="Describe brevemente tus logros, materias destacadas o proyectos en esta formación..." maxlength="500" >{{ old('descripcion') }}</textarea>
-                                            <div class="char-counter" id="descripcionCounter">0 / 500</div>
+                                            placeholder="Describe brevemente tus logros, materias destacadas o proyectos en esta formación..." maxlength="500">{{ old('descripcion') }}</textarea>
+                                        <div class="char-counter" id="descripcionCounter">0 / 500</div>
                                     </div>
                                 </div>
-
                                 <div class="form-group" style="margin-top: 8px;">
                                     <label class="form-label">
                                         Evidencias

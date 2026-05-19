@@ -350,3 +350,65 @@
         justify-content: center;
     }
 }
+
+/* ══════════════════════════════════════════
+   ICONO DE PDF - TAMAÑO GRANDE Y HORIZONTAL
+══════════════════════════════════════════ */
+
+/* Contenedor horizontal de evidencias */
+.evidencias-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 12px;
+    flex-direction: row;
+    align-items: center;
+}
+
+/* Enlace del PDF */
+.pdf-icon-only {
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* Icono PDF tamaño grande (como las fotos) */
+.pdf-icon-custom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background: #fff;
+    border: 1.5px solid #e53e3e;
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pdf-icon-custom::before {
+    content: "PDF";
+    font-size: 14px;
+    font-weight: 700;
+    color: #e53e3e;
+    letter-spacing: 1px;
+}
+
+.pdf-icon-custom::after {
+    content: "";
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: #e53e3e;
+    border-radius: 2px;
+}
+
+.pdf-icon-custom:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+    border-color: #c0392b;
+}
