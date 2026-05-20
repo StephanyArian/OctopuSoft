@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 
 /* ── Constantes ─────────────────────────────────────────── */
@@ -8,30 +8,26 @@ const MESES = {
     '07': 'Julio',   '08': 'Agosto',   '09': 'Septiembre',
     '10': 'Octubre', '11': 'Noviembre','12': 'Diciembre'
 };
-const ANIO_MAX = new Date().getFullYear();
-const DIAS     = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
 
 const CARGO_OPTIONS = [
-    'Frontend Developer',
-    'Backend Developer',
-    'Full Stack Developer',
-    'UI/UX Designer',
-    'DevOps Engineer',
-    'Mobile Developer',
-    'Project Manager',
-    'QA Tester',
-    'Database Administrator',
-    'Technical Leader',
-    'Data Analyst',
-    'Scrum Master',
-    'Product Owner',
-    'Business Analyst',
-    'Security Engineer',
-    'Data Engineer',
-    'Cloud Engineer',
-    'AI Engineer',
-    'Systems Analyst',
+    'Frontend Developer', 'Backend Developer', 'Full Stack Developer',
+    'UI/UX Designer', 'DevOps Engineer', 'Mobile Developer',
+    'Project Manager', 'QA Tester', 'Database Administrator',
+    'Technical Leader', 'Data Analyst', 'Scrum Master',
+    'Product Owner', 'Business Analyst', 'Security Engineer',
+    'Data Engineer', 'Cloud Engineer', 'AI Engineer', 'Systems Analyst',
 ];
+
+const QUILL_TOOLBAR = [
+    [{ font: [] }],
+    ['bold', 'italic', 'underline'],
+    [{ color: [] }],
+    ['link'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['clean'],
+];
+
+const MAX_DESC_CHARS = 500;
 
 /* ── Iconos ────────────────────────────────────────────── */
 const IconEdit = () => (
@@ -53,12 +49,6 @@ const IconX = () => (
     </svg>
 );
 
-const IconCheck = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{flexShrink:0}}>
-        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 1 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
-    </svg>
-);
-
 /* ── Utilidades de fecha ────────────────────────────────── */
 function getDia(fecha)  { return fecha ? String(fecha).substring(8, 10) : ''; }
 function getMes(fecha)  { return fecha ? String(fecha).substring(5, 7)  : ''; }
@@ -69,6 +59,17 @@ function fmtFecha(fecha) {
     const dia = getDia(fecha), mes = getMes(fecha), anio = getAnio(fecha);
     if (!dia || !mes || !anio) return null;
     return `${parseInt(dia)} de ${MESES[mes] || mes} de ${anio}`;
+}
+
+function padZ(n) { return String(n).padStart(2, '0'); }
+function toDateVal(anio, mes, dia) {
+    if (!anio || !mes || !dia) return '';
+    return `${anio}-${padZ(mes)}-${padZ(dia)}`;
+}
+function fromDateVal(val) {
+    if (!val) return { dia: '', mes: '', anio: '' };
+    const [anio, mes, dia] = val.split('-');
+    return { dia, mes, anio };
 }
 
 /* ── Agrupación por empresa + start_date ────────────────── */
@@ -91,6 +92,55 @@ function agruparExperiencias(experiencias) {
         mapa.get(key).items.push(exp);
     });
     return Array.from(mapa.values());
+}
+
+/* ══════════════════════════════════════════════════════════
+   Hook: useQuillEditor
+   Monta Quill en un ref de div, devuelve getHTML / setHTML
+   ══════════════════════════════════════════════════════════ */
+function useQuillEditor(containerRef, initialHTML, onChange) {
+    const quillRef = useRef(null);
+
+    useEffect(() => {
+        /* Quill ya está cargado globalmente vía CDN en el Blade */
+        if (!window.Quill || !containerRef.current) return;
+        /* Evitar doble inicialización */
+        if (quillRef.current) return;
+
+        const quill = new window.Quill(containerRef.current, {
+            theme: 'snow',
+            placeholder: 'Describe brevemente tus responsabilidades y logros en este cargo...',
+            modules: { toolbar: QUILL_TOOLBAR },
+        });
+
+        /* Cargar contenido inicial */
+        if (initialHTML && initialHTML.trim() && initialHTML !== '<p><br></p>') {
+            quill.root.innerHTML = initialHTML;
+        }
+
+        quill.on('text-change', () => {
+            const text = quill.getText().trim();
+            /* Limitar a MAX_DESC_CHARS caracteres de texto plano */
+            if (text.length > MAX_DESC_CHARS) {
+                quill.deleteText(MAX_DESC_CHARS, text.length - MAX_DESC_CHARS);
+                return;
+            }
+            const html = quill.root.innerHTML;
+            onChange(html === '<p><br></p>' ? '' : html, text.length);
+        });
+
+        quillRef.current = quill;
+
+        /* Cleanup: destruir el editor al desmontar */
+        return () => {
+            if (quillRef.current) {
+                quillRef.current = null;
+            }
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); /* Solo al montar */
+
+    return quillRef;
 }
 
 /* ── Dropdown personalizado para React ──────────────────── */
@@ -142,18 +192,6 @@ function CargoDropdown({ value, onChange, name }) {
     );
 }
 
-/* ── Helpers de fecha ───────────────────────────────────── */
-function padZ(n) { return String(n).padStart(2, '0'); }
-function toDateVal(anio, mes, dia) {
-    if (!anio || !mes || !dia) return '';
-    return `${anio}-${padZ(mes)}-${padZ(dia)}`;
-}
-function fromDateVal(val) {
-    if (!val) return { dia: '', mes: '', anio: '' };
-    const [anio, mes, dia] = val.split('-');
-    return { dia, mes, anio };
-}
-
 /* ── Toggle trabajo actual ──────────────────────────────── */
 function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia, finMes, finAnio, errorFin }) {
     const [actual,    setActual]    = useState(defaultChecked || false);
@@ -180,36 +218,24 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
             </div>
 
             <div className="form-row" style={{ marginBottom: '14px' }}>
-                {/* ── Fecha de inicio ── */}
                 <div className="form-group">
                     <label className="form-label">Fecha de inicio <span className="required">*</span></label>
                     <div className="date-picker-wrap">
-                        <input
-                            type="date"
-                            className="form-input date-picker"
-                            value={inicioVal}
-                            min="1950-01-01"
-                            max={today}
-                            onChange={e => setInicioVal(e.target.value)}
-                        />
+                        <input type="date" className="form-input date-picker"
+                            value={inicioVal} min="1950-01-01" max={today}
+                            onChange={e => setInicioVal(e.target.value)} />
                     </div>
                 </div>
-
-                {/* ── Fecha de fin ── */}
                 <div className="form-group" style={{ opacity: actual ? 0.4 : 1 }}>
                     <label className="form-label">
                         Fecha de fin {!actual && <span className="required">*</span>}
                     </label>
                     <div className="date-picker-wrap">
-                        <input
-                            type="date"
+                        <input type="date"
                             className={`form-input date-picker${errorFin ? ' is-invalid' : ''}`}
-                            value={finVal}
-                            min={inicioVal || "1950-01-01"}
-                            max={today}
+                            value={finVal} min={inicioVal || '1950-01-01'} max={today}
                             disabled={actual}
-                            onChange={e => setFinVal(e.target.value)}
-                        />
+                            onChange={e => setFinVal(e.target.value)} />
                     </div>
                     {errorFin && <div className="error-message">{errorFin}</div>}
                 </div>
@@ -219,7 +245,7 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
 }
 
 /* ══════════════════════════════════════════════════════════
-   FormEdicionGrupo
+   FormEdicionGrupo — con Quill integrado
    ══════════════════════════════════════════════════════════ */
 function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
     const [error,           setError]          = useState('');
@@ -228,7 +254,33 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
     const [confirmEliminar, setConfirmEliminar] = useState(null);
     const [empresa,         setEmpresa]        = useState(grupo.institution || '');
     const [ubicacion,       setUbicacion]      = useState(grupo.location || '');
+
+    /* ── Estado de descripción (HTML de Quill) ── */
     const [descripcion,     setDescripcion]    = useState(grupo.description || '');
+    const [descCharCount,   setDescCharCount]  = useState(0);
+
+    /* Ref del div donde montará Quill */
+    const quillContainerRef = useRef(null);
+
+    /* Callback estable para el hook */
+    const handleDescChange = useCallback((html, charCount) => {
+        setDescripcion(html);
+        setDescCharCount(charCount);
+    }, []);
+
+    /* Montar Quill cuando el componente se monte */
+    useQuillEditor(quillContainerRef, grupo.description || '', handleDescChange);
+
+    /* Calcular chars iniciales al montar */
+    useEffect(() => {
+        if (grupo.description) {
+            /* Contar texto plano del HTML inicial */
+            const tmp = document.createElement('div');
+            tmp.innerHTML = grupo.description;
+            setDescCharCount(tmp.textContent.trim().length);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const [cargos, setCargos] = useState(
         grupo.items.map(exp => ({ id: exp.id, tempId: null, value: exp.title || '', deleted: false }))
@@ -261,6 +313,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
         e.preventDefault();
         setError('');
 
+        /* Validar cargos */
         for (const c of cargosVisibles) {
             if (!c.value) { setError('Debes seleccionar un cargo en cada campo.'); return; }
         }
@@ -294,8 +347,11 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             if (fin < ini) { setErrorFin('La fecha de fin no puede ser anterior a la de inicio.'); return; }
         }
 
+        /* descripcion ya tiene el HTML actualizado gracias al hook */
         const payload = {
-            empresa, location: ubicacion, descripcion,
+            empresa,
+            location:          ubicacion,
+            descripcion:       descripcion,  /* ← HTML de Quill */
             fecha_inicio_dia:  inicioDia,
             fecha_inicio_mes:  inicioMes,
             fecha_inicio_anio: inicioAnio,
@@ -309,6 +365,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
         try {
             const idsEliminados = new Set();
 
+            /* Eliminar cargos marcados */
             const aEliminar = cargos.filter(c => c.deleted && c.id);
             for (const c of aEliminar) {
                 await fetch(`/experiencia-laboral/${c.id}`, {
@@ -318,6 +375,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 idsEliminados.add(c.id);
             }
 
+            /* Actualizar cargos existentes */
             const existentes = cargosVisibles.filter(c => c.id);
             const putResults = [];
             for (const c of existentes) {
@@ -334,6 +392,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 }
             }
 
+            /* Crear nuevos cargos */
             const nuevos      = cargosVisibles.filter(c => !c.id);
             const postResults = [];
             for (const c of nuevos) {
@@ -351,7 +410,29 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 }
             }
 
-            onGuardado([...putResults, ...postResults], idsEliminados);
+            /* Construir start_date / end_date para el payloadLocal */
+            const startDate = (inicioAnio && inicioMes && inicioDia)
+                ? `${inicioAnio}-${String(inicioMes).padStart(2,'0')}-${String(inicioDia).padStart(2,'0')}`
+                : null;
+            const endDate = (!trabajoActual && finAnio && finMes && finDia)
+                ? `${finAnio}-${String(finMes).padStart(2,'0')}-${String(finDia).padStart(2,'0')}`
+                : null;
+
+            /* IDs de TODOS los items del grupo: los que se actualizaron via PUT
+               y los que quedaron igual. Todos comparten description/empresa/fechas. */
+            const idsGrupoCompleto = new Set(grupo.items.map(i => i.id));
+
+            const payloadLocal = {
+                idsGrupo:    idsGrupoCompleto,
+                descripcion: descripcion,
+                empresa:     empresa,
+                location:    ubicacion,
+                start_date:  startDate,
+                end_date:    endDate,
+                is_current:  trabajoActual,
+            };
+
+            onGuardado([...putResults, ...postResults], idsEliminados, payloadLocal);
 
         } catch (err) {
             if (err && err.errors) setError(Object.values(err.errors).join(' — '));
@@ -456,7 +537,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 </div>
             </div>
 
-            {/* Fechas (con ícono de calendario personalizado vía ToggleActual) */}
+            {/* Fechas */}
             <ToggleActual
                 defaultChecked={grupo.is_current}
                 inicioDia={getDia(rep.start_date)}  inicioMes={getMes(rep.start_date)}  inicioAnio={getAnio(rep.start_date)}
@@ -464,13 +545,17 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 errorFin={errorFin}
             />
 
-            {/* Descripción */}
+            {/* ── Descripción con Quill ── */}
             <div className="form-group" style={{ marginBottom: '14px' }}>
                 <label className="form-label">Descripción</label>
-                <textarea name="descripcion" value={descripcion} maxLength={500}
-                    className="form-textarea" rows={3}
-                    onChange={e => setDescripcion(e.target.value)} />
-                <div className="char-counter">{descripcion.length}/500</div>
+
+                {/* Contador de caracteres sobre el editor */}
+                <div className="char-counter" style={{ textAlign: 'right', marginBottom: '4px' }}>
+                    {descCharCount} / {MAX_DESC_CHARS} caracteres
+                </div>
+
+                {/* El div donde Quill se montará */}
+                <div ref={quillContainerRef} className="quill-editor-wrap" />
             </div>
 
             <div className="btn-row" style={{ marginTop: 0 }}>
@@ -490,6 +575,49 @@ const DESC_LIMIT = 120;
 function DescripcionExpandible({ texto }) {
     const [expandida, setExpandida] = useState(false);
     if (!texto) return null;
+
+    /* Si el texto es HTML (tiene tags), renderizar como HTML */
+    const esHTML = /<[a-z][\s\S]*>/i.test(texto);
+
+    if (esHTML) {
+        /* Extraer texto plano para saber si es largo */
+        const tmp = document.createElement('div');
+        tmp.innerHTML = texto;
+        const plain = tmp.textContent || '';
+        const corta = plain.length > DESC_LIMIT;
+
+        return (
+            <div className="historial-desc">
+                {corta && !expandida
+                    ? (
+                        <>
+                            <div
+                                className="quill-rendered-content"
+                                dangerouslySetInnerHTML={{
+                                    __html: texto.slice(0, texto.indexOf(' ', DESC_LIMIT)) || texto
+                                }}
+                                style={{ display: 'inline' }}
+                            />
+                            <span>…</span>
+                        </>
+                    )
+                    : (
+                        <div
+                            className="quill-rendered-content"
+                            dangerouslySetInnerHTML={{ __html: texto }}
+                        />
+                    )
+                }
+                {corta && (
+                    <button type="button" className="btn-ver-mas" onClick={() => setExpandida(v => !v)}>
+                        {expandida ? ' Ver menos' : ' Ver más'}
+                    </button>
+                )}
+            </div>
+        );
+    }
+
+    /* Texto plano (compatibilidad con registros antiguos) */
     const corta = texto.length > DESC_LIMIT;
     return (
         <div className="historial-desc">
@@ -506,8 +634,7 @@ function DescripcionExpandible({ texto }) {
 /* ══════════════════════════════════════════════════════════
    Componente principal
    ══════════════════════════════════════════════════════════ */
-function ExperienciaLaboral({ experiencias: initialExperiencias }) {
-    const [experiencias,  setExperiencias]  = useState(initialExperiencias);
+function ExperienciaLaboral({ experiencias, setExperiencias }) {
     const [editandoGrupo, setEditandoGrupo] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
@@ -529,13 +656,34 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
         }
     }
 
-    function handleGuardado(actualizados, idsEliminados) {
+    function handleGuardado(actualizados, idsEliminados, payloadLocal) {
         setExperiencias(prev => {
+            // 1. Quitar los eliminados
             let siguiente = prev.filter(e => !idsEliminados.has(e.id));
+
+            // 2. Actualizar los existentes
             siguiente = siguiente.map(e => {
                 const match = actualizados.find(a => a.id === e.id);
-                return match ?? e;
+                if (match) return match;
+
+                // Si el servidor no devolvió este id en `actualizados` pero sí
+                // estaba en el grupo editado, forzar los campos compartidos
+                // (description, institution, location, fechas) desde payloadLocal.
+                if (payloadLocal && payloadLocal.idsGrupo && payloadLocal.idsGrupo.has(e.id)) {
+                    return {
+                        ...e,
+                        description:  payloadLocal.descripcion   ?? e.description,
+                        institution:  payloadLocal.empresa        ?? e.institution,
+                        location:     payloadLocal.location       ?? e.location,
+                        start_date:   payloadLocal.start_date     ?? e.start_date,
+                        end_date:     payloadLocal.end_date       ?? e.end_date,
+                        is_current:   payloadLocal.is_current     ?? e.is_current,
+                    };
+                }
+                return e;
             });
+
+            // 3. Agregar nuevos
             const idsExistentes = new Set(prev.map(e => e.id));
             const nuevos = actualizados.filter(a => !idsExistentes.has(a.id));
             return [...siguiente, ...nuevos];
@@ -613,11 +761,10 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
                 </div>
             ))}
 
-            {/* ── Modal de confirmación ── */}
+            {/* Modal de confirmación */}
             {confirmDelete && (
                 <div className="modal-overlay">
                     <div className="modal-box">
-                        <div className="modal-icon"><IconTrash /></div>
                         <div className="modal-title">¿Eliminar esta experiencia?</div>
                         <div className="modal-desc">
                             Esta acción eliminará <strong>todos los cargos</strong> asociados a
@@ -645,6 +792,41 @@ function ExperienciaLaboral({ experiencias: initialExperiencias }) {
 /* ── Bootstrap ─────────────────────────────────────────── */
 const el = document.getElementById('historial-laboral-react');
 if (el) {
-    const data = JSON.parse(el.dataset.experiencias || '[]');
-    ReactDOM.createRoot(el).render(<ExperienciaLaboral experiencias={data} />);
+    const STORAGE_KEY = 'exp_laboral_state';
+
+    /* Leer datos: preferir sessionStorage (estado más reciente) sobre el HTML */
+    function getDatos() {
+        try {
+            const saved = sessionStorage.getItem(STORAGE_KEY);
+            if (saved) return JSON.parse(saved);
+        } catch (_) {}
+        return JSON.parse(el.dataset.experiencias || '[]');
+    }
+
+    const root = ReactDOM.createRoot(el);
+
+    /* Wrapper que intercepta cambios de estado para persistirlos */
+    function AppWrapper() {
+        const [experiencias, setExperiencias] = React.useState(getDatos);
+
+        function setYGuardar(fn) {
+            setExperiencias(prev => {
+                const next = typeof fn === 'function' ? fn(prev) : fn;
+                try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (_) {}
+                return next;
+            });
+        }
+
+        return <ExperienciaLaboral
+            experiencias={experiencias}
+            setExperiencias={setYGuardar}
+        />;
+    }
+
+    root.render(<AppWrapper />);
+
+    /* También cubrir el bfcache por si acaso */
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) root.render(<AppWrapper />);
+    });
 }

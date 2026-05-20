@@ -45,7 +45,7 @@
 </button>
 
 @php
-    $allowedProjectHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
+    $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
 @endphp
 
 <div class="preview-container">
@@ -170,10 +170,13 @@
                         — Actualidad
                     @endif
                 </div>
+
                 @if($exp->descripcion)
                 <div class="description-wrapper">
-                    <div class="description collapsed" id="desc-exp-{{ $loop->index }}">{{ $exp->descripcion }}</div>
-                    @if(strlen($exp->descripcion) > 150)
+                    <div class="description collapsed" id="desc-exp-{{ $loop->index }}">
+                        <div class="ql-snow"><div class="ql-editor">{!! strip_tags($exp->descripcion, $allowedHtmlTags) !!}</div></div>
+                    </div>
+                    @if(mb_strlen(trim(strip_tags($exp->descripcion))) > 150)
                         <button class="ver-mas-btn" onclick="toggleDesc('desc-exp-{{ $loop->index }}', this)">Ver más</button>
                     @endif
                 </div>
@@ -203,8 +206,10 @@
                     </div>
                     @if($aca->descripcion)
                     <div class="description-wrapper">
-                        <div class="description collapsed" id="desc-aca-{{ $loop->index }}">{{ $aca->descripcion }}</div>
-                        @if(strlen($aca->descripcion) > 150)
+                        <div class="description collapsed" id="desc-aca-{{ $loop->index }}">
+                            <div class="ql-snow"><div class="ql-editor">{!! strip_tags($aca->descripcion, $allowedHtmlTags) !!}</div></div>
+                        </div>
+                        @if(mb_strlen(trim(strip_tags($aca->descripcion))) > 150)
                             <button class="ver-mas-btn" onclick="toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
                         @endif
                     </div>
@@ -297,44 +302,43 @@
     </div>
 
     <!-- IDIOMAS -->
-<div class="section">
-    <h2><i class="fas fa-language"></i> Idiomas</h2>
-    @php
-        // Inicializar variable si no existe
-        if (!isset($idiomas)) {
-            $idiomas = collect();
-        }
-    @endphp
-    
-    @if($idiomas->isEmpty())
-        <div class="empty-message">No hay idiomas registrados</div>
-    @else
-        <div class="idiomas-preview-grid">
-            @foreach($idiomas as $idioma)
-            <div class="idioma-preview-card">
-                <div class="idioma-preview-header">
-                    <div class="idioma-preview-left">
-                        <span class="idioma-bandera">{{ $idioma->bandera }}</span>
-                        <div class="idioma-preview-info">
-                            <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
-                            <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+    <div class="section">
+        <h2><i class="fas fa-language"></i> Idiomas</h2>
+        @php
+            if (!isset($idiomas)) {
+                $idiomas = collect();
+            }
+        @endphp
+        
+        @if($idiomas->isEmpty())
+            <div class="empty-message">No hay idiomas registrados</div>
+        @else
+            <div class="idiomas-preview-grid">
+                @foreach($idiomas as $idioma)
+                <div class="idioma-preview-card">
+                    <div class="idioma-preview-header">
+                        <div class="idioma-preview-left">
+                            <span class="idioma-bandera">{{ $idioma->bandera }}</span>
+                            <div class="idioma-preview-info">
+                                <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
+                                <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+                            </div>
                         </div>
+                        @if($idioma->certificado)
+                        <a href="{{ asset('storage/' . $idioma->certificado) }}"
+                        target="_blank" class="idioma-cert-link">
+                            <i class="fas fa-certificate"></i> Cert.
+                        </a>
+                        @endif
                     </div>
-                    @if($idioma->certificado)
-                    <a href="{{ asset('storage/' . $idioma->certificado) }}"
-                    target="_blank" class="idioma-cert-link">
-                        <i class="fas fa-certificate"></i> Cert.
-                    </a>
-                    @endif
+                    <div class="idioma-barra-wrap">
+                        <div class="idioma-barra-fill" style="width: {{ $idioma->porcentaje }}%"></div>
+                    </div>
                 </div>
-                <div class="idioma-barra-wrap">
-                    <div class="idioma-barra-fill" style="width: {{ $idioma->porcentaje }}%"></div>
-                </div>
+                @endforeach
             </div>
-            @endforeach
-        </div>
-    @endif
-</div>
+        @endif
+    </div>
 
     <!-- HABILIDADES BLANDAS -->
     <div class="section">
@@ -348,7 +352,6 @@
         </div>
     </div>
 
-
     <!-- PROYECTOS -->
     <div class="section">
         <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
@@ -357,7 +360,7 @@
                 @php
                     $modalProyectoPayload = [
                         'nombre' => $proyecto->nombre,
-                        'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedProjectHtmlTags),
+                        'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedHtmlTags),
                         'fecha_inicio' => optional($proyecto->fecha_inicio)->format('d/m/Y'),
                         'fecha_fin' => optional($proyecto->fecha_fin)->format('d/m/Y'),
                         'estado' => $proyecto->estado,
@@ -373,7 +376,7 @@
                     @if($proyecto->descripcion)
                     <div class="description-wrapper">
                         <div class="description collapsed proyecto-desc-wrap" id="desc-proy-{{ $loop->index }}">
-                            <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedProjectHtmlTags) !!}</div></div>
+                            <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedHtmlTags) !!}</div></div>
                         </div>
                         @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
                             <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
@@ -483,13 +486,12 @@
 </div>
 
 <script>
-// Mapa de proyectos para abrir por ID desde skills
 window.previewProjectsById = {!! json_encode(
-    collect($proyectos)->keyBy('id')->map(function($p) use ($allowedProjectHtmlTags) {
+    collect($proyectos)->keyBy('id')->map(function($p) use ($allowedHtmlTags) {
         return [
             'id' => $p->id,
             'nombre' => $p->nombre,
-            'descripcion' => strip_tags($p->descripcion ?? '', $allowedProjectHtmlTags),
+            'descripcion' => strip_tags($p->descripcion ?? '', $allowedHtmlTags),
             'fecha_inicio' => optional($p->fecha_inicio)->format('d/m/Y'),
             'fecha_fin' => optional($p->fecha_fin)->format('d/m/Y'),
             'estado' => $p->estado,
@@ -594,7 +596,6 @@ function toggleDesc(id, btn) {
     }
 }
 
-// Compartir Modal Funciones
 function abrirModalCompartir() {
     document.getElementById('modal-compartir').style.display = 'flex';
 }

@@ -8,13 +8,15 @@ use Illuminate\Support\Facades\DB;
 
 class ExperienciaLaboralController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $experiencias = Experience::where('user_id', auth()->id())
             ->where('type', 'work')
             ->orderBy('start_date', 'desc')
             ->get();
-
+        if ($request->expectsJson()) {
+            return response()->json($experiencias);
+        }
         return view('experiencia-laboral', compact('experiencias'));
     }
 
@@ -28,18 +30,21 @@ class ExperienciaLaboralController extends Controller
         $vocales = self::VOCALES;
 
         $patrones = [
-            'empresa'     => "/^[{$letras}0-9\s\.\,\-\&]+$/",
-            'cargo'       => "/^[{$letras}0-9\s\.\,\-\/]+$/",
-            'location'    => "/^[{$letras}0-9\s\.\,\-\/\#\@\(\)°º\'\"]+$/",
-            'descripcion' => "/^[{$letras}0-9\s\.\,\;\:\!\?\-\(\)\"\'\n\r]+$/",
+            'empresa'  => "/^[{$letras}0-9\s\.\,\-\&]+$/",
+            'cargo'    => "/^[{$letras}0-9\s\.\,\-\/]+$/",
+            'location' => "/^[{$letras}0-9\s\.\,\-\/\#\@\(\)°º\'\"]+$/",
         ];
 
         $mensajesCaracteres = [
-            'empresa'     => 'El nombre de la empresa solo puede contener letras, números y los caracteres: . , - &',
-            'cargo'       => 'El cargo solo puede contener letras, números y los caracteres: . , - /',
-            'location'    => 'La ubicación solo puede contener letras, números y los caracteres: . , - / # @ ( ) ° º \' "',
-            'descripcion' => 'La descripción solo puede contener letras, números y puntuación común ( . , ; : ! ? - ( ) " \' )',
+            'empresa'  => 'El nombre de la empresa solo puede contener letras, números y los caracteres: . , - &',
+            'cargo'    => 'El cargo solo puede contener letras, números y los caracteres: . , - /',
+            'location' => 'La ubicación solo puede contener letras, números y los caracteres: . , - / # @ ( ) ° º \' "',
         ];
+
+        // La descripción ya no pasa por este método (tiene su propia validación)
+        if (!isset($patrones[$campo])) {
+            return null;
+        }
 
         if (!preg_match($patrones[$campo], $valor)) {
             return $mensajesCaracteres[$campo];
@@ -47,15 +52,70 @@ class ExperienciaLaboralController extends Controller
 
         if (!preg_match("/[{$vocales}]/", $valor)) {
             $nombres = [
-                'empresa'     => 'El nombre de la empresa',
-                'cargo'       => 'El cargo',
-                'location'    => 'La ubicación',
-                'descripcion' => 'La descripción',
+                'empresa'  => 'El nombre de la empresa',
+                'cargo'    => 'El cargo',
+                'location' => 'La ubicación',
             ];
-            return $nombres[$campo] . ' no parece ser un texto válido. Asegúrate de escribir palabras reales.';
+            return ($nombres[$campo] ?? 'El campo') . ' no parece ser un texto válido. Asegúrate de escribir palabras reales.';
         }
 
         return null;
+    }
+
+    /**
+     * Valida la descripción que puede venir como HTML de Quill o texto plano.
+     */
+    private function validarDescripcion(string $valor): ?string
+    {
+        $vocales = self::VOCALES;
+
+        // Extraer texto plano quitando etiquetas HTML
+        $textoPlano = trim(strip_tags($valor));
+
+        // Si está vacío tras quitar etiquetas, no hay nada que validar
+        if ($textoPlano === '') {
+            return null;
+        }
+
+        // Límite de caracteres sobre el texto plano
+        if (mb_strlen($textoPlano) < 10) {
+            return 'La descripción debe tener al menos 10 caracteres.';
+        }
+
+        if (mb_strlen($textoPlano) > 500) {
+            return 'La descripción no puede superar los 500 caracteres.';
+        }
+
+        // Verificar que haya al menos una vocal (texto real)
+        if (!preg_match("/[{$vocales}]/u", $textoPlano)) {
+            return 'La descripción no parece ser un texto válido. Asegúrate de escribir palabras reales.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Sanea el HTML de Quill permitiendo solo las etiquetas seguras
+     * que Quill genera. Evita XSS guardando solo lo necesario.
+     */
+    private function sanitizarDescripcion(string $valor): string
+    {
+        // Si no contiene etiquetas HTML, devolver tal cual
+        if (strip_tags($valor) === $valor) {
+            return $valor;
+        }
+
+        // Etiquetas permitidas (las que genera Quill)
+        $etiquetasPermitidas = '<p><br><strong><em><u><s><a><ul><ol><li><span><h1><h2><h3><blockquote>';
+
+        $sanitizado = strip_tags($valor, $etiquetasPermitidas);
+
+        // Quitar atributos peligrosos (onclick, onerror, javascript:, etc.)
+        // Permitir solo href, style y class (que usa Quill para colores)
+        $sanitizado = preg_replace('/\s+on\w+\s*=\s*["\'][^"\']*["\']/i', '', $sanitizado);
+        $sanitizado = preg_replace('/javascript\s*:/i', '', $sanitizado);
+
+        return $sanitizado;
     }
 
     // ── Validación de campos comunes ───────────────────────────────────────
@@ -87,20 +147,13 @@ class ExperienciaLaboralController extends Controller
             }
         }
 
-        // Descripción (opcional)
+        // ── Descripción (opcional) — acepta HTML de Quill ─────────────────
         if (!empty($request->descripcion)) {
-            if (strlen($request->descripcion) < 10) {
-                $errores['descripcion'] = 'La descripción debe tener al menos 10 caracteres.';
-            } elseif (strlen($request->descripcion) > 500) {
-                $errores['descripcion'] = 'La descripción no puede superar los 500 caracteres.';
-            } else {
-                $error = $this->validarCampoTexto($request->descripcion, 'descripcion');
-                if ($error) $errores['descripcion'] = $error;
-            }
+            $errorDesc = $this->validarDescripcion($request->descripcion);
+            if ($errorDesc) $errores['descripcion'] = $errorDesc;
         }
 
         // ── Fecha de inicio ───────────────────────────────────────────────
-        // Acepta hiddens separados (dia/mes/anio) O campo completo YYYY-MM-DD
         $tieneParciales = !empty($request->fecha_inicio_dia)
                        && !empty($request->fecha_inicio_mes)
                        && !empty($request->fecha_inicio_anio);
@@ -119,7 +172,6 @@ class ExperienciaLaboralController extends Controller
         }
 
         // ── Fecha de fin ──────────────────────────────────────────────────
-        // Obligatoria si no es trabajo actual
         if (!$request->trabajo_actual) {
             $tieneFinParcial  = !empty($request->fecha_fin_dia)
                              && !empty($request->fecha_fin_mes)
@@ -228,8 +280,7 @@ class ExperienciaLaboralController extends Controller
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    //  STORE  —  guarda UNA fila por cargo en transacción (HU-12)
-    //  Acepta form POST (blade) y JSON (edición React)
+    //  STORE
     // ══════════════════════════════════════════════════════════════════════
     public function store(Request $request)
     {
@@ -254,10 +305,14 @@ class ExperienciaLaboralController extends Controller
                 : back()->withErrors($msg)->withInput();
         }
 
-        $cargos  = array_filter(array_map('trim', $request->input('cargos', [])));
-        $creados = [];
+        $cargos      = array_filter(array_map('trim', $request->input('cargos', [])));
+        // Sanear el HTML de Quill antes de guardar
+        $descripcion = !empty($request->descripcion)
+            ? $this->sanitizarDescripcion($request->descripcion)
+            : null;
+        $creados     = [];
 
-        DB::transaction(function () use ($request, $cargos, $fechaInicio, $fechaFin, &$creados) {
+        DB::transaction(function () use ($request, $cargos, $fechaInicio, $fechaFin, $descripcion, &$creados) {
             foreach ($cargos as $cargo) {
                 $creados[] = Experience::create([
                     'user_id'       => auth()->id(),
@@ -265,7 +320,7 @@ class ExperienciaLaboralController extends Controller
                     'institution'   => $request->empresa,
                     'title'         => $cargo,
                     'location'      => $request->location,
-                    'description'   => $request->descripcion,
+                    'description'   => $descripcion,
                     'start_date'    => $fechaInicio,
                     'end_date'      => $fechaFin,
                     'is_current'    => $request->trabajo_actual ? true : false,
@@ -281,7 +336,7 @@ class ExperienciaLaboralController extends Controller
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    //  UPDATE  —  edita un registro individual
+    //  UPDATE
     // ══════════════════════════════════════════════════════════════════════
     public function update(Request $request, $id)
     {
@@ -310,13 +365,16 @@ class ExperienciaLaboralController extends Controller
             ], 422);
         }
 
-        $cargo = trim($request->input('cargos.0') ?? $request->input('cargo', ''));
+        $cargo       = trim($request->input('cargos.0') ?? $request->input('cargo', ''));
+        $descripcion = !empty($request->descripcion)
+            ? $this->sanitizarDescripcion($request->descripcion)
+            : null;
 
         $experiencia->update([
             'institution' => $request->empresa,
             'title'       => $cargo,
             'location'    => $request->location,
-            'description' => $request->descripcion,
+            'description' => $descripcion,
             'start_date'  => $fechaInicio,
             'end_date'    => $fechaFin,
             'is_current'  => $request->trabajo_actual ? true : false,
@@ -327,8 +385,6 @@ class ExperienciaLaboralController extends Controller
 
     // ══════════════════════════════════════════════════════════════════════
     //  DESTROY
-    //  ?grupo=1  → elimina todo el grupo (botón "Eliminar experiencia")
-    //  sin param → elimina solo ese cargo  (edición individual)
     // ══════════════════════════════════════════════════════════════════════
     public function destroy($id, Request $request)
     {

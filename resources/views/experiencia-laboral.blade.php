@@ -1,26 +1,28 @@
 <x-app-layout>
-    
+    {{-- Quill CSS --}}
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/experiencia-laboral.css') }}">
 
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="shell">
-            
+
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
-                    <div class="nav-tab muted">VER PERFIL</div>
+                    <a href="{{ route('preview') }}" class="nav-tab muted">VER PERFIL</a>
                 </div>
+
                 <div class="body-row">
                     <div class="sidebar">
-                        <a href="{{ route('profile.create') }}" class="sidebar-item">Personal</a>
-                        <a href="{{ route('experiencia.laboral') }}" class="sidebar-item active">Experiencia laboral</a>
+                        <a href="{{ route('profile.create') }}"        class="sidebar-item">Personal</a>
+                        <a href="{{ route('experiencia.laboral') }}"   class="sidebar-item active">Experiencia laboral</a>
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
-                        <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
-                        <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <a href="{{ route('proyectos') }}" class="sidebar-item">Proyectos</a>  
-                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a>
-                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
+                        <a href="{{ route('skills.tecnicas') }}"       class="sidebar-item">Habilidades técnicas</a>
+                        <a href="{{ route('skills.blandas') }}"        class="sidebar-item">Habilidades blandas</a>
+                        <a href="{{ route('proyectos') }}"             class="sidebar-item">Proyectos</a>
+                        <a href="{{ route('idiomas.index') }}"         class="sidebar-item">Idiomas</a>
+                        <a href="{{ route('redes.index') }}"           class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
 
                     <div class="main">
@@ -161,14 +163,23 @@
                                         <label for="trabajoActual">Trabajo actual</label>
                                     </div>
 
-                                    {{-- Descripción --}}
+                                    {{-- Descripción con Quill --}}
                                     <div class="form-group">
                                         <label class="form-label">Descripción</label>
-                                        <textarea class="form-textarea" name="descripcion" id="descripcion"
-                                            maxlength="500"
-                                            oninput="updateCounter('descripcion','descripcionCount')"
-                                            placeholder="Describe brevemente tus responsabilidades y logros en este cargo...">{{ old('descripcion') }}</textarea>
-                                        <div class="char-counter"><span id="descripcionCount">0</span>/500</div>
+
+                                        {{-- Hidden input que recibirá el HTML de Quill antes de enviar --}}
+                                        <input type="hidden" name="descripcion" id="descripcionHidden"
+                                               value="{{ old('descripcion') }}">
+
+                                        {{-- Contador de caracteres --}}
+                                        <div id="descripcionCount" class="char-counter" style="text-align:right; margin-bottom:4px;">
+                                            0 / 500 caracteres
+                                        </div>
+
+                                        {{-- Contenedor del editor Quill --}}
+                                        <div id="quillEditorAdd" class="quill-editor-wrap"></div>
+
+                                        <div id="descripcionError" class="error-message hidden"></div>
                                     </div>
 
                                 </div>
@@ -188,9 +199,79 @@
         </div>
     </div>
 
+    {{-- Quill JS --}}
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="{{ asset('js/experiencia-laboral.js') }}"></script>
 
     @viteReactRefresh
     @vite('resources/js/experiencia-laboral.jsx')
+
+    {{-- Inicializar Quill en el formulario de añadir --}}
+    <script>
+    (function () {
+        /* ── Quill toolbar personalizado ── */
+        const TOOLBAR = [
+            [{ font: [] }],
+            ['bold', 'italic', 'underline'],
+            [{ color: [] }],
+            ['link'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['clean']
+        ];
+
+        const MAX_CHARS = 500;
+
+        /* ── Instancia global para el formulario de añadir ── */
+        window.quillAdd = new Quill('#quillEditorAdd', {
+            theme: 'snow',
+            placeholder: 'Describe brevemente tus responsabilidades y logros en este cargo...',
+            modules: { toolbar: TOOLBAR }
+        });
+
+        const counterEl = document.getElementById('descripcionCount');
+        const hiddenEl  = document.getElementById('descripcionHidden');
+        const errorEl   = document.getElementById('descripcionError');
+
+        /* Actualizar contador y hidden en cada cambio */
+        window.quillAdd.on('text-change', function () {
+            const text   = window.quillAdd.getText().trim();
+            const len    = text.length;
+            const html   = window.quillAdd.root.innerHTML;
+
+            /* Límite de texto plano */
+            if (len > MAX_CHARS) {
+                window.quillAdd.deleteText(MAX_CHARS, len - MAX_CHARS);
+                return;
+            }
+
+            /* El "vacío" de Quill es '<p><br></p>' — lo normalizamos a '' */
+            hiddenEl.value = (html === '<p><br></p>') ? '' : html;
+            counterEl.textContent = len + ' / ' + MAX_CHARS + ' caracteres';
+        });
+
+        /* Pre-cargar valor antiguo (old('descripcion')) si existe */
+        const oldVal = hiddenEl.value;
+        if (oldVal) {
+            window.quillAdd.root.innerHTML = oldVal;
+            const text = window.quillAdd.getText().trim();
+            counterEl.textContent = text.length + ' / ' + MAX_CHARS + ' caracteres';
+        }
+
+        /* ── Sincronizar el hidden ANTES de que el form envíe ── */
+        document.getElementById('experienciaForm').addEventListener('submit', function (e) {
+            const html = window.quillAdd.root.innerHTML;
+            hiddenEl.value = (html === '<p><br></p>') ? '' : html;
+        }, true); /* capture=true para que ocurra ANTES del listener de validación */
+
+        /* ── Extender resetForm para limpiar el editor ── */
+        const originalReset = window.resetForm;
+        window.resetForm = function () {
+            originalReset();
+            window.quillAdd.setContents([]);
+            hiddenEl.value = '';
+            counterEl.textContent = '0 / ' + MAX_CHARS + ' caracteres';
+        };
+    })();
+    </script>
 
 </x-app-layout>

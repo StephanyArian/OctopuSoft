@@ -120,11 +120,7 @@ class PreviewController extends Controller
             $fecha_fin = $grupo->contains('is_current', true) ? null : $grupo->max('end_date');
             $trabajo_actual = $grupo->contains('is_current', true);
             
-            // Combinar descripciones
-            $descripcion = $grupo->map(function($exp) {
-                return $exp->description;
-            })->filter()->implode("\n\n");
-            
+            $descripcion = $primera->description;
             return (object) [
                 'empresa' => $primera->institution,
                 'cargo' => $roles,
@@ -320,7 +316,7 @@ class PreviewController extends Controller
                 $fecha_inicio = $grupo->min('start_date');
                 $fecha_fin = $grupo->contains('is_current', true) ? null : $grupo->max('end_date');
                 $trabajo_actual = $grupo->contains('is_current', true);
-                $descripcion = $grupo->map(fn($exp) => $exp->description)->filter()->implode("\n\n");
+                $descripcion = $primera->description;
                 
                 return (object) [
                     'empresa' => $primera->institution,

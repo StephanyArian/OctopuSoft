@@ -6,8 +6,7 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
 @php
-    /** Misma salida que Quill, sin scripts/iframes (lista blanca). */
-    $allowedProjectHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
+    $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
 @endphp
 <a href="javascript:history.back()" class="btn-flotante">
     <i class="fas fa-edit"></i> Continuar editando
@@ -103,7 +102,6 @@
             </div>
         </div>
         
-        
         <!-- EXPERIENCIA LABORAL -->
         <div class="section">
             <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
@@ -135,14 +133,15 @@
                             — Actualidad
                         @endif
                     </div>
+
                     @if($exp->descripcion)
                     <div class="description-wrapper">
-                    <div class="description collapsed" id="desc-exp-{{ $loop->index }}">{{ $exp->descripcion }}</div>
-                        @if(strlen($exp->descripcion) > 150)
+                        <div class="description collapsed" id="desc-exp-{{ $loop->index }}">
+                            <div class="ql-snow"><div class="ql-editor">{!! strip_tags($exp->descripcion, $allowedHtmlTags) !!}</div></div>
+                        </div>
+                        @if(mb_strlen(trim(strip_tags($exp->descripcion))) > 150)
                             <button class="ver-mas-btn" onclick="toggleDesc('desc-exp-{{ $loop->index }}', this)">Ver más</button>
                         @endif
-
-                    
                     </div>
                     @endif
                 </div>
@@ -153,73 +152,74 @@
         </div>
 
         <!-- INFORMACIÓN ACADÉMICA -->
-        
-            <div class="section">
-                <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
-                <div class="cards-grid">
-                    @forelse($academicas as $aca)
-                        <div class="card">
-                            <h3>{{ $aca->institucion }}</h3>
-                            <div class="subtitle">{{ $aca->titulo }}</div>
-                            
-                            @if(isset($aca->specialty) && $aca->specialty)
-                                <div class="specialty-badge">
-                                    <i class="fas fa-tag"></i> {{ $aca->specialty }}
-                                </div>
-                                @endif
-                            
-                            <div class="date">
-                                {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
-                                @if($aca->fecha_fin)
-                                    — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
-                                @elseif($aca->estudio_actual)
-                                    — Actualidad
-                                @endif
+        <div class="section">
+            <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
+            <div class="cards-grid">
+                @forelse($academicas as $aca)
+                    <div class="card">
+                        <h3>{{ $aca->institucion }}</h3>
+                        <div class="subtitle">{{ $aca->titulo }}</div>
+                        
+                        @if(isset($aca->specialty) && $aca->specialty)
+                            <div class="specialty-badge">
+                                <i class="fas fa-tag"></i> {{ $aca->specialty }}
                             </div>
-                            
-                            @if($aca->descripcion)
-                            <div class="description-wrapper">
-                                <div class="description collapsed" id="desc-aca-{{ $loop->index }}">{{ $aca->descripcion }}</div>
-                                @if(strlen($aca->descripcion) > 150)
-                                    <button class="ver-mas-btn" onclick="toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
-                                @endif
-                            </div>
-                            @endif
-                            
-                            <!-- MOSTRAR EVIDENCIAS ACADÉMICAS -->
-                            @if(isset($aca->evidence_url) && $aca->evidence_url)
-                                @php $evidencias = json_decode($aca->evidence_url, true); @endphp
-                                @if(!empty($evidencias))
-                                    <div class="academic-evidences">
-                                        <div class="evidences-title">
-                                            <i class="fas fa-paperclip"></i> Evidencias
-                                        </div>
-                                        <div class="evidences-grid-preview">
-                                            @foreach($evidencias as $evidencia)
-                                                @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
-                                                    <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="pdf-card-preview" title="{{ basename($evidencia) }}">
-                                                        <div class="pdf-icon-preview">
-                                                            <i class="fas fa-file-pdf"></i>
-                                                            <span>PDF</span>
-                                                        </div>
-                                                        <span class="pdf-name">{{ \Illuminate\Support\Str::limit(basename($evidencia), 20) }}</span>
-                                                    </a>
-                                                @else
-                                                    <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="img-card-preview">
-                                                        <img src="{{ asset('storage/' . $evidencia) }}" alt="Evidencia">
-                                                    </a>
-                                                @endif
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
+                        @endif
+                        
+                        <div class="date">
+                            {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
+                            @if($aca->fecha_fin)
+                                — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
+                            @elseif($aca->estudio_actual)
+                                — Actualidad
                             @endif
                         </div>
-                    @empty
-                        <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
-                    @endforelse
-                </div>
+                        
+                        @if($aca->descripcion)
+                        <div class="description-wrapper">
+                            <div class="description collapsed" id="desc-aca-{{ $loop->index }}">
+                                <div class="ql-snow"><div class="ql-editor">{!! strip_tags($aca->descripcion, $allowedHtmlTags) !!}</div></div>
+                            </div>
+                            @if(mb_strlen(trim(strip_tags($aca->descripcion))) > 150)
+                                <button class="ver-mas-btn" onclick="toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
+                            @endif
+                        </div>
+                        @endif
+                        
+                        <!-- MOSTRAR EVIDENCIAS ACADÉMICAS -->
+                        @if(isset($aca->evidence_url) && $aca->evidence_url)
+                            @php $evidencias = json_decode($aca->evidence_url, true); @endphp
+                            @if(!empty($evidencias))
+                                <div class="academic-evidences">
+                                    <div class="evidences-title">
+                                        <i class="fas fa-paperclip"></i> Evidencias
+                                    </div>
+                                    <div class="evidences-grid-preview">
+                                        @foreach($evidencias as $evidencia)
+                                            @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
+                                                <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="pdf-card-preview" title="{{ basename($evidencia) }}">
+                                                    <div class="pdf-icon-preview">
+                                                        <i class="fas fa-file-pdf"></i>
+                                                        <span>PDF</span>
+                                                    </div>
+                                                    <span class="pdf-name">{{ \Illuminate\Support\Str::limit(basename($evidencia), 20) }}</span>
+                                                </a>
+                                            @else
+                                                <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="img-card-preview">
+                                                    <img src="{{ asset('storage/' . $evidencia) }}" alt="Evidencia">
+                                                </a>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+                @empty
+                    <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
+                @endforelse
             </div>
+        </div>
 
         <!-- HABILIDADES TÉCNICAS (Frontend / Backend) -->
         <div class="section">
@@ -345,6 +345,7 @@
                 </div>
             @endif
         </div>
+
         <!-- PROYECTOS -->
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
@@ -353,7 +354,7 @@
                     @php
                         $modalProyectoPayload = [
                             'nombre' => $proyecto->nombre,
-                            'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedProjectHtmlTags),
+                            'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedHtmlTags),
                             'fecha_inicio' => optional($proyecto->fecha_inicio)->format('d/m/Y'),
                             'fecha_fin' => optional($proyecto->fecha_fin)->format('d/m/Y'),
                             'estado' => $proyecto->estado,
@@ -368,9 +369,9 @@
                         
                         @if($proyecto->descripcion)
                         <div class="description-wrapper">
-                        <div class="description collapsed proyecto-desc-wrap" id="desc-proy-{{ $loop->index }}">
-                            <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedProjectHtmlTags) !!}</div></div>
-                        </div>
+                            <div class="description collapsed proyecto-desc-wrap" id="desc-proy-{{ $loop->index }}">
+                                <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedHtmlTags) !!}</div></div>
+                            </div>
                             @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
                                 <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
                             @endif
@@ -401,8 +402,6 @@
                 @endforelse
             </div>
         </div>
-
-
 
         <!-- MODAL COMPARTIR -->
         <div id="modal-compartir" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(2px);">
@@ -480,7 +479,6 @@
 
         <!-- BOTONES -->
         <div class="buttons-container">
-            
             <form action="{{ route('perfil.publicar') }}" method="POST" style="margin: 0;" id="formPublicar">
                 @csrf
                 <button type="submit" class="btn btn-publicar">
@@ -498,25 +496,24 @@
     });
 
     function toggleDesc(id, btn) {
-    const el = document.getElementById(id);
-    if (el.classList.contains('collapsed')) {
-        el.classList.remove('collapsed');
-        el.classList.add('expanded');
-        btn.textContent = 'Ver menos';
-    } else {
-        el.classList.remove('expanded');
-        el.classList.add('collapsed');
-        btn.textContent = 'Ver más';
-    }
+        const el = document.getElementById(id);
+        if (el.classList.contains('collapsed')) {
+            el.classList.remove('collapsed');
+            el.classList.add('expanded');
+            btn.textContent = 'Ver menos';
+        } else {
+            el.classList.remove('expanded');
+            el.classList.add('collapsed');
+            btn.textContent = 'Ver más';
+        }
     }
 
-    // Mapa de proyectos para abrir por ID desde skills
     window.previewProjectsById = {!! json_encode(
-        collect($proyectos)->keyBy('id')->map(function($p) use ($allowedProjectHtmlTags) {
+        collect($proyectos)->keyBy('id')->map(function($p) use ($allowedHtmlTags) {
             return [
                 'id' => $p->id,
                 'nombre' => $p->nombre,
-                'descripcion' => strip_tags($p->descripcion ?? '', $allowedProjectHtmlTags),
+                'descripcion' => strip_tags($p->descripcion ?? '', $allowedHtmlTags),
                 'fecha_inicio' => optional($p->fecha_inicio)->format('d/m/Y'),
                 'fecha_fin' => optional($p->fecha_fin)->format('d/m/Y'),
                 'estado' => $p->estado,
@@ -531,7 +528,6 @@
     function abrirModalPorId(projectId) {
         const data = (window.previewProjectsById || {})[projectId];
         if (!data) return;
-        // Scroll suave a sección proyectos
         const target = document.getElementById('project-card-' + projectId);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         abrirModal(data);
@@ -609,7 +605,6 @@
         if (e.target === this) cerrarModal();
     });
 
-    // Compartir Modal Funciones
     function abrirModalCompartir() {
         document.getElementById('modal-compartir').style.display = 'flex';
     }
@@ -656,8 +651,6 @@
         
         if(url) window.open(url, '_blank', 'width=600,height=400');
     }
-
     </script>
-
 
 @endsection
