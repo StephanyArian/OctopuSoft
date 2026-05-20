@@ -114,7 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ── FILTRADO Y BUSCADOR AJAX ── */
     function fetchFilteredPortfolios() {
         // Recopilamos los valores actuales de la interfaz de forma segura
-        const query = searchInput ? searchInput.value : '';
+        const query = searchInput
+        ? searchInput.value
+           .normalize("NFD")
+           .replace(/[\u0300-\u036f]/g, "")
+        : '';
         const category = categorySelect ? categorySelect.value : '';
         const skill = skillsSelect ? skillsSelect.value : '';
         const sort = sortSelect ? sortSelect.value : 'desc';

@@ -490,38 +490,136 @@ $skills = collect([
         ->with(['user.profession', 'user.skills', 'projects.technologies']);
 
     if ($request->filled('search')) {
-        $search = trim($request->input('search'));
+     $search = trim($request->input('search'));
 
-        $query->where(function ($q) use ($search) {
-            $q->whereHas('user', function ($u) use ($search) {
-                $u->where('first_name', 'LIKE', "%{$search}%")
-                  ->orWhere('last_name', 'LIKE', "%{$search}%")
-                  ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
-                  ->orWhere('biography', 'LIKE', "%{$search}%");
-            })
-            ->orWhereHas('user.profession', function ($p) use ($search) {
-                $p->where('name', 'LIKE', "%{$search}%");
-            })
-            ->orWhereHas('user.skills', function ($s) use ($search) {
-                $s->where('name', 'LIKE', "%{$search}%");
+     $searchNormalized = strtolower(str_replace(
+        ['á','é','í','ó','ú','Á','É','Í','Ó','Ú'],
+        ['a','e','i','o','u','a','e','i','o','u'],
+        $search
+     ));
+
+     $terms = [$searchNormalized];
+
+
+$synonyms = [
+    'ingenieria' => ['ing', 'engineering'],
+    'ing' => ['ingenieria', 'engineering'],
+
+    'sistemas' => ['systems', 'system'],
+    'systems' => ['sistemas'],
+
+    'desarrollador' => ['developer', 'dev'],
+    'desarrollo' => ['development', 'developer', 'dev'],
+    'developer' => ['desarrollador', 'desarrollo', 'dev'],
+    'development' => ['desarrollo', 'developer', 'dev'],
+    'dev' => ['developer', 'development', 'desarrollador'],
+
+    'frontend' => ['front end', 'front-end'],
+    'backend' => ['back end', 'back-end'],
+
+    'fullstack' => ['full stack', 'full-stack'],
+    'full stack' => ['fullstack', 'full-stack'],
+
+    'diseñador' => ['designer', 'ui ux', 'ui/ux'],
+    'designer' => ['diseñador', 'ui ux', 'ui/ux'],
+
+    'administrador' => ['admin', 'administrator'],
+    'administrator' => ['administrador', 'admin'],
+
+    'seguridad' => ['security'],
+    'security' => ['seguridad'],
+
+    'datos' => ['data'],
+    'data' => ['datos'],
+];
+
+foreach ($synonyms as $word => $equivalents) {
+    if (str_contains($searchNormalized, $word)) {
+        foreach ($equivalents as $equivalent) {
+            $terms[] = str_replace($word, $equivalent, $searchNormalized);
+            $terms[] = $equivalent;
+        }
+    }
+}
+
+$terms = array_unique(array_filter($terms));
+
+     $normalizeColumn = function ($column) {
+        return "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($column,
+            'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'))";
+     };
+
+     $query->where(function ($q) use ($terms, $normalizeColumn) {
+        foreach ($terms as $term) {
+            $like = "%{$term}%";
+
+            $q->orWhereHas('user', function ($u) use ($like, $normalizeColumn) {
+                $u->whereRaw($normalizeColumn('first_name') . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn('last_name') . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn("CONCAT(first_name, ' ', last_name)") . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn('biography') . " LIKE ?", [$like]);
             })
 
-            ->orWhereHas('projects.technologies', function ($t) use ($search) {
-                $t->where('name', 'LIKE', "%{$search}%");
+            ->orWhereHas('user.profession', function ($p) use ($like, $normalizeColumn) {
+                $p->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
             })
 
-            ->orWhereHas('projects', function ($p) use ($search) {
-            $p->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('description', 'LIKE', "%{$search}%")
-              ->orWhere('role', 'LIKE', "%{$search}%")
-              ->orWhere('company', 'LIKE', "%{$search}%");
-           });
-        });
+            ->orWhereHas('user.skills', function ($s) use ($like, $normalizeColumn) {
+                $s->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
+            })
+
+            ->orWhereHas('user.experiences', function ($e) use ($like, $normalizeColumn) {
+                $e->where('is_visible', true)
+                  ->where(function ($exp) use ($like, $normalizeColumn) {
+                      $exp->whereRaw($normalizeColumn('title') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('institution') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('specialty') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('description') . " LIKE ?", [$like]);
+                  });
+            })
+
+            ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
+                $p->where('is_visible', true)
+                  ->where(function ($projectQuery) use ($like, $normalizeColumn) {
+                      $projectQuery->whereRaw($normalizeColumn('name') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('description') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('role') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('company') . " LIKE ?", [$like]);
+                  });
+            })
+
+            ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
+                $p->where('is_visible', true)
+                  ->whereHas('technologies', function ($t) use ($like, $normalizeColumn) {
+                      $t->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
+                  });
+            });
+        }
+     });
     }
 
     if ($request->filled('category')) {
-    $query->whereHas('user.profession', function ($q) use ($request) {
-        $q->where('name', $request->category);
+
+     $category = trim($request->category);
+
+     $query->where(function ($q) use ($category) {
+
+        // 1. Profesión principal
+        $q->whereHas('user.profession', function ($p) use ($category) {
+            $p->where('name', 'LIKE', "%{$category}%");
+        })
+
+        // 2. Experiencia laboral
+        ->orWhereHas('user.experiences', function ($e) use ($category) {
+            $e->where('type', 'work')
+              ->where('title', 'LIKE', "%{$category}%");
+        })
+
+        // 3. Roles de proyectos
+        ->orWhereHas('projects', function ($p) use ($category) {
+           $p->where('is_visible', true)
+              ->where('role', 'LIKE', "%{$category}%");
+        });
     });
 }
 
@@ -538,16 +636,71 @@ $skills = collect([
             })
 
             // 2. Busca también en tecnologías usadas dentro de proyectos
-            ->orWhereHas('projects.technologies', function ($t) use ($skillName) {
-                $t->where('name', $skillName);
+            ->orWhereHas('projects', function ($p) use ($skillName) {
+                $p->where('is_visible', true)
+                  ->whereHas('technologies', function ($t) use ($skillName) {
+                      $t->where('name', $skillName);
+                   });
             });
         });
     }
 }
-    $sort = $request->input('sort', 'desc');
-    $sort = in_array($sort, ['asc', 'desc']) ? $sort : 'desc';
 
-    $query->orderBy('created_at', $sort);
+if ($request->filled('search')) {
+
+    $priorityLikes = array_map(function ($term) {
+        return "%{$term}%";
+    }, $terms);
+
+    $query->select('portfolios.*')
+        ->selectRaw("
+            CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM users
+                    JOIN professions ON professions.id = users.profession_id
+                    WHERE users.id = portfolios.user_id
+                    AND (
+                        " . collect($priorityLikes)->map(function () {
+                            return "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(professions.name,
+                                'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u')) LIKE ?";
+                        })->implode(' OR ') . "
+                    )
+                ) THEN 5
+
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM experiences
+                    WHERE experiences.user_id = portfolios.user_id
+                    AND experiences.type = 'education'
+                    AND experiences.is_visible = 1
+                    AND (
+                        " . collect($priorityLikes)->map(function () {
+                            return "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(experiences.title,
+                                'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u')) LIKE ?
+                            OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(experiences.specialty,
+                                'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u')) LIKE ?
+                            OR LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(experiences.institution,
+                                'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u')) LIKE ?";
+                        })->implode(' OR ') . "
+                    )
+                ) THEN 4
+
+                ELSE 1
+            END AS relevance_priority
+        ", array_merge(
+            $priorityLikes,
+            $priorityLikes,
+            $priorityLikes,
+            $priorityLikes
+        ))
+        ->orderByDesc('relevance_priority');
+}
+
+$sort = $request->input('sort', 'desc');
+$sort = in_array($sort, ['asc', 'desc']) ? $sort : 'desc';
+
+$query->orderBy('created_at', $sort);
 
     if ($request->ajax()) {
         $portfolios = $query->get();
