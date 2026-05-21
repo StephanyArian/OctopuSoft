@@ -3,6 +3,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/skills.css') }}">
 
 
     
@@ -10,12 +11,6 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            @if(session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
-            @endif
-
             <div class="shell">
                 
                 <div class="navbar">
@@ -42,21 +37,41 @@
                                 Crea tu perfil con nombre, foto de perfil y biografía para presentarte profesionalmente.
                             </div>
                             
+                            @if(session('success'))
+                                <div class="alert-skill success">
+                                    <div class="alert-skill-icon">✓</div>
+                                    <span>{{ session('success') }}</span>
+                                </div>
+                            @endif
+
+                            @if($errors->any())
+                                <div class="alert-skill error">
+                                    <div class="alert-skill-icon">!</div>
+                                    <span>Por favor, verifica que todos los campos estén correctamente llenados.</span>
+                                </div>
+                            @endif
+                            
                             <form id="profileForm" action="{{ route('profile.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-grid">
                                     <div class="form-row">
                                         <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                                            <div class="photo-box" onclick="document.getElementById('photoInput').click()">
+                                            <div class="photo-box">
                                                 @php $user = Auth::user(); @endphp
                                                 @if($user->photo_base64)
-                                                    <img id="photoPreview" src="{{ $user->photo_base64 }}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; border-radius: 50%; display: block;">
+                                                    <a id="photoLink" href="#" data-src="{{ $user->photo_base64 }}" onclick="openPhotoPreview(this.dataset.src); return false;" style="width: 100%; height: 100%; display: block; position: absolute; z-index: 10; border-radius: 50%;">
+                                                        <img id="photoPreview" src="{{ $user->photo_base64 }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+                                                    </a>
                                                     <div class="photo-icon" id="photoIcon" style="display: none;">📷</div>
                                                     <div class="photo-label" id="photoLabel" style="display: none;">Subir foto<br>de perfil</div>
                                                 @else
-                                                    <div class="photo-icon" id="photoIcon">📷</div>
-                                                    <div class="photo-label" id="photoLabel">Subir foto<br>de perfil</div>
-                                                    <img id="photoPreview" src="#" alt="Preview" style="display: none;">
+                                                    <div onclick="document.getElementById('photoInput').click()" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+                                                        <div class="photo-icon" id="photoIcon">📷</div>
+                                                        <div class="photo-label" id="photoLabel">Subir foto<br>de perfil</div>
+                                                    </div>
+                                                    <a id="photoLink" href="#" data-src="" onclick="openPhotoPreview(this.dataset.src); return false;" style="display: none; width: 100%; height: 100%; position: absolute; z-index: 10; border-radius: 50%;">
+                                                        <img id="photoPreview" src="#" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;">
+                                                    </a>
                                                 @endif
                                             </div>
                                             
@@ -72,7 +87,7 @@
                                                 
                                                 <!-- Ícono para eliminar foto (solo si existe foto) -->
                                                 @if($user->photo_base64)
-                                                    <button type="button" onclick="if(confirm('¿Eliminar foto?')) document.getElementById('deletePhotoForm').submit();" title="Eliminar foto" style="background: rgb(255, 8, 8); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: white; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                                                    <button type="button" onclick="openDeleteModal()" title="Eliminar foto" style="background: rgb(255, 8, 8); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: white; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" aria-hidden="true">
                                                             <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
                                                             <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
@@ -114,7 +129,7 @@
                                 
                                 <div class="btn-row">
                                     <button type="button" class="btn" onclick="window.history.back()">Cancelar</button>
-                                    <button type="submit" class="btn primary">Guardar y continuar →</button>
+                                    <button type="submit" class="btn primary">Guardar</button>
                                 </div>
                             </form>
                             <form id="deletePhotoForm" method="POST" action="{{ url('/profile/photo') }}" style="display: none;">
@@ -125,6 +140,30 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- Modal eliminar foto --}}
+    <div class="modal-backdrop" id="delete-modal">
+        <div class="modal-box">
+            <h3>Eliminar foto de perfil</h3>
+            <p>¿Estás seguro de que deseas eliminar tu foto de perfil?<br>Esta acción no se puede deshacer.</p>
+            <form id="deletePhotoFormModal" method="POST" action="{{ url('/profile/photo') }}">
+                @csrf
+                @method('DELETE')
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button type="submit" class="btn-danger" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; padding: 10px 28px; border-radius: 40px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3); transition: all 0.3s;">Sí, eliminar</button>
+                    <button type="button" class="btn" onclick="closeDeleteModal()" style="padding: 10px 28px; border-radius: 40px; font-weight: 700; font-size: 13px; cursor: pointer; background: transparent; border: 1.5px solid var(--gray-100); color: var(--gray-700);">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- Lightbox para ver la foto --}}
+    <div class="modal-backdrop" id="photo-lightbox" onclick="this.classList.remove('active')" style="cursor: pointer; z-index: 1000;">
+        <div style="max-width: 90%; max-height: 90%; position: relative;">
+            <button type="button" style="position: absolute; top: -15px; right: -15px; background: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 20px; font-weight: bold; cursor: pointer; color: #50081e; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; z-index: 10;">&times;</button>
+            <img id="lightbox-img" src="" style="max-width: 100%; max-height: 90vh; border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); object-fit: contain; position: relative;">
         </div>
     </div>
 

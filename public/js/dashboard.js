@@ -4,12 +4,17 @@
             const preview = document.getElementById('photoPreview');
             const photoIcon = document.getElementById('photoIcon');
             const photoLabel = document.getElementById('photoLabel');
+            const photoLink = document.getElementById('photoLink');
             
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     preview.src = e.target.result;
                     preview.style.display = 'block';
+                    if (photoLink) {
+                        photoLink.dataset.src = e.target.result;
+                        photoLink.style.display = 'block';
+                    }
                     if (photoIcon) photoIcon.style.display = 'none';
                     if (photoLabel) photoLabel.style.display = 'none';
                 }
@@ -155,4 +160,29 @@
             e.preventDefault();
             window.location.href = '{{ url("/dashboard") }}';
         });
+        // Funciones para el modal de eliminar foto
+        function openDeleteModal() {
+            const modal = document.getElementById('delete-modal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('delete-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+        
+        // Función para abrir la foto en el lightbox
+        function openPhotoPreview(src) {
+            if (!src || src === '#') return;
+            const lightbox = document.getElementById('photo-lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            if (lightbox && lightboxImg) {
+                lightboxImg.src = src;
+                lightbox.classList.add('active');
+            }
+        }
     
