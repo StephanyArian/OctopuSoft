@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Script de información académica cargado');
     
+    
     // ==========================================
     // CONTADOR DE DESCRIPCIÓN
     // ==========================================
@@ -159,8 +160,57 @@ document.addEventListener('DOMContentLoaded', function() {
         window.toggleFechaFin(estudioActualCheck);
     }
     
+    // ==========================================
+    // DROPDOWN TIPO DE FORMACIÓN
+    // ==========================================
+    const dropdown = document.getElementById('tipoFormacionDropdown');
+    if (dropdown) {
+        const toggleBtn = dropdown.querySelector('.custom-dropdown-toggle');
+        const menu      = dropdown.querySelector('.custom-dropdown-menu');
+        const label     = document.getElementById('tipoFormacionLabel');
+        const hidden    = document.getElementById('tipoFormacionHidden');
+        const arrow     = dropdown.querySelector('.dropdown-arrow');
+        const errorEl   = document.getElementById('tipoFormacionError');
+
+        function abrirDrop() {
+            dropdown.classList.add('open');
+            arrow.textContent = '▼';
+            menu.style.display = 'block';
+        }
+        function cerrarDrop() {
+            dropdown.classList.remove('open');
+            arrow.textContent = '▲';
+            menu.style.display = 'none';
+        }
+
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.contains('open') ? cerrarDrop() : abrirDrop();
+        });
+
+        menu.querySelectorAll('li:not(.dropdown-group-title)').forEach(function(li) {
+            li.addEventListener('click', function() {
+                const valor = li.dataset.value || '';
+                label.textContent = valor || '— Seleccionar tipo —';
+                valor ? label.classList.remove('muted') : label.classList.add('muted');
+                hidden.value = valor;
+                menu.querySelectorAll('li').forEach(l => l.classList.remove('selected'));
+                li.classList.add('selected');
+                if (errorEl) errorEl.classList.add('hidden');
+                cerrarDrop();
+            });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!dropdown.contains(e.target)) cerrarDrop();
+        });
+
+        cerrarDrop();
+    }
+
     console.log('✅ Script inicializado correctamente');
 });
+
 
 const MAX_SIZE_MB   = 2;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
@@ -307,3 +357,4 @@ function toggleUploadZone() {
         document.getElementById('uploadZone').style.display = 'block';
     }
 }
+

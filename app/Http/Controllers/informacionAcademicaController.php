@@ -29,6 +29,7 @@ class InformacionAcademicaController extends Controller
             'descripcion'     => 'nullable|string|max:500|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,}).+$/u',
             'estudio_actual'  => 'nullable',
             'especialidad'    => 'nullable|string|max:50|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'tipo_formacion' => 'required|string|max:50',
             'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
 
          ], [
@@ -77,7 +78,7 @@ class InformacionAcademicaController extends Controller
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
             'specialty'    => $request->especialidad,  
-
+            'formation_type' => $request->tipo_formacion,
             'description' => $request->descripcion,
             'evidence_url' => !empty($evidenciasUrls) ? json_encode($evidenciasUrls) : null,
             'start_date'  => $startDate,
@@ -97,6 +98,7 @@ class InformacionAcademicaController extends Controller
             'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'especialidad' => 'nullable|string|max:50', 
+            'tipo_formacion' => 'required|string|max:50',
 
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
@@ -145,6 +147,7 @@ class InformacionAcademicaController extends Controller
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
             'specialty'    => $request->especialidad,  
+            'formation_type' => $request->tipo_formacion,
             'description' => $request->descripcion,
             'evidence_url' => !empty($evidenciasActuales) ? json_encode($evidenciasActuales) : null,
             'start_date'  => $startDate,

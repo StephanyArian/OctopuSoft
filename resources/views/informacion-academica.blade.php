@@ -83,11 +83,33 @@
                                             <input class="form-input" type="text" name="especialidad" id="especialidad"
                                                 placeholder="Ej. Inteligencia Artificial, Redes, Desarrollo Web, QA, DevOps"
                                                 value="{{ old('especialidad') }}" maxlength="50">
-                                            <div id="especialidadError" class="error-message hidden"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label">&nbsp;</label>
-                                            <div style="visibility: hidden;">&nbsp;</div>
+                                            <label class="form-label">Tipo de formación <span class="required">*</span></label>
+                                            <div class="custom-dropdown" id="tipoFormacionDropdown">
+                                            <button type="button" class="custom-dropdown-toggle">
+                                                    <span class="dropdown-label muted" id="tipoFormacionLabel">— Seleccionar tipo —</span>
+                                                    <span class="dropdown-arrow">▲</span>
+                                                </button>
+                                                <ul class="custom-dropdown-menu">
+                                                    <li data-value="" class="placeholder-opt selected">— Seleccionar tipo —</li>
+                                                    <li class="dropdown-group-title">Educación formal</li>
+                                                    <li data-value="Colegio / Bachillerato">Colegio / Bachillerato</li>
+                                                    <li data-value="Técnico Superior">Técnico Superior</li>
+                                                    <li data-value="Licenciatura / Ingeniería">Licenciatura / Ingeniería</li>
+                                                    <li data-value="Maestría">Maestría</li>
+                                                    <li data-value="Doctorado / PhD">Doctorado / PhD</li>
+                                                    <li class="dropdown-group-title">Formación complementaria</li>
+                                                    <li data-value="Bootcamp">Bootcamp</li>
+                                                    <li data-value="Curso online">Curso online</li>
+                                                    <li data-value="Certificación profesional">Certificación profesional</li>
+                                                    <li data-value="Diplomado">Diplomado</li>
+                                                    <li data-value="Intercambio académico">Intercambio académico</li>
+                                                    <li data-value="Otro">Otro</li>
+                                                </ul>
+                                                <input type="hidden" name="tipo_formacion" id="tipoFormacionHidden" value="">
+                                            </div>
+                                            <div id="tipoFormacionError" class="error-message hidden">El tipo de formación es obligatorio</div>
                                         </div>
                                     </div>
 

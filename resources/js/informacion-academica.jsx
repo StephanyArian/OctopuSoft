@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
+
 // Función para acortar nombres largos
 function acortarNombre(nombre) {
     if (!nombre) return '';
@@ -24,6 +25,70 @@ const IconTrash = () => (
         <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
     </svg>
 );
+
+
+const TIPO_FORMACION_OPTIONS = {
+    'Educación formal': [
+        'Colegio / Bachillerato', 'Técnico Superior',
+        'Licenciatura / Ingeniería', 'Maestría', 'Doctorado / PhD'
+    ],
+    'Formación complementaria': [
+        'Bootcamp', 'Curso online', 'Certificación profesional',
+        'Diplomado', 'Intercambio académico', 'Otro'
+    ]
+};
+
+// 👇 AGREGA ESTO JUSTO AQUÍ
+function TipoFormacionDropdown({ value, name }) {
+    const [open, setOpen]         = useState(false);
+    const [selected, setSelected] = useState(value || '');
+    const ref                     = useRef(null);
+
+    useEffect(() => {
+        function handler(e) {
+            if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+        }
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    function elegir(val) {
+        setSelected(val);
+        setOpen(false);
+    }
+
+    return (
+        <div className={`custom-dropdown${open ? ' open' : ''}`} ref={ref}>
+            <button type="button" className="custom-dropdown-toggle" onClick={() => setOpen(o => !o)}>
+                <span className={`dropdown-label${!selected ? ' muted' : ''}`}>
+                    {selected || '— Seleccionar tipo —'}
+                </span>
+                <span className="dropdown-arrow">{open ? '▼' : '▲'}</span>
+            </button>
+            {open && (
+                <ul className="custom-dropdown-menu">
+                    <li className={`placeholder-opt${!selected ? ' selected' : ''}`}
+                        onClick={() => elegir('')} data-value="">
+                        — Seleccionar tipo —
+                    </li>
+                    {Object.entries(TIPO_FORMACION_OPTIONS).map(([grupo, opciones]) => (
+                        <React.Fragment key={grupo}>
+                            <li className="dropdown-group-title">{grupo}</li>
+                            {opciones.map(opt => (
+                                <li key={opt}
+                                    className={selected === opt ? 'selected' : ''}
+                                    onClick={() => elegir(opt)}>
+                                    {opt}
+                                </li>
+                            ))}
+                        </React.Fragment>
+                    ))}
+                </ul>
+            )}
+            <input type="hidden" name={name} value={selected} required />
+        </div>
+    );
+}
 
 function DescripcionColapsable({ texto, limite = 150 }) {
     const [expandido, setExpandido] = useState(false);
@@ -318,14 +383,20 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 </div>
 
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
-                                    
-                                <div className="form-group">
-                                    <label className="form-label">Especialidad</label>
-                                    <input className="form-input" name="especialidad" defaultValue={f.specialty || ''} maxLength="30" />
+                                    <div className="form-group">
+                                        <label className="form-label">Especialidad</label>
+                                        <input className="form-input" name="especialidad" defaultValue={f.specialty || ''} maxLength="50" />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Tipo de formación <span className="required">*</span></label>
+                                        <TipoFormacionDropdown
+                                            value={f.formation_type || ''}
+                                            onChange={val => {/* se maneja via hidden input */}}
+                                            name="tipo_formacion"
+                                        />
+                                    </div>
                                 </div>
-    
-    
-                                </div>
+
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de inicio</label>
@@ -403,6 +474,14 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 </div>
                                 <div className="historial-title">{f.title}</div>
                                 <div className="historial-subtitle">{f.institution}</div>
+
+                                
+                                    {f.formation_type && (
+                                        <span className="tag tag-gray" style={{marginBottom: '4px', display: 'inline-block'}}>
+                                            🎓 {f.formation_type}
+                                        </span>
+                                    )}
+
                                 <div className="historial-tags">
                                     <span className="tag tag-teal">
                                         {f.start_date?.substring(0, 7)} – {f.is_current ? 'Presente' : (f.end_date?.substring(0, 7) || '')}
