@@ -98,86 +98,26 @@
         </div>
     </section>
 
-    {{-- BENEFICIOS --}}
-    <section id="beneficios" class="section section-gray">
-        <div class="container">
-            <h2 class="section-title">Beneficios</h2>
-            <p class="section-subtitle">Todo lo que necesitas para destacar en el mundo digital</p>
-
-            <div class="benefits-grid">
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                       <i class="fas fa-layer-group"></i>
-                    </div>
-                    <h3>Diseños Profesionales</h3>
-                    <p>Plantillas modernas y personalizables para todos los estilos.</p>
-                </div>
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <h3>Fácil de Usar</h3>
-                    <p>Crea tu portafolio en minutos, sin complicaciones técnicas.</p>
-                </div>
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                        <i class="fas fa-mobile-screen-button"></i>
-                    </div>
-                    <h3>Acceso desde cualquier dispositivo</h3>
-                    <p>Tu portafolio se ve bien en todos lados.</p>
-                </div>
-                <div class="benefit-card">
-                    <div class="benefit-icon">
-                       <i class="fas fa-share-nodes"></i>
-                    </div>
-                    <h3>Comparte tu Trabajo</h3>
-                    <p>Comparte tu portafolio con un enlace único y profesional.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- CÓMO FUNCIONA --}}
-    <section id="como-funciona" class="section section-white">
-        <div class="container">
-            <h2 class="section-title">¿Cómo funciona?</h2>
-            <p class="section-subtitle">En 4 sencillos pasos ya tienes tu portafolio en línea</p>
-
-            <div class="steps-grid">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Regístrate</h3>
-                    <p>Crea tu cuenta en pocos pasos.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Personaliza</h3>
-                    <p>Completa tu perfil y agrega tus proyectos.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Publica</h3>
-                    <p>Genera tu portafolio y hazlo visible al mundo.</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h3>Comparte</h3>
-                    <p>Comparte tu enlace y destaca tu talento.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {{-- PORTAFOLIOS DESTACADOS (CARRUSEL DINÁMICO) --}}
+        {{-- PORTAFOLIOS DESTACADOS (CARRUSEL DINÁMICO) --}}
     <section class="carousel-section">
         <div class="container">
 
             <div class="section-header">
-                <h2 class="section-title">Portafolios destacados</h2>
-                <p class="section-subtitle" style="margin-bottom: 0">
-                    Explora el talento de nuestra comunidad
-                </p>
+                <div class="header-left">
+                    <div class="header-text">
+                        <h2 class="section-title">Portafolios destacados</h2>
+                        <p class="section-subtitle" style="margin-bottom: 0">
+                            Explora el talento de nuestra comunidad
+                        </p>
+                    </div>
+                </div>
+                <div class="header-action">
+                    <a href="{{ route('portafolio.explore') }}" class="btn-outline">
+                        Ver todos los portafolios &nbsp;<i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
+            
 
             <div class="carousel-wrapper">
                 <div class="carousel-track" id="carouselTrack">
@@ -237,30 +177,78 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-            
-            <div style="text-align:center; margin-top: 28px;">
-                <a href="{{ route('portafolio.explore') }}" class="btn-outline">
-                    Ver todos los portafolios &nbsp;<i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
-    
         </div>
     </section>
 
-    {{-- CTA FINAL --}}
-    <div class="container">
-        <div class="cta-section">
-            <div class="cta-text">
-                <h2>¿Listo para crear tu portafolio?</h2>
-                <p>Únete a miles de profesionales que ya destacan su talento</p>
+    {{-- BENEFICIOS --}}
+    <section id="beneficios" class="section section-white">
+        <div class="container">
+            <h2 class="section-title">Beneficios</h2>
+            <p class="section-subtitle">Todo lo que necesitas para destacar en el mundo digital</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                       <i class="fas fa-layer-group"></i>
+                    </div>
+                    <h3>Diseños Profesionales</h3>
+                    <p>Plantillas modernas y personalizables para todos los estilos.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Fácil de Usar</h3>
+                    <p>Crea tu portafolio en minutos, sin complicaciones técnicas.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fas fa-mobile-screen-button"></i>
+                    </div>
+                    <h3>Acceso desde cualquier dispositivo</h3>
+                    <p>Tu portafolio se ve bien en todos lados.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                       <i class="fas fa-share-nodes"></i>
+                    </div>
+                    <h3>Comparte tu Trabajo</h3>
+                    <p>Comparte tu portafolio con un enlace único y profesional.</p>
+                </div>
             </div>
-            @guest
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn-primary">Regístrate Gratis</a>
-                @endif
-            @endguest
         </div>
-    </div>
+    </section>
+
+    {{-- CÓMO FUNCIONA --}}
+    <section id="como-funciona" class="section section-gray">
+        <div class="container">
+            <h2 class="section-title">¿Cómo funciona?</h2>
+            <p class="section-subtitle">En 4 sencillos pasos ya tienes tu portafolio en línea</p>
+
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Regístrate</h3>
+                    <p>Crea tu cuenta en pocos pasos.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Personaliza</h3>
+                    <p>Completa tu perfil y agrega tus proyectos.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Publica</h3>
+                    <p>Genera tu portafolio y hazlo visible al mundo.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Comparte</h3>
+                    <p>Comparte tu enlace y destaca tu talento.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     {{-- FOOTER --}}
     <footer>
