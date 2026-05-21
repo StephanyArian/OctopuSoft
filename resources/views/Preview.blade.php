@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
     /* Estilos adicionales para el modal de todos los proyectos */
     .btn-ver-todos {
@@ -704,9 +706,39 @@
 
     <script>
     document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
-        if(!confirm('¿Estás segura de que quieres publicar tu perfil? Una vez publicado, será visible para todos.')) {
-            e.preventDefault();
-        }
+        e.preventDefault();
+        
+        Swal.fire({
+            title: '¿Publicar portafolio?',
+            text: 'Tu perfil será visible para todos los usuarios. Podrás seguir editándolo en cualquier momento.',
+            icon: null,
+            showCancelButton: true,
+            confirmButtonColor: '#0abf9e',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Publicar',
+            cancelButtonText: 'Cancelar',
+            imageUrl: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="%230abf9e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"%3E%3Ccircle cx="12" cy="12" r="10"%3E%3C/circle%3E%3Cline x1="12" y1="8" x2="12" y2="12"%3E%3C/line%3E%3Cline x1="12" y1="16" x2="12.01" y2="16"%3E%3C/line%3E%3C/svg%3E',
+            imageWidth: 50,
+            imageHeight: 50,
+            imageAlt: 'info'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Publicando...',
+                    text: 'Por favor espera',
+                    icon: null,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    imageUrl: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="%230abf9e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"%3E%3Cpath d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4-3-9s1.34-9 3-9"%3E%3C/path%3E%3C/svg%3E',
+                    imageWidth: 40,
+                    imageHeight: 40,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        document.getElementById('formPublicar').submit();
+                    }
+                });
+            }
+        });
     });
 
     function toggleDesc(id, btn) {
