@@ -181,6 +181,29 @@
         .estado-curso { background: #fef3c7; color: #92400e; }
         .estado-default { background: #f1f5f9; color: #64748b; }
 
+        /* ⭐ EFECTO HOVER PROFESIONAL PARA TARJETAS DE PROYECTOS ⭐ */
+        .card {
+            transition: all 0.25s ease;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background: white;
+            position: relative;
+        }
+        .card:hover {
+            border-color: #0abf9e;
+            box-shadow: 0 12px 28px -10px rgba(10, 191, 158, 0.25);
+            transform: translateY(-4px);
+        }
+        .card:hover h3 {
+            color: #0abf9e !important;
+            transform: translateX(3px);
+        }
+        .card h3 {
+            transition: all 0.2s;
+            display: inline-block;
+        }
+       
+
         @media (max-width: 768px) {
             .todos-proyectos-grid {
                 grid-template-columns: 1fr;
@@ -565,8 +588,9 @@
                             'evidencias' => $proyecto->evidencias,
                         ];
                     @endphp
-                    <div class="card" id="project-card-{{ $proyecto->id }}">
-                        <h3 style="cursor:pointer; color:#1abc9c; font-size:1rem;" onclick='abrirModal(@json($modalProyectoPayload))'>{{ $proyecto->nombre }}</h3>
+                    <!-- ⭐ TARJETA COMPLETA CLICKEABLE ⭐ -->
+                    <div class="card" id="project-card-{{ $proyecto->id }}" onclick='abrirModal(@json($modalProyectoPayload))'>
+                        <h3 style="color:#1abc9c; font-size:1rem; margin-bottom: 8px;">{{ $proyecto->nombre }}</h3>
                         
                         @if($proyecto->descripcion)
                         <div class="description-wrapper">
@@ -574,7 +598,7 @@
                                 <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedHtmlTags) !!}</div></div>
                             </div>
                             @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
-                                <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
+                                <button type="button" class="ver-mas-btn" onclick="event.stopPropagation(); toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
                             @endif
                         </div>
                         @endif
@@ -711,7 +735,7 @@
         </div>
     </div>
 
-    <!-- MODAL PROYECTO (detalle) - IDÉNTICO AL PREVIEW -->
+    <!-- MODAL PROYECTO (detalle) -->
     <div id="modal-proyecto" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
         <div style="background:#fff; border-radius:12px; max-width:680px; width:90%; max-height:88vh; overflow-y:auto; position:relative;">
             <div style="padding:24px 28px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:flex-start;">
@@ -913,7 +937,7 @@
     function abrirModalTodosProyectos() {
         document.getElementById('modal-todos-proyectos').style.display = 'flex';
         document.body.style.overflow = 'hidden';
-        window.desdeModalTodos = true; // Marcamos que venimos del modal de todos
+        window.desdeModalTodos = true;
     }
 
     function cerrarModalTodosProyectos() {

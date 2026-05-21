@@ -150,6 +150,28 @@
             padding: 16px;
         }
     }
+
+    /* ⭐ EFECTO HOVER PROFESIONAL PARA TARJETAS DE PROYECTOS ⭐ */
+    .card {
+        transition: all 0.25s ease;
+        cursor: pointer;
+        border: 1px solid #e2e8f0;
+        background: white;
+        position: relative;
+    }
+    .card:hover {
+        border-color: #0abf9e;
+        box-shadow: 0 12px 28px -10px rgba(10, 191, 158, 0.25);
+        transform: translateY(-4px);
+    }
+    .card:hover h3 {
+        color: #0abf9e !important;
+        transform: translateX(3px);
+    }
+    .card h3 {
+        transition: all 0.2s;
+        display: inline-block;
+    }
 </style>
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -518,8 +540,9 @@
                                 'evidencias' => $proyecto->evidencias,
                             ];
                         @endphp
-                        <div class="card" id="project-card-{{ $proyecto->id }}">
-                            <h3 style="cursor:pointer; color:#1abc9c;" onclick='abrirModal(@json($modalProyectoPayload))'>{{ $proyecto->nombre }}</h3>
+                        <!-- ⭐ TARJETA COMPLETA CLICKEABLE CON EFECTO HOVER ⭐ -->
+                        <div class="card" id="project-card-{{ $proyecto->id }}" onclick='abrirModal(@json($modalProyectoPayload))' style="cursor: pointer;">
+                            <h3 style="color:#1abc9c;">{{ $proyecto->nombre }}</h3>
                             
                             @if($proyecto->descripcion)
                             <div class="description-wrapper">
@@ -527,7 +550,7 @@
                                     <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedHtmlTags) !!}</div></div>
                                 </div>
                                 @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
-                                    <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
+                                    <button type="button" class="ver-mas-btn" onclick="event.stopPropagation(); toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
                                 @endif
                             </div>
                             @endif
