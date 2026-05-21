@@ -5,8 +5,156 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
+<style>
+    /* Estilos adicionales para el modal de todos los proyectos */
+    .btn-ver-todos {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    .btn-ver-todos button {
+        background: #0abf9e;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 40px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    .btn-ver-todos button:hover {
+        background: #07866e;
+        transform: translateY(-2px);
+    }
+    .modal-todos-proyectos {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(3px);
+    }
+    .modal-todos-content {
+        background: white;
+        border-radius: 20px;
+        max-width: 950px;
+        width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+        animation: modalFadeIn 0.2s ease;
+    }
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .modal-todos-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        border-radius: 20px 20px 0 0;
+    }
+    .modal-todos-header h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .modal-todos-header h2 i {
+        color: #0abf9e;
+        margin-right: 8px;
+    }
+    .close-todos-modal {
+        background: none;
+        border: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: #94a3b8;
+        transition: all 0.2s;
+    }
+    .close-todos-modal:hover {
+        color: #ef4444;
+    }
+    .todos-proyectos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        padding: 24px;
+    }
+    .proyecto-card-modal {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .proyecto-card-modal:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+        border-color: #0abf9e;
+    }
+    .proyecto-card-modal h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 8px;
+        color: #1abc9c;
+    }
+    .proyecto-card-modal .proyecto-tech {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+    }
+    .proyecto-card-modal .proyecto-tech span {
+        background: #eef2ff;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        color: #0abf9e;
+    }
+    .proyecto-card-modal .proyecto-fecha {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin: 8px 0;
+    }
+    .proyecto-card-modal .estado-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 0.65rem;
+        font-weight: 600;
+    }
+    .estado-completado { background: #d1fae5; color: #065f46; }
+    .estado-curso { background: #fef3c7; color: #92400e; }
+    .estado-default { background: #f1f5f9; color: #64748b; }
+    @media (max-width: 768px) {
+        .todos-proyectos-grid {
+            grid-template-columns: 1fr;
+            padding: 16px;
+        }
+    }
+</style>
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
+    
+    // Separar proyectos: los 2 más recientes para mostrar, el resto para el modal
+    $proyectosRecientes = $proyectos->take(2);
+    $proyectosRestantes = $proyectos->skip(2);
 @endphp
 <a href="javascript:history.back()" class="btn-flotante">
     <i class="fas fa-edit"></i> Continuar editando
@@ -346,60 +494,126 @@
             @endif
         </div>
 
-        <!-- PROYECTOS -->
+        <!-- PROYECTOS - SOLO 2 PROYECTOS + BOTÓN VER TODOS ABAJO -->
         <div class="section">
             <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
-            <div class="cards-grid">
-                @forelse($proyectos as $proyecto)
-                    @php
-                        $modalProyectoPayload = [
-                            'nombre' => $proyecto->nombre,
-                            'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedHtmlTags),
-                            'fecha_inicio' => optional($proyecto->fecha_inicio)->format('d/m/Y'),
-                            'fecha_fin' => optional($proyecto->fecha_fin)->format('d/m/Y'),
-                            'estado' => $proyecto->estado,
-                            'rol' => $proyecto->rol,
-                            'cliente' => $proyecto->cliente,
-                            'tecnologias' => $proyecto->tecnologias,
-                            'evidencias' => $proyecto->evidencias,
-                        ];
-                    @endphp
-                    <div class="card" id="project-card-{{ $proyecto->id }}">
-                        <h3 style="cursor:pointer; color:#1abc9c;" onclick='abrirModal(@json($modalProyectoPayload))'>{{ $proyecto->nombre }}</h3>
-                        
-                        @if($proyecto->descripcion)
-                        <div class="description-wrapper">
-                            <div class="description collapsed proyecto-desc-wrap" id="desc-proy-{{ $loop->index }}">
-                                <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedHtmlTags) !!}</div></div>
+            
+            @if($proyectos->isEmpty())
+                <div class="empty-message">No hay proyectos registrados</div>
+            @else
+                <div class="cards-grid">
+                    @foreach($proyectosRecientes as $proyecto)
+                        @php
+                            $modalProyectoPayload = [
+                                'nombre' => $proyecto->nombre,
+                                'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedHtmlTags),
+                                'fecha_inicio' => optional($proyecto->fecha_inicio)->format('d/m/Y'),
+                                'fecha_fin' => optional($proyecto->fecha_fin)->format('d/m/Y'),
+                                'estado' => $proyecto->estado,
+                                'rol' => $proyecto->rol,
+                                'cliente' => $proyecto->cliente,
+                                'tecnologias' => $proyecto->tecnologias,
+                                'evidencias' => $proyecto->evidencias,
+                            ];
+                        @endphp
+                        <div class="card" id="project-card-{{ $proyecto->id }}">
+                            <h3 style="cursor:pointer; color:#1abc9c;" onclick='abrirModal(@json($modalProyectoPayload))'>{{ $proyecto->nombre }}</h3>
+                            
+                            @if($proyecto->descripcion)
+                            <div class="description-wrapper">
+                                <div class="description collapsed proyecto-desc-wrap" id="desc-proy-{{ $loop->index }}">
+                                    <div class="ql-snow"><div class="ql-editor">{!! strip_tags($proyecto->descripcion, $allowedHtmlTags) !!}</div></div>
+                                </div>
+                                @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
+                                    <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
+                                @endif
                             </div>
-                            @if(mb_strlen(trim(strip_tags($proyecto->descripcion))) > 150)
-                                <button type="button" class="ver-mas-btn" onclick="toggleDesc('desc-proy-{{ $loop->index }}', this)">Ver más</button>
                             @endif
-                        </div>
-                        @endif
 
-                        <div class="date">
-                            {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
-                            @if($proyecto->fecha_fin)
-                                — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }}
-                            @endif
-                            | {{ $proyecto->estado ?? 'En progreso' }}
-                        </div>
-                        <div class="description">
-                            Rol: {{ $proyecto->rol ?? '' }}
-                            @if($proyecto->cliente) | Cliente: {{ $proyecto->cliente }} @endif
-                        </div>
-                        @if(!empty($proyecto->tecnologias))
-                            <div class="proyecto-tecnologias">
-                                @foreach($proyecto->tecnologias as $tec)
-                                    <span class="tec-badge">{{ $tec }}</span>
-                                @endforeach
+                            <div class="date">
+                                {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
+                                @if($proyecto->fecha_fin)
+                                    — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }}
+                                @endif
+                                | {{ $proyecto->estado ?? 'En progreso' }}
                             </div>
-                        @endif
+                            <div class="description">
+                                Rol: {{ $proyecto->rol ?? '' }}
+                                @if($proyecto->cliente) | Cliente: {{ $proyecto->cliente }} @endif
+                            </div>
+                            @if(!empty($proyecto->tecnologias))
+                                <div class="proyecto-tecnologias">
+                                    @foreach($proyecto->tecnologias as $tec)
+                                        <span class="tec-badge">{{ $tec }}</span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Botón "Ver todos los proyectos" solo si hay más de 2 proyectos -->
+                @if($proyectosRestantes->count() > 0)
+                    <div class="btn-ver-todos">
+                        <button onclick="abrirModalTodosProyectos()">
+                            <i class="fas fa-th-large"></i> Ver todos los proyectos ({{ $proyectos->count() }})
+                        </button>
                     </div>
-                @empty
-                    <div class="empty-message" style="grid-column: 1 / -1;">No hay proyectos registrados</div>
-                @endforelse
+                @endif
+            @endif
+        </div>
+
+        <!-- MODAL "TODOS LOS PROYECTOS" -->
+        <div id="modal-todos-proyectos" class="modal-todos-proyectos">
+            <div class="modal-todos-content">
+                <div class="modal-todos-header">
+                    <h2><i class="fas fa-project-diagram"></i> Todos los proyectos ({{ $proyectos->count() }})</h2>
+                    <button class="close-todos-modal" onclick="cerrarModalTodosProyectos()">✕</button>
+                </div>
+                <div class="todos-proyectos-grid">
+                    @foreach($proyectos as $proyecto)
+                        @php
+                            $estadoClass = '';
+                            if ($proyecto->estado == 'Completado') $estadoClass = 'estado-completado';
+                            elseif ($proyecto->estado == 'En curso') $estadoClass = 'estado-curso';
+                            else $estadoClass = 'estado-default';
+                            
+                            $modalProyectoPayload = [
+                                'nombre' => $proyecto->nombre,
+                                'descripcion' => strip_tags($proyecto->descripcion ?? '', $allowedHtmlTags),
+                                'fecha_inicio' => optional($proyecto->fecha_inicio)->format('d/m/Y'),
+                                'fecha_fin' => optional($proyecto->fecha_fin)->format('d/m/Y'),
+                                'estado' => $proyecto->estado,
+                                'rol' => $proyecto->rol,
+                                'cliente' => $proyecto->cliente,
+                                'tecnologias' => $proyecto->tecnologias,
+                                'evidencias' => $proyecto->evidencias,
+                            ];
+                        @endphp
+                        <div class="proyecto-card-modal" onclick='cerrarModalTodosProyectos(); abrirModal(@json($modalProyectoPayload));'>
+                            <h4>{{ $proyecto->nombre }}</h4>
+                            <div class="proyecto-fecha">
+                                <i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
+                                @if($proyecto->fecha_fin) → {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif
+                            </div>
+                            <div class="description" style="font-size:0.75rem; margin: 8px 0; color:#475569;">
+                                Rol: {{ $proyecto->rol ?? '' }}
+                                @if($proyecto->cliente) | Cliente: {{ $proyecto->cliente }} @endif
+                            </div>
+                            <span class="estado-badge {{ $estadoClass }}">{{ $proyecto->estado ?? 'En progreso' }}</span>
+                            @if(!empty($proyecto->tecnologias))
+                                <div class="proyecto-tech">
+                                    @foreach(array_slice($proyecto->tecnologias, 0, 3) as $tec)
+                                        <span>{{ $tec }}</span>
+                                    @endforeach
+                                    @if(count($proyecto->tecnologias) > 3)
+                                        <span>+{{ count($proyecto->tecnologias) - 3 }}</span>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
 
@@ -595,10 +809,17 @@
         }
 
         document.getElementById('modal-proyecto').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     function cerrarModal() {
         document.getElementById('modal-proyecto').style.display = 'none';
+        document.body.style.overflow = '';
+        // Si veníamos del modal de todos los proyectos, lo volvemos a mostrar
+        if (window.desdeModalTodos) {
+            document.getElementById('modal-todos-proyectos').style.display = 'flex';
+            window.desdeModalTodos = false;
+        }
     }
 
     document.getElementById('modal-proyecto').addEventListener('click', function(e) {
@@ -651,6 +872,23 @@
         
         if(url) window.open(url, '_blank', 'width=600,height=400');
     }
+
+    // Funciones para el modal de todos los proyectos
+    function abrirModalTodosProyectos() {
+        document.getElementById('modal-todos-proyectos').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        window.desdeModalTodos = true;
+    }
+
+    function cerrarModalTodosProyectos() {
+        document.getElementById('modal-todos-proyectos').style.display = 'none';
+        document.body.style.overflow = '';
+        window.desdeModalTodos = false;
+    }
+
+    document.getElementById('modal-todos-proyectos')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalTodosProyectos();
+    });
     </script>
 
 @endsection
