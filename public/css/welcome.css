@@ -48,6 +48,21 @@ body {
     flex-wrap: wrap;
 }
 
+.nav-links-center {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    margin-left: auto;  /* Empuja los enlaces a la derecha */
+    margin-right: 60px;;    /* Sin margen derecho */
+}
+
+/* NUEVO: Clase para los enlaces a la derecha */
+.nav-links-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .logo h2 { color: var(--teal); font-weight: 800; font-size: 1.5rem; }
 
 .menu-toggle {
@@ -63,7 +78,7 @@ body {
 
 .nav-links {
     display: flex;
-    gap: 32px;
+    gap: 32 px;
     align-items: center;
     flex-wrap: wrap;
 }
@@ -607,7 +622,7 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
 @media (max-width: 768px) {
     .menu-toggle { display: block; }
 
-    .nav-links {
+    .nav-links-center {
         display: none;
         width: 100%;
         flex-direction: column;

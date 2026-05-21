@@ -30,20 +30,46 @@
                         </button>
                     </x-slot>
 
+
+
                     <x-slot name="content">
                         <div style="border: 2px solid #0abf9e; border-radius: 12px; overflow: hidden; background: white; min-width: 160px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            
+                            <a href="{{ url('/')}}" 
+                            style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; transition: all 0.3s ease; font-size: 14px; display:flex; align-items:center; gap:8px;"
+                            onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                <i class="bi bi-house-fill"></i> Inicio
+                            </a>
+
+                            <a href="{{ route('informacion.academica') }}" 
+                            style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px; display:flex; align-items:center; gap:8px;"
+                            onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                <i class="bi bi-pencil-fill"></i> Completar
+                            </a>
+
+                            <a href="{{ route('preview') }}" 
+                            style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px; display:flex; align-items:center; gap:8px;"
+                            onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                <i class="bi bi-eye-fill"></i> Ver perfil
+                            </a>
+
                             <a href="{{ route('profile.edit') }}" 
-                               style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; transition: all 0.3s ease; font-size: 14px;"
-                               onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
-                               onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
-                                {{ __('Configuracion') }}
+                            style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px; display:flex; align-items:center; gap:8px;"
+                            onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                <i class="bi bi-gear-fill"></i> Configuracion
                             </a>
+
                             <a href="{{ route('cerrar.sesion') }}" 
-                               style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px;"
-                               onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
-                               onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
-                                {{ __('Cerrar Sesión') }}
+                            style="display: block; padding: 12px 20px; color: #2d0a1e; text-decoration: none; border-top: 1px solid #e5e7eb; transition: all 0.3s ease; font-size: 14px; display:flex; align-items:center; gap:8px;"
+                            onmouseover="this.style.backgroundColor='#e0faf5'; this.style.paddingLeft='25px';" 
+                            onmouseout="this.style.backgroundColor='transparent'; this.style.paddingLeft='20px';">
+                                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
                             </a>
+
                         </div>
                     </x-slot>
                 </x-dropdown>

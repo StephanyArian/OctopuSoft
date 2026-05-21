@@ -192,4 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchFilteredPortfolios();
         });
     }
+
+    const menuToggleWelcome = document.getElementById('menuToggle');
+    const navLinksWelcome = document.getElementById('navLinks');
+
+    if (menuToggleWelcome && navLinksWelcome) {
+        menuToggleWelcome.addEventListener('click', () => {
+            navLinksWelcome.classList.toggle('active');
+        });
+    }
+
 });

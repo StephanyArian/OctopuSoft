@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
 
+    {{-- Bootstrap Icons --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     {{-- Font Awesome --}}
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -19,46 +22,48 @@
 </head>
 <body>
 
-    {{-- NAVBAR --}}
     <nav class="navbar">
         <div class="nav-container">
-            
             <div class="logo">
                 <h2>DevFolio</h2>
             </div>
 
+            <div class="nav-links-center" id="navLinks">
+                <a href="#inicio" class="nav-link">Inicio</a>
+                <a href="#que-es" class="nav-link">Nuestro sistema</a>
+                <a href="#beneficios" class="nav-link">Beneficios</a>
+                <a href="#como-funciona" class="nav-link">Cómo funciona</a>
+            </div>
+
             <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
-                <i class="fas fa-bars"></i>
+                <i class="bi bi-list"></i>
             </button>
 
-            <div class="nav-links" id="navLinks">
-                <a href="#inicio"        class="nav-link">Inicio</a>
-                <a href="#que-es"        class="nav-link">Nuestro sistema</a>
-                <a href="#beneficios"    class="nav-link">Beneficios</a>
-                <a href="#como-funciona" class="nav-link">Cómo funciona</a>
-
+            <div class="nav-links-right">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="btn-primary">Dashboard</a>
                         <div class="nav-user-dropdown" id="userDropdown">
                             <button class="nav-user-trigger" onclick="toggleUserMenu()">
                                 {{ Auth::user()->first_name ?? Auth::user()->name }}
-                                <i class="fas fa-chevron-down" id="dropdownChevron"></i>
+                                <i class="bi bi-chevron-down" id="dropdownChevron"></i>
                             </button>
                             <div class="nav-user-menu" id="userMenu">
-                                <a href="{{ route('profile.edit') }}">Configuración</a>
-                                <a href="{{ route('cerrar.sesion') }}">Cerrar sesión</a>
+                                <a href="{{ url('/') }}"><i class="bi bi-house-fill"></i> Inicio</a>
+                                <a href="{{ route('dashboard') }}"><i class="bi bi-display-fill"></i> Mi espacio</a>
+                                <a href="{{ route('informacion.academica') }}"><i class="bi bi-pencil-fill"></i> Completar</a>
+                                <a href="{{ route('preview') }}"><i class="bi bi-eye-fill"></i> Ver perfil</a>
+                                <a href="{{ route('profile.edit') }}"><i class="bi bi-gear-fill"></i> Configuración</a>
+                                <a href="{{ route('cerrar.sesion') }}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
                             </div>
                         </div>
                     @else
-                        <a href="{{ route('login') }}"    class="btn-outline-nav">Iniciar sesión</a>
+                        <a href="{{ route('login') }}" class="btn-outline-nav">Iniciar sesión</a>
                         <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
                     @endauth
                 @endif
             </div>
         </div>
     </nav>
-
     {{-- HERO --}}
     <section id="inicio" class="hero">
         <div class="container hero-content">
