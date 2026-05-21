@@ -368,26 +368,57 @@ body {
 /* ---- CARRUSEL ---- */
 .carousel-section { padding: 60px 0; background: var(--off); }
 
-.carousel-section .container { padding: 0; }
+.carousel-section .container { 
+    padding: 0; 
+    max-width: 1300px;
+}
 
-.carousel-section .section-header { padding: 0 20px; margin-bottom: 32px; }
+/* ---- CAROUSEL SECTION HEADER ---- */
+.carousel-section .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    margin-bottom: 32px;
+    position: relative;
+}
+
+.carousel-section .section-header .header-left {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); 
+}
+
+.carousel-section .section-header .section-title {
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.carousel-section .section-header .section-subtitle {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.carousel-section .section-header .header-action {
+    margin-left: auto;
+}
 
 .carousel-wrapper {
     overflow: hidden;
     position: relative;
-    padding: 8px 0;
+    padding: 8px 15px;
 }
 
 .carousel-track {
     display: flex;
-    gap: 24px;
+    gap: 20px;
     transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
 }
 
 .portfolio-card {
-    flex: 0 0 300px;
-    width: 300px;
+    flex: 0 0 calc(25% - 15px);
+    width: calc(25% - 15px);
     background: var(--white);
     border-radius: 16px;
     overflow: hidden;
@@ -662,6 +693,42 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
     .footer-nav  { gap: 16px; }
 
     .hero { background-position: 65% center; }
+}
+
+/* ---- RESPONSIVE GENERAL del carrusel */
+@media (max-width: 900px) {
+    .carousel-section .section-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+        padding: 0 20px;
+        position: static; 
+    }
+
+    .carousel-section .section-header .header-left {
+        position: static;       
+        transform: none;       
+        width: 100%;
+        text-align: center;
+    }
+
+    .carousel-section .section-header .section-title {
+        text-align: center;
+        font-size: 1.75rem;     
+    }
+
+    .carousel-section .section-header .section-subtitle {
+        text-align: center;
+        margin-bottom: 0;
+    }
+
+    .carousel-section .section-header .header-action {
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        text-align: center;
+    }
 }
 
 @media (max-width: 480px) {
