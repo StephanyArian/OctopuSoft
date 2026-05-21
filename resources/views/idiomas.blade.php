@@ -4,19 +4,9 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            @if(session('success'))
-                <div class="success-message">{{ session('success') }}</div>
-            @endif
+        
 
-            @if($errors->any())
-                <div class="error-box">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            
 
             <div class="shell">
                 <div class="navbar">
@@ -45,6 +35,13 @@
                             <div class="section-subtitle">
                                 Agrega los idiomas que dominas con su nivel y opcionalmente un certificado que lo respalde.
                             </div>
+
+                            @if(session('success'))
+                                <div class="alert-skill success" style="max-width: 500px;">
+                                    <div class="alert-skill-icon">✓</div>
+                                    <span>{{ session('success') }}</span>
+                                </div>
+                            @endif
 
                             <form id="idiomaForm" action="{{ route('idiomas.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
@@ -155,12 +152,21 @@
                                     @endif
 
                                     <div class="idioma-actions">
-                                        <button class="btn-sm" onclick="mostrarEditar({{ $idioma->id }})">✏️ Editar</button>
-                                        <form action="{{ route('idiomas.destroy', $idioma->id) }}" method="POST"
-                                              onsubmit="return confirm('¿Eliminar este idioma?')" style="display:inline">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn-sm danger">🗑 Eliminar</button>
-                                        </form>
+                                    <button class="btn-sm" onclick="mostrarEditar({{ $idioma->id }})">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                                        </svg>
+                                        Editar
+                                    </button>
+                                        <button type="button" class="btn-sm danger"
+                                                onclick="openDeleteModalIdioma('{{ $idioma->id }}', '{{ addslashes($idioma->name) }}')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                                            </svg>
+                                            Eliminar
+                                        </button>
                                     </div>
                                 </div>
 
@@ -247,6 +253,21 @@
             </div>{{-- /shell --}}
         </div>
     </div>
+
+    {{-- Modal eliminar idioma --}}
+<div class="modal-backdrop" id="delete-modal-idioma">
+    <div class="modal-box">
+        <h3>Eliminar idioma</h3>
+        <p>¿Estás seguro de que deseas eliminar <strong id="modal-idioma-name"></strong>?<br>Esta acción no se puede deshacer.</p>
+        <form id="delete-form-idioma" method="POST">
+            @csrf @method('DELETE')
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button type="submit" class="btn-danger">Sí, eliminar</button>
+                <button type="button" class="btn" onclick="closeDeleteModalIdioma()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
 
     <script src="{{ asset('js/idiomas.js') }}"></script>
 </x-app-layout>

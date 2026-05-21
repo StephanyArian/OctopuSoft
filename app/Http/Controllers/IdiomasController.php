@@ -20,7 +20,7 @@ class IdiomasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre'    => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'nombre' => 'required|string|min:3|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'nivel'     => 'required|string|in:A1,A2,B1,B2,C1,C2,Nativo',
             'evidencia' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
@@ -32,6 +32,30 @@ class IdiomasController extends Controller
             'evidencia.mimes' => 'Solo se permiten archivos JPG, PNG o PDF',
             'evidencia.max'   => 'El archivo no puede superar los 2MB',
         ]);
+
+        $idiomasValidos = [
+            'español', 'inglés', 'ingles', 'francés', 'frances', 'portugués', 'portugues',
+            'alemán', 'aleman', 'italiano', 'chino', 'japonés', 'japones', 'coreano',
+            'árabe', 'arabe', 'ruso', 'hindi', 'turco', 'holandés', 'holandes',
+            'sueco', 'noruego', 'danés', 'danes', 'finlandés', 'finlandes', 'polaco',
+            'checo', 'húngaro', 'hungaro', 'rumano', 'griego', 'hebreo', 'tailandés',
+            'tailandes', 'vietnamita', 'indonesio', 'malayo', 'swahili', 'catalán',
+            'catalan', 'euskera', 'gallego', 'ucraniano', 'bengalí', 'bengali',
+            'urdu', 'persa', 'farsi', 'punjabi', 'tamil', 'telugu', 'marathi',
+            'quechua', 'aymara', 'guaraní', 'guarani', 'latin', 'latín',
+            'mandarín', 'mandarin', 'cantonés', 'cantones', 'shanghainés',
+        ];
+        
+        $nombreNorm = strtolower(trim($request->nombre));
+        
+        if (!in_array($nombreNorm, $idiomasValidos)) {
+            return back()
+                ->withErrors(['nombre' => 'Ingresa un idioma válido (ej. Inglés, Francés, Alemán...)'])
+                ->withInput();
+        }
+
+        
+
  
         // Verificar duplicado
         $existe = Skill::where('user_id', auth()->id())
@@ -71,7 +95,7 @@ class IdiomasController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nombre'    => 'required|string|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'nombre' => 'required|string|min:3|max:100|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'nivel'     => 'required|string|in:A1,A2,B1,B2,C1,C2,Nativo',
             'evidencia' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
@@ -81,7 +105,28 @@ class IdiomasController extends Controller
             'evidencia.mimes' => 'Solo se permiten archivos JPG, PNG o PDF',
             'evidencia.max'   => 'El archivo no puede superar los 2MB',
         ]);
- 
+
+        $idiomasValidos = [
+            'español', 'inglés', 'ingles', 'francés', 'frances', 'portugués', 'portugues',
+            'alemán', 'aleman', 'italiano', 'chino', 'japonés', 'japones', 'coreano',
+            'árabe', 'arabe', 'ruso', 'hindi', 'turco', 'holandés', 'holandes',
+            'sueco', 'noruego', 'danés', 'danes', 'finlandés', 'finlandes', 'polaco',
+            'checo', 'húngaro', 'hungaro', 'rumano', 'griego', 'hebreo', 'tailandés',
+            'tailandes', 'vietnamita', 'indonesio', 'malayo', 'swahili', 'catalán',
+            'catalan', 'euskera', 'gallego', 'ucraniano', 'bengalí', 'bengali',
+            'urdu', 'persa', 'farsi', 'punjabi', 'tamil', 'telugu', 'marathi',
+            'quechua', 'aymara', 'guaraní', 'guarani', 'latin', 'latín',
+            'mandarín', 'mandarin', 'cantonés', 'cantones', 'shanghainés',
+        ];
+        
+        $nombreNorm = strtolower(trim($request->nombre));
+        
+        if (!in_array($nombreNorm, $idiomasValidos)) {
+            return back()
+                ->withErrors(['nombre' => 'Ingresa un idioma válido (ej. Inglés, Francés, Alemán...)'])
+                ->withInput();
+        }
+                
         $idioma = Skill::where('id', $id)
             ->where('user_id', auth()->id())
             ->where('type', 'language')

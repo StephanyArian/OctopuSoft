@@ -211,6 +211,14 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ Script inicializado correctamente');
 });
 
+// Marcar bordes rojos desde errores del servidor
+document.querySelectorAll('.error-message').forEach(el => {
+    if (!el.classList.contains('hidden')) {
+        const input = el.closest('.form-group')?.querySelector('.form-input, .form-textarea');
+        if (input) input.classList.add('error');
+    }
+});
+
 
 const MAX_SIZE_MB   = 2;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];

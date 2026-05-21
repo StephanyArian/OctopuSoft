@@ -266,7 +266,9 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
     );
 }
 
+
 function HistorialAcademico({ formaciones: initialFormaciones }) {
+    const [erroresEdicion, setErroresEdicion] = useState({});
     const [formaciones, setFormaciones] = useState(initialFormaciones);
     const [editando, setEditando] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
@@ -350,10 +352,9 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
             const updated = await res.json();
             setFormaciones(formaciones.map(f => f.id === id ? updated : f));
             setEditando(null);
-        }else if (res.status === 422) {
-            const errores = await res.json();
-            const msgs = Object.values(errores.errors).flat().join('\n');
-            alert(msgs);
+        } else if (res.status === 422) {
+            const data = await res.json();
+            setErroresEdicion(prev => ({ ...prev, [id]: data.errors }));
         }
     }
 
@@ -374,11 +375,23 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Institución <span className="required">*</span></label>
-                                        <input className="form-input" name="institucion" defaultValue={f.institution} required maxLength= "30" />
+                                        <input className={`form-input${erroresEdicion[f.id]?.institucion ? ' error' : ''}`}
+                                            name="institucion" defaultValue={f.institution} required maxLength="60" />
+                                        {erroresEdicion[f.id]?.institucion && (
+                                            <span style={{color:'#e74c3c', fontSize:'11px', fontWeight:500}}>
+                                                {erroresEdicion[f.id].institucion[0]}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Título obtenido <span className="required">*</span></label>
-                                        <input className="form-input" name="titulo_obtenido" defaultValue={f.title} required maxLength="30" />
+                                        <input className={`form-input${erroresEdicion[f.id]?.titulo_obtenido ? ' error' : ''}`}
+                                            name="titulo_obtenido" defaultValue={f.title} required maxLength="30" />
+                                        {erroresEdicion[f.id]?.titulo_obtenido && (
+                                            <span style={{color:'#e74c3c', fontSize:'11px', fontWeight:500}}>
+                                                {erroresEdicion[f.id].titulo_obtenido[0]}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
 
@@ -433,7 +446,8 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 </div>
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label className="form-label">Descripción</label>
-                                    <textarea className="form-textarea" name="descripcion"  id={`edit-descripcion-${f.id}`} defaultValue={f.description} maxLength="500" rows="4"
+                                    <textarea className={`form-textarea${erroresEdicion[f.id]?.descripcion ? ' error' : ''}`}
+                                        name="descripcion" id={`edit-descripcion-${f.id}`} defaultValue={f.description} maxLength="500" rows="4"
                                         onInput={(e) => {
                                             const counter = document.getElementById(`descripcionCounter_${f.id}`);
                                             if (counter) counter.textContent = `${e.target.value.length} / 500`;
@@ -441,6 +455,11 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     <div id={`descripcionCounter_${f.id}`} className="char-counter">
                                         {f.description?.length || 0} / 500
                                     </div>
+                                    {erroresEdicion[f.id]?.descripcion && (
+                                        <span style={{color:'#e74c3c', fontSize:'11px', fontWeight:500}}>
+                                            {erroresEdicion[f.id].descripcion[0]}
+                                        </span>
+                                    )}
                                 </div>
                                 <EvidenciasEditor
                                      formacionId={f.id}
@@ -460,8 +479,8 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     <button type="submit" className="btn-sm btn-guardar">
                                         Guardar cambios
                                     </button>
-                                    <button type="button" className="btn-sm" onClick={() => setEditando(null)}>
-                                        Cancelar
+                                    <button type="button" className="btn-sm" onClick={() => { setEditando(null); setErroresEdicion({}); }}>
+                                            Cancelar
                                     </button>
                                 </div>
                             </form>
@@ -534,18 +553,18 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                 ))}
             </div>
             {confirmDelete && (
-                <div className="modal-overlay" onClick={() => setConfirmDelete(null)}>
+                <div className="modal-backdrop active" onClick={() => setConfirmDelete(null)}>
                     <div className="modal-box" onClick={e => e.stopPropagation()}>
-                        <p className="modal-title">Eliminar formación</p>
-                        <p className="modal-text">
+                        <h3>Eliminar formación</h3>
+                        <p>
                             ¿Estás seguro de que deseas eliminar este registro?<br/>
-                            <span>Esta acción no se puede deshacer.</span>
+                            <span style={{color:'#e74c3c', fontWeight:600}}>Esta acción no se puede deshacer.</span>
                         </p>
-                        <div className="modal-actions">
-                            <button className="btn-sm btn-eliminar" onClick={() => eliminar(confirmDelete)}>
+                        <div style={{display:'flex', gap:'12px', justifyContent:'center'}}>
+                            <button className="btn-danger" onClick={() => eliminar(confirmDelete)}>
                                 Sí, eliminar
                             </button>
-                            <button className="btn-sm" onClick={() => setConfirmDelete(null)}>
+                            <button className="btn" onClick={() => setConfirmDelete(null)}>
                                 Cancelar
                             </button>
                         </div>

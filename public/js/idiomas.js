@@ -61,6 +61,14 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 });
 
+// Marcar en rojo campos con errores de servidor
+document.querySelectorAll('.error-message').forEach(el => {
+    if (!el.classList.contains('hidden')) {
+        const input = el.closest('.form-group')?.querySelector('.form-input');
+        if (input) input.classList.add('error');
+    }
+});
+
 // ══════════════════════════════════════
 // MANEJO DE ARCHIVOS — FORMULARIO CREAR
 // ══════════════════════════════════════
@@ -188,3 +196,18 @@ function quitarEvidenciaEdit(id) {
     preview.classList.add('hidden');
     document.getElementById(`uploadZoneEdit-${id}`).style.display = 'block';
 }
+
+function openDeleteModalIdioma(id, name) {
+    document.getElementById('modal-idioma-name').textContent = name;
+    document.getElementById('delete-form-idioma').action = '/idiomas/' + id;
+    document.getElementById('delete-modal-idioma').classList.add('active');
+}
+function closeDeleteModalIdioma() {
+    document.getElementById('delete-modal-idioma').classList.remove('active');
+}
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('delete-modal-idioma');
+    if (modal) modal.addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModalIdioma();
+    });
+});

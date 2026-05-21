@@ -6,24 +6,11 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
  
-            @if(session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
-            @endif
+            
 
 
 
-         <!-- MOSTRAR ERRORES DE VALIDACIÓN DEL SERVIDOR -->
-            @if($errors->any())
-                <div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; padding: 12px; margin-bottom: 20px;">
-                    <ul style="margin: 0; padding-left: 20px;">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+        
  
             <div class="shell">
                 <div class="header-bar" style="display: none;"></div>
@@ -51,6 +38,13 @@
                             <div class="section-subtitle">
                                 Registra tus estudios con institución, título, período y descripción para enriquecer tu perfil.
                             </div>
+
+                            @if(session('success'))
+                                <div class="alert-skill success" style="max-width:500px;">
+                                    <div class="alert-skill-icon">✓</div>
+                                    <span>{{ session('success') }}</span>
+                                </div>
+                            @endif
  
                             <form id="academicForm" action="{{ route('informacion.academica.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
