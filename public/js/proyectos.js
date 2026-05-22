@@ -1,7 +1,7 @@
 // =====================================================================
 // public/js/proyectos.js
 // Módulo: Gestión de Proyectos del Portafolio
-// CORREGIDO: Límite de 1000 CARACTERES (no palabras)
+// CON MODAL DE ELIMINACIÓN Y BANNER ESTILO HABILIDADES BLANDAS
 // =====================================================================
 
 (function() {
@@ -11,7 +11,7 @@
     let quill = null;
     let lastValidHtml = '';
 
-    // LÍMITE DE 1000 CARACTERES PARA DESCRIPCIÓN
+    // LÍMITE DE 5000 CARACTERES PARA DESCRIPCIÓN
     const LIMITE_CARACTERES_DESC = 5000;
 
     let textoBusqueda = localStorage.getItem('proy_busqueda') || '';
@@ -48,6 +48,61 @@
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     let isLoading = false;
 
+    // Animación CSS para el toast de errores/validaciones
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+
+    // ====================================================================
+    // BANNER DE ÉXITO — estilo habilidades blandas (guardar / eliminar)
+    // ====================================================================
+    function mostrarBanner(mensaje) {
+        const banner = document.getElementById('proyBannerExito');
+        const texto  = document.getElementById('proyBannerTexto');
+        if (!banner || !texto) return;
+        texto.textContent = mensaje;
+        banner.style.display = 'flex';
+        clearTimeout(window._bannerTimer);
+        window._bannerTimer = setTimeout(() => {
+            banner.style.display = 'none';
+        }, 4000);
+    }
+
+    // ====================================================================
+    // TOAST — solo para errores, validaciones y mensajes menores
+    // ====================================================================
+    function mostrarToast(mensaje) {
+        const toast = document.createElement('div');
+        toast.textContent = mensaje;
+        toast.style.cssText = `
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: #0abf9e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            font-family: system-ui, -apple-system, sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease;
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 2500);
+    }
+
     const todasLasTecnologias = [
         'Angular', 'AWS', 'Azure', 'Bootstrap', 'C#', 'Cassandra', 'Django',
         'Docker', 'Express.js', 'Figma', 'Firebase', 'Flutter', 'Git', 'Go',
@@ -61,9 +116,7 @@
     const svgCandadoAbierto = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>';
     const svgCandadoCerrado = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="3" y1="3" x2="21" y2="21"/></svg>';
     const svgEditar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0abf9e" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-    const svgEliminar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
-    const svgCheck = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-    const svgError = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    const svgEliminar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>';
     const svgImagen = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
     const svgEnlace = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
     const svgRepo = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>';
@@ -81,15 +134,6 @@
     function toggleProyHeader(ocultar) { if (!proyHeader) return; proyHeader.style.display = ocultar ? 'none' : 'flex'; }
     function toggleGrid(ocultar) { if (!grid) return; grid.style.display = ocultar ? 'none' : 'grid'; }
     function mostrarLoading(mostrar) { isLoading = mostrar; if (btnGuardarForm) { btnGuardarForm.disabled = mostrar; btnGuardarForm.textContent = mostrar ? 'Guardando...' : 'Guardar proyecto'; } }
-
-    function mostrarToast(mensaje, tipo = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `proy-toast ${tipo === 'error' ? 'error' : ''}`;
-        toast.innerHTML = `${tipo === 'error' ? svgError : svgCheck} ${mensaje}`;
-        toast.style.cssText = `position:fixed;bottom:20px;right:20px;background:${tipo==='error'?'#ef4444':'#10b981'};color:white;padding:12px 20px;border-radius:12px;font-weight:500;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.15);animation:toastIn .3s ease forwards;display:flex;align-items:center;gap:8px;`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
 
     function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
@@ -122,9 +166,6 @@
 
     function getBadgeClass(e) { if (e === 'Completado') return 'proy-badge-completado'; if (e === 'En curso') return 'proy-badge-en-curso'; return 'proy-badge-en-pausa'; }
 
-    // ====================================================================
-    // CONTADOR DE CARACTERES (CORREGIDO)
-    // ====================================================================
     function actualizarContadorCaracteres() {
         if (!contadorDesc) return;
         const text = quill ? quill.getText() : '';
@@ -135,9 +176,6 @@
         else if (caracteres >= LIMITE_CARACTERES_DESC - 200) contadorDesc.classList.add('warning');
     }
 
-    // ====================================================================
-    // QUILL EDITOR - CON LÍMITE DE 1000 CARACTERES
-    // ====================================================================
     function initQuill() {
         if (typeof Quill === 'undefined') return;
         const qc = document.getElementById('quillEditor');
@@ -176,7 +214,7 @@
                     if (selection && selection.index !== undefined) {
                         quill.setSelection(selection.index, 0);
                     }
-                    mostrarToast(`Límite de ${LIMITE_CARACTERES_DESC} caracteres alcanzado`, 'error');
+                    mostrarToast(`Límite de ${LIMITE_CARACTERES_DESC} caracteres alcanzado`);
                 } else {
                     lastValidHtml = quill.root.innerHTML;
                     if (inputDesc) inputDesc.value = quill.root.innerHTML;
@@ -195,9 +233,6 @@
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initQuill); } 
     else { initQuill(); }
 
-    // ====================================================================
-    // FUNCIÓN DE ORDENAMIENTO CORREGIDA
-    // ====================================================================
     function ordenarProyectos(proyectosLista, criterio, direccion) {
         return [...proyectosLista].sort((a, b) => {
             let valorA, valorB;
@@ -231,9 +266,6 @@
         });
     }
 
-    // ====================================================================
-    // VISIBILIDAD
-    // ====================================================================
     window.toggleVisDropdown = function(event, id) {
         event.stopPropagation();
         document.querySelectorAll('.vis-mini-dropdown.open').forEach(d => { if (d.dataset.proyectoId != id) d.classList.remove('open'); });
@@ -250,7 +282,7 @@
             document.querySelectorAll('.vis-mini-dropdown.open').forEach(d => d.classList.remove('open'));
             renderizar();
             mostrarToast(nv ? 'Visible para todos' : 'Solo para mí');
-        } catch (e) { mostrarToast('Error', 'error'); }
+        } catch (e) { mostrarToast('Error'); }
     };
 
     async function cambiarVisibilidadDirecta(id, nv) {
@@ -261,14 +293,11 @@
             if (!r.ok) throw new Error('Error');
             p.is_visible = nv;
             mostrarToast(nv ? 'Visible para todos' : 'Solo para mí');
-        } catch (e) { mostrarToast('Error', 'error'); }
+        } catch (e) { mostrarToast('Error'); }
     }
 
     document.addEventListener('click', (e) => { if (!e.target.closest('.vis-toggle-wrap')) document.querySelectorAll('.vis-mini-dropdown.open').forEach(d => d.classList.remove('open')); });
 
-    // ====================================================================
-    // FECHA FIN DINÁMICA
-    // ====================================================================
     function actualizarEstadoFechaFin() {
         if (!inputFechaFin) return;
         const estado = selectEstado ? selectEstado.value : 'En curso';
@@ -277,9 +306,6 @@
     }
     if (selectEstado) { const obs = new MutationObserver(() => actualizarEstadoFechaFin()); obs.observe(selectEstado, { attributes: true, attributeFilter: ['value'] }); }
 
-    // ====================================================================
-    // VISTA PREVIA
-    // ====================================================================
     async function abrirPreview(id) {
         let evs = [];
         try { const r = await fetch(`/proyectos/${id}/evidencias`, { headers: { 'Accept':'application/json' } }); if (r.ok) evs = await r.json(); } catch(e) {}
@@ -312,38 +338,91 @@
         previewPage.classList.add('open');
         previewPage.querySelector('#previewBackBtn')?.addEventListener('click', cerrarPreview);
         previewPage.querySelector('#previewEditBtn2')?.addEventListener('click', () => { cerrarPreview(); editarProyecto(id); });
-        previewPage.querySelector('#previewDeleteBtn')?.addEventListener('click', () => { cerrarPreview(); eliminarProyectoBD(id); });
+        previewPage.querySelector('#previewDeleteBtn')?.addEventListener('click', () => { cerrarPreview(); openDeleteProjectModal(id, p.nombre); });
         previewPage.querySelector('#previewToggleVisBtn')?.addEventListener('click', async () => { await cambiarVisibilidadDirecta(id, !p.is_visible); abrirPreview(id); });
     }
 
     function cerrarPreview() { if (previewPage) { previewPage.classList.remove('open'); previewPage.innerHTML = ''; } toggleGrid(false); toggleProyHeader(false); cargarProyectos(); }
 
     // ====================================================================
-    // DROPDOWNS FORM
+    // MODAL DE ELIMINACIÓN
     // ====================================================================
+    window.openDeleteProjectModal = function(id, nombreProyecto) {
+        const modal = document.getElementById('delete-project-modal');
+        const nombreSpan = document.getElementById('modal-project-name');
+        const form = document.getElementById('delete-project-form');
+        
+        if (!modal || !nombreSpan || !form) return;
+        
+        nombreSpan.textContent = nombreProyecto;
+        form.action = `/proyectos/${id}`;
+        modal.style.display = 'flex';
+    };
+
+    window.closeDeleteProjectModal = function() {
+        const modal = document.getElementById('delete-project-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('delete-project-modal');
+        if (modal && e.target === modal) {
+            closeDeleteProjectModal();
+        }
+    });
+
+    // ====================================================================
+    // MANEJAR ENVÍO DEL FORMULARIO DE ELIMINACIÓN
+    // ====================================================================
+    const deleteForm = document.getElementById('delete-project-form');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const url = form.action;
+            const method = form.querySelector('input[name="_method"]')?.value || 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success || response.ok) {
+                    closeDeleteProjectModal();
+                    // ✅ BANNER estilo habilidades blandas
+                    mostrarBanner('Proyecto eliminado correctamente.');
+                    setTimeout(() => cargarProyectos(), 1000);
+                } else {
+                    mostrarToast('Error al eliminar el proyecto');
+                }
+            } catch (error) {
+                mostrarToast('Error al eliminar el proyecto');
+            }
+        });
+    }
+
     function setupCustomDropdown(did,bid,mid,hid,tid){const d=document.getElementById(did),b=document.getElementById(bid),m=document.getElementById(mid),h=document.getElementById(hid),t=document.getElementById(tid);if(!d||!b||!m||!h)return;b.addEventListener('click',(e)=>{e.stopPropagation();const io=d.classList.contains('open');document.querySelectorAll('.custom-dropdown.open').forEach(x=>x.classList.remove('open'));document.querySelectorAll('.stack-dropdown.open').forEach(x=>x.classList.remove('open'));if(!io)d.classList.add('open');});m.querySelectorAll('li').forEach(li=>{li.addEventListener('click',(e)=>{e.stopPropagation();h.value=li.dataset.value;if(t)t.textContent=li.textContent;m.querySelectorAll('li').forEach(l=>l.classList.remove('selected'));li.classList.add('selected');d.classList.remove('open');});});}
     setupCustomDropdown('dropdownEstado','btnEstado','menuEstado','proyEstado','btnEstadoText');
     setupCustomDropdown('dropdownRol','btnRol','menuRol','proyRol','btnRolText');
 
-    // ====================================================================
-    // STACK TECNOLÓGICO
-    // ====================================================================
     const stackDropdown=document.getElementById('stackDropdown'),stackInputWrapper=document.getElementById('stackInputWrapper'),stackSearch=document.getElementById('stackSearch'),stackMenu=document.getElementById('stackMenu'),stackList=document.getElementById('stackList'),tecBadgesContainer=document.getElementById('tecBadgesContainer');
-    function renderStackOptions(filter=''){const disponibles=todasLasTecnologias.filter(t=>!tecnologiasActuales.includes(t));const filtered=filter.trim()===''?disponibles:disponibles.filter(t=>t.toLowerCase().includes(filter.toLowerCase()));if(filtered.length===0){stackList.innerHTML='<div class="stack-no-results">Sin resultados. Presiona Enter para agregar.</div>';return;}stackList.innerHTML=filtered.map(tech=>`<div class="stack-option" data-value="${escapeHtml(tech)}"><span class="check">✓</span>${tech}</div>`).join('');stackList.querySelectorAll('.stack-option').forEach(option=>{option.addEventListener('click',(e)=>{e.stopPropagation();if(tecnologiasActuales.length>=15){mostrarToast('Máximo 15 tecnologías','error');return;}tecnologiasActuales.push(option.dataset.value);renderTecnologiasBadges();renderStackOptions(stackSearch.value);stackSearch.value='';stackSearch.focus();});});}
+    function renderStackOptions(filter=''){const disponibles=todasLasTecnologias.filter(t=>!tecnologiasActuales.includes(t));const filtered=filter.trim()===''?disponibles:disponibles.filter(t=>t.toLowerCase().includes(filter.toLowerCase()));if(filtered.length===0){stackList.innerHTML='<div class="stack-no-results">Sin resultados. Presiona Enter para agregar.</div>';return;}stackList.innerHTML=filtered.map(tech=>`<div class="stack-option" data-value="${escapeHtml(tech)}"><span class="check">✓</span>${tech}</div>`).join('');stackList.querySelectorAll('.stack-option').forEach(option=>{option.addEventListener('click',(e)=>{e.stopPropagation();if(tecnologiasActuales.length>=15){mostrarToast('Máximo 15 tecnologías');return;}tecnologiasActuales.push(option.dataset.value);renderTecnologiasBadges();renderStackOptions(stackSearch.value);stackSearch.value='';stackSearch.focus();});});}
     function renderTecnologiasBadges(){if(!tecBadgesContainer)return;if(tecCountBadge)tecCountBadge.textContent=tecnologiasActuales.length;if(tecnologiasActuales.length===0){tecBadgesContainer.innerHTML='<div class="tec-empty-state"><div class="tec-empty-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div><div class="tec-empty-text">Aún no hay tecnologías</div></div>';return;}tecBadgesContainer.innerHTML=tecnologiasActuales.map(tec=>`<span class="tec-badge"><span class="tec-badge-logo">${getTecnologiaLogo(tec)}</span><span>${escapeHtml(tec)}</span><span class="tec-badge-remove" data-tec="${escapeHtml(tec)}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></span>`).join('');document.querySelectorAll('.tec-badges-col .tec-badge-remove').forEach(btn=>{btn.addEventListener('click',(e)=>{e.stopPropagation();tecnologiasActuales=tecnologiasActuales.filter(t=>t!==btn.dataset.tec);renderTecnologiasBadges();renderStackOptions(stackSearch.value);});});}
     if(stackInputWrapper){stackInputWrapper.addEventListener('click',(e)=>{e.stopPropagation();const io=stackDropdown.classList.contains('open');document.querySelectorAll('.custom-dropdown.open').forEach(x=>x.classList.remove('open'));document.querySelectorAll('.stack-dropdown.open').forEach(x=>x.classList.remove('open'));if(!io){stackDropdown.classList.add('open');stackSearch.focus();renderStackOptions(stackSearch.value);}});}
-    if(stackSearch){stackSearch.setAttribute('maxlength','20');stackSearch.addEventListener('input',(e)=>{if(!stackDropdown.classList.contains('open'))stackDropdown.classList.add('open');renderStackOptions(e.target.value);});stackSearch.addEventListener('click',(e)=>{e.stopPropagation();if(!stackDropdown.classList.contains('open')){stackDropdown.classList.add('open');renderStackOptions(stackSearch.value);}});stackSearch.addEventListener('keypress',(e)=>{if(e.key==='Enter'){e.preventDefault();const v=stackSearch.value.trim();if(v&&!tecnologiasActuales.includes(v)){if(tecnologiasActuales.length>=15){mostrarToast('Máximo 15 tecnologías','error');return;}tecnologiasActuales.push(v);renderTecnologiasBadges();renderStackOptions('');stackSearch.value='';}}});}
+    if(stackSearch){stackSearch.setAttribute('maxlength','20');stackSearch.addEventListener('input',(e)=>{if(!stackDropdown.classList.contains('open'))stackDropdown.classList.add('open');renderStackOptions(e.target.value);});stackSearch.addEventListener('click',(e)=>{e.stopPropagation();if(!stackDropdown.classList.contains('open')){stackDropdown.classList.add('open');renderStackOptions(stackSearch.value);}});stackSearch.addEventListener('keypress',(e)=>{if(e.key==='Enter'){e.preventDefault();const v=stackSearch.value.trim();if(v&&!tecnologiasActuales.includes(v)){if(tecnologiasActuales.length>=15){mostrarToast('Máximo 15 tecnologías');return;}tecnologiasActuales.push(v);renderTecnologiasBadges();renderStackOptions('');stackSearch.value='';}}});}
 
-    // ====================================================================
-    // API CALLS
-    // ====================================================================
-    async function cargarProyectos(){try{mostrarLoading(true);const r=await fetch('/proyectos',{method:'GET',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}});if(!r.ok)throw new Error('Error');proyectos=await r.json();poblarSelectsDinamicos();restaurarFiltrosVisuales();renderizar();}catch(e){mostrarToast('Error al cargar proyectos','error');}finally{mostrarLoading(false);}}
+    async function cargarProyectos(){try{mostrarLoading(true);const r=await fetch('/proyectos',{method:'GET',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}});if(!r.ok)throw new Error('Error');proyectos=await r.json();poblarSelectsDinamicos();restaurarFiltrosVisuales();renderizar();}catch(e){mostrarToast('Error al cargar proyectos');}finally{mostrarLoading(false);}}
 
     async function guardarProyectoBD(){
         if (quill) {
             const textoActual = quill.getText();
             if (textoActual.length > LIMITE_CARACTERES_DESC) {
-                mostrarToast(`La descripción excede el límite de ${LIMITE_CARACTERES_DESC} caracteres`, 'error');
+                mostrarToast(`La descripción excede el límite de ${LIMITE_CARACTERES_DESC} caracteres`);
                 return;
             }
             inputDesc.value = quill.root.innerHTML;
@@ -363,19 +442,28 @@
         if(!nombre){inputNombre.classList.add('proy-err');document.getElementById('proyErrNombre').classList.add('visible');isValid=false;}else{inputNombre.classList.remove('proy-err');document.getElementById('proyErrNombre').classList.remove('visible');}
         const descText=quill?quill.getText().trim():descripcion;
         if(!descText){document.getElementById('quillEditor').style.border='1.5px solid #ef4444';document.getElementById('proyErrDesc').classList.add('visible');isValid=false;}else{document.getElementById('quillEditor').style.border='';document.getElementById('proyErrDesc').classList.remove('visible');}
-        if(fecha&&fechaFin&&new Date(fechaFin)<new Date(fecha)){mostrarToast('La fecha de fin no puede ser menor a la fecha de inicio','error');isValid=false;}
-        if(estado==='Completado'&&!fechaFin){mostrarToast('Un proyecto completado debe tener fecha de fin','error');isValid=false;}
+        if(fecha&&fechaFin&&new Date(fechaFin)<new Date(fecha)){mostrarToast('La fecha de fin no puede ser menor a la fecha de inicio');isValid=false;}
+        if(estado==='Completado'&&!fechaFin){mostrarToast('Un proyecto completado debe tener fecha de fin');isValid=false;}
         if(!isValid)return;
         
         const proyectoData={nombre,descripcion,fecha:fecha||null,fecha_fin:fechaFin||null,estado,rol,cliente,visibilidad,tecnologias};
-        try{mostrarLoading(true);const url=editandoId?`/proyectos/${editandoId}`:'/proyectos';const method=editandoId?'PUT':'POST';const r=await fetch(url,{method,headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrfToken,'X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(proyectoData)});if(!r.ok){const err=await r.json();throw new Error(err.message||'Error');}const resultado=await r.json();window._proyectoParaEvidencias=resultado;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(resultado));if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSubirPendientes(resultado.id);}mostrarToast(editandoId?'Proyecto actualizado':'Proyecto creado');ocultarForm();await cargarProyectos();}catch(e){mostrarToast(e.message||'Error al guardar','error');}finally{mostrarLoading(false);}
+        try{
+            mostrarLoading(true);
+            const url=editandoId?`/proyectos/${editandoId}`:'/proyectos';
+            const method=editandoId?'PUT':'POST';
+            const r=await fetch(url,{method,headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':csrfToken,'X-Requested-With':'XMLHttpRequest'},body:JSON.stringify(proyectoData)});
+            if(!r.ok){const err=await r.json();throw new Error(err.message||'Error');}
+            const resultado=await r.json();
+            window._proyectoParaEvidencias=resultado;
+            sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(resultado));
+            if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSubirPendientes(resultado.id);}
+            // ✅ BANNER estilo habilidades blandas
+            mostrarBanner(editandoId ? 'Proyecto actualizado correctamente.' : 'Proyecto guardado correctamente.');
+            ocultarForm();
+            await cargarProyectos();
+        }catch(e){mostrarToast(e.message||'Error al guardar');}finally{mostrarLoading(false);}
     }
 
-    async function eliminarProyectoBD(id){const p=proyectos.find(x=>x.id===id);if(!confirm(`¿Eliminar "${p.nombre}"?`))return;try{mostrarLoading(true);const r=await fetch(`/proyectos/${id}`,{method:'DELETE',headers:{'Accept':'application/json','X-CSRF-TOKEN':csrfToken,'X-Requested-With':'XMLHttpRequest'}});if(!r.ok)throw new Error('Error');mostrarToast('Proyecto eliminado');await cargarProyectos();if(editandoId===id)ocultarForm();}catch(e){mostrarToast('Error al eliminar','error');}finally{mostrarLoading(false);}}
-
-    // ====================================================================
-    // FILTROS DINÁMICOS
-    // ====================================================================
     function poblarSelectsDinamicos(){
         const rolesUnicos=[...new Set(proyectos.map(p=>p.rol).filter(r=>r&&r.trim()!==''))];
         const rolFilterSection = document.getElementById('rolFilterSection');
@@ -441,9 +529,6 @@
         }
     }
 
-    // ====================================================================
-    // UI
-    // ====================================================================
     function limpiarForm(){
         inputNombre.value='';if(quill)quill.setText('');if(inputDesc)inputDesc.value='';inputFecha.value='';
         if(inputFechaFin){inputFechaFin.value='';inputFechaFin.disabled=true;}
@@ -473,49 +558,39 @@
             const descripcionPreview = p.descripcion
                 ? `<div class="ql-snow" style="border:none;"><div class="ql-editor proy-card-ql-inner">${p.descripcion}</div></div>`
                 : '';
-            card.innerHTML=`<div class="proy-card-band"></div><div class="proy-card-top"><div class="proy-card-nombre">${escapeHtml(p.nombre)} ${vb}</div><div class="proy-card-actions"><div class="vis-toggle-wrap"><button class="proy-icon-btn btn-toggle-vis" data-id="${p.id}" onclick="toggleVisDropdown(event, ${p.id})">${p.is_visible?svgCandadoAbierto:svgCandadoCerrado}</button><div class="vis-mini-dropdown" data-proyecto-id="${p.id}"><div class="vis-mini-option ${p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},true)"><span class="vis-icon">${svgCandadoAbierto}</span><span>Visible para todos</span><span class="vis-check">✓</span></div><div class="vis-mini-option ${!p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},false)"><span class="vis-icon">${svgCandadoCerrado}</span><span>Solo para mí</span><span class="vis-check">✓</span></div></div></div><button class="proy-icon-btn btn-editar" data-id="${p.id}">${svgEditar}</button><button class="proy-icon-btn btn-eliminar" data-id="${p.id}">${svgEliminar}</button></div></div><div class="proy-card-body">${rc}<div class="proy-card-desc-preview">${descripcionPreview}</div><div class="proy-card-tec">${(p.tecnologias||[]).slice(0,4).map(t=>`<span class="tec-mini">${getTecnologiaLogo(t)} ${escapeHtml(t)}</span>`).join('')}${(p.tecnologias||[]).length>4?`<span class="tec-mini">+${p.tecnologias.length-4}</span>`:''}</div><div class="proy-card-footer"><span class="proy-card-fecha"><i class="far fa-calendar-alt"></i> ${p.fecha||'Sin fecha'}</span><span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span></div></div>`;
+            card.innerHTML=`<div class="proy-card-band"></div><div class="proy-card-top"><div class="proy-card-nombre">${escapeHtml(p.nombre)} ${vb}</div><div class="proy-card-actions"><div class="vis-toggle-wrap"><button class="proy-icon-btn btn-toggle-vis" data-id="${p.id}" onclick="toggleVisDropdown(event, ${p.id})">${p.is_visible?svgCandadoAbierto:svgCandadoCerrado}</button><div class="vis-mini-dropdown" data-proyecto-id="${p.id}"><div class="vis-mini-option ${p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},true)"><span class="vis-icon">${svgCandadoAbierto}</span><span>Visible para todos</span><span class="vis-check">✓</span></div><div class="vis-mini-option ${!p.is_visible?'active':''}" onclick="cambiarVisibilidad(${p.id},false)"><span class="vis-icon">${svgCandadoCerrado}</span><span>Solo para mí</span><span class="vis-check">✓</span></div></div></div><button class="proy-icon-btn btn-editar" data-id="${p.id}">${svgEditar}</button><button class="proy-icon-btn btn-eliminar" data-id="${p.id}" data-nombre="${escapeHtml(p.nombre)}">${svgEliminar}</button></div></div><div class="proy-card-body">${rc}<div class="proy-card-desc-preview">${descripcionPreview}</div><div class="proy-card-tec">${(p.tecnologias||[]).slice(0,4).map(t=>`<span class="tec-mini">${getTecnologiaLogo(t)} ${escapeHtml(t)}</span>`).join('')}${(p.tecnologias||[]).length>4?`<span class="tec-mini">+${p.tecnologias.length-4}</span>`:''}</div><div class="proy-card-footer"><span class="proy-card-fecha"><i class="far fa-calendar-alt"></i> ${p.fecha||'Sin fecha'}</span><span class="proy-badge ${getBadgeClass(p.estado)}">${p.estado}</span></div></div>`;
             grid.appendChild(card);
             card.addEventListener('click',(e)=>{if(e.target.closest('button')||e.target.closest('.vis-mini-dropdown'))return;abrirPreview(p.id);});
         });
         document.querySelectorAll('.btn-editar').forEach(b=>b.addEventListener('click',(e)=>{e.stopPropagation();editarProyecto(parseInt(b.dataset.id));}));
-        document.querySelectorAll('.btn-eliminar').forEach(b=>b.addEventListener('click',(e)=>{e.stopPropagation();eliminarProyectoBD(parseInt(b.dataset.id));}));
+        document.querySelectorAll('.btn-eliminar').forEach(b=>b.addEventListener('click',(e)=>{
+            e.stopPropagation();
+            const id = parseInt(b.dataset.id);
+            const nombre = b.dataset.nombre || 'este proyecto';
+            openDeleteProjectModal(id, nombre);
+        }));
     }
 
     function editarProyecto(id){const p=proyectos.find(x=>x.id===id);if(!p)return;window._proyectoParaEvidencias=p;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(p));editandoId=id;inputNombre.value=p.nombre;if(quill)quill.root.innerHTML=p.descripcion||'';if(inputDesc)inputDesc.value=p.descripcion||'';inputFecha.value=p.fecha||'';if(inputFechaFin)inputFechaFin.value=p.fecha_fin||'';if(selectEstado)selectEstado.value=p.estado;document.getElementById('btnEstadoText').textContent=p.estado;document.querySelectorAll('#menuEstado li').forEach(l=>l.classList.remove('selected'));document.querySelector(`#menuEstado li[data-value="${p.estado}"]`)?.classList.add('selected');if(selectRol)selectRol.value=p.rol||'';document.getElementById('btnRolText').textContent=p.rol||'— Seleccionar rol —';document.querySelectorAll('#menuRol li').forEach(l=>l.classList.remove('selected'));if(p.rol)document.querySelector(`#menuRol li[data-value="${p.rol}"]`)?.classList.add('selected');else document.querySelector('#menuRol li[data-value=""]')?.classList.add('selected');if(inputCliente)inputCliente.value=p.cliente||'';tecnologiasActuales=[...(p.tecnologias||[])];renderTecnologiasBadges();if(stackSearch)stackSearch.value='';actualizarContadorCaracteres();actualizarEstadoFechaFin();formTitle.innerHTML='Editar Proyecto';mostrarForm();setTimeout(()=>{if(typeof window.evInit==='function'){window.evInit(p);}const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection&&!evInlineSection.classList.contains('open')){evInlineSection.classList.add('open');}},500);}
 
     function resetearFiltros(){textoBusqueda='';filtroEstadoActual='todos';filtroRolActual='todos';filtroTecnologiaActual='todas';filtroVisibilidadActual='todos';ordenActual='fecha_desc';guardarFiltros();if(buscadorInput){buscadorInput.value='';if(limpiarBuscadorBtn)limpiarBuscadorBtn.style.display='none';}['ddFiltrar','ddOrdenar','ddTecnologia'].forEach(ddId=>{const dd=document.getElementById(ddId);if(dd)dd.querySelectorAll('.ft-dd-item').forEach(i=>i.classList.remove('selected'));});document.querySelector('#ddFiltrar .ft-dd-item[data-val="todos"]')?.classList.add('selected');document.querySelector('#ddOrdenar .ft-dd-item[data-val="fecha_desc"]')?.classList.add('selected');document.querySelector('#ddTecnologia .ft-dd-item[data-val="todas"]')?.classList.add('selected');poblarSelectsDinamicos();renderizar();mostrarToast('Filtros limpiados');}
 
-    // ====================================================================
-    // EVIDENCIAS
-    // ====================================================================
-    function abrirEvidencias(proyecto){if(!proyecto||!proyecto.id){mostrarToast('Error: Proyecto no válido','error');return;}toggleProyHeader(true);toggleGrid(true);window._proyectoParaEvidencias=proyecto;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(proyecto));if(formCard)formCard.classList.remove('open');if(typeof window.evInit==='function'){window.evInit(proyecto);}else{mostrarToast('Error al cargar evidencias','error');}}
-    if(btnEvidencias){btnEvidencias.addEventListener('click',()=>{if(editandoId){const pa=proyectos.find(p=>p.id===editandoId);if(pa){window._proyectoParaEvidencias=pa;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(pa));if(typeof window.evInit==='function'){window.evInit(pa);}const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection){evInlineSection.classList.add('open');}}return;}const evInlineSection=document.getElementById('evInlineSection');if(!evInlineSection){mostrarToast('Panel de evidencias no encontrado','error');return;}evInlineSection.classList.toggle('open');if(evInlineSection.classList.contains('open')){if(typeof window.evResetearPendientes==='function'){window.evResetearPendientes();}}const arrow=btnEvidencias.querySelector('.ev-trigger-arrow');if(arrow){arrow.style.transform=evInlineSection.classList.contains('open')?'rotate(90deg)':'';}});}
+    function abrirEvidencias(proyecto){if(!proyecto||!proyecto.id){mostrarToast('Error: Proyecto no válido');return;}toggleProyHeader(true);toggleGrid(true);window._proyectoParaEvidencias=proyecto;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(proyecto));if(formCard)formCard.classList.remove('open');if(typeof window.evInit==='function'){window.evInit(proyecto);}else{mostrarToast('Error al cargar evidencias');}}
+    if(btnEvidencias){btnEvidencias.addEventListener('click',()=>{if(editandoId){const pa=proyectos.find(p=>p.id===editandoId);if(pa){window._proyectoParaEvidencias=pa;sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(pa));if(typeof window.evInit==='function'){window.evInit(pa);}const evInlineSection=document.getElementById('evInlineSection');if(evInlineSection){evInlineSection.classList.add('open');}}return;}const evInlineSection=document.getElementById('evInlineSection');if(!evInlineSection){mostrarToast('Panel de evidencias no encontrado');return;}evInlineSection.classList.toggle('open');if(evInlineSection.classList.contains('open')){if(typeof window.evResetearPendientes==='function'){window.evResetearPendientes();}}const arrow=btnEvidencias.querySelector('.ev-trigger-arrow');if(arrow){arrow.style.transform=evInlineSection.classList.contains('open')?'rotate(90deg)':'';}});}
     document.addEventListener('ev:volver',()=>{toggleProyHeader(false);toggleGrid(false);cargarProyectos();});
 
-    // ====================================================================
-    // DROPDOWNS TOOLBAR
-    // ====================================================================
     function setupDropdown(btnId,ddId){const btn=document.getElementById(btnId),dd=document.getElementById(ddId);if(!btn||!dd)return;btn.addEventListener('click',(e)=>{e.stopPropagation();const io=dd.classList.contains('open');document.querySelectorAll('.ft-dropdown').forEach(d=>d.classList.remove('open'));document.querySelectorAll('.ft-btn-sm').forEach(b=>b.classList.remove('open'));if(!io){dd.classList.add('open');btn.classList.add('open');}});dd.querySelectorAll('.ft-dd-item').forEach(item=>{item.addEventListener('click',(e)=>{e.stopPropagation();const filtro=item.dataset.filtro,val=item.dataset.val,section=item.closest('.ft-dd-section');if(section)section.querySelectorAll('.ft-dd-item').forEach(i=>i.classList.remove('selected'));item.classList.add('selected');if(filtro==='estado'){filtroEstadoActual=val;guardarFiltros();}if(filtro==='visibilidad'){filtroVisibilidadActual=val;guardarFiltros();poblarSelectsDinamicos();}if(filtro==='rol'){filtroRolActual=val;guardarFiltros();}if(filtro==='tecnologia'){filtroTecnologiaActual=val;guardarFiltros();}if(filtro==='ordenar'||filtro==='direccion'){const secOrden=document.querySelector('#ddOrdenar .ft-dd-section:first-child .ft-dd-item.selected');const secDir=document.querySelector('#ddOrdenar .ft-dd-section:last-child .ft-dd-item.selected');const base=secOrden?.dataset.val||'fecha_desc';const dir=secDir?.dataset.val||'desc';if(base==='fecha_desc')ordenActual=dir==='asc'?'fecha_asc':'fecha_desc';if(base==='nombre_asc')ordenActual=dir==='asc'?'nombre_asc':'nombre_desc';if(base==='rol_asc')ordenActual=dir==='asc'?'rol_asc':'rol_desc';guardarFiltros();restaurarFiltrosVisuales();}renderizar();dd.classList.remove('open');btn.classList.remove('open');});});}
     setupDropdown('btnOrdenar','ddOrdenar');setupDropdown('btnFiltrar','ddFiltrar');setupDropdown('btnTecnologia','ddTecnologia');
     document.addEventListener('click',()=>{document.querySelectorAll('.ft-dropdown').forEach(d=>d.classList.remove('open'));document.querySelectorAll('.ft-btn-sm').forEach(b=>b.classList.remove('open'));document.querySelectorAll('.custom-dropdown.open').forEach(d=>d.classList.remove('open'));document.querySelectorAll('.stack-dropdown.open').forEach(d=>d.classList.remove('open'));});
 
-    // ====================================================================
-    // BUSCADOR
-    // ====================================================================
     if(buscadorInput){buscadorInput.setAttribute('maxlength','50');buscadorInput.value=textoBusqueda;if(textoBusqueda&&limpiarBuscadorBtn)limpiarBuscadorBtn.style.display='block';buscadorInput.addEventListener('input',(e)=>{textoBusqueda=e.target.value;guardarFiltros();if(limpiarBuscadorBtn)limpiarBuscadorBtn.style.display=textoBusqueda?'block':'none';renderizar();});}
     if(limpiarBuscadorBtn){limpiarBuscadorBtn.addEventListener('click',()=>{textoBusqueda='';buscadorInput.value='';guardarFiltros();limpiarBuscadorBtn.style.display='none';renderizar();});}
     if(limpiarFiltrosBtn)limpiarFiltrosBtn.addEventListener('click',resetearFiltros);
 
-    // ====================================================================
-    // EVENTOS PRINCIPALES
-    // ====================================================================
     if(btnMostrarForm)btnMostrarForm.addEventListener('click',()=>{limpiarForm();mostrarForm();if(typeof window.evResetearPendientes==='function')window.evResetearPendientes();});
     if(btnCancelarForm)btnCancelarForm.addEventListener('click',ocultarForm);
     if(btnGuardarForm)btnGuardarForm.addEventListener('click',guardarProyectoBD);
     if(inputCliente)inputCliente.setAttribute('maxlength','60');
 
-    // ====================================================================
-    // INICIALIZACIÓN
-    // ====================================================================
     toggleProyHeader(false);toggleGrid(false);cargarProyectos();
 })();

@@ -24,11 +24,23 @@
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
                         <a href="{{ route('proyectos') }}" class="sidebar-item active">Proyectos</a>
-                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a>
+                        <a href="{{ route('idiomas.index') }}" class="sidebar-item">Idiomas</a>
                         <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
 
                     <div class="main-panel" id="mainPanel">
+
+                        {{-- ============================================================ --}}
+                        {{-- BANNER DE ÉXITO (estilo habilidades blandas)                --}}
+                        {{-- ============================================================ --}}
+                        <div id="proyBannerExito" style="display:none; align-items:center; gap:10px; background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                                <circle cx="12" cy="12" r="10" fill="#10b981"/>
+                                <path d="M7 13l3 3 7-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span id="proyBannerTexto" style="color:#065f46; font-size:14px; font-weight:500;"></span>
+                        </div>
+
                         <div class="proy-header" id="proyHeader">
                             <div class="proy-title-wrap">
                                 <h2>Mis Proyectos</h2>
@@ -115,6 +127,21 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- MODAL ELIMINAR PROYECTO --}}
+    <div class="modal-backdrop" id="delete-project-modal">
+        <div class="modal-box">
+            <h3>Eliminar proyecto</h3>
+            <p>¿Estás seguro de que deseas eliminar <strong id="modal-project-name"></strong>?<br>Esta acción no se puede deshacer.</p>
+            <form id="delete-project-form" method="POST">
+                @csrf @method('DELETE')
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button type="submit" class="btn-danger">Sí, eliminar</button>
+                    <button type="button" class="btn-cancel-modal" onclick="closeDeleteProjectModal()">Cancelar</button>
+                </div>
+            </form>
         </div>
     </div>
 
