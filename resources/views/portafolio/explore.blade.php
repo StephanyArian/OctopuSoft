@@ -14,31 +14,19 @@
 
     <style>
         /* ── Hero ── */
-        .explore-hero {
-            background: var(--burg-deep);
-            padding: 40px 0 32px;
-            border-bottom: 1px solid var(--burg-mid);
-        }
-        .explore-hero-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-        .explore-hero-text h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--white);
-            margin-bottom: 4px;
-        }
-        .explore-hero-text p {
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.5);
-        }
+        .explore-summary {
+     max-width: 1100px;
+     margin: 28px auto 18px;
+     padding: 0 20px;
+     font-size: 1rem;
+     font-weight: 700;
+     color: var(--dark);
+     }
+
+     .explore-summary span {
+     color: var(--teal);
+     font-weight: 800;
+       }
         .btn-back {
             display: inline-flex;
             align-items: center;
@@ -62,7 +50,7 @@
         .explore-body {
             background: var(--off);
             min-height: calc(100vh - 200px);
-            padding: 48px 0 60px;
+            padding: 16px 0 60px;
         }
 
         /* Contenedor central de filtros y resultados */
@@ -80,22 +68,57 @@
             box-shadow: 0 2px 12px rgba(0,0,0,0.04);
             margin-bottom: 32px;
         }
-        .search-bar-row {
-            margin-bottom: 16px;
-        }
-        .search-bar-row input {
-            width: 100%;
-            padding: 14px 20px;
-            border: 1.5px solid var(--gray-300);
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-bar-row input:focus {
-            border-color: var(--teal);
-        }
+        
+       .search-bar-row {
+      position: relative;
+      margin-bottom: 16px;
+      background: var(--white);
+      border-radius: 10px;
+      }
+
+       /* ICONO LUPA */
+       .search-bar-row i {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      font-size: 0.95rem;
+      pointer-events: none;
+      z-index: 2;
+     }
+
+     .search-sticky-wrapper {
+      position: sticky;
+      top: 78px;
+      z-index: 900;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      }
+
+     .search-sticky-wrapper .search-bar-row {
+      margin-bottom: 0;
+     }
+
+      /* INPUT */
+     .search-bar-row input {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      border: 1.5px solid var(--gray-300);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.2s ease;
+      background: var(--white);
+     }
+
+     /* FOCUS */
+     .search-bar-row input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 4px rgba(10,191,158,0.08);
+      }
         .filters-row {
             display: flex;
             gap: 16px;
@@ -285,9 +308,109 @@
             color: var(--gray-500);
             line-height: 1.6;
         }
-    </style>
-</head>
-<body>
+
+        /* =========================================
+   OCULTAR LINKS SUPERIORES
+========================================= */
+
+.nav-links .nav-link {
+    display: none !important;
+}
+
+/* =========================================
+   NAVBAR COMPACTO
+========================================= */
+
+.navbar.compact {
+    padding: 8px 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+/* Ocultar botones al bajar */
+.navbar.compact .btn-outline-nav,
+.navbar.compact .btn-primary {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateY(-10px);
+
+    transition: all 0.25s ease;
+}
+
+/* Mantener logo visible */
+.navbar.compact .logo {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* =========================================
+   BUSCADOR STICKY
+========================================= */
+
+.search-sticky-wrapper {
+    position: sticky;
+    top: 14px;
+    z-index: 999;
+
+    margin-bottom: 18px;
+
+    background: transparent;
+}
+
+/* Eliminar efectos raros */
+.search-sticky-wrapper::before,
+.search-sticky-wrapper::after {
+    display: none;
+}
+
+.search-sticky-wrapper .search-bar-row {
+    margin-bottom: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* =========================================
+   BOTON VOLVER FLOTANTE
+========================================= */
+
+.btn-back {
+    position: fixed;
+
+    right: 24px;
+    bottom: 24px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 14px 22px;
+
+    background: var(--white);
+    color: var(--dark);
+
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 999px;
+
+    font-size: 0.95rem;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+
+    z-index: 1200;
+
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+}
+
+</style>
+ </head>
+ <body>
 
     {{-- NAVBAR --}}
     <nav class="navbar">
@@ -330,30 +453,28 @@
         </div>
     </nav>
 
-    {{-- HEADER DE LA PÁGINA --}}
-    <div class="explore-hero">
-        <div class="explore-hero-inner">
-            <div class="explore-hero-text">
-                <h1>Portafolios de la comunidad</h1>
-                <p><span id="totalResultsHero">{{ $portfolios->total() }}</span> portafolios publicados</p>
-            </div>
-            <a href="{{ route('home') }}" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Volver al inicio
-            </a>
-        </div>
-    </div>
-
     {{-- CUERPO PRINCIPAL --}}
     <div class="explore-body">
         <div class="explore-container">
 
             {{-- Estructura de Filtros Interactiva --}}
-            <div class="filter-container">
-                <div class="search-bar-row">
-                    <input type="text" id="searchRepo" maxlength="50" placeholder="Buscar por nombre, tecnología o rol...">
-                </div>
-                
-                <div class="filters-row">
+ {{-- Buscador sticky --}}
+ <div class="search-sticky-wrapper">
+    <div class="search-bar-row">
+        <i class="fas fa-search"></i>
+
+        <input
+            type="text"
+            id="searchRepo"
+            maxlength="50"
+            placeholder="Buscar por nombre, tecnología o rol..."
+        >
+    </div>
+ </div>
+
+ {{-- Filtros normales --}}
+ <div class="filter-container">
+    <div class="filters-row">
                     <select id="filterCategory">
                         <option value="">Todas las categorías</option>
                         @foreach($categories as $cat)
@@ -486,9 +607,26 @@
             chevron.style.transform = 'rotate(0deg)';
         }
     });
-</script>
+ </script>
     
     <script src="{{ asset('js/welcome.js') }}"></script>
 
-</body>
-</html>
+    <script>
+ window.addEventListener('scroll', function () {
+
+    const navbar = document.querySelector('.navbar');
+
+    if (window.scrollY > 120) {
+        navbar.classList.add('compact');
+    } else {
+        navbar.classList.remove('compact');
+    }
+
+ });
+ </script>
+ <a href="{{ route('home') }}" class="btn-back">
+    <i class="fas fa-arrow-left"></i> Volver al inicio
+ </a>
+
+ </body>
+ </html>
