@@ -550,10 +550,11 @@
                             </div>
                         </div>
                         @if($idioma->certificado)
-                        <a href="{{ asset('storage/' . $idioma->certificado) }}"
-                        target="_blank" class="idioma-cert-link">
-                            <i class="fas fa-certificate"></i> Cert.
-                        </a>
+                       <a href="javascript:void(0)"
+   onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')"
+   class="idioma-cert-link">
+    <i class="fas fa-certificate"></i> Cert.
+</a>
                         @endif
                     </div>
                     <div class="idioma-barra-wrap">
