@@ -144,7 +144,7 @@
                                         </div>
                                     </div>
                                     <input type="text" id="input-whatsapp" name="whatsapp" class="form-input"
-                                           placeholder="Ej. 67466004" pattern="^\+?[0-9]{8,15}$"
+                                           placeholder="Ej. 61234556" pattern="^\+?[0-9]{8,15}$"
                                            value="{{ old('whatsapp', isset($redes[$platforms['WhatsApp']]) ? preg_replace('/https:\/\/wa\.me\//', '', $redes[$platforms['WhatsApp']]->profile_url) : '') }}">
                                     <div class="privacy-hint" id="hint-whatsapp">
                                         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1z" stroke="#999" stroke-width="1.2"/><path d="M8 7v5M8 5v.5" stroke="#999" stroke-width="1.2" stroke-linecap="round"/></svg>
