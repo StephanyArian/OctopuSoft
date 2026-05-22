@@ -153,7 +153,7 @@
                 @method('DELETE')
                 <div style="display:flex;gap:12px;justify-content:center;">
                     <button type="submit" class="btn-danger" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; padding: 10px 28px; border-radius: 40px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3); transition: all 0.3s;">Sí, eliminar</button>
-                    <button type="button" class="btn" onclick="closeDeleteModal()" style="padding: 10px 28px; border-radius: 40px; font-weight: 700; font-size: 13px; cursor: pointer; background: transparent; border: 1.5px solid var(--gray-100); color: var(--gray-700);">Cancelar</button>
+                    <button type="button" class="btn" onclick="closeDeleteModal()" style="padding: 10px 28px; border-radius: 40px; font-weight: 700; font-size: 13px; cursor: pointer; background: #d1d5db; border: none; color: #374151; transition: all 0.3s;">Cancelar</button>
                 </div>
             </form>
         </div>

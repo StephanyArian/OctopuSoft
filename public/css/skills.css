@@ -1,9 +1,9 @@
-/* ============================================================
-   skills.css  —  Habilidades técnicas y blandas
+﻿/* ============================================================
+   skills.css  â€”  Habilidades tÃ©cnicas y blandas
    Reutiliza variables definidas en informacion-academica.css
    ============================================================ */
 
-/* ── Botón agregar  */
+/* â”€â”€ BotÃ³n agregar  */
 .btn-agregar {
     display: inline-flex;
     align-items: center;
@@ -91,7 +91,7 @@
 .alert-skill.warning .alert-skill-icon { background: #e6a82a; color: white; }
 .alert-skill.success .alert-skill-icon { background: var(--teal); color: white; }
 
-/* ── Estado vacío */
+/* â”€â”€ Estado vacÃ­o */
 .skills-empty {
     border: 1.5px dashed var(--gray-300);
     border-radius: 14px;
@@ -114,7 +114,7 @@
     margin: 0 auto 12px;
 }
 
-/*  Contador / límite  */
+/*  Contador / lÃ­mite  */
 .skills-counter {
     display: flex;
     align-items: center;
@@ -175,7 +175,7 @@
     text-overflow: ellipsis;
 }
 
-/* Barra de progreso (solo técnicas) */
+/* Barra de progreso (solo tÃ©cnicas) */
 .skill-progress {
     height: 7px;
     border-radius: 99px;
@@ -280,7 +280,7 @@
 .btn-sm.danger { color: #e74c3c; border-color: rgba(231,76,60,0.2); }
 .btn-sm.danger:hover { background: rgba(231,76,60,0.06); border-color: rgba(231,76,60,0.3); }
 
-/*  Modal de confirmación de eliminación  */
+/*  Modal de confirmaciÃ³n de eliminaciÃ³n  */
 .modal-backdrop {
     display: none;
     position: fixed;
@@ -387,7 +387,7 @@
     border-style: solid;
 }
 
-/* ── Modal selector de proyectos */
+/* â”€â”€ Modal selector de proyectos */
 .project-option {
     display: flex;
     align-items: center;
@@ -449,7 +449,7 @@
     opacity: 0.7;
 }
 
-/* Botón × dentro del chip */
+/* BotÃ³n Ã— dentro del chip */
 .chip-remove {
     background: none;
     border: none;
@@ -464,7 +464,7 @@
 }
 .chip-remove:hover { color: #a32d2d; }
 
-/* Botón "+ proyecto" / "+ Agregar proyecto" */
+/* BotÃ³n "+ proyecto" / "+ Agregar proyecto" */
 .chip-add {
     background: transparent;
     border: 1px dashed #cbd5e1;
@@ -481,7 +481,7 @@
     border-color: #1abc9c;
 }
 
-/* Banner de confirmación de desvinculación */
+/* Banner de confirmaciÃ³n de desvinculaciÃ³n */
 .detach-confirm-banner {
     display: flex;
     align-items: center;

@@ -1,4 +1,4 @@
-* {
+﻿* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -42,7 +42,7 @@
     background: var(--white);
     border-radius: 0;
     box-shadow: none;
-    overflow: hidden;
+    
     position: relative;
     z-index: 1;
 }
@@ -53,7 +53,7 @@
     color: var(--white);
     flex-wrap: wrap;
     padding: 0;
-}
+ position: sticky; top: 64px; z-index: 99; }
 
 .nav-tab {
     padding: 14px 24px;
@@ -93,7 +93,7 @@
     flex-wrap: wrap;
 }
 
-.sidebar {
+.sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
     width: 240px;
     min-width: 240px;
     background: var(--burg-deep);
@@ -297,9 +297,9 @@
     background: linear-gradient(135deg, var(--teal-light), var(--teal));
 }
 
-/* ══════════════════════════════════════════════════
-   Mensaje de éxito
-   ══════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Mensaje de Ã©xito
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .success-message {
     background: rgba(10, 191, 158, 0.10);
     border: 1.5px solid rgba(10, 191, 158, 0.30);
@@ -423,9 +423,9 @@
 .btn-sm.danger { color: var(--danger); border-color: rgba(231,76,60,0.2); }
 .btn-sm.danger:hover { background: var(--danger-bg); border-color: rgba(231,76,60,0.3); }
 
-/* ══════════════════════════════════════════════════
-   Modal de confirmación
-   ══════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   Modal de confirmaciÃ³n
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -673,7 +673,7 @@
     margin-left: 4px;
 }
 
-/* ── Historial — vista de cargos ── */
+/* â”€â”€ Historial â€” vista de cargos â”€â”€ */
 .cargos-grupo-list {
     display: flex;
     flex-direction: column;
@@ -744,9 +744,9 @@
     opacity: 0.8;
 }
 
-/* ══════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DATE PICKER
-   ══════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .date-picker-wrap {
     position: relative;
     display: flex;
@@ -788,7 +788,7 @@
     cursor: pointer;
 }
 
-/* ── Contador de caracteres ── */
+/* â”€â”€ Contador de caracteres â”€â”€ */
 .char-counter {
     font-size: 11px;
     color: var(--gray-500);
@@ -798,7 +798,7 @@
     transition: color 0.2s;
 }
 
-/* ── Botón Ver más / Ver menos ── */
+/* â”€â”€ BotÃ³n Ver mÃ¡s / Ver menos â”€â”€ */
 .btn-ver-mas {
     background: none;
     border: none;
@@ -812,9 +812,9 @@
 }
 .btn-ver-mas:hover { color: var(--teal); }
 
-/* ══════════════════════════════════════════════════════════════
-   QUILL EDITOR — integración y personalización de estilos
-   ══════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   QUILL EDITOR â€” integraciÃ³n y personalizaciÃ³n de estilos
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Contenedor que envuelve el editor Quill */
 .quill-editor-wrap {
@@ -843,14 +843,14 @@
     gap: 2px;
 }
 
-/* Área de texto de Quill */
+/* Ãrea de texto de Quill */
 .quill-editor-wrap .ql-container.ql-snow {
     border: none;
     font-family: inherit;
     font-size: 14px;
 }
 
-/* Altura del área editable */
+/* Altura del Ã¡rea editable */
 .quill-editor-wrap .ql-editor {
     min-height: 110px;
     max-height: 260px;
@@ -898,7 +898,7 @@
 .quill-editor-wrap .ql-toolbar button:hover svg .ql-fill,
 .quill-editor-wrap .ql-toolbar button.ql-active svg .ql-fill { fill: var(--teal-dim); }
 
-/* Picker (fuente, color…) */
+/* Picker (fuente, colorâ€¦) */
 .quill-editor-wrap .ql-picker-options {
     border-radius: 10px;
     border: 1px solid var(--gray-100);
@@ -917,7 +917,7 @@
 .quill-editor-wrap .ql-editor::-webkit-scrollbar-track { background: transparent; }
 .quill-editor-wrap .ql-editor::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 4px; }
 
-/* ── Versión compacta: dentro del edit-form-wrap (fondo gris) ── */
+/* â”€â”€ VersiÃ³n compacta: dentro del edit-form-wrap (fondo gris) â”€â”€ */
 .edit-form-wrap .quill-editor-wrap {
     background: var(--white);
 }
@@ -926,7 +926,7 @@
     background: var(--gray-100);
 }
 
-/* ── Contenido HTML renderizado en el historial ── */
+/* â”€â”€ Contenido HTML renderizado en el historial â”€â”€ */
 .quill-rendered-content {
     font-size: 13px;
     color: var(--gray-500);
@@ -948,11 +948,11 @@
 
 .quill-rendered-content p     { margin: 0 0 4px; }
 
-/* ═══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    Responsive
-   ═══════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 @media (max-width: 768px) {
-    .sidebar { display: none; }
+    .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start;  display: none; }
     .body-row { flex-direction: column; }
     .main { padding: 24px; }
     .section-card { padding: 20px; }
@@ -971,3 +971,4 @@
     .page-title { font-size: 20px; }
     .historial-card { padding: 16px; }
 }
+

@@ -1,4 +1,4 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+﻿* { box-sizing: border-box; margin: 0; padding: 0; }
  
 :root {
     --burg-deep:  #2d0a1e;
@@ -19,7 +19,7 @@
 .main-content > div { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
 .shell { display: flex; flex-direction: column; min-height: 100vh; background: var(--white); }
  
-.navbar { display: flex; background: var(--burg-deep); color: var(--white); }
+.navbar { display: flex; background: var(--burg-deep); color: var(--white);  position: sticky; top: 64px; z-index: 99; }
 .nav-tab { padding: 14px 24px; font-size: 13px; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1); cursor: pointer; letter-spacing: .5px; transition: all 0.3s; text-decoration: none; color: var(--white); }
 .nav-tab.active { background: var(--white); color: var(--burg-deep); font-weight: 700; position: relative; }
 .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--teal); }
@@ -27,7 +27,7 @@
  
 .body-row { display: flex; flex: 1; }
  
-.sidebar { width: 240px; min-width: 240px; background: var(--burg-deep); padding: 20px 0; }
+.sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start;  width: 240px; min-width: 240px; background: var(--burg-deep); padding: 20px 0; }
 .sidebar-item { padding: 13px 24px; font-size: 13px; cursor: pointer; display: flex; align-items: center; color: rgba(255,255,255,0.45); transition: all 0.2s; font-weight: 500; text-decoration: none; border-left: 3px solid transparent; }
 .sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
 .sidebar-item.active { background: rgba(10,191,158,0.08); font-weight: 700; color: var(--teal); border-left: 3px solid var(--teal); }
@@ -106,7 +106,7 @@
 .btn-sm.danger:hover { background: rgba(231,76,60,0.05); }
  
 @media (max-width: 768px) {
-    .sidebar { display: none; }
+    .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start;  display: none; }
     .main { padding: 20px 16px; }
     .idioma-vista { flex-wrap: wrap; }
 }
@@ -140,3 +140,4 @@
 .form-input.error {
     border-color: #e74c3c;
 }
+

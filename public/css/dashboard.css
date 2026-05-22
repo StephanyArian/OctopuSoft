@@ -1,4 +1,4 @@
-* {
+﻿* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -20,7 +20,7 @@
     --dark: #111827;
 }
 
-/* ── CAMBIO 1: sin padding ni fondo ── */
+/* â”€â”€ CAMBIO 1: sin padding ni fondo â”€â”€ */
 .main-content {
     background: none;
     min-height: 100vh;
@@ -28,14 +28,14 @@
     position: relative;
 }
 
-/* ── CAMBIO 2: quitar el max-w-7xl centrado ── */
+/* â”€â”€ CAMBIO 2: quitar el max-w-7xl centrado â”€â”€ */
 .main-content > div {
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
 }
 
-/* ── CAMBIO 3: shell ocupa toda la pantalla ── */
+/* â”€â”€ CAMBIO 3: shell ocupa toda la pantalla â”€â”€ */
 .shell {
     display: flex;
     flex-direction: column;
@@ -43,7 +43,7 @@
     background: var(--white);
     border-radius: 0;
     box-shadow: none;
-    overflow: hidden;
+    
     position: relative;
     z-index: 1;
 }
@@ -54,7 +54,7 @@
     color: var(--white);
     flex-wrap: wrap;
     padding: 0;
-}
+ position: sticky; top: 64px; z-index: 99; }
 
 .nav-tab {
     padding: 14px 24px;
@@ -92,8 +92,8 @@
     flex-wrap: wrap;
 }
 
-/* ── CAMBIO 4: sidebar oscuro ── */
-.sidebar {
+/* â”€â”€ CAMBIO 4: sidebar oscuro â”€â”€ */
+.sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
     width: 240px;
     min-width: 240px;
     background: var(--burg-deep);
@@ -338,7 +338,7 @@
 }
 
 @media (max-width: 768px) {
-    .sidebar {
+    .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
         display: none;
     }
     .main { padding: 24px; }
@@ -354,3 +354,5 @@
     .btn { padding: 8px 20px; font-size: 12px; }
     .main { padding: 16px; }
 }
+
+

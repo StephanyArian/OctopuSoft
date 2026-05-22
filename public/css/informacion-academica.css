@@ -1,4 +1,4 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+﻿* { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
     --burg-deep: #2d0a1e;
@@ -16,14 +16,14 @@
     --dark: #111827;
 }
 
-/* ── FIX: pantalla completa ── */
+/* â”€â”€ FIX: pantalla completa â”€â”€ */
 .main-content { background: none; min-height: 100vh; padding: 0; position: relative; }
 .main-content > div { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-.shell { display: flex; flex-direction: column; min-height: 100vh; background: var(--white); border-radius: 0; box-shadow: none; overflow: hidden; position: relative; z-index: 1; }
+.shell { display: flex; flex-direction: column; min-height: 100vh; background: var(--white); border-radius: 0; box-shadow: none;  position: relative; z-index: 1; }
 
 .header-bar { background: linear-gradient(135deg, var(--burg-deep), var(--burg-mid)); color: var(--white); padding: 10px 20px; font-size: 12px; letter-spacing: 1px; font-weight: 700; text-align: center; text-transform: uppercase; }
 
-.navbar { display: flex; background: var(--burg-deep); color: var(--white); flex-wrap: wrap; padding: 0; }
+.navbar { display: flex; background: var(--burg-deep); color: var(--white); flex-wrap: wrap; padding: 0;  position: sticky; top: 64px; z-index: 99; }
 .nav-tab { padding: 14px 24px; font-size: 13px; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.1); cursor: pointer; letter-spacing: .5px; transition: all 0.3s ease; }
 .nav-tab.active { background: var(--white); color: var(--burg-deep); font-weight: 700; position: relative; }
 .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--teal); }
@@ -31,8 +31,8 @@
 
 .body-row { display: flex; flex: 1; flex-wrap: wrap; }
 
-/* ── FIX: sidebar oscuro ── */
-.sidebar { width: 240px; min-width: 240px; background: var(--burg-deep); border-right: none; padding: 20px 0; }
+/* â”€â”€ FIX: sidebar oscuro â”€â”€ */
+.sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start;  width: 240px; min-width: 240px; background: var(--burg-deep); border-right: none; padding: 20px 0; }
 .sidebar-item { padding: 13px 24px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.45); transition: all 0.2s ease; font-weight: 500; position: relative; text-decoration: none !important; border-left: 3px solid transparent; }
 .sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); border-left-color: rgba(10,191,158,0.4); }
 .sidebar-item.active { background: rgba(10,191,158,0.08); font-weight: 700; color: var(--teal); border-left: 3px solid var(--teal); }
@@ -97,7 +97,7 @@
 .btn-sm.danger:hover { background: rgba(231,76,60,0.05); }
 
 @media (max-width: 768px) {
-    .sidebar { width: 100%; min-width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0; display: flex; flex-wrap: wrap; }
+    .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start;  width: 100%; min-width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 10px 0; display: flex; flex-wrap: wrap; }
     .sidebar-item { width: 50%; padding: 10px 16px; }
     .main { padding: 24px; }
     .section-card { padding: 20px; }
@@ -128,7 +128,7 @@
     font-weight: 700;
 }
 
-/* ── MENÚ MÓVIL ── */
+/* â”€â”€ MENÃš MÃ“VIL â”€â”€ */
 .mobile-menu-btn {
     display: none;
     width: 100%;
@@ -166,7 +166,7 @@
     max-height: 500px;
 }
 @media (max-width: 768px) {
-    .sidebar {
+    .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
         display: none;
     }
     .body-row {
@@ -285,9 +285,9 @@
     border: none;
 }
 
-/* ══════════════════════════════════════════
-   EVIDENCIAS — agregar al final del CSS existente
-══════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   EVIDENCIAS â€” agregar al final del CSS existente
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
  
 #uploadZone:hover {
     border-color: var(--teal) !important;
@@ -351,9 +351,9 @@
     }
 }
 
-/* ══════════════════════════════════════════
-   ICONO DE PDF - TAMAÑO GRANDE Y HORIZONTAL
-══════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   ICONO DE PDF - TAMAÃ‘O GRANDE Y HORIZONTAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* Contenedor horizontal de evidencias */
 .evidencias-grid {
@@ -371,7 +371,7 @@
     text-decoration: none;
 }
 
-/* Icono PDF tamaño grande (como las fotos) */
+/* Icono PDF tamaÃ±o grande (como las fotos) */
 .pdf-icon-custom {
     display: flex;
     flex-direction: column;
@@ -413,9 +413,9 @@
     border-color: #c0392b;
 }
 
-/* ══════════════════════════════════════════════
-   DROPDOWN TIPO FORMACIÓN — override específico
-   ══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   DROPDOWN TIPO FORMACIÃ“N â€” override especÃ­fico
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
    #tipoFormacionDropdown .custom-dropdown-toggle {
     background: var(--white);
     border: 1.5px solid var(--gray-300);
@@ -569,3 +569,4 @@
 .form-input.error, .form-textarea.error {
     border-color: #e74c3c;
 }
+

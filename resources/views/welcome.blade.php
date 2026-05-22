@@ -256,25 +256,13 @@
     </section>
 
     {{-- FOOTER --}}
-    <footer>
-        <div class="container">
-            <div class="footer-main">
-                <div class="footer-brand">
-                    <div class="footer-logo-text">DevFolio</div>
-                    <div class="footer-tagline">Crea. Comparte. Impacta.</div>
-                </div>
-                <nav class="footer-nav" aria-label="Links del footer">
-                    <a href="#inicio">Inicio</a>
-                    <a href="#que-es">¿Qué es el sistema?</a>
-                    <a href="#beneficios">Beneficios</a>
-                    <a href="#como-funciona">Cómo funciona</a>
-                </nav>
-            </div>
-            <div class="footer-bottom">
-                <p>Todos los derechos estan reservados por la empresa de software OctopuSoft.</p>
-            </div>
+<footer style="min-height: 80px; display: flex; align-items: center;">
+    <div class="container">
+        <div class="footer-bottom">
+            <p>© 2026 Todos los derechos reservados OctopuSoft SRL.Sudamérica-Bolivia</p>
         </div>
-    </footer>
+    </div>
+</footer>
 
     <script src="{{ asset('js/welcome.js') }}"></script>
     <script>

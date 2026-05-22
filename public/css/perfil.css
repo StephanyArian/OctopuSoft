@@ -1,4 +1,4 @@
-* {
+﻿* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -28,7 +28,7 @@
     position: relative;
 }
 
-/* Decoración sutil de fondo */
+/* DecoraciÃ³n sutil de fondo */
 .main-content::before {
     content: '';
     position: absolute;
@@ -47,7 +47,7 @@
     min-height: 600px;
     background: var(--white);
     border-radius: 20px;
-    overflow: hidden;
+    
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
     position: relative;
     z-index: 1;
@@ -59,7 +59,7 @@
     color: var(--white);
     flex-wrap: wrap;
     padding: 0;
-}
+ position: sticky; top: 64px; z-index: 99; }
 
 .nav-tab {
     padding: 14px 24px;
@@ -109,7 +109,7 @@
     flex-wrap: wrap;
 }
 
-.sidebar {
+.sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
     width: 220px;
     min-width: 220px;
     background: var(--white);
@@ -142,7 +142,7 @@
     border-left: 3px solid var(--teal);
 }
 
-/* NÚMEROS ELIMINADOS - LOS COMENTAMOS */
+/* NÃšMEROS ELIMINADOS - LOS COMENTAMOS */
 /* .sidebar-item::before {
     content: counter(item-counter);
     counter-increment: item-counter;
@@ -164,7 +164,7 @@
     color: var(--white);
 }
 
-.sidebar {
+.sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
     counter-reset: item-counter;
 } */
 
@@ -284,7 +284,7 @@
     box-shadow: 0 0 0 3px rgba(10, 191, 158, 0.1);
 }
 
-/* Foto de perfil - Círculo elegante */
+/* Foto de perfil - CÃ­rculo elegante */
 .photo-box {
     width: 140px;
     height: 140px;
@@ -416,7 +416,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .sidebar {
+    .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start; 
         width: 100%;
         min-width: 100%;
         border-right: none;
@@ -473,3 +473,5 @@
         padding: 16px;
     }
 }
+
+
