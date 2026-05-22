@@ -172,6 +172,18 @@
         transition: all 0.2s;
         display: inline-block;
     }
+
+    /* Lightbox */
+    #lightbox-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.9);
+        z-index: 20000;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
 </style>
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -684,7 +696,7 @@
             </div>
         </div>
 
-        <!-- MODAL PROYECTO -->
+        <!-- MODAL PROYECTO (detalle) - CON EVIDENCIAS MEJORADAS -->
         <div id="modal-proyecto" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
             <div style="background:#fff; border-radius:12px; max-width:680px; width:90%; max-height:88vh; overflow-y:auto; position:relative;">
                 <div style="padding:24px 28px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:flex-start;">
@@ -710,7 +722,7 @@
                         <div style="font-size:11px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px; padding-top:16px; border-top:1px solid #f0f0f0;">
                             Evidencias <span id="modal-ev-count" style="color:#1abc9c;"></span>
                         </div>
-                        <div id="modal-evidencias-lista" style="display:flex; flex-direction:column; gap:10px;"></div>
+                        <div id="modal-evidencias-lista" style="display:flex; flex-direction:column; gap:12px;"></div>
                     </div>
                 </div>
             </div>
@@ -728,6 +740,35 @@
     </div>
 
     <script>
+    // Lightbox para ver imágenes en grande
+    function abrirLightbox(imagenSrc) {
+        let lightbox = document.getElementById('lightbox-modal');
+        if (!lightbox) {
+            lightbox = document.createElement('div');
+            lightbox.id = 'lightbox-modal';
+            lightbox.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:20000; align-items:center; justify-content:center; cursor:pointer;';
+            lightbox.innerHTML = `
+                <div style="position:relative; max-width:90vw; max-height:90vh;">
+                    <img id="lightbox-img" style="max-width:100%; max-height:90vh; object-fit:contain; border-radius:8px;">
+                    <button id="lightbox-close" style="position:absolute; top:-40px; right:0; background:none; border:none; color:white; font-size:28px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(0,0,0,0.5);">✕</button>
+                </div>
+            `;
+            document.body.appendChild(lightbox);
+            
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox || e.target.id === 'lightbox-close') {
+                    lightbox.style.display = 'none';
+                }
+            });
+        }
+        
+        const img = document.getElementById('lightbox-img');
+        if (img) {
+            img.src = imagenSrc;
+            lightbox.style.display = 'flex';
+        }
+    }
+
     document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -849,13 +890,95 @@
             document.getElementById('modal-ev-count').textContent = '(' + data.evidencias.length + ')';
             data.evidencias.forEach(ev => {
                 let item = document.createElement('div');
-                item.style.cssText = 'padding:12px;border:1px solid #eee;border-radius:8px;background:#fafafa;';
+                
+                // IMAGEN
                 if (ev.tipo === 'imagen' && ev.imagen) {
-                    item.innerHTML = `<p style="font-size:12px;color:#888;margin:0 0 8px;">🖼️ ${ev.titulo}</p><img src="${ev.imagen}" style="width:100%;border-radius:6px;max-height:220px;object-fit:cover;">`;
-                } else if (ev.tipo === 'enlace') {
-                    item.innerHTML = `<p style="font-size:12px;color:#888;margin:0 0 4px;">🔗 ${ev.titulo}</p><a href="${ev.url}" target="_blank" style="color:#1abc9c;font-size:13px;word-break:break-all;">${ev.url}</a>`;
-                } else if (ev.tipo === 'repositorio') {
-                    item.innerHTML = `<p style="font-size:12px;color:#888;margin:0 0 4px;">📦 ${ev.titulo}</p><a href="${ev.url}" target="_blank" style="color:#1abc9c;font-size:13px;word-break:break-all;">${ev.url}</a>`;
+                    let nombreImagen = ev.titulo || 'Imagen del proyecto';
+                    if (nombreImagen.match(/\.(jpg|jpeg|png|gif|webp)$/i) || nombreImagen.length > 30) {
+                        nombreImagen = 'Imagen del proyecto';
+                    }
+                    item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    item.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image" style="color: #0abf9e; font-size: 18px;"></i>
+                            </div>
+                            <div>
+                                <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(nombreImagen)}</strong>
+                            </div>
+                        </div>
+                        <div style="padding: 16px; background: white; position: relative;">
+                            <div style="position: relative; display: inline-block; width: 100%; border-radius: 16px; overflow: hidden;">
+                                <img src="${ev.imagen}" style="width:100%; max-height:280px; object-fit:cover; border-radius: 16px; cursor: pointer; transition: transform 0.2s;" 
+                                     onclick="abrirLightbox('${ev.imagen}')"
+                                     onmouseover="this.style.transform='scale(1.01)'"
+                                     onmouseout="this.style.transform='scale(1)'"
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:#ef4444;font-size:12px;padding:16px;text-align:center;\'>❌ No se pudo cargar la imagen</p>'">
+                                <div onclick="abrirLightbox('${ev.imagen}')" style="position: absolute; bottom: 16px; right: 16px; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); border-radius: 40px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    <span style="color: white; font-size: 12px; font-weight: 500;">Ver imagen</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                // ENLACE
+                else if (ev.tipo === 'enlace' && ev.url) {
+                    item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    item.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-link" style="color: #0abf9e; font-size: 18px;"></i>
+                            </div>
+                            <div>
+                                <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Enlace')}</strong>
+                                ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
+                            </div>
+                        </div>
+                        <div style="padding: 16px; background: white;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
+                                    <i class="fas fa-globe" style="font-size: 12px; color: #0abf9e;"></i>
+                                    <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
+                                </div>
+                                <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                    Abrir enlace <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+                // REPOSITORIO
+                else if (ev.tipo === 'repositorio' && ev.url) {
+                    let icon = 'fa-github';
+                    if (ev.plataforma === 'GitLab') icon = 'fa-gitlab';
+                    else if (ev.plataforma === 'Bitbucket') icon = 'fa-bitbucket';
+                    item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    item.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                            <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fab ${icon}" style="color: #0abf9e; font-size: 18px;"></i>
+                            </div>
+                            <div>
+                                <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Repositorio')}</strong>
+                                ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
+                            </div>
+                        </div>
+                        <div style="padding: 16px; background: white;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
+                                    <i class="fab ${icon}" style="font-size: 12px;"></i>
+                                    <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
+                                </div>
+                                <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                    Ver repositorio <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+                                </a>
+                            </div>
+                        </div>
+                    `;
                 }
                 evDiv.appendChild(item);
             });
