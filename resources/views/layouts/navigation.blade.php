@@ -4,55 +4,47 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ url('/') }}" style="text-decoration: none;">
-                        <div class="logo" style="display: flex; align-items: center; gap: 8px;">
-    <!-- Casita con gradiente -->
-    <div style="
-        width: 38px; height: 38px;
-        background: linear-gradient(135deg, #0abf9e, #1de8c0, #00ff88);
-        border-radius: 10px;
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 0 12px rgba(10, 191, 158, 0.5);
-    ">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#2d0a1e" viewBox="0 0 16 16">
-            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
-            <path d="M13 7.293l-5-5-5 5V14a1 1 0 0 0 1 1h3v-3h2v3h3a1 1 0 0 0 1-1z"/>
-        </svg>
-    </div>
-    <!-- Texto DevFolio con gradiente -->
-    <span style="
-        font-weight: 800;
-        font-size: 1.4rem;
-        font-family: 'Figtree', sans-serif;
-        background: linear-gradient(135deg, #0abf9e, #00ff88);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.5px;
-    ">DevFolio</span>
+<div class="shrink-0 flex items-center">
+    <span style="font-weight:800;font-size:1.4rem;font-family:'Figtree',sans-serif;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px;">DevFolio</span>
 </div>
-                    </a>
-                </div>
-            </div>
 
             <!-- Settings Dropdown -->
             <div class="sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button style="color: #1de8c0; background: transparent; border: 1px solid #0abf9e; border-radius: 50px; padding: 8px 16px; transition: all 0.3s ease;" 
-                                onmouseover="this.style.backgroundColor='#0abf9e'; this.style.color='#2d0a1e';" 
-                                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#1de8c0';"
-                                class="inline-flex items-center px-3 py-2 text-sm leading-4 font-medium rounded-md focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->first_name ?? Auth::user()->name ?? 'Usuario' }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+<x-slot name="trigger">
+    <div style="display:flex;align-items:center;gap:8px;">
+        
+        <!-- Casita FUERA del botón dropdown -->
+        <a href="{{ url('/') }}" style="text-decoration:none;" onclick="event.stopPropagation();">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(10,191,158,0.5);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="#2d0a1e" viewBox="0 0 16 16">
+                    <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+                    <path d="M13 7.293l-5-5-5 5V14a1 1 0 0 0 1 1h3v-3h2v3h3a1 1 0 0 0 1-1z"/>
+                </svg>
+            </div>
+        </a>
 
+        <!-- Botón dropdown solo con foto/abreviatura -->
+        <button style="background:transparent;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:6px;"
+                class="inline-flex items-center focus:outline-none transition ease-in-out duration-150">
+            <div style="position:relative;">
+                @if(Auth::user()->photo_base64)
+                    <img src="{{ Auth::user()->photo_base64 }}"
+                         style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid #0abf9e;box-shadow:0 0 10px rgba(10,191,158,0.5);">
+                @else
+                    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;color:#2d0a1e;box-shadow:0 0 10px rgba(10,191,158,0.5);">
+                        {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name ?? 'U', 0, 1)) }}
+                    </div>
+                @endif
+                <div style="position:absolute;bottom:0;right:0;width:10px;height:10px;background:#00ff88;border-radius:50%;border:2px solid #2d0a1e;"></div>
+            </div>
+            <svg class="fill-current h-4 w-4" style="color:#0abf9e;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+
+    </div>
+</x-slot>
 
 
                     <x-slot name="content">
