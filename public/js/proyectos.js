@@ -1,7 +1,7 @@
 // =====================================================================
 // public/js/proyectos.js
 // Módulo: Gestión de Proyectos del Portafolio
-// CON MODAL DE ELIMINACIÓN Y BANNER ESTILO HABILIDADES BLANDAS
+// CON MODAL DE ELIMINACIÓN Y EVIDENCIAS CORREGIDAS
 // =====================================================================
 
 (function() {
@@ -48,7 +48,17 @@
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     let isLoading = false;
 
-    // Animación CSS para el toast de errores/validaciones
+    // SVG ICONS
+    const svgCandadoAbierto = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>';
+    const svgCandadoCerrado = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="3" y1="3" x2="21" y2="21"/></svg>';
+    const svgEditar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0abf9e" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    const svgEliminar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>';
+    const svgImagen = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+    const svgEnlace = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
+    const svgRepo = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>';
+    const svgVolver = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>';
+
+    // Agregar animación CSS para el toast
     const styleSheet = document.createElement("style");
     styleSheet.textContent = `
         @keyframes fadeIn {
@@ -58,24 +68,7 @@
     `;
     document.head.appendChild(styleSheet);
 
-    // ====================================================================
-    // BANNER DE ÉXITO — estilo habilidades blandas (guardar / eliminar)
-    // ====================================================================
-    function mostrarBanner(mensaje) {
-        const banner = document.getElementById('proyBannerExito');
-        const texto  = document.getElementById('proyBannerTexto');
-        if (!banner || !texto) return;
-        texto.textContent = mensaje;
-        banner.style.display = 'flex';
-        clearTimeout(window._bannerTimer);
-        window._bannerTimer = setTimeout(() => {
-            banner.style.display = 'none';
-        }, 4000);
-    }
-
-    // ====================================================================
-    // TOAST — solo para errores, validaciones y mensajes menores
-    // ====================================================================
+    // Toast estilo idiomas (turquesa, arriba izquierda)
     function mostrarToast(mensaje) {
         const toast = document.createElement('div');
         toast.textContent = mensaje;
@@ -112,15 +105,6 @@
         'Rust', 'Sass', 'Spring Boot', 'Supabase', 'Svelte', 'Swift',
         'Tailwind CSS', 'TypeScript', 'Unity', 'Vue.js', 'Webpack', 'WordPress'
     ];
-
-    const svgCandadoAbierto = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>';
-    const svgCandadoCerrado = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="3" y1="3" x2="21" y2="21"/></svg>';
-    const svgEditar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0abf9e" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-    const svgEliminar = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>';
-    const svgImagen = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
-    const svgEnlace = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
-    const svgRepo = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>';
-    const svgVolver = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>';
 
     function guardarFiltros() {
         localStorage.setItem('proy_busqueda', textoBusqueda);
@@ -306,22 +290,69 @@
     }
     if (selectEstado) { const obs = new MutationObserver(() => actualizarEstadoFechaFin()); obs.observe(selectEstado, { attributes: true, attributeFilter: ['value'] }); }
 
+    // ====================================================================
+    // ABRIR PREVIEW CON EVIDENCIAS CORREGIDAS
+    // ====================================================================
     async function abrirPreview(id) {
         let evs = [];
-        try { const r = await fetch(`/proyectos/${id}/evidencias`, { headers: { 'Accept':'application/json' } }); if (r.ok) evs = await r.json(); } catch(e) {}
+        try { 
+            const r = await fetch(`/proyectos/${id}/evidencias`, { headers: { 'Accept':'application/json' } }); 
+            if (r.ok) {
+                evs = await r.json();
+            }
+        } catch(e) {}
+        
         const p = proyectos.find(x => x.id === id);
         if (!p) return;
         toggleGrid(true); toggleProyHeader(true);
         if (formCard) formCard.classList.remove('open');
         if (!previewPage) return;
         previewPage.innerHTML = '';
+        
+        // Renderizar evidencias (compatible con evidencia.js)
         let evHTML = '';
-        if (evs.length > 0) { evHTML = `<hr class="preview-divider"><div class="preview-section-title">Evidencias (${evs.length})</div><div class="preview-evidencias-list">${evs.map(ev => {
-            if (ev.imagen_path) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgImagen} ${escapeHtml(ev.titulo||'Imagen')}</div><img src="/storage/${ev.imagen_path}" class="preview-evidencia-imagen" onerror="this.style.display='none'"></div>`;
-            if (ev.enlace) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgEnlace} ${escapeHtml(ev.titulo||'Enlace')}</div><a href="${escapeHtml(ev.enlace)}" target="_blank" class="preview-evidencia-enlace">${escapeHtml(ev.enlace)}</a></div>`;
-            if (ev.repositorio) return `<div class="preview-evidencia-card"><div class="preview-evidencia-header">${svgRepo} ${escapeHtml(ev.titulo||'Repositorio')}</div><div class="preview-evidencia-repo">${escapeHtml(ev.repositorio)}</div></div>`;
-            return '';
-        }).join('')}</div>`; }
+        if (evs.length > 0) { 
+            evHTML = `<hr class="preview-divider"><div class="preview-section-title">Evidencias (${evs.length})</div><div class="preview-evidencias-list">${evs.map(ev => {
+                // 📷 IMAGEN
+                if (ev.tipo === 'imagen' && ev.url_publica) {
+                    return `<div class="preview-evidencia-card" style="margin-bottom:12px; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden;">
+                                <div class="preview-evidencia-header" style="display:flex;align-items:center;gap:8px; padding:12px; background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                                    ${svgImagen} 
+                                    <strong>${escapeHtml(ev.etiqueta || ev.titulo || 'Imagen')}</strong>
+                                </div>
+                                <img src="${ev.url_publica}" style="width:100%; max-height:280px; object-fit:contain; background:#f1f5f9;" 
+                                     onerror="this.style.display='none'">
+                            </div>`;
+                }
+                
+                // 🔗 ENLACE
+                if (ev.tipo === 'enlace' && ev.url_publica) {
+                    return `<div class="preview-evidencia-card" style="margin-bottom:12px; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+                                <div class="preview-evidencia-header" style="display:flex;align-items:center;gap:8px; margin-bottom:8px;">
+                                    ${svgEnlace} 
+                                    <strong>${escapeHtml(ev.etiqueta || ev.titulo || 'Enlace')}</strong>
+                                </div>
+                                <a href="${ev.url_publica}" target="_blank" style="color:#0abf9e; word-break:break-all;">${escapeHtml(ev.url_publica)}</a>
+                                ${ev.descripcion ? `<p style="font-size:12px; color:#64748b; margin-top:8px;">${escapeHtml(ev.descripcion)}</p>` : ''}
+                            </div>`;
+                }
+                
+                // 📦 REPOSITORIO
+                if (ev.tipo === 'repositorio' && ev.url_publica) {
+                    const icon = ev.plataforma === 'GitLab' ? 'fa-gitlab' : ev.plataforma === 'Bitbucket' ? 'fa-bitbucket' : 'fa-github';
+                    return `<div class="preview-evidencia-card" style="margin-bottom:12px; border:1px solid #e2e8f0; border-radius:12px; padding:12px;">
+                                <div class="preview-evidencia-header" style="display:flex;align-items:center;gap:8px; margin-bottom:8px;">
+                                    <i class="fab ${icon}" style="font-size:16px; color:#0abf9e;"></i>
+                                    <strong>${escapeHtml(ev.etiqueta || ev.titulo || 'Repositorio')}</strong>
+                                </div>
+                                <a href="${ev.url_publica}" target="_blank" style="color:#0abf9e; word-break:break-all;">${escapeHtml(ev.url_publica)}</a>
+                                ${ev.descripcion ? `<p style="font-size:12px; color:#64748b; margin-top:8px;">${escapeHtml(ev.descripcion)}</p>` : ''}
+                            </div>`;
+                }
+                return '';
+            }).join('')}</div>`; 
+        }
+        
         previewPage.innerHTML = `<div class="preview-doc">
             <button class="preview-back" id="previewBackBtn">${svgVolver} Volver a proyectos</button>
             <h1 class="preview-doc-title">${escapeHtml(p.nombre)}</h1>
@@ -334,7 +365,9 @@
                 <button class="preview-btn preview-btn-outline" id="previewToggleVisBtn">${p.is_visible ? svgCandadoCerrado + ' Hacer privado' : svgCandadoAbierto + ' Hacer público'}</button>
                 <button class="preview-btn preview-btn-outline" id="previewEditBtn2">${svgEditar} Editar</button>
                 <button class="preview-btn preview-btn-outline" id="previewDeleteBtn" style="color:#ef4444;border-color:#fecaca;">${svgEliminar} Eliminar</button>
-            </div></div>`;
+            </div>
+        </div>`;
+        
         previewPage.classList.add('open');
         previewPage.querySelector('#previewBackBtn')?.addEventListener('click', cerrarPreview);
         previewPage.querySelector('#previewEditBtn2')?.addEventListener('click', () => { cerrarPreview(); editarProyecto(id); });
@@ -394,8 +427,7 @@
                 
                 if (data.success || response.ok) {
                     closeDeleteProjectModal();
-                    // ✅ BANNER estilo habilidades blandas
-                    mostrarBanner('Proyecto eliminado correctamente.');
+                    mostrarToast('Proyecto eliminado correctamente');
                     setTimeout(() => cargarProyectos(), 1000);
                 } else {
                     mostrarToast('Error al eliminar el proyecto');
@@ -457,8 +489,7 @@
             window._proyectoParaEvidencias=resultado;
             sessionStorage.setItem('ultimo_proyecto_activo',JSON.stringify(resultado));
             if(!editandoId&&typeof window.evSubirPendientes==='function'){await window.evSubirPendientes(resultado.id);}
-            // ✅ BANNER estilo habilidades blandas
-            mostrarBanner(editandoId ? 'Proyecto actualizado correctamente.' : 'Proyecto guardado correctamente.');
+            mostrarToast(editandoId?'Proyecto actualizado':'Proyecto guardado correctamente');
             ocultarForm();
             await cargarProyectos();
         }catch(e){mostrarToast(e.message||'Error al guardar');}finally{mostrarLoading(false);}

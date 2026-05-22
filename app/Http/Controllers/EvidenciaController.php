@@ -61,7 +61,7 @@ class EvidenciaController extends Controller
                 'url'        => $request->input('url'),
                 'imagen_path'=> null,
                 'descripcion' => $request->input('descripcion'),
-                ]);
+            ]);
             return response()->json(['evidencia' => $this->formato($ev)], 201);
         }
 
@@ -80,7 +80,7 @@ class EvidenciaController extends Controller
                 'titulo'     => $request->input('etiqueta'),
                 'url'        => $request->input('url'),
                 'imagen_path'=> null,
-                'plataforma'  => $request->input('plataforma'),  // ✅ AGREGAR
+                'plataforma'  => $request->input('plataforma'),
                 'descripcion' => $request->input('descripcion'),
             ]);
             return response()->json(['evidencia' => $this->formato($ev)], 201);
@@ -103,20 +103,18 @@ class EvidenciaController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    // ── Formato de respuesta compatible con evidencia.blade.php ──
+    // ── Formato de respuesta compatible con evidencia.js y proyectos.js ──
     private function formato(ProjectEvidencia $ev): array
     {
-        
         return [
             'id'             => $ev->id,
             'tipo'           => $ev->tipo,
             'etiqueta'       => $ev->titulo,
+            'titulo'         => $ev->titulo,
+            'url_publica'    => $ev->imagen_path ? asset('storage/' . $ev->imagen_path) : $ev->url,
+            'descripcion'    => $ev->descripcion ?? null,
+            'plataforma'     => $ev->plataforma ?? null,
             'archivo_nombre' => $ev->imagen_path ? basename($ev->imagen_path) : null,
-            'url_publica'    => $ev->imagen_path
-                                    ? asset('storage/' . $ev->imagen_path)
-                                    : $ev->url,
-            'descripcion' => $ev->descripcion ?? null,
-            'plataforma'  => $ev->plataforma  ?? null,
             'created_at'     => $ev->created_at,
         ];
     }
