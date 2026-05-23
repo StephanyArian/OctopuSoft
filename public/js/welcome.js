@@ -49,13 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let step = originalCards.length; 
             let busy = false;
             let autoTimer;
-
-            function buildExtended() {
-                track.innerHTML = '';
-                [...originalCards, ...originalCards, ...originalCards].forEach(card => {
-                    track.appendChild(card.cloneNode(true));
-                });
-            }
+            let loopEnabled = false; 
 
             function getPerView() {
                 const w = window.innerWidth;
@@ -91,14 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             function go(delta) {
-                if (busy) return;
+                if (!loopEnabled || busy) return;
                 busy = true;
                 slide(step + delta);
                 updateDots();
 
                 setTimeout(() => {
-                    const n = originalCards.length;
-                
+                    const n = originalCards.length;               
                     if (step <= 0 || step >= n * 2) {
                         teleport(n + realIndex());
                     }
@@ -108,6 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             function buildDots() {
                 dotsWrapper.innerHTML = '';
+                if (!loopEnabled) return; // sin dots en modo estático
+
                 const groups = Math.ceil(originalCards.length / getPerView());
                 for (let i = 0; i < groups; i++) {
                     const btn = document.createElement('button');
@@ -133,11 +128,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            function startAutoplay() { autoTimer = setInterval(() => go(1), 4000); }
+            function startAutoplay() { 
+                if (!loopEnabled) return;
+                autoTimer = setInterval(() => go(1), 4000);
+            }
             function resetAutoplay()  { clearInterval(autoTimer); startAutoplay(); }
 
+                // ── NUEVA función central: decide el modo según cantidad de cards ──
+            function setup() {
+                const perView = getPerView();
+                loopEnabled = originalCards.length > perView;
+
+                track.innerHTML = '';
+
+                if (loopEnabled) {
+                   // Triplicar para loop infinito
+                    [...originalCards, ...originalCards, ...originalCards].forEach(card => {
+                        track.appendChild(card.cloneNode(true));
+                    });
+                    // Mostrar controles
+                    btnPrev.style.visibility = '';
+                    btnNext.style.visibility = '';
+                    dotsWrapper.style.visibility = '';
+
+                    buildDots();
+                    teleport(originalCards.length);
+                    startAutoplay();
+                } else {
+                    // Modo estático: mostrar cards sin duplicar, centradas
+                    originalCards.forEach(card => track.appendChild(card.cloneNode(true)));
+                    track.style.transition = 'none';
+                    track.style.transform  = 'translateX(0)';
+                    step = 0;
+
+                    // Ocultar controles 
+                    btnPrev.style.visibility = 'hidden';
+                    btnNext.style.visibility = 'hidden';
+                    dotsWrapper.style.visibility = 'hidden';
+
+                    buildDots(); // no genera nada, pero limpia por si acaso
+                }
+            }
+
             track.addEventListener('mouseenter', () => clearInterval(autoTimer));
-            track.addEventListener('mouseleave', resetAutoplay);
+            track.addEventListener('mouseleave', () => { if (loopEnabled) resetAutoplay(); });
 
             btnPrev.addEventListener('click', () => { go(-1); resetAutoplay(); });
             btnNext.addEventListener('click', () => { go(1);  resetAutoplay(); });
@@ -147,18 +181,14 @@ document.addEventListener('DOMContentLoaded', () => {
             window.addEventListener('resize', () => {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(() => {
-                    buildExtended();
-                    buildDots();
-                    teleport(originalCards.length);
+                    clearInterval(autoTimer);
+                    setup();
                     updateDots();
                 }, 150);
             });
 
             /* ── Iniciar ── */
-            buildExtended();
-            buildDots();
-            teleport(originalCards.length);
-            startAutoplay();
+            setup();
         }
     
     /* ── FILTRADO Y BUSCADOR AJAX ── */
