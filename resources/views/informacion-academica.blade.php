@@ -1,16 +1,9 @@
 <x-app-layout>
     
- 
     <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
  
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
- 
-            
-
-
-
-        
  
             <div class="shell">
                 <div class="header-bar" style="display: none;"></div>
@@ -25,9 +18,9 @@
                         <a href="{{ route('informacion.academica') }}" class="sidebar-item active">Información académica</a>
                         <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
                         <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <a href="{{ route('proyectos') }}" class="sidebar-item" >Proyectos</a>  
-                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a>
-                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto  </a>
+                        <a href="{{ route('proyectos') }}" class="sidebar-item">Proyectos</a>  
+                        <a href="{{ route('idiomas.index') }}" class="sidebar-item">Idiomas</a>
+                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
                     </div>
  
                     <div class="main">
@@ -81,7 +74,7 @@
                                         <div class="form-group">
                                             <label class="form-label">Tipo de formación <span class="required">*</span></label>
                                             <div class="custom-dropdown" id="tipoFormacionDropdown">
-                                            <button type="button" class="custom-dropdown-toggle">
+                                                <button type="button" class="custom-dropdown-toggle">
                                                     <span class="dropdown-label muted" id="tipoFormacionLabel">— Seleccionar tipo —</span>
                                                     <span class="dropdown-arrow">▲</span>
                                                 </button>
@@ -101,9 +94,29 @@
                                                     <li data-value="Intercambio académico">Intercambio académico</li>
                                                     <li data-value="Otro">Otro</li>
                                                 </ul>
-                                                <input type="hidden" name="tipo_formacion" id="tipoFormacionHidden" value="">
+                                                <input type="hidden" name="tipo_formacion" id="tipoFormacionHidden" value="{{ old('tipo_formacion') }}">
                                             </div>
+                                            
+                                            <!-- Campo "Otro" - se mostrará cuando seleccionen Otro -->
+                                            <div id="otroTipoFormacionContainer" style="display: none; margin-top: 12px;">
+                                                <label class="form-label">Especificar otro tipo de formación <span class="required">*</span></label>
+                                                <input type="text" 
+                                                       name="otro_tipo_formacion" 
+                                                       id="otroTipoFormacion" 
+                                                       class="form-input" 
+                                                       placeholder="Ej. Microcredencial, Taller especializado, Curso presencial, etc."
+                                                       maxlength="50"
+                                                       value="{{ old('otro_tipo_formacion') }}">
+                                                <div id="otroTipoFormacionError" class="error-message hidden"></div>
+                                            </div>
+                                            
                                             <div id="tipoFormacionError" class="error-message hidden">El tipo de formación es obligatorio</div>
+                                            @error('tipo_formacion')
+                                                <div class="error-message">{{ $message }}</div>
+                                            @enderror
+                                            @error('otro_tipo_formacion')
+                                                <div class="error-message">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
 
@@ -145,6 +158,7 @@
                                         <div class="char-counter" id="descripcionCounter">0 / 500</div>
                                     </div>
                                 </div>
+                                
                                 <div class="form-group" style="margin-top: 8px;">
                                     <label class="form-label">
                                         Evidencias
@@ -156,7 +170,7 @@
                                     {{-- Grid de previsualizaciones --}}
                                     <div id="evidenciasGrid" style="display:flex; flex-wrap:wrap; gap:12px; margin-bottom:12px;"></div>
                                 
-                                    {{-- Zona de arrastre (oculta al inicio si hay archivos) --}}
+                                    {{-- Zona de arrastre --}}
                                     <div id="uploadZone"
                                         style="border:2px dashed var(--gray-300); border-radius:12px; padding:20px;
                                                 text-align:center; cursor:pointer; background:var(--off); transition:all 0.2s;"
@@ -196,12 +210,9 @@
                                 </div>
                             </form>
                         </div>
- 
-
 
                         <div id="historial-react" data-formaciones='@json($formaciones)'></div>
 
-                    </div>{{-- /main --}}                         
                     </div>{{-- /main --}}
                 </div>{{-- /body-row --}}
             </div>{{-- /shell --}}

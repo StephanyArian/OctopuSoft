@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Script de información académica cargado');
     
-    
     // ==========================================
     // CONTADOR DE DESCRIPCIÓN
     // ==========================================
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const longitud = textareaDescripcion.value.length;
             contadorDescripcion.textContent = longitud + ' / 500';
             
-            // Cambiar color según la longitud
             if (longitud >= 500) {
                 contadorDescripcion.style.color = 'red';
                 contadorDescripcion.style.fontWeight = 'bold';
@@ -29,12 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         textareaDescripcion.addEventListener('input', actualizarContadorDescripcion);
-        actualizarContadorDescripcion(); // Valor inicial
-        
+        actualizarContadorDescripcion();
     } else {
         console.error('✗ No se encontró el textarea o contador de descripción');
-        console.log('textareaDescripcion:', textareaDescripcion);
-        console.log('contadorDescripcion:', contadorDescripcion);
     }
     
     // ==========================================
@@ -62,13 +57,29 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaFin = document.getElementById('fechaFin');
         if (fechaFin) fechaFin.disabled = false;
         
-        // Resetear contador de descripción
         if (textareaDescripcion && contadorDescripcion) {
             contadorDescripcion.textContent = '0 / 500';
             contadorDescripcion.style.color = '#6c757d';
         }
+
+        // Resetear campo "Otro"
+        const otroContainer = document.getElementById('otroTipoFormacionContainer');
+        const otroInput = document.getElementById('otroTipoFormacion');
+        if (otroContainer) otroContainer.style.display = 'none';
+        if (otroInput) {
+            otroInput.value = '';
+            otroInput.removeAttribute('required');
+        }
         
-        // Ocultar mensajes de error
+        // Resetear dropdown
+        const label = document.getElementById('tipoFormacionLabel');
+        const hidden = document.getElementById('tipoFormacionHidden');
+        if (label) {
+            label.textContent = '— Seleccionar tipo —';
+            label.classList.add('muted');
+        }
+        if (hidden) hidden.value = '';
+        
         document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.form-input, .form-textarea').forEach(el => el.classList.remove('error'));
 
@@ -81,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (uploadZone) uploadZone.style.display = 'block';
         const errorEv = document.getElementById('evidenciasError');
         if (errorEv) errorEv.classList.add('hidden');
-        };
+    };
     
     // ==========================================
     // VALIDACIÓN DEL FORMULARIO
@@ -91,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(e) {
             let isValid = true;
             
-            // Limpiar errores previos
             document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.form-input, .form-textarea').forEach(el => el.classList.remove('error'));
             
@@ -113,6 +123,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
+            // Validar Tipo de Formación
+            const tipoFormacion = document.getElementById('tipoFormacionHidden').value;
+            if (!tipoFormacion) {
+                const errorEl = document.getElementById('tipoFormacionError');
+                if (errorEl) errorEl.classList.remove('hidden');
+                isValid = false;
+            }
+            
+            // Validar "Otro" si se seleccionó
+            if (tipoFormacion === 'Otro') {
+                const otroInput = document.getElementById('otroTipoFormacion');
+                const otroError = document.getElementById('otroTipoFormacionError');
+                
+                if (!otroInput || !otroInput.value.trim()) {
+                    isValid = false;
+                    if (otroError) {
+                        otroError.textContent = 'Por favor, especifica el tipo de formación';
+                        otroError.classList.remove('hidden');
+                    }
+                    if (otroInput) otroInput.classList.add('error');
+                }
+            }
+            
             // Validar Fecha Inicio
             const fechaInicio = document.getElementById('fechaInicio').value;
             if (!fechaInicio) {
@@ -122,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
-            // Validar fechas (fin vs inicio)
+            // Validar fechas
             const estudioActual = document.getElementById('estudioActual').checked;
             const fechaFin = document.getElementById('fechaFin').value;
             const fechaFinError = document.getElementById('fechaFinError');
@@ -161,22 +194,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ==========================================
-    // DROPDOWN TIPO DE FORMACIÓN
+    // DROPDOWN TIPO DE FORMACIÓN CON "OTRO"
     // ==========================================
     const dropdown = document.getElementById('tipoFormacionDropdown');
     if (dropdown) {
         const toggleBtn = dropdown.querySelector('.custom-dropdown-toggle');
-        const menu      = dropdown.querySelector('.custom-dropdown-menu');
-        const label     = document.getElementById('tipoFormacionLabel');
-        const hidden    = document.getElementById('tipoFormacionHidden');
-        const arrow     = dropdown.querySelector('.dropdown-arrow');
-        const errorEl   = document.getElementById('tipoFormacionError');
+        const menu = dropdown.querySelector('.custom-dropdown-menu');
+        const label = document.getElementById('tipoFormacionLabel');
+        const hidden = document.getElementById('tipoFormacionHidden');
+        const arrow = dropdown.querySelector('.dropdown-arrow');
+        const errorEl = document.getElementById('tipoFormacionError');
+        const otroContainer = document.getElementById('otroTipoFormacionContainer');
+        const otroInput = document.getElementById('otroTipoFormacion');
+        const otroError = document.getElementById('otroTipoFormacionError');
 
         function abrirDrop() {
             dropdown.classList.add('open');
             arrow.textContent = '▼';
             menu.style.display = 'block';
         }
+        
         function cerrarDrop() {
             dropdown.classList.remove('open');
             arrow.textContent = '▲';
@@ -188,47 +225,100 @@ document.addEventListener('DOMContentLoaded', function() {
             dropdown.classList.contains('open') ? cerrarDrop() : abrirDrop();
         });
 
-        menu.querySelectorAll('li:not(.dropdown-group-title)').forEach(function(li) {
-            li.addEventListener('click', function() {
-                const valor = li.dataset.value || '';
-                label.textContent = valor || '— Seleccionar tipo —';
-                valor ? label.classList.remove('muted') : label.classList.add('muted');
-                hidden.value = valor;
+        // Función para manejar la selección incluyendo "Otro"
+        function handleDropdownSelection(li, valor, texto) {
+            // Actualizar label y hidden
+            label.textContent = texto || valor || '— Seleccionar tipo —';
+            if (valor) {
+                label.classList.remove('muted');
+            } else {
+                label.classList.add('muted');
+            }
+            hidden.value = valor || '';
+            
+            // Marcar como seleccionado (solo si hay li)
+            if (li) {
                 menu.querySelectorAll('li').forEach(l => l.classList.remove('selected'));
                 li.classList.add('selected');
-                if (errorEl) errorEl.classList.add('hidden');
-                cerrarDrop();
+            }
+            
+            // Manejar "Otro"
+            if (valor === 'Otro') {
+                if (otroContainer) otroContainer.style.display = 'block';
+                if (otroInput) {
+                    otroInput.setAttribute('required', 'required');
+                    setTimeout(() => otroInput.focus(), 100);
+                }
+                if (otroError) otroError.classList.add('hidden');
+            } else {
+                if (otroContainer) otroContainer.style.display = 'none';
+                if (otroInput) {
+                    otroInput.removeAttribute('required');
+                    otroInput.value = '';
+                }
+                if (otroError) otroError.classList.add('hidden');
+            }
+            
+            if (errorEl) errorEl.classList.add('hidden');
+            cerrarDrop();
+        }
+
+        // Agregar event listeners a cada item del dropdown
+        menu.querySelectorAll('li:not(.dropdown-group-title)').forEach(function(li) {
+            li.addEventListener('click', function() {
+                const valor = this.dataset.value || '';
+                const texto = this.textContent;
+                handleDropdownSelection(this, valor, texto);
             });
         });
 
+        // Cerrar dropdown al hacer clic fuera
         document.addEventListener('click', function(e) {
             if (!dropdown.contains(e.target)) cerrarDrop();
         });
 
         cerrarDrop();
+        
+        // Si hay un valor guardado (para edición), restaurarlo
+        const valorGuardado = hidden.value;
+        if (valorGuardado) {
+            const opcionesPredefinidas = [
+                'Colegio / Bachillerato', 'Técnico Superior', 'Licenciatura / Ingeniería',
+                'Maestría', 'Doctorado / PhD', 'Bootcamp', 'Curso online',
+                'Certificación profesional', 'Diplomado', 'Intercambio académico', 'Otro'
+            ];
+            
+            if (!opcionesPredefinidas.includes(valorGuardado)) {
+                // Es un valor personalizado
+                handleDropdownSelection(null, 'Otro', 'Otro');
+                if (otroInput) otroInput.value = valorGuardado;
+            } else {
+                // Es una opción predefinida, buscar y seleccionar
+                const itemToSelect = Array.from(menu.querySelectorAll('li[data-value]')).find(
+                    li => li.dataset.value === valorGuardado
+                );
+                if (itemToSelect) {
+                    handleDropdownSelection(itemToSelect, valorGuardado, itemToSelect.textContent);
+                }
+            }
+        }
     }
 
     console.log('✅ Script inicializado correctamente');
 });
 
-// Marcar bordes rojos desde errores del servidor
-document.querySelectorAll('.error-message').forEach(el => {
-    if (!el.classList.contains('hidden')) {
-        const input = el.closest('.form-group')?.querySelector('.form-input, .form-textarea');
-        if (input) input.classList.add('error');
-    }
-});
-
-
-const MAX_SIZE_MB   = 2;
+// ==========================================
+// MANEJO DE EVIDENCIAS
+// ==========================================
+const MAX_SIZE_MB = 2;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
-let archivosEvidencia = []; // Array de File objects
+let archivosEvidencia = [];
 
 function handleDrop(event) {
     event.preventDefault();
     const zone = document.getElementById('uploadZone');
     zone.style.borderColor = 'var(--gray-300)';
-    zone.style.background  = 'var(--off)';
+    zone.style.background = 'var(--off)';
     handleFiles(event.dataTransfer.files);
 }
  
@@ -237,19 +327,16 @@ function handleFiles(files) {
     errorEl.classList.add('hidden');
  
     Array.from(files).forEach(file => {
-        // Validar tipo
         if (!ALLOWED_TYPES.includes(file.type)) {
             errorEl.textContent = `"${file.name}" — Formato no permitido. Use JPG, PNG o PDF`;
             errorEl.classList.remove('hidden');
             return;
         }
-        // Validar tamaño
         if (file.size > MAX_SIZE_MB * 1024 * 1024) {
             errorEl.textContent = `"${file.name}" — El archivo no puede superar los 2MB`;
             errorEl.classList.remove('hidden');
             return;
         }
-        // Evitar duplicados
         if (archivosEvidencia.find(f => f.name === file.name && f.size === file.size)) return;
  
         archivosEvidencia.push(file);
@@ -263,7 +350,7 @@ function handleFiles(files) {
 function renderEvidenciaCard(file, index) {
     const grid = document.getElementById('evidenciasGrid');
     const card = document.createElement('div');
-    card.id    = `ev-card-${index}`;
+    card.id = `ev-card-${index}`;
     card.style.cssText = `
         width:110px; border-radius:10px; overflow:hidden;
         border:1px solid var(--gray-100); position:relative;
@@ -301,7 +388,6 @@ function renderEvidenciaCard(file, index) {
         `;
     }
  
-    // Botón eliminar
     const btnRemove = document.createElement('div');
     btnRemove.style.cssText = `
         position:absolute; top:4px; right:4px; width:20px; height:20px;
@@ -318,7 +404,6 @@ function renderEvidenciaCard(file, index) {
  
 function eliminarEvidencia(index) {
     archivosEvidencia.splice(index, 1);
-    // Re-renderizar todo el grid
     const grid = document.getElementById('evidenciasGrid');
     grid.innerHTML = '';
     archivosEvidencia.forEach((file, i) => renderEvidenciaCard(file, i));
@@ -327,23 +412,20 @@ function eliminarEvidencia(index) {
 }
  
 function actualizarInputFiles() {
-    // Sincronizar el input con el array
-    const input    = document.getElementById('evidenciasInput');
+    const input = document.getElementById('evidenciasInput');
     const dataTransfer = new DataTransfer();
     archivosEvidencia.forEach(f => dataTransfer.items.add(f));
     input.files = dataTransfer.files;
 }
  
 function toggleUploadZone() {
-    // Siempre visible — el botón + está en el grid
-    // Solo agregar botón "+" si hay archivos
-    const grid   = document.getElementById('evidenciasGrid');
+    const grid = document.getElementById('evidenciasGrid');
     const btnAdd = document.getElementById('ev-add-btn');
  
     if (archivosEvidencia.length > 0) {
         if (!btnAdd) {
             const btn = document.createElement('div');
-            btn.id    = 'ev-add-btn';
+            btn.id = 'ev-add-btn';
             btn.style.cssText = `
                 width:110px; height:110px; border:2px dashed var(--gray-300);
                 border-radius:10px; display:flex; flex-direction:column;
@@ -365,4 +447,3 @@ function toggleUploadZone() {
         document.getElementById('uploadZone').style.display = 'block';
     }
 }
-

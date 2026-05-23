@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
-
 // Función para acortar nombres largos
 function acortarNombre(nombre) {
     if (!nombre) return '';
@@ -9,9 +8,8 @@ function acortarNombre(nombre) {
     return nombre.substring(0, 22) + '...';
 }
 
-const MAX_SIZE_MB   = 2;
+const MAX_SIZE_MB = 2;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
-
 
 const IconEdit = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{flexShrink:0}}>
@@ -26,73 +24,172 @@ const IconTrash = () => (
     </svg>
 );
 
+// COMPONENTE DROPDOWN PARA TIPO DE FORMACIÓN
+function TipoFormacionDropdown({ value, name, formacionId }) {
+    const [open, setOpen] = useState(false);
+    const [selected, setSelected] = useState('');
+    const [mostrarOtroInput, setMostrarOtroInput] = useState(false);
+    const [otroValue, setOtroValue] = useState('');
+    const dropdownRef = useRef(null);
 
-const TIPO_FORMACION_OPTIONS = {
-    'Educación formal': [
-        'Colegio / Bachillerato', 'Técnico Superior',
-        'Licenciatura / Ingeniería', 'Maestría', 'Doctorado / PhD'
-    ],
-    'Formación complementaria': [
-        'Bootcamp', 'Curso online', 'Certificación profesional',
-        'Diplomado', 'Intercambio académico', 'Otro'
-    ]
-};
+    const TIPO_FORMACION_OPTIONS = {
+        'Educación formal': [
+            'Colegio / Bachillerato', 'Técnico Superior',
+            'Licenciatura / Ingeniería', 'Maestría', 'Doctorado / PhD'
+        ],
+        'Formación complementaria': [
+            'Bootcamp', 'Curso online', 'Certificación profesional',
+            'Diplomado', 'Intercambio académico', 'Otro'
+        ]
+    };
 
-// 👇 AGREGA ESTO JUSTO AQUÍ
-function TipoFormacionDropdown({ value, name }) {
-    const [open, setOpen]         = useState(false);
-    const [selected, setSelected] = useState(value || '');
-    const ref                     = useRef(null);
+    const todasOpciones = Object.values(TIPO_FORMACION_OPTIONS).flat();
 
+    // Inicializar según el valor existente
     useEffect(() => {
-        function handler(e) {
-            if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+        if (value && todasOpciones.includes(value) && value !== 'Otro') {
+            setSelected(value);
+            setMostrarOtroInput(false);
+            setOtroValue('');
+        } else if (value === 'Otro') {
+            setSelected('Otro');
+            setMostrarOtroInput(true);
+            setOtroValue('');
+        } else if (value && !todasOpciones.includes(value) && value !== 'Otro') {
+            // Valor personalizado (ej: "TALLER")
+            setSelected('Otro');
+            setMostrarOtroInput(true);
+            setOtroValue(value);
+        } else {
+            setSelected('');
+            setMostrarOtroInput(false);
+            setOtroValue('');
         }
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
+    }, [value]);
+
+    // Cerrar dropdown al hacer clic fuera
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    function elegir(val) {
-        setSelected(val);
+    const elegirOpcion = (opcion) => {
+        setSelected(opcion);
         setOpen(false);
-    }
+        
+        if (opcion === 'Otro') {
+            setMostrarOtroInput(true);
+        } else {
+            setMostrarOtroInput(false);
+            setOtroValue('');
+        }
+    };
+
+    const handleOtroChange = (e) => {
+        setOtroValue(e.target.value);
+    };
+
+    // Determinar el texto a mostrar en el botón
+    const getButtonText = () => {
+        if (!selected) return '— Seleccionar tipo —';
+        if (selected === 'Otro' && otroValue) return `Otro: ${otroValue}`;
+        if (selected === 'Otro' && !otroValue) return 'Otro (especificar)';
+        return selected;
+    };
+
+    // Valor final a enviar
+    const valorFinal = selected === 'Otro' && otroValue ? otroValue : selected;
 
     return (
-        <div className={`custom-dropdown${open ? ' open' : ''}`} ref={ref}>
-            <button type="button" className="custom-dropdown-toggle" onClick={() => setOpen(o => !o)}>
-                <span className={`dropdown-label${!selected ? ' muted' : ''}`}>
-                    {selected || '— Seleccionar tipo —'}
-                </span>
-                <span className="dropdown-arrow">{open ? '▼' : '▲'}</span>
-            </button>
-            {open && (
-                <ul className="custom-dropdown-menu">
-                    <li className={`placeholder-opt${!selected ? ' selected' : ''}`}
-                        onClick={() => elegir('')} data-value="">
-                        — Seleccionar tipo —
-                    </li>
-                    {Object.entries(TIPO_FORMACION_OPTIONS).map(([grupo, opciones]) => (
-                        <React.Fragment key={grupo}>
-                            <li className="dropdown-group-title">{grupo}</li>
-                            {opciones.map(opt => (
-                                <li key={opt}
-                                    className={selected === opt ? 'selected' : ''}
-                                    onClick={() => elegir(opt)}>
-                                    {opt}
-                                </li>
-                            ))}
-                        </React.Fragment>
-                    ))}
-                </ul>
+        <div className="form-group" style={{ width: '100%' }}>
+            <label className="form-label">
+                Tipo de formación <span className="required">*</span>
+            </label>
+            
+            <div 
+                className={`custom-dropdown ${open ? 'open' : ''}`} 
+                id="tipoFormacionDropdown"  
+                ref={dropdownRef}
+                style={{ position: 'relative', width: '100%' }}
+            >
+                <button 
+                    type="button" 
+                    className="custom-dropdown-toggle"
+                    onClick={() => setOpen(!open)}
+                >
+                    <span className={`dropdown-label ${!selected ? 'muted' : ''}`}>
+                        {getButtonText()}
+                    </span>
+                    <span className="dropdown-arrow">{open ? '▼' : '▲'}</span>
+                </button>
+                
+                {open && (
+                    <ul className="custom-dropdown-menu">
+                        <li 
+                            className={`placeholder-opt ${!selected ? 'selected' : ''}`}
+                            onClick={() => elegirOpcion('')}
+                        >
+                            — Seleccionar tipo —
+                        </li>
+                        
+                        {Object.entries(TIPO_FORMACION_OPTIONS).map(([grupo, opciones]) => (
+                            <React.Fragment key={grupo}>
+                                <li className="dropdown-group-title">{grupo}</li>
+                                {opciones.map(opt => (
+                                    <li 
+                                        key={opt}
+                                        className={selected === opt ? 'selected' : ''}
+                                        onClick={() => elegirOpcion(opt)}
+                                    >
+                                        {opt}
+                                    </li>
+                                ))}
+                            </React.Fragment>
+                        ))}
+                    </ul>
+                )}
+                
+                <input type="hidden" name={name} value={valorFinal} />
+            </div>
+            
+            {/* Campo para especificar "Otro" */}
+            {mostrarOtroInput && (
+                <div style={{ marginTop: '12px' }}>
+                    <label className="form-label">
+                        Especificar otro tipo de formación 
+                        <span className="required">*</span>
+                    </label>
+                    <input 
+                        type="text"
+                        name="otro_tipo_formacion"
+                        className="form-input"
+                        placeholder="Ej. Microcredencial, Taller especializado, Curso presencial, etc."
+                        value={otroValue}
+                        onChange={handleOtroChange}
+                        maxLength="50"
+                        autoFocus={selected === 'Otro'}
+                    />
+                    {!otroValue && selected === 'Otro' && (
+                        <div className="error-message" style={{ marginTop: '4px' }}>
+                            Por favor, especifica el tipo de formación
+                        </div>
+                    )}
+                </div>
             )}
-            <input type="hidden" name={name} value={selected} required />
         </div>
     );
 }
 
 function DescripcionColapsable({ texto, limite = 150 }) {
     const [expandido, setExpandido] = useState(false);
-    const esMuyLargo = texto.length > limite;
+    const esMuyLargo = texto && texto.length > limite;
+
+    if (!texto) return null;
 
     return (
         <div>
@@ -125,11 +222,11 @@ function DescripcionColapsable({ texto, limite = 150 }) {
 }
 
 function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
-    const [evidencias, setEvidencias]   = useState(evidenciasIniciales);
-    const [archivos, setArchivos]       = useState([]);   // archivos nuevos pendientes
-    const [errores, setErrores]         = useState([]);
-    const inputRef                      = useRef(null);
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const [evidencias, setEvidencias] = useState(evidenciasIniciales);
+    const [archivos, setArchivos] = useState([]);
+    const [errores, setErrores] = useState([]);
+    const inputRef = useRef(null);
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     function validarArchivo(file) {
         if (!ALLOWED_TYPES.includes(file.type))
@@ -139,13 +236,6 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
         return null;
     }
 
-    function sincronizarInput(lista) {
-        if (!inputRef.current) return;
-        const dt = new DataTransfer();
-        lista.forEach(a => dt.items.add(a.file));
-        inputRef.current.files = dt.files;
-    }
-    
     function agregarArchivos(e) {
         const nuevos = Array.from(e.target.files);
         const errs = [];
@@ -156,20 +246,12 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
             else validos.push({ file: f, preview: URL.createObjectURL(f) });
         });
         setErrores(errs);
-        setArchivos(prev => {
-            const actualizados = [...prev, ...validos];
-            sincronizarInput(actualizados);
-            return actualizados;
-        });
+        setArchivos(prev => [...prev, ...validos]);
         e.target.value = '';
     }
     
     function quitarPendiente(idx) {
-        setArchivos(prev => {
-            const actualizados = prev.filter((_, i) => i !== idx);
-            sincronizarInput(actualizados);
-            return actualizados;
-        });
+        setArchivos(prev => prev.filter((_, i) => i !== idx));
     }
 
     async function eliminarEvidencia(evidenciaId) {
@@ -180,30 +262,20 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
         if (res.ok) setEvidencias(prev => prev.filter(e => e.id !== evidenciaId));
     }
 
-    // Esta función la llama el form padre al hacer submit — devuelve los archivos pendientes
-    // para que guardarEdicion los adjunte al FormData
-    function getArchivosPendientes() {
-        return archivos.map(a => a.file);
-    }
-
-    // Exponer al padre vía ref (se usa con useImperativeHandle si quieres, o simplemente
-    // adjuntamos los archivos en el submit del form padre directamente desde `archivos`)
     return (
         <div style={{ marginBottom: '12px' }}>
             <label className="form-label">Evidencias (JPG, PNG, PDF — máx. {MAX_SIZE_MB} MB c/u)</label>
 
-            {/* Evidencias ya guardadas */}
             {evidencias.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                <div className="evidencias-grid">
                     {evidencias.map(ev => (
                         <div key={ev.id} style={{ position: 'relative', display: 'inline-block' }}>
                             {ev.mime_type?.startsWith('image/') ? (
                                 <img src={ev.url} alt="evidencia"
-                                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 6, border: '1px solid #ddd' }} />
+                                    style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 8, border: '1px solid #ddd' }} />
                             ) : (
-                                <a href={ev.url} target="_blank" rel="noreferrer"
-                                    style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: 'var(--teal)' }}>
-                                    📄 {ev.nombre || 'PDF'}
+                                <a href={ev.url} target="_blank" rel="noreferrer" className="pdf-icon-only">
+                                    <span className="pdf-icon-custom"></span>
                                 </a>
                             )}
                             <button type="button"
@@ -219,18 +291,17 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                 </div>
             )}
 
-            {/* Archivos nuevos (pendientes de guardar) */}
             {archivos.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                <div className="evidencias-grid">
                     {archivos.map((a, i) => (
                         <div key={i} style={{ position: 'relative', display: 'inline-block' }}>
                             {a.file.type.startsWith('image/') ? (
                                 <img src={a.preview} alt="preview"
-                                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 6,
+                                    style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 8,
                                              border: '2px dashed var(--teal)', opacity: 0.85 }} />
                             ) : (
-                                <div style={{ fontSize: 12, color: '#555' }}>
-                                    📄 {a.file.name.length > 30 ? a.file.name.substring(0, 27) + '...' : a.file.name}
+                                <div className="pdf-icon-only">
+                                    <span className="pdf-icon-custom" style={{ borderColor: 'var(--teal)' }}></span>
                                 </div>
                             )}
                             <button type="button" onClick={() => quitarPendiente(i)}
@@ -251,8 +322,6 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                 </ul>
             )}
 
-            
-
             <input ref={inputRef} type="file" name="evidencias[]" multiple
                 accept=".jpg,.jpeg,.png,.pdf"
                 onChange={agregarArchivos}
@@ -266,56 +335,14 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
     );
 }
 
-
 function HistorialAcademico({ formaciones: initialFormaciones }) {
     const [erroresEdicion, setErroresEdicion] = useState({});
     const [formaciones, setFormaciones] = useState(initialFormaciones);
     const [editando, setEditando] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
-    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-    useEffect(() => {
-        if (editando) {
-            // Configurar contador para descripción
-            const descripcion = document.querySelector(`#edit-descripcion-${editando}`);
-            const counterDesc = document.getElementById(`descripcionCounter_${editando}`);
-            
-            if (descripcion && counterDesc) {
-                const updateDesc = () => {
-                    counterDesc.textContent = `${descripcion.value.length} / 500`;
-                };
-                descripcion.addEventListener('input', updateDesc);
-                updateDesc();
-            }
-
-            // Configurar contador para institución
-            const institucion = document.querySelector(`input[name="institucion"]`);
-            const counterInst = document.getElementById(`institucionCounter_${editando}`);
-            
-            if (institucion && counterInst) {
-                const updateInst = () => {
-                    counterInst.textContent = `${institucion.value.length} / 60`;
-                };
-                institucion.addEventListener('input', updateInst);
-                updateInst();
-            }
-
-            // Configurar contador para título obtenido
-            const tituloObtenido = document.querySelector(`input[name="titulo_obtenido"]`);
-            const counterTit = document.getElementById(`tituloCounter_${editando}`);
-            
-            if (tituloObtenido && counterTit) {
-                const updateTit = () => {
-                    counterTit.textContent = `${tituloObtenido.value.length} / 30`;
-                };
-                tituloObtenido.addEventListener('input', updateTit);
-                updateTit();
-            }
-        }
-    }, [editando]);
-
-    // ── ELIMINAR ──
     async function eliminar(id) {
         const res = await fetch(`/informacion-academica/${id}`, {
             method: 'DELETE',
@@ -330,12 +357,9 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
         }
     }
 
-    // ── EDITAR ──
     async function guardarEdicion(e, id) {
         e.preventDefault();
         
-        
-
         const formData = new FormData(e.target);
         formData.append('_method', 'PUT');
     
@@ -352,6 +376,7 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
             const updated = await res.json();
             setFormaciones(formaciones.map(f => f.id === id ? updated : f));
             setEditando(null);
+            setErroresEdicion(prev => ({ ...prev, [id]: null }));
         } else if (res.status === 422) {
             const data = await res.json();
             setErroresEdicion(prev => ({ ...prev, [id]: data.errors }));
@@ -370,100 +395,115 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                 {formaciones.map((f, index) => (
                     <div key={f.id} className="historial-card">
                         {editando === f.id ? (
-                            // ── MODO EDICIÓN ──
                             <form onSubmit={(e) => guardarEdicion(e, f.id)} encType="multipart/form-data">
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Institución <span className="required">*</span></label>
-                                        <input className={`form-input${erroresEdicion[f.id]?.institucion ? ' error' : ''}`}
-                                            name="institucion" defaultValue={f.institution} required maxLength="60" />
+                                        <input 
+                                            className={`form-input${erroresEdicion[f.id]?.institucion ? ' error' : ''}`}
+                                            name="institucion" 
+                                            defaultValue={f.institution} 
+                                            required 
+                                            maxLength="60" 
+                                        />
                                         {erroresEdicion[f.id]?.institucion && (
-                                            <span style={{color:'#e74c3c', fontSize:'11px', fontWeight:500}}>
-                                                {erroresEdicion[f.id].institucion[0]}
-                                            </span>
+                                            <span className="error-message">{erroresEdicion[f.id].institucion[0]}</span>
                                         )}
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Título obtenido <span className="required">*</span></label>
-                                        <input className={`form-input${erroresEdicion[f.id]?.titulo_obtenido ? ' error' : ''}`}
-                                            name="titulo_obtenido" defaultValue={f.title} required maxLength="30" />
+                                        <input 
+                                            className={`form-input${erroresEdicion[f.id]?.titulo_obtenido ? ' error' : ''}`}
+                                            name="titulo_obtenido" 
+                                            defaultValue={f.title} 
+                                            required 
+                                            maxLength="30" 
+                                        />
                                         {erroresEdicion[f.id]?.titulo_obtenido && (
-                                            <span style={{color:'#e74c3c', fontSize:'11px', fontWeight:500}}>
-                                                {erroresEdicion[f.id].titulo_obtenido[0]}
-                                            </span>
+                                            <span className="error-message">{erroresEdicion[f.id].titulo_obtenido[0]}</span>
                                         )}
                                     </div>
                                 </div>
 
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
-                                        <label className="form-label">Especialidad</label>
-                                        <input className="form-input" name="especialidad" defaultValue={f.specialty || ''} maxLength="50" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Tipo de formación <span className="required">*</span></label>
-                                        <TipoFormacionDropdown
-                                            value={f.formation_type || ''}
-                                            onChange={val => {/* se maneja via hidden input */}}
-                                            name="tipo_formacion"
+                                        <label className="form-label">Especialidad (opcional)</label>
+                                        <input 
+                                            className="form-input" 
+                                            name="especialidad" 
+                                            defaultValue={f.specialty || ''} 
+                                            maxLength="50"
+                                            placeholder="Ej. Inteligencia Artificial, Redes, Desarrollo Web, QA, DevOps"
                                         />
                                     </div>
+                                    
+                                    <TipoFormacionDropdown
+                                        value={f.formation_type || ''}
+                                        name="tipo_formacion"
+                                        formacionId={f.id}
+                                    />
                                 </div>
 
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de inicio</label>
-                                        <input className="form-input" type="date" name="fecha_inicio"
+                                        <input 
+                                            className="form-input" 
+                                            type="date" 
+                                            name="fecha_inicio"
                                             defaultValue={f.start_date ? f.start_date.substring(0, 10) : ''} 
-                                            min="1950-01-01" max={new Date().toISOString().substring(0, 10)} required />
+                                            min="1950-01-01" 
+                                            max={new Date().toISOString().substring(0, 10)} 
+                                            required 
+                                        />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de fin</label>
-                                        <input className="form-input" type="date" name="fecha_fin"  id={`fechaFin_${f.id}`}
+                                        <input 
+                                            className="form-input" 
+                                            type="date" 
+                                            name="fecha_fin" 
+                                            id={`fechaFin_${f.id}`}
                                             defaultValue={f.end_date ? f.end_date.substring(0, 10) : ''} 
-                                            min="1950-01-01" max={new Date().toISOString().substring(0, 10)} />
+                                            min="1950-01-01" 
+                                            max={new Date().toISOString().substring(0, 10)} 
+                                        />
                                     </div>
                                 </div>
+
                                 <div className="form-checkbox-row" style={{ marginBottom: '12px' }}>
                                     <input 
                                         type="checkbox" 
                                         name="estudio_actual" 
                                         defaultChecked={f.is_current}
                                         onChange={(e) => {
-                                            // Usa el ID específico en lugar de querySelector
                                             const fechaFinInput = document.getElementById(`fechaFin_${f.id}`);
                                             if (fechaFinInput) {
-                                                if (e.target.checked) {
-                                                    fechaFinInput.value = '';
-                                                    fechaFinInput.disabled = true;
-                                                } else {
-                                                    fechaFinInput.disabled = false;
-                                                }
+                                                fechaFinInput.disabled = e.target.checked;
+                                                if (e.target.checked) fechaFinInput.value = '';
                                             }
                                         }}
                                     />
                                     <label>Estudio actual</label>
                                 </div>
+
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label className="form-label">Descripción</label>
-                                    <textarea className={`form-textarea${erroresEdicion[f.id]?.descripcion ? ' error' : ''}`}
-                                        name="descripcion" id={`edit-descripcion-${f.id}`} defaultValue={f.description} maxLength="500" rows="4"
-                                        onInput={(e) => {
-                                            const counter = document.getElementById(`descripcionCounter_${f.id}`);
-                                            if (counter) counter.textContent = `${e.target.value.length} / 500`;
-                                        }} />
-                                    <div id={`descripcionCounter_${f.id}`} className="char-counter">
-                                        {f.description?.length || 0} / 500
-                                    </div>
+                                    <textarea 
+                                        className={`form-textarea${erroresEdicion[f.id]?.descripcion ? ' error' : ''}`}
+                                        name="descripcion" 
+                                        defaultValue={f.description || ''} 
+                                        maxLength="500" 
+                                        rows="4" 
+                                    />
                                     {erroresEdicion[f.id]?.descripcion && (
-                                        <span style={{color:'#e74c3c', fontSize:'11px', fontWeight:500}}>
-                                            {erroresEdicion[f.id].descripcion[0]}
-                                        </span>
+                                        <span className="error-message">{erroresEdicion[f.id].descripcion[0]}</span>
                                     )}
                                 </div>
+
                                 <EvidenciasEditor
-                                     formacionId={f.id}
-                                     evidenciasIniciales={
+                                    formacionId={f.id}
+                                    evidenciasIniciales={
                                         f.evidence_url
                                             ? JSON.parse(f.evidence_url).map((path, i) => ({
                                                 id: i,
@@ -480,13 +520,12 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                         Guardar cambios
                                     </button>
                                     <button type="button" className="btn-sm" onClick={() => { setEditando(null); setErroresEdicion({}); }}>
-                                            Cancelar
+                                        Cancelar
                                     </button>
                                 </div>
                             </form>
                         ) : (
-                            // ── MODO VISTA ──
-                            <>
+                            <div>
                                 <div className="historial-card-header">
                                     <span className="historial-index">{String(index + 1).padStart(2, '0')}</span>
                                     {f.is_current && <span className="badge-actual">Actual</span>}
@@ -494,12 +533,11 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="historial-title">{f.title}</div>
                                 <div className="historial-subtitle">{f.institution}</div>
 
-                                
-                                    {f.formation_type && (
-                                        <span className="tag tag-gray" style={{marginBottom: '4px', display: 'inline-block'}}>
-                                            🎓 {f.formation_type}
-                                        </span>
-                                    )}
+                                {f.formation_type && (
+                                    <span className="tag tag-gray" style={{marginBottom: '4px', display: 'inline-block'}}>
+                                        🎓 {f.formation_type}
+                                    </span>
+                                )}
 
                                 <div className="historial-tags">
                                     <span className="tag tag-teal">
@@ -507,38 +545,37 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     </span>
                                     <span className="tag tag-gray">{f.is_current ? 'En curso' : 'Finalizado'}</span>
                                 </div>
+
                                 {f.description && (
                                     <DescripcionColapsable texto={f.description} />
                                 )}
 
-                                    {f.evidence_url && JSON.parse(f.evidence_url).length > 0 && (
-                                        <div className="evidencias-grid">
-                                            {JSON.parse(f.evidence_url).map((path, i) => (
-                                                path.endsWith('.pdf') ? (
-                                                    <a key={i} 
+                                {f.evidence_url && JSON.parse(f.evidence_url).length > 0 && (
+                                    <div className="evidencias-grid">
+                                        {JSON.parse(f.evidence_url).map((path, i) => (
+                                            path.endsWith('.pdf') ? (
+                                                <a key={i} 
                                                     href={`/storage/${path}`} 
                                                     target="_blank" 
                                                     rel="noreferrer"
-                                                    className="pdf-icon-only"
-                                                    title={path.split('/').pop()}
-                                                    >
-                                                        <span className="pdf-icon-custom"></span>
-                                                    </a>
-                                                ) : (
-                                                    <a key={i} 
+                                                    className="pdf-icon-only">
+                                                    <span className="pdf-icon-custom"></span>
+                                                </a>
+                                            ) : (
+                                                <a key={i} 
                                                     href={`/storage/${path}`} 
                                                     target="_blank" 
                                                     rel="noreferrer"
-                                                    className="img-link"
-                                                    >
-                                                        <img src={`/storage/${path}`} alt="evidencia"
-                                                            style={{ width: 70, height: 70, objectFit: 'cover',
-                                                                    borderRadius: 8, border: '1px solid #ddd' }} />
-                                                    </a>
-                                                )
-                                            ))}
-                                        </div>
-                                    )}
+                                                    className="img-link">
+                                                    <img src={`/storage/${path}`} alt="evidencia"
+                                                        style={{ width: 70, height: 70, objectFit: 'cover',
+                                                                borderRadius: 8, border: '1px solid #ddd' }} />
+                                                </a>
+                                            )
+                                        ))}
+                                    </div>
+                                )}
+
                                 <div className="historial-actions">
                                     <button className="btn-sm" onClick={() => setEditando(f.id)}>
                                         <IconEdit /> Editar
@@ -547,11 +584,12 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                         <IconTrash /> Eliminar
                                     </button>
                                 </div>
-                            </>
+                            </div>
                         )}
                     </div>
                 ))}
             </div>
+
             {confirmDelete && (
                 <div className="modal-backdrop active" onClick={() => setConfirmDelete(null)}>
                     <div className="modal-box" onClick={e => e.stopPropagation()}>
@@ -574,8 +612,6 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
         </>
     );
 }
-
-
 
 // Montar el componente
 const el = document.getElementById('historial-react');
