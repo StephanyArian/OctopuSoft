@@ -647,7 +647,7 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
 .footer-nav a:hover { color: var(--teal-light); }
 
 .footer-bottom { padding: 12px 0; text-align: center; }
-.footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.22); }
+.footer-bottom p { font-size: 0.9rem; color: rgba(255,255,255,0.45); }
 
 /* ---- RESPONSIVE GENERAL ---- */
 @media (max-width: 768px) {

@@ -1,0 +1,297 @@
+/* ── Summary ── */
+.explore-summary {
+    max-width: 1100px;
+    margin: 28px auto 18px;
+    padding: 0 20px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+.explore-summary span {
+    color: var(--teal);
+    font-weight: 800;
+}
+
+/* ── Body ── */
+.explore-body {
+    background: var(--off);
+    min-height: calc(100vh - 200px);
+    padding: 16px 0 60px;
+}
+
+.explore-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ── Buscador sticky ── */
+.search-sticky-wrapper {
+    position: sticky;
+    top: 14px;
+    z-index: 999;
+    margin-bottom: 18px;
+    background: transparent;
+}
+.search-sticky-wrapper::before,
+.search-sticky-wrapper::after {
+    display: none;
+}
+.search-sticky-wrapper .search-bar-row {
+    margin-bottom: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.search-bar-row {
+    position: relative;
+    margin-bottom: 16px;
+    background: var(--white);
+    border-radius: 10px;
+}
+.search-bar-row i {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-500);
+    font-size: 0.95rem;
+    pointer-events: none;
+    z-index: 2;
+}
+.search-bar-row input {
+    width: 100%;
+    padding: 14px 20px 14px 48px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+    background: var(--white);
+}
+.search-bar-row input:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 4px rgba(10,191,158,0.08);
+}
+
+/* ── Filtros ── */
+.filter-container {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    margin-bottom: 32px;
+}
+.filters-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.filters-row select {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--gray-300);
+    border-radius: 10px;
+    background: var(--white);
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--dark);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+.filters-row select:focus {
+    border-color: var(--teal);
+}
+.btn-clean {
+    padding: 12px 24px;
+    border: 1.5px solid var(--teal);
+    background: transparent;
+    color: var(--teal);
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-clean:hover {
+    background: rgba(10,191,158,0.08);
+}
+
+/* ── Resultados ── */
+.results-count {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+.results-count span {
+    font-weight: 700;
+    color: var(--dark);
+}
+
+/* ── Grid ── */
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+@media (max-width: 900px) {
+    .explore-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 580px) {
+    .explore-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Tarjeta ── */
+.explore-grid .portfolio-card {
+    flex: none;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--white);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.explore-grid .portfolio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+.explore-grid .card-photo {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.explore-grid .card-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    display: block;
+}
+.explore-grid .card-photo.no-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.explore-grid .card-photo .initials-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--white);
+}
+.explore-grid .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+.explore-grid .card-footer-row {
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+/* ── Paginación ── */
+.pagination-wrapper {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.pagination-wrapper .page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    border: 1.5px solid var(--gray-300);
+    background: var(--white);
+    color: var(--dark);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.pagination-wrapper .page-link:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+}
+.pagination-wrapper .page-link.active {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: var(--white);
+}
+.pagination-wrapper .page-link.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* ── Estado vacío ── */
+.empty-state {
+    max-width: 400px;
+    margin: 60px auto;
+    text-align: center;
+    padding: 0 20px;
+}
+.empty-state i {
+    font-size: 3rem;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+}
+.empty-state h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-700);
+    margin-bottom: 8px;
+}
+.empty-state p {
+    font-size: 0.9rem;
+    color: var(--gray-500);
+    line-height: 1.6;
+}
+
+/* ── Navbar ── */
+.navbar.compact {
+    padding: 8px 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+/* ── Botón volver al inicio ── */
+.btn-back {
+    position: static;           
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: var(--teal);  
+    color: var(--white);
+    border: none;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: none;
+    z-index: auto;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-back:hover {
+    background: var(--teal-dark, #08a88a);
+    transform: none;
+    color: var(--white);
+    border-color: transparent;
+}

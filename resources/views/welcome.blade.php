@@ -296,7 +296,7 @@
 <footer style="min-height: 80px; display: flex; align-items: center;">
     <div class="container">
         <div class="footer-bottom">
-            <p>© 2026 Todos los derechos reservados OctopuSoft SRL.Sudamérica-Bolivia</p>
+            <p>© 2026 Todos los derechos reservados OctopuSoft SRL. Cochabamba-Bolivia</p>
         </div>
     </div>
 </footer>
