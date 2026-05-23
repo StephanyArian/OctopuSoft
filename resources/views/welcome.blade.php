@@ -84,19 +84,86 @@
     </div>
     <i class="bi bi-chevron-down" id="dropdownChevron" style="color:#0abf9e;font-size:12px;"></i>
 </button>
-                            <div class="nav-user-menu" id="userMenu">
-                                <a href="{{ url('/') }}"><i class="bi bi-house-fill"></i> Inicio</a>
-                                <a href="{{ route('dashboard') }}"><i class="bi bi-display-fill"></i> Mi espacio</a>
-                                <a href="{{ route('informacion.academica') }}"><i class="bi bi-pencil-fill"></i> Completar</a>
-                                <a href="{{ route('preview') }}"><i class="bi bi-eye-fill"></i> Ver perfil</a>
-                                <a href="{{ route('profile.edit') }}"><i class="bi bi-gear-fill"></i> Configuración</a>
-                                <a href="{{ route('cerrar.sesion') }}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
-                            </div>
+                            <div class="nav-user-menu" id="userMenu" style="background:white; border-radius:16px; border:2px solid #a855f7; box-shadow:0 0 20px rgba(168,85,247,0.25); min-width:200px; padding:8px; display:flex; flex-direction:column; gap:6px;">
+
+    <a href="{{ url('/') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-house-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Inicio
+    </a>
+
+    <a href="{{ route('dashboard') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-display-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Mi espacio
+    </a>
+
+    <a href="{{ route('informacion.academica') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-pencil-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Completar
+    </a>
+
+    <a href="{{ route('preview') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-eye-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Ver perfil
+    </a>
+
+    <a href="{{ route('profile.edit') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-gear-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Configuración
+    </a>
+
+    <a href="{{ route('cerrar.sesion') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#e53e3e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#f87171,#dc2626) border-box;box-shadow:0 2px 8px rgba(229,62,62,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(229,62,62,0.3)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(229,62,62,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#f87171,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-box-arrow-right" style="color:white;"></i>
+        </div>
+        Cerrar sesión
+    </a>
+
+</div>
+
                         </div>
-                    @else
-                        <a href="{{ route('login') }}" class="btn-outline-nav">Iniciar sesión</a>
-                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
-                    @endauth
+        @else
+            <a href="{{ route('login') }}" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+                    <i class="bi bi-box-arrow-in-right" style="font-size:20px;color:#2d0a1e;"></i>
+                </div>
+                <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Iniciar sesión</span>
+            </a>
+
+            <a href="{{ route('register') }}" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+                    <i class="bi bi-person-plus-fill" style="font-size:20px;color:#2d0a1e;"></i>
+                </div>
+                <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Registrarse</span>
+            </a>
+        @endauth
                 @endif
             </div>
         </div>
