@@ -328,9 +328,11 @@
                 @endif
 
                 @if($user->biography)
-                <div class="contact-row">
-                    <i class="fas fa-quote-left"></i>
-                    <span>{{ $user->biography }}</span>
+                <div class="contact-row" style="align-items: flex-start;">
+                    <i class="fas fa-quote-left" style="margin-top: 4px;"></i>
+                    <div class="ql-snow" style="width: 100%;">
+                        <div class="ql-editor" style="padding: 0; min-height: 0; font-family: inherit;">{!! strip_tags($user->biography, $allowedHtmlTags) !!}</div>
+                    </div>
                 </div>
                 @endif
             </div>

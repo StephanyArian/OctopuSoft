@@ -40,7 +40,7 @@
             </div>
 
             <p class="card-bio">
-                {{ Str::limit($portfolio->user->biography ?? 'Sin biografía', 80) }}
+                {{ Str::limit(strip_tags($portfolio->user->biography ?? 'Sin biografía'), 80) }}
             </p>
 
             {{-- Tags de habilidades --}}

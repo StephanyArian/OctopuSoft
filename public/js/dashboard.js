@@ -104,7 +104,7 @@
             // Validación de BIOGRAFÍA
             const bio = document.getElementById('bio').value;
             const bioError = document.getElementById('bioError');
-            if (bio.length > 500) {
+            if (bio.length > 5000) {
                 bioError.classList.remove('hidden');
                 isValid = false;
             } else {
@@ -185,4 +185,65 @@
                 lightbox.classList.add('active');
             }
         }
+        
+        // Inicializar Quill para biografía
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Quill === 'undefined') return;
+            const qc = document.getElementById('quillEditor');
+            if (!qc) return;
+
+            const Font = Quill.import('formats/font');
+            Font.whitelist = ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'];
+            Quill.register(Font, true);
+
+            const quill = new Quill('#quillEditor', {
+                theme: 'snow',
+                placeholder: 'Escribe una breve presentación sobre ti, tu experiencia y lo que te apasiona profesionalmente...',
+                modules: {
+                    toolbar: [
+                        [{ 'font': ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'] }, { 'size': [] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'script': 'super' }, { 'script': 'sub' }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
+                        [{ 'align': [] }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+
+            const inputBio = document.getElementById('bio');
+            const contadorBio = document.getElementById('contadorBio');
+            let lastValidHtml = quill.root.innerHTML;
+
+            function actualizarContador() {
+                const currentText = quill.getText();
+                const length = currentText.length > 0 ? currentText.length - 1 : 0;
+                if (contadorBio) contadorBio.textContent = length + '/5000 caracteres';
+                if (length > 5000) {
+                    if (contadorBio) contadorBio.style.color = '#ef4444';
+                } else {
+                    if (contadorBio) contadorBio.style.color = '#94a3b8';
+                }
+            }
+
+            quill.on('text-change', function() {
+                const currentText = quill.getText();
+                const length = currentText.length > 0 ? currentText.length - 1 : 0;
+                if (length > 5000) {
+                    const selection = quill.getSelection();
+                    quill.root.innerHTML = lastValidHtml;
+                    if (selection) {
+                        quill.setSelection(selection.index, 0);
+                    }
+                } else {
+                    lastValidHtml = quill.root.innerHTML;
+                    if (inputBio) inputBio.value = quill.root.innerHTML;
+                }
+                actualizarContador();
+            });
+
+            actualizarContador();
+        });
     
