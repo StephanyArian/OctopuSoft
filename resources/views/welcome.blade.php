@@ -154,7 +154,7 @@
                                     <span class="card-profession-extra">+{{ $extraSkills }} más</span>
                                 @endif
                             </div>
-                            <p class="card-bio">{{ Str::limit($portfolio->user->biography ?? 'Sin biografía', 80) }}</p>
+                            <p class="card-bio">{{ Str::limit(strip_tags($portfolio->user->biography ?? 'Sin biografía'), 80) }}</p>
                             <div class="card-tags">
                                 @foreach($portfolio->user->skills->where('type', 'technical')->take(3) as $skill)
                                     <span class="card-tag">{{ $skill->name }}</span>

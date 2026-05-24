@@ -1,12 +1,14 @@
 <x-app-layout>
     
 
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/skills.css') }}">
-
-
-    
+    <style>
+        .ql-editor { font-family: 'Arial', sans-serif; }
+    </style>
 
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -118,9 +120,13 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Biografía profesional</label>
-                                        <textarea class="form-textarea" id="bio" name="bio" placeholder="Escribe una breve presentación sobre ti, tu experiencia y lo que te apasiona profesionalmente..." maxlength="500">{{ old('bio', $user->biography) }}</textarea>
-                                        <div id="bioError" class="error-message hidden">La biografía no puede exceder los 500 caracteres</div>
-                                        <span class="text-xs text-gray-400 mt-1">Máximo 500 caracteres</span>
+                                        <div class="textarea-wrapper" style="position: relative;">
+                                            <div id="quillEditor" style="min-height:120px;background:white;border-radius:12px;">{!! old('bio', $user->biography) !!}</div>
+                                            <textarea id="bio" name="bio" style="display:none;">{{ old('bio', $user->biography) }}</textarea>
+                                            <span class="word-count" id="contadorBio" style="display:block; text-align:left; font-size:12px; color:#94a3b8; margin-top:4px;">0/5000 caracteres</span>
+                                        </div>
+                                        <div id="bioError" class="error-message hidden">La biografía no puede exceder los 5000 caracteres</div>
+                                        <span class="text-xs text-gray-400 mt-1">Máximo 5000 caracteres</span>
                                     </div>
                                 </div>
                                 
