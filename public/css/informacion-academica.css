@@ -580,7 +580,7 @@
        border-color: var(--teal);
        box-shadow: 0 0 0 3px rgba(10, 191, 158, 0.1);
    }
-   
+
 .alert-skill {
     display: flex; align-items: flex-start; gap: 10px;
     padding: 12px 16px; border-radius: 12px;
@@ -890,4 +890,89 @@
     font-size: 11px;
     margin-top: 4px;
     font-weight: 500;
+}
+
+/* Estilos para el editor Quill */
+.ql-editor {
+    min-height: 150px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.ql-toolbar.ql-snow {
+    border-radius: 12px 12px 0 0;
+    border-color: var(--gray-100);
+}
+
+.ql-container.ql-snow {
+    border-radius: 0 0 12px 12px;
+    border-color: var(--gray-100);
+    font-family: inherit;
+}
+
+.ql-editor.ql-blank::before {
+    color: var(--gray-500);
+    font-style: normal;
+}
+
+/* Estilos para el editor Quill con más opciones */
+.ql-editor {
+    min-height: 150px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+/* Opciones de fuente */
+.ql-snow .ql-picker.ql-font .ql-picker-label::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+    content: "Normal";
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="monospace"]::before {
+    content: "Monospace";
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="serif"]::before {
+    content: "Serif";
+}
+
+/* Opciones de tamaño */
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before {
+    content: "Pequeño";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before {
+    content: "Grande";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before {
+    content: "Muy grande";
+}
+
+/* Toolbar más compacto */
+.ql-toolbar.ql-snow {
+    border-radius: 12px 12px 0 0;
+    border-color: var(--gray-100);
+    padding: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.ql-container.ql-snow {
+    border-radius: 0 0 12px 12px;
+    border-color: var(--gray-100);
+    font-family: inherit;
+}
+
+/* Selectores de color más visibles */
+.ql-color .ql-picker-options,
+.ql-background .ql-picker-options {
+    width: 180px;
+}
+
+.ql-color .ql-picker-item,
+.ql-background .ql-picker-item {
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    border-radius: 4px;
 }

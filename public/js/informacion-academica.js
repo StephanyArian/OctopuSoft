@@ -2,7 +2,96 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Script de información académica cargado');
     
     // ==========================================
-    // CONTADOR DE DESCRIPCIÓN
+    // INICIALIZAR EDITOR QUILL PARA DESCRIPCIÓN
+    // ==========================================
+    const editorElement = document.getElementById('editorDescripcion');
+    if (editorElement && typeof Quill !== 'undefined') {
+        console.log('✓ Inicializando Quill editor');
+        
+        // Crear el editor
+        const quillDescripcion = new Quill('#editorDescripcion', {
+            theme: 'snow',
+            placeholder: 'Describe brevemente tus logros, materias destacadas o proyectos en esta formación...',
+            modules: {
+                toolbar: [
+                    [{ 'font': [] }],
+                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'align': [] }],
+                    ['link', 'clean']
+                ]
+            }
+        });
+
+        // Sincronizar Quill con el textarea hidden
+        const descripcionHidden = document.getElementById('descripcionHidden');
+        const descripcionCounter = document.getElementById('descripcionCounter');
+        const descripcionError = document.getElementById('descripcionError');
+
+        // Cargar contenido existente si hay
+        if (descripcionHidden && descripcionHidden.value) {
+            quillDescripcion.root.innerHTML = descripcionHidden.value;
+        }
+
+        // Función para actualizar contador y validar
+        function actualizarDescripcion() {
+            const html = quillDescripcion.root.innerHTML;
+            const text = quillDescripcion.getText();
+            const longitud = text.length;
+            
+            // Actualizar hidden
+            if (descripcionHidden) {
+                descripcionHidden.value = html;
+            }
+            
+            // Actualizar contador
+            if (descripcionCounter) {
+                descripcionCounter.textContent = `${longitud} / 500`;
+                
+                if (longitud > 500) {
+                    descripcionCounter.style.color = '#e74c3c';
+                    descripcionCounter.style.fontWeight = 'bold';
+                    if (descripcionError) descripcionError.classList.remove('hidden');
+                } else if (longitud >= 490) {
+                    descripcionCounter.style.color = '#f39c12';
+                    if (descripcionError) descripcionError.classList.add('hidden');
+                } else {
+                    descripcionCounter.style.color = '#6c757d';
+                    if (descripcionError) descripcionError.classList.add('hidden');
+                }
+            }
+        }
+
+        // Escuchar cambios en Quill
+        quillDescripcion.on('text-change', function() {
+            actualizarDescripcion();
+        });
+
+        // Inicializar contador
+        actualizarDescripcion();
+
+        // 🔥 IMPORTANTE: Al enviar el formulario, asegurar que el hidden input esté actualizado
+        const form = document.getElementById('academicForm');
+        if (form) {
+            form.addEventListener('submit', function() {
+                if (quillDescripcion) {
+                    const html = quillDescripcion.root.innerHTML;
+                    if (descripcionHidden) {
+                        descripcionHidden.value = html;
+                        console.log('Enviando descripción, longitud:', html.length);
+                    }
+                }
+            });
+        }
+    } else {
+        console.warn('⚠️ Editor Quill no encontrado o Quill no está cargado');
+    }
+    
+    // ==========================================
+    // CONTADOR DE DESCRIPCIÓN (solo por si hay textarea)
     // ==========================================
     const textareaDescripcion = document.getElementById('descripcion');
     const contadorDescripcion = document.getElementById('descripcionCounter');
@@ -28,8 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         textareaDescripcion.addEventListener('input', actualizarContadorDescripcion);
         actualizarContadorDescripcion();
-    } else {
-        console.error('✗ No se encontró el textarea o contador de descripción');
     }
     
     // ==========================================
@@ -56,6 +143,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const fechaFin = document.getElementById('fechaFin');
         if (fechaFin) fechaFin.disabled = false;
+        
+        // Resetear Quill si existe
+        if (window.quillDescripcion) {
+            window.quillDescripcion.root.innerHTML = '';
+            const descripcionHidden = document.getElementById('descripcionHidden');
+            if (descripcionHidden) descripcionHidden.value = '';
+            const descripcionCounter = document.getElementById('descripcionCounter');
+            if (descripcionCounter) {
+                descripcionCounter.textContent = '0 / 500';
+                descripcionCounter.style.color = '#6c757d';
+            }
+        }
         
         if (textareaDescripcion && contadorDescripcion) {
             contadorDescripcion.textContent = '0 / 500';

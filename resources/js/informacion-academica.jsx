@@ -340,8 +340,84 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
     const [formaciones, setFormaciones] = useState(initialFormaciones);
     const [editando, setEditando] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
+    const quillInstances = useRef({}); // Para guardar instancias de Quill
 
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    // ==========================================
+    // INICIALIZAR QUILL CUANDO SE ENTRA EN MODO EDICIÓN
+    // ==========================================
+    useEffect(() => {
+        if (editando && typeof window !== 'undefined' && window.Quill) {
+            // Limpiar instancia anterior si existe
+            if (quillInstances.current[editando]) {
+                delete quillInstances.current[editando];
+            }
+            
+            setTimeout(() => {
+                const editorId = `editorDescripcionEdit_${editando}`;
+                const editorElement = document.getElementById(editorId);
+                const hiddenInput = document.getElementById(`descripcionHidden_${editando}`);
+                const counterElement = document.getElementById(`descripcionCounter_${editando}`);
+                
+                if (editorElement && !editorElement.querySelector('.ql-editor')) {
+                    try {
+                        const quill = new window.Quill(`#${editorId}`, {
+                            theme: 'snow',
+                            placeholder: 'Describe brevemente tus logros, materias destacadas o proyectos...',
+                            modules: {
+                                toolbar: [
+                                    [{ 'font': [] }],
+                                    [{ 'size': ['small', false, 'large', 'huge'] }],
+                                    ['bold', 'italic', 'underline', 'strike'],
+                                    [{ 'color': [] }, { 'background': [] }],
+                                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                                    [{ 'align': [] }],
+                                    ['link', 'clean']
+                                ]
+                            }
+                        });
+                        
+                        // Guardar instancia
+                        quillInstances.current[editando] = quill;
+                        
+                        // Cargar contenido existente
+                        if (hiddenInput && hiddenInput.value) {
+                            quill.root.innerHTML = hiddenInput.value;
+                        }
+                        
+                        // Función para actualizar
+                        const actualizarDescripcion = () => {
+                            const html = quill.root.innerHTML;
+                            const text = quill.getText();
+                            const longitud = text.length;
+                            
+                            if (hiddenInput) hiddenInput.value = html;
+                            
+                            if (counterElement) {
+                                counterElement.textContent = `${longitud} / 500`;
+                                if (longitud > 500) {
+                                    counterElement.style.color = '#e74c3c';
+                                } else if (longitud >= 490) {
+                                    counterElement.style.color = '#f39c12';
+                                } else {
+                                    counterElement.style.color = '#6c757d';
+                                }
+                            }
+                        };
+                        
+                        // Escuchar cambios
+                        quill.on('text-change', actualizarDescripcion);
+                        actualizarDescripcion();
+                        
+                    } catch (error) {
+                        console.error('Error inicializando Quill:', error);
+                    }
+                }
+            }, 100);
+        }
+    }, [editando]);
 
     async function eliminar(id) {
         const res = await fetch(`/informacion-academica/${id}`, {
@@ -359,6 +435,14 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
 
     async function guardarEdicion(e, id) {
         e.preventDefault();
+        
+        // Asegurar que Quill sincronice antes de guardar
+        if (quillInstances.current[id]) {
+            const quill = quillInstances.current[id];
+            const html = quill.root.innerHTML;
+            const hiddenInput = document.getElementById(`descripcionHidden_${id}`);
+            if (hiddenInput) hiddenInput.value = html;
+        }
         
         const formData = new FormData(e.target);
         formData.append('_method', 'PUT');
@@ -489,13 +573,11 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
 
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label className="form-label">Descripción</label>
-                                    <textarea 
-                                        className={`form-textarea${erroresEdicion[f.id]?.descripcion ? ' error' : ''}`}
-                                        name="descripcion" 
-                                        defaultValue={f.description || ''} 
-                                        maxLength="500" 
-                                        rows="4" 
-                                    />
+                                    <div id={`editorDescripcionEdit_${f.id}`} style={{ height: '180px', marginBottom: '45px' }}></div>
+                                    <input type="hidden" name="descripcion" id={`descripcionHidden_${f.id}`} defaultValue={f.description || ''} />
+                                    <div id={`descripcionCounter_${f.id}`} className="char-counter">
+                                        {(f.description?.length || 0)} / 500
+                                    </div>
                                     {erroresEdicion[f.id]?.descripcion && (
                                         <span className="error-message">{erroresEdicion[f.id].descripcion[0]}</span>
                                     )}
@@ -619,3 +701,4 @@ if (el) {
     const formaciones = JSON.parse(el.dataset.formaciones || '[]');
     ReactDOM.createRoot(el).render(<HistorialAcademico formaciones={formaciones} />);
 }
+

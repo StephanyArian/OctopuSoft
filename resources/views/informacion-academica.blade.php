@@ -2,6 +2,9 @@
     
     <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
  
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
  
@@ -153,10 +156,15 @@
 
                                     <div class="form-group">
                                         <label class="form-label">Descripción</label>
-                                        <textarea class="form-textarea" name="descripcion" id="descripcion" 
-                                            placeholder="Describe brevemente tus logros, materias destacadas o proyectos en esta formación..." maxlength="500">{{ old('descripcion') }}</textarea>
+                                        
+                                        {{-- Editor Quill con más opciones --}}
+                                        <div id="editorDescripcion" style="height: 200px; margin-bottom: 45px;"></div>
+                                        <textarea name="descripcion" id="descripcionHidden" style="display: none;">{{ old('descripcion') }}</textarea>
+                                        
                                         <div class="char-counter" id="descripcionCounter">0 / 500</div>
-                                    </div>
+                                        <div id="descripcionError" class="error-message hidden">La descripción no puede exceder los 500 caracteres</div>
+                                    </div> 
+                                     
                                 </div>
                                 
                                 <div class="form-group" style="margin-top: 8px;">
