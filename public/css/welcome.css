@@ -775,3 +775,123 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
     .logo h2       { font-size: 1.2rem; }
     .menu-toggle   { font-size: 1.5rem; }
 }
+
+/* ============================================
+   DROPDOWN DEL USUARIO - CORREGIDO
+   ============================================ */
+   .nav-user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.nav-user-trigger:hover {
+    background: rgba(10, 191, 158, 0.1);
+}
+
+.nav-user-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 16px;
+    min-width: 220px;
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    border: 1px solid var(--gray-100);
+}
+
+.nav-user-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Flecha decorativa del dropdown */
+.nav-user-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+    z-index: 1001;
+}
+
+/* Estilos para los enlaces del menú */
+.nav-user-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: var(--burg-deep);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border-bottom: none;
+}
+
+.nav-user-menu a:hover {
+    background: rgba(10, 191, 158, 0.08);
+    padding-left: 16px;
+}
+
+/* Iconos dentro del menú */
+.nav-user-menu .menu-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0abf9e, #1de8c0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav-user-menu .menu-icon i {
+    color: #2d0a1e;
+    font-size: 14px;
+}
+
+/* Opción de cerrar sesión con color rojo */
+.nav-user-menu .logout-item {
+    color: #e53e3e;
+}
+
+.nav-user-menu .logout-item .menu-icon {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.nav-user-menu .logout-item .menu-icon i {
+    color: white;
+}
+
+.nav-user-menu .logout-item:hover {
+    background: rgba(229, 62, 62, 0.08);
+}
+
+/* Icono de chevron animado */
+#dropdownChevron {
+    transition: transform 0.2s ease;
+}
