@@ -7,24 +7,28 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet">
+
+    {{-- FontAwesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
     <link rel="stylesheet" href="{{ asset('css/explore.css') }}">
 </head>
+
 <body>
 
     {{-- NAVBAR --}}
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <a href="{{ route('home') }}" style="text-decoration:none">
+                <a href="{{ route('home') }}" style="text-decoration: none;">
                     <h2>DevFolio</h2>
                 </a>
             </div>
-            
+
             <a href="{{ route('home') }}" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Volver al inicio
+                <i class="fas fa-arrow-left"></i>
+                Volver al inicio
             </a>
         </div>
     </nav>
@@ -33,89 +37,299 @@
     <div class="explore-body">
         <div class="explore-container">
 
-            {{-- Buscador sticky --}}
+            {{-- BUSCADOR + LIMPIAR FILTROS --}}
             <div class="search-sticky-wrapper">
-                <div class="search-bar-row">
-                    <i class="fas fa-search"></i>
-                    <input
-                        type="text"
-                        id="searchRepo"
-                        maxlength="50"
-                        placeholder="Buscar por nombre, tecnología o rol..."
-                    >
+                <div class="search-actions-row">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+
+                        <input
+                            type="text"
+                            id="searchRepo"
+                            value="{{ request('search') }}"
+                            placeholder="Buscar por nombre, tecnología o rol..."
+                            autocomplete="off"
+                            maxlength="50"
+                        >
+                    </div>
+
+                    <button type="button" id="btnClearFilters" class="btn-clear-inline">
+                        Limpiar filtros
+                    </button>
                 </div>
             </div>
 
-            {{-- Filtros --}}
+            {{-- FILTROS --}}
             <div class="filter-container">
                 <div class="filters-row">
-                    <select id="filterCategory">
-                        <option value="">Todas las categorías</option>
-                        @foreach($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
 
-                    <select id="filterSkills">
-                        <option value="">Todas las tecnologías</option>
-                        @foreach($skills as $skill)
-                            <option value="{{ $skill->name }}">{{ $skill->name }}</option>
-                        @endforeach
-                    </select>
+                    {{-- Categorías --}}
+<div class="custom-dropdown" id="categoryDropdown">
+    <button type="button" class="custom-dropdown-btn" id="categoryDropdownBtn">
+        <span id="categoryDropdownText">Categorías</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
 
-                    <select id="filterSort">
-                        <option value="desc">Más recientes</option>
-                        <option value="asc">Más antiguos</option>
-                    </select>
+    <div class="custom-dropdown-menu" id="categoryDropdownMenu">
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="category"
+                value=""
+                {{ request('category') ? '' : 'checked' }}
+            >
+            <span>Categorías</span>
+        </label>
 
-                    <button id="btnClearFilters" class="btn-clean">Limpiar filtros</button>
+        @foreach($categories as $cat)
+            <label class="custom-option">
+                <input
+                    type="radio"
+                    name="category"
+                    value="{{ $cat->id }}"
+                    {{ request('category') == $cat->id ? 'checked' : '' }}
+                >
+                <span>{{ $cat->name }}</span>
+            </label>
+        @endforeach
+    </div>
+</div>
+
+{{-- Tecnologías múltiples --}}
+<div class="custom-dropdown" id="skillsDropdown">
+    <button type="button" class="custom-dropdown-btn" id="skillsDropdownBtn">
+        <span id="skillsDropdownText">Tecnologías</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="custom-dropdown-menu" id="skillsDropdownMenu">
+
+        <label class="custom-option custom-option-reset" id="clearSkillsOption">
+            <input type="button" value="">
+            <span>Tecnologías</span>
+        </label>
+
+        @foreach($skills as $skill)
+            <label class="custom-option">
+                <input
+                    type="checkbox"
+                    name="skills[]"
+                    value="{{ $skill->name }}"
+                    {{ in_array($skill->name, request('skills', [])) ? 'checked' : '' }}
+                >
+                <span>{{ $skill->name }}</span>
+            </label>
+        @endforeach
+    </div>
+</div>
+
+{{-- Proyectos --}}
+<div class="custom-dropdown" id="projectsDropdown">
+    <button type="button" class="custom-dropdown-btn" id="projectsDropdownBtn">
+        <span id="projectsDropdownText">Proyectos</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="custom-dropdown-menu" id="projectsDropdownMenu">
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="min_projects"
+                value=""
+                {{ request('min_projects') ? '' : 'checked' }}
+            >
+            <span>Proyectos</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="min_projects"
+                value="1"
+                {{ request('min_projects') == '1' ? 'checked' : '' }}
+            >
+            <span>1 o más proyectos</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="min_projects"
+                value="3"
+                {{ request('min_projects') == '3' ? 'checked' : '' }}
+            >
+            <span>3 o más proyectos</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="min_projects"
+                value="5"
+                {{ request('min_projects') == '5' ? 'checked' : '' }}
+            >
+            <span>5 o más proyectos</span>
+        </label>
+    </div>
+</div>
+
+{{-- Idiomas --}}
+<div class="custom-dropdown" id="languageDropdown">
+    <button type="button" class="custom-dropdown-btn" id="languageDropdownBtn">
+        <span id="languageDropdownText">Idiomas</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="custom-dropdown-menu" id="languageDropdownMenu">
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="language"
+                value=""
+                {{ request('language') ? '' : 'checked' }}
+            >
+            <span>Idiomas</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="language"
+                value="Español"
+                {{ request('language') == 'Español' ? 'checked' : '' }}
+            >
+            <span>Español</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="language"
+                value="Inglés"
+                {{ request('language') == 'Inglés' ? 'checked' : '' }}
+            >
+            <span>Inglés</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="language"
+                value="Portugués"
+                {{ request('language') == 'Portugués' ? 'checked' : '' }}
+            >
+            <span>Portugués</span>
+        </label>
+    </div>
+</div>
+
+{{-- Ordenamiento --}}
+<div class="custom-dropdown" id="sortDropdown">
+    <button type="button" class="custom-dropdown-btn" id="sortDropdownBtn">
+        <span id="sortDropdownText">Más recientes</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="custom-dropdown-menu" id="sortDropdownMenu">
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="desc"
+                {{ request('sort', 'desc') == 'desc' ? 'checked' : '' }}
+            >
+            <span>Más recientes</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="asc"
+                {{ request('sort') == 'asc' ? 'checked' : '' }}
+            >
+            <span>Más antiguos</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="complete"
+                {{ request('sort') == 'complete' ? 'checked' : '' }}
+            >
+            <span>Más completos</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="projects"
+                {{ request('sort') == 'projects' ? 'checked' : '' }}
+            >
+            <span>Más proyectos</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="skills"
+                {{ request('sort') == 'skills' ? 'checked' : '' }}
+            >
+            <span>Más tecnologías</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="az"
+                {{ request('sort') == 'az' ? 'checked' : '' }}
+            >
+            <span>A-Z</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="sort"
+                value="za"
+                {{ request('sort') == 'za' ? 'checked' : '' }}
+            >
+            <span>Z-A</span>
+        </label>
+    </div>
+</div>
+
                 </div>
             </div>
 
-            {{-- Contador de resultados --}}
+            {{-- CONTADOR DE RESULTADOS --}}
             <div class="results-count">
-                <span id="totalResults">{{ $portfolios->total() }}</span> resultados encontrados
+                <span id="totalResults">{{ $portfolios->total() }}</span>
+                resultados encontrados
             </div>
 
-            {{-- Grilla --}}
+            {{-- GRILLA DE PORTAFOLIOS --}}
             <div id="portfoliosGrid" class="explore-grid">
                 @if($portfolios->isEmpty())
                     <div class="empty-state">
                         <i class="fas fa-folder-open"></i>
                         <h3>No hay portafolios aún</h3>
                         <p>Sé el primero en crear y publicar tu portafolio profesional.</p>
+
                         <br>
+
                         @if(Route::has('register'))
-                            <a href="{{ route('register') }}" class="btn-primary">Crear mi portafolio</a>
+                            <a href="{{ route('register') }}" class="btn-primary">
+                                Crear mi portafolio
+                            </a>
                         @endif
                     </div>
                 @else
                     @include('partials.portfolio_cards')
-
-                    {{-- Paginación --}}
-                    @if($portfolios->hasPages())
-                        <div class="pagination-wrapper">
-                            @if($portfolios->onFirstPage())
-                                <span class="page-link disabled"><i class="fas fa-chevron-left"></i></span>
-                            @else
-                                <a href="{{ $portfolios->previousPageUrl() }}" class="page-link"><i class="fas fa-chevron-left"></i></a>
-                            @endif
-
-                            @foreach($portfolios->getUrlRange(1, $portfolios->lastPage()) as $page => $url)
-                                @if($page == $portfolios->currentPage())
-                                    <span class="page-link active">{{ $page }}</span>
-                                @else
-                                    <a href="{{ $url }}" class="page-link">{{ $page }}</a>
-                                @endif
-                            @endforeach
-
-                            @if($portfolios->hasMorePages())
-                                <a href="{{ $portfolios->nextPageUrl() }}" class="page-link"><i class="fas fa-chevron-right"></i></a>
-                            @else
-                                <span class="page-link disabled"><i class="fas fa-chevron-right"></i></span>
-                            @endif
-                        </div>
-                    @endif
                 @endif
             </div>
 
@@ -125,15 +339,12 @@
     {{-- FOOTER --}}
     <footer>
         <div class="container">
-            
             <div class="footer-bottom">
                 <p>© 2026 Todos los derechos reservados OctopuSoft SRL. Cochabamba-Bolivia</p>
             </div>
         </div>
     </footer>
 
-
-    <script src="{{ asset('js/welcome.js') }}"></script>
     <script src="{{ asset('js/explore.js') }}"></script>
 </body>
 </html>

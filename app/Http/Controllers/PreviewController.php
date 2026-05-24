@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Portfolio;
 use App\Models\Profession;
 use App\Models\Skill;
+use Illuminate\Support\Facades\DB;
 
 class PreviewController extends Controller
 {
@@ -658,25 +659,204 @@ class PreviewController extends Controller
             }
         }
 
-        // ORDENAMIENTO
-        $sort = $request->input('sort', 'desc');
-        $sort = in_array($sort, ['asc', 'desc']) ? $sort : 'desc';
-        $query->orderBy('created_at', $sort);
+        // FILTRO POR CANTIDAD MÍNIMA DE PROYECTOS
+if ($request->filled('min_projects')) {
+    $minProjects = (int) $request->input('min_projects');
 
-        // RESPUESTA AJAX
-        if ($request->ajax()) {
-            $portfolios = $query->get();
-            return response()->json([
-                'html' => view('partials.portfolio_cards', [
-                    'portfolios' => $portfolios,
-                    'ajax' => true
-                ])->render(),
-                'count' => $portfolios->count()
-            ]);
-        }
+    if (in_array($minProjects, [1, 3, 5])) {
+        $query->whereHas('projects', function ($p) {
+            $p->where('is_visible', true);
+        }, '>=', $minProjects);
+    }
+}
 
-        $portfolios = $query->paginate(12);
+// FILTRO POR IDIOMA
+if ($request->filled('language')) {
+    $language = trim($request->input('language'));
 
-        return view('portafolio.explore', compact('portfolios', 'categories', 'skills'));
+    $query->whereHas('user.skills', function ($s) use ($language) {
+        $s->where('type', 'language')
+          ->where('is_visible', true)
+          ->where('name', $language);
+    });
+}
+
+// ORDENAMIENTO
+$sort = $request->input('sort', 'desc');
+
+switch ($sort) {
+    case 'asc':
+        $query->orderBy('portfolios.created_at', 'asc');
+        break;
+
+    case 'complete':
+        $query
+            ->addSelect([
+                'visible_projects_count' => DB::table('projects')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('projects.portfolio_id', 'portfolios.id')
+                    ->where('projects.is_visible', true),
+
+                'technical_skills_count' => DB::table('skills')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('skills.user_id', 'portfolios.user_id')
+                    ->where('skills.type', 'technical')
+                    ->where('skills.is_visible', true),
+
+                'languages_count' => DB::table('skills')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('skills.user_id', 'portfolios.user_id')
+                    ->where('skills.type', 'language')
+                    ->where('skills.is_visible', true),
+
+                'experiences_count' => DB::table('experiences')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('experiences.user_id', 'portfolios.user_id')
+                    ->where('experiences.type', 'work')
+                    ->where('experiences.is_visible', true),
+
+                'education_count' => DB::table('experiences')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('experiences.user_id', 'portfolios.user_id')
+                    ->where('experiences.type', 'education')
+                    ->where('experiences.is_visible', true),
+
+                'networks_count' => DB::table('professional_networks')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('professional_networks.user_id', 'portfolios.user_id')
+                    ->where('professional_networks.is_visible', true),
+            ])
+            ->orderByDesc(DB::raw("
+                (
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM users
+                        WHERE users.id = portfolios.user_id
+                        AND users.photo_base64 IS NOT NULL
+                        AND users.photo_base64 != ''
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM users
+                        WHERE users.id = portfolios.user_id
+                        AND users.biography IS NOT NULL
+                        AND users.biography != ''
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM users
+                        WHERE users.id = portfolios.user_id
+                        AND users.profession_id IS NOT NULL
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM skills
+                        WHERE skills.user_id = portfolios.user_id
+                        AND skills.type = 'technical'
+                        AND skills.is_visible = 1
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM projects
+                        WHERE projects.portfolio_id = portfolios.id
+                        AND projects.is_visible = 1
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM professional_networks
+                        WHERE professional_networks.user_id = portfolios.user_id
+                        AND professional_networks.is_visible = 1
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM experiences
+                        WHERE experiences.user_id = portfolios.user_id
+                        AND experiences.type = 'work'
+                        AND experiences.is_visible = 1
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM experiences
+                        WHERE experiences.user_id = portfolios.user_id
+                        AND experiences.type = 'education'
+                        AND experiences.is_visible = 1
+                    ) THEN 1 ELSE 0 END
+                    +
+                    CASE WHEN EXISTS (
+                        SELECT 1 FROM skills
+                        WHERE skills.user_id = portfolios.user_id
+                        AND skills.type = 'language'
+                        AND skills.is_visible = 1
+                    ) THEN 1 ELSE 0 END
+                )
+            "))
+            ->orderBy('portfolios.created_at', 'desc');
+        break;
+
+    case 'projects':
+        $query
+            ->addSelect([
+                'visible_projects_count' => DB::table('projects')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('projects.portfolio_id', 'portfolios.id')
+                    ->where('projects.is_visible', true),
+            ])
+            ->orderByDesc('visible_projects_count')
+            ->orderBy('portfolios.created_at', 'desc');
+        break;
+
+    case 'skills':
+        $query
+            ->addSelect([
+                'technical_skills_count' => DB::table('skills')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('skills.user_id', 'portfolios.user_id')
+                    ->where('skills.type', 'technical')
+                    ->where('skills.is_visible', true),
+            ])
+            ->orderByDesc('technical_skills_count')
+            ->orderBy('portfolios.created_at', 'desc');
+        break;
+
+    case 'az':
+        $query
+            ->join('users', 'users.id', '=', 'portfolios.user_id')
+            ->orderBy('users.first_name', 'asc')
+            ->orderBy('users.last_name', 'asc')
+            ->select('portfolios.*');
+        break;
+
+    case 'za':
+        $query
+            ->join('users', 'users.id', '=', 'portfolios.user_id')
+            ->orderBy('users.first_name', 'desc')
+            ->orderBy('users.last_name', 'desc')
+            ->select('portfolios.*');
+        break;
+
+    case 'desc':
+    default:
+        $query->orderBy('portfolios.created_at', 'desc');
+        break;
+}
+
+// PAGINACIÓN
+$portfolios = $query->paginate(12)->appends($request->query());
+
+// RESPUESTA AJAX: solo cuando venga desde fetch()
+if (
+    $request->header('X-Requested-With') === 'XMLHttpRequest'
+    && $request->expectsJson()
+) {
+    return response()->json([
+        'html' => view('partials.portfolio_cards', [
+            'portfolios' => $portfolios,
+            'ajax' => true
+        ])->render(),
+        'count' => $portfolios->total()
+    ]);
+}
+
+// RESPUESTA NORMAL: cuando entras o vuelves desde un portafolio
+return view('portafolio.explore', compact('portfolios', 'categories', 'skills'));
     }
 }
