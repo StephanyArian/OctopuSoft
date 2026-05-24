@@ -657,39 +657,36 @@ function ExperienciaLaboral({ experiencias, setExperiencias }) {
     }
 
     function handleGuardado(actualizados, idsEliminados, payloadLocal) {
-        setExperiencias(prev => {
-            // 1. Quitar los eliminados
-            let siguiente = prev.filter(e => !idsEliminados.has(e.id));
+        console.log('actualizados:', actualizados);
+    console.log('idsEliminados:', idsEliminados);
+    console.log('payloadLocal:', payloadLocal);
+      setExperiencias(prev => {
+        let siguiente = prev.filter(e => !idsEliminados.has(e.id));
 
-            // 2. Actualizar los existentes
-            siguiente = siguiente.map(e => {
-                const match = actualizados.find(a => a.id === e.id);
-                if (match) return match;
+        siguiente = siguiente.map(e => {
+            const match = actualizados.find(a => String(a.id) === String(e.id)); // ← fix
+            if (match) return match;
 
-                // Si el servidor no devolvió este id en `actualizados` pero sí
-                // estaba en el grupo editado, forzar los campos compartidos
-                // (description, institution, location, fechas) desde payloadLocal.
-                if (payloadLocal && payloadLocal.idsGrupo && payloadLocal.idsGrupo.has(e.id)) {
-                    return {
-                        ...e,
-                        description:  payloadLocal.descripcion   ?? e.description,
-                        institution:  payloadLocal.empresa        ?? e.institution,
-                        location:     payloadLocal.location       ?? e.location,
-                        start_date:   payloadLocal.start_date     ?? e.start_date,
-                        end_date:     payloadLocal.end_date       ?? e.end_date,
-                        is_current:   payloadLocal.is_current     ?? e.is_current,
-                    };
-                }
-                return e;
-            });
-
-            // 3. Agregar nuevos
-            const idsExistentes = new Set(prev.map(e => e.id));
-            const nuevos = actualizados.filter(a => !idsExistentes.has(a.id));
-            return [...siguiente, ...nuevos];
+            if (payloadLocal?.idsGrupo?.has(e.id)) {
+                return {
+                    ...e,
+                    description: payloadLocal.descripcion ?? e.description,
+                    institution: payloadLocal.empresa     ?? e.institution,
+                    location:    payloadLocal.location    ?? e.location,
+                    start_date:  payloadLocal.start_date  ?? e.start_date,
+                    end_date:    payloadLocal.end_date    ?? e.end_date,
+                    is_current:  payloadLocal.is_current  ?? e.is_current,
+                };
+            }
+            return e;
         });
-        setEditandoGrupo(null);
-    }
+
+        const idsExistentes = new Set(prev.map(e => String(e.id))); // ← fix
+        const nuevos = actualizados.filter(a => !idsExistentes.has(String(a.id))); // ← fix
+        return [...siguiente, ...nuevos];
+    });
+    setEditandoGrupo(null);
+}
 
     const grupos = agruparExperiencias(experiencias);
 
@@ -790,29 +787,36 @@ function ExperienciaLaboral({ experiencias, setExperiencias }) {
 }
 
 /* ── Bootstrap ─────────────────────────────────────────── */
+/* ── Bootstrap ─────────────────────────────────────────── */
 const el = document.getElementById('historial-laboral-react');
 if (el) {
     const STORAGE_KEY = 'exp_laboral_state';
 
-    /* Leer datos: preferir sessionStorage (estado más reciente) sobre el HTML */
     function getDatos() {
         try {
             const saved = sessionStorage.getItem(STORAGE_KEY);
-            if (saved) return JSON.parse(saved);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                const fromHTML = JSON.parse(el.dataset.experiencias || '[]');
+                if (fromHTML.length > parsed.length) return fromHTML;
+                return parsed;
+            }
         } catch (_) {}
         return JSON.parse(el.dataset.experiencias || '[]');
     }
 
     const root = ReactDOM.createRoot(el);
 
-    /* Wrapper que intercepta cambios de estado para persistirlos */
     function AppWrapper() {
         const [experiencias, setExperiencias] = React.useState(getDatos);
 
         function setYGuardar(fn) {
             setExperiencias(prev => {
                 const next = typeof fn === 'function' ? fn(prev) : fn;
-                try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch (_) {}
+                try {
+                    sessionStorage.removeItem(STORAGE_KEY);
+                    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+                } catch (_) {}
                 return next;
             });
         }
@@ -825,7 +829,6 @@ if (el) {
 
     root.render(<AppWrapper />);
 
-    /* También cubrir el bfcache por si acaso */
     window.addEventListener('pageshow', function (e) {
         if (e.persisted) root.render(<AppWrapper />);
     });

@@ -74,10 +74,7 @@
 
                     <div class="main">
 
-                        {{-- Mensaje de éxito --}}
-                        @if(session('success'))
-                            <div class="success-message">{{ session('success') }}</div>
-                        @endif
+                        
 
                         <div class="page-title">Experiencia laboral</div>
 
@@ -89,7 +86,10 @@
                             <form id="experienciaForm" action="{{ route('experiencia.laboral.store') }}" method="POST">
                                 @csrf
                                 <div class="form-grid">
-
+                                    {{-- Mensaje de éxito --}}
+                                    @if(session('success'))
+                                        <div class="success-message">{{ session('success') }}</div>
+                                    @endif
                                     {{-- Empresa --}}
                                     <div class="form-row">
                                         <div class="form-group">
