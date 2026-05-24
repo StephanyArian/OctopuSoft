@@ -76,36 +76,11 @@
             <h1>{{ $user->first_name ?? 'Usuario' }} {{ $user->last_name ?? '' }}</h1>
             <div class="title">{{ $user->profession->name ?? 'Profesional' }}</div>
 
-<<<<<<< HEAD
-                    @if($redes['correo'])
-                    <div class="contact-row">
-                        <i class="fas fa-envelope"></i>
-                        <span>{{ $redes['correo'] }}</span>
-                    </div>
-                    @endif
-
-                    @if($redes['whatsapp'])
-                    <div class="contact-row">
-                        <i class="fab fa-whatsapp"></i>
-                        <span>{{ $redes['whatsapp'] }}</span>
-                    </div>
-                    @endif
-
-                    @if($user->biography)
-                    <div class="contact-row" style="align-items: flex-start;">
-                        <i class="fas fa-quote-left" style="margin-top: 4px;"></i>
-                        <div class="ql-snow" style="width: 100%;">
-                            <div class="ql-editor" style="padding: 0; min-height: 0; font-family: inherit;">{!! strip_tags($user->biography, $allowedHtmlTags) !!}</div>
-                        </div>
-                    </div>
-                    @endif
-=======
             <div class="profile-contact-list">
                 @if($user->city || $user->country)
                 <div class="contact-row">
                     <i class="fas fa-map-marker-alt"></i>
                     <span>{{ $user->city ?? '' }}{{ $user->country ? ', ' . $user->country : '' }}</span>
->>>>>>> 7737f7f775f9bbd5d259b0977561df52dc859637
                 </div>
                 @endif
 
@@ -124,9 +99,11 @@
                 @endif
 
                 @if($user->biography)
-                <div class="contact-row">
-                    <i class="fas fa-quote-left"></i>
-                    <span>{{ $user->biography }}</span>
+                <div class="contact-row" style="align-items: flex-start;">
+                    <i class="fas fa-quote-left" style="margin-top: 4px;"></i>
+                    <div class="ql-snow" style="width: 100%;">
+                        <div class="ql-editor" style="padding: 0; min-height: 0; font-family: inherit;">{!! strip_tags($user->biography, $allowedHtmlTags) !!}</div>
+                    </div>
                 </div>
                 @endif
             </div>
