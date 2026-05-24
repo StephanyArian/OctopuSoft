@@ -36,7 +36,8 @@
     position: sticky; 
     top: 72px; 
     height: calc(100vh - 72px); 
-    overflow-y: auto; 
+    overflow-y: auto;
+    scrollbar-gutter: stable; 
     align-self: flex-start; 
     width: 240px !important;
     min-width: 240px !important;
@@ -46,6 +47,16 @@
     background: var(--burg-deep);
     border-right: none;
     padding: 20px 0;
+}
+
+.sidebar.sidebar-restoring {
+    background: var(--burg-deep);
+}
+
+.sidebar.sidebar-restoring .sidebar-profile,
+.sidebar.sidebar-restoring .sidebar-item,
+.sidebar.sidebar-restoring .sidebar-footer-actions {
+    opacity: 0;
 }
 .sidebar-item { padding: 12px 20px; font-size: 13px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.6) !important; transition: all .3s ease; font-weight: 500; text-decoration: none; }
 .sidebar-item:hover { background: rgba(255,255,255,.08) !important; color: white !important; }

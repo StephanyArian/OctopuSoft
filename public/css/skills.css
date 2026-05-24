@@ -732,3 +732,17 @@
     background: linear-gradient(135deg, var(--teal-light), var(--teal));
     color: var(--burg-deep) !important;
 }
+
+.sidebar {
+    scrollbar-gutter: stable;
+}
+
+.sidebar.sidebar-restoring {
+    background: var(--burg-deep);
+}
+
+.sidebar.sidebar-restoring .sidebar-profile,
+.sidebar.sidebar-restoring .sidebar-item,
+.sidebar.sidebar-restoring .sidebar-footer-actions {
+    opacity: 0;
+}

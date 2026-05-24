@@ -102,7 +102,8 @@
     position: sticky; 
     top: 72px; 
     height: calc(100vh - 72px); 
-    overflow-y: auto; 
+    overflow-y: auto;
+    scrollbar-gutter: stable;
     align-self: flex-start; 
     width: 240px !important;
     min-width: 240px !important;
@@ -110,6 +111,16 @@
     background: var(--burg-deep);
     border-right: none;
     padding: 20px 0;
+}
+
+.sidebar.sidebar-restoring {
+    background: var(--burg-deep);
+}
+
+.sidebar.sidebar-restoring .sidebar-profile,
+.sidebar.sidebar-restoring .sidebar-item,
+.sidebar.sidebar-restoring .sidebar-footer-actions {
+    opacity: 0;
 }
 
 .sidebar a,

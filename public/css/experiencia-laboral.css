@@ -98,6 +98,7 @@
     top: 72px; 
     height: calc(100vh - 72px); 
     overflow-y: auto; 
+    scrollbar-gutter: stable;
     align-self: flex-start; 
     width: 240px;
     min-width: 240px;
@@ -119,6 +120,16 @@
     position: relative;
     text-decoration: none !important;
     border-left: 3px solid transparent;
+}
+
+.sidebar.sidebar-restoring {
+    background: var(--burg-deep);
+}
+
+.sidebar.sidebar-restoring .sidebar-profile,
+.sidebar.sidebar-restoring .sidebar-item,
+.sidebar.sidebar-restoring .sidebar-footer-actions {
+    opacity: 0;
 }
 
 .sidebar-item:hover {

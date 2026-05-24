@@ -10,7 +10,7 @@
     $initial = strtoupper(substr($fullName, 0, 1));
 @endphp
 
-<div class="sidebar">
+<div class="sidebar sidebar-restoring" id="completeSidebar">
 
     <div class="sidebar-profile">
         <div class="sidebar-profile-photo">
@@ -78,3 +78,38 @@
     </div>
 
 </div>
+<script>
+(function () {
+    const sidebarScrollKey = 'devfolio_complete_sidebar_scroll';
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('completeSidebar');
+
+        if (!sidebar) return;
+
+        const savedScroll = sessionStorage.getItem(sidebarScrollKey);
+
+        if (savedScroll !== null) {
+            sidebar.scrollTop = parseInt(savedScroll, 10) || 0;
+        }
+
+        requestAnimationFrame(() => {
+            sidebar.classList.remove('sidebar-restoring');
+        });
+
+        sidebar.querySelectorAll('a.sidebar-item').forEach(link => {
+            link.addEventListener('mousedown', function () {
+                sessionStorage.setItem(sidebarScrollKey, sidebar.scrollTop);
+            });
+
+            link.addEventListener('click', function () {
+                sessionStorage.setItem(sidebarScrollKey, sidebar.scrollTop);
+            });
+        });
+
+        window.addEventListener('beforeunload', function () {
+            sessionStorage.setItem(sidebarScrollKey, sidebar.scrollTop);
+        });
+    });
+})();
+</script>
