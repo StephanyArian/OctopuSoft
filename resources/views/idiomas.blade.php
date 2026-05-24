@@ -4,10 +4,6 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        
-
-            
-
             <div class="shell">
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
@@ -17,14 +13,61 @@
                 <div class="body-row">
                     <!-- SIDEBAR -->
                     <div class="sidebar">
-                        <a href="{{ route('profile.create') }}"       class="sidebar-item">Personal</a>
-                        <a href="{{ route('experiencia.laboral') }}"  class="sidebar-item">Experiencia laboral</a>
-                        <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
-                        <a href="{{ route('skills.tecnicas') }}"      class="sidebar-item">Habilidades técnicas</a>
-                        <a href="{{ route('skills.blandas') }}"       class="sidebar-item">Habilidades blandas</a>
-                        <a href="{{ route('proyectos') }}"            class="sidebar-item">Proyectos</a>
-                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item active">Idiomas</a>
-                        <a href="{{ route('redes.index') }}"          class="sidebar-item">Redes profesionales y contacto</a>
+                        <a href="{{ route('profile.create') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+        Personal
+    </a>
+
+    <a href="{{ route('experiencia.laboral') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+        Experiencia laboral
+    </a>
+
+    <a href="{{ route('informacion.academica') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+        Información académica
+    </a>
+
+    <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+        Habilidades técnicas
+    </a>
+
+    <a href="{{ route('skills.blandas') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Habilidades blandas
+    </a>
+
+    <a href="{{ route('proyectos') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        Proyectos
+    </a>
+
+    <a href="{{ route('idiomas.index') }}" class="sidebar-item active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h4M15 9h2M9 9h2"/><path d="M2 9h20"/>
+        </svg>
+        Idiomas
+    </a>
+
+    <a href="{{ route('redes.index') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Redes profesionales y contacto
+    </a>
                     </div>
 
                     <div class="main">
@@ -126,20 +169,86 @@
                                 $nivelNombre = $nivelesNombre[$nivelLabel] ?? '';
                                 $porcentaje = ['A1'=>15,'A2'=>30,'B1'=>50,'B2'=>65,'C1'=>80,'C2'=>95,'Nativo'=>100];
                                 $pct = $porcentaje[$nivelLabel] ?? 50;
-                                $banderas = ['inglés'=>'🇬🇧','español'=>'🇧🇴','portugués'=>'🇧🇷','francés'=>'🇫🇷','alemán'=>'🇩🇪','italiano'=>'🇮🇹','chino'=>'🇨🇳','japonés'=>'🇯🇵'];
-                                $bandera = $banderas[strtolower($idioma->name)] ?? '🌐';
+
+                                // Banderas emoji para idiomas reconocidos
+                                $banderas = [
+                                    'inglés'=>'🇬🇧','ingles'=>'🇬🇧',
+                                    'español'=>'🇧🇴','espanol'=>'🇧🇴',
+                                    'portugués'=>'🇧🇷','portugues'=>'🇧🇷',
+                                    'francés'=>'🇫🇷','frances'=>'🇫🇷',
+                                    'alemán'=>'🇩🇪','aleman'=>'🇩🇪',
+                                    'italiano'=>'🇮🇹',
+                                    'chino'=>'🇨🇳',
+                                    'japonés'=>'🇯🇵','japones'=>'🇯🇵',
+                                    'coreano'=>'🇰🇷',
+                                    'árabe'=>'🇸🇦','arabe'=>'🇸🇦',
+                                    'ruso'=>'🇷🇺',
+                                    'hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
+                                    'holandés'=>'🇳🇱','holandes'=>'🇳🇱',
+                                    'sueco'=>'🇸🇪',
+                                    'noruego'=>'🇳🇴',
+                                    'danés'=>'🇩🇰','danes'=>'🇩🇰',
+                                    'polaco'=>'🇵🇱',
+                                    'turco'=>'🇹🇷',
+                                    'griego'=>'🇬🇷',
+                                    'hebreo'=>'🇮🇱',
+                                    'tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
+                                    'vietnamita'=>'🇻🇳',
+                                    'indonesio'=>'🇮🇩',
+                                    'catalán'=>'🏳️','catalan'=>'🏳️',
+                                    'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
+                                ];
+                                $bandera = $banderas[strtolower($idioma->name)] ?? null;
+
+                                // Código de idioma para mostrar en lugar de bandera si no hay emoji
+                                $codigos = [
+                                    'inglés'=>'EN','ingles'=>'EN',
+                                    'español'=>'ES','espanol'=>'ES',
+                                    'francés'=>'FR','frances'=>'FR',
+                                    'alemán'=>'DE','aleman'=>'DE',
+                                    'portugués'=>'PT','portugues'=>'PT',
+                                    'italiano'=>'IT','chino'=>'ZH',
+                                    'japonés'=>'JP','japones'=>'JP',
+                                    'coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
+                                    'ruso'=>'RU','hindi'=>'HI','indu'=>'HI',
+                                    'mandarin'=>'ZH','mandarín'=>'ZH',
+                                ];
+                                $codigo = $codigos[strtolower($idioma->name)] ?? strtoupper(substr($idioma->name, 0, 2));
+
+                                // Colores de barra por índice
+                                $coloresBarra = [
+                                    'linear-gradient(90deg,#07866e,#0abf9e)',
+                                    'linear-gradient(90deg,#1d4ed8,#3b82f6)',
+                                    'linear-gradient(90deg,#7c3aed,#a855f7)',
+                                    'linear-gradient(90deg,#b45309,#f59e0b)',
+                                    'linear-gradient(90deg,#be123c,#f43f5e)',
+                                    'linear-gradient(90deg,#0e7490,#22d3ee)',
+                                    'linear-gradient(90deg,#15803d,#4ade80)',
+                                    'linear-gradient(90deg,#9a3412,#fb923c)',
+                                ];
+                                $colorBarra = $coloresBarra[$loop->index % count($coloresBarra)];
+
+                                // Colores de fondo para el código (cuando no hay bandera)
+                                $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
+                                $colorFondo = $colorFondos[$loop->index % count($colorFondos)];
                             @endphp
 
                             <div class="idioma-card" id="idioma-{{ $idioma->id }}">
 
                                 {{-- MODO VISTA --}}
                                 <div class="idioma-vista" id="vista-{{ $idioma->id }}">
-                                    <div class="idioma-flag">{{ $bandera }}</div>
+                                    {{-- Flag o código --}}
+                                    @if($bandera)
+                                        <div class="idioma-flag">{{ $bandera }}</div>
+                                    @else
+                                        <div class="idioma-flag-code" style="background: {{ $colorFondo }};">{{ $codigo }}</div>
+                                    @endif
+
                                     <div class="idioma-info">
                                         <div class="idioma-nombre">{{ $idioma->name }}</div>
                                         <div class="idioma-nivel">{{ $nivelLabel }} — {{ $nivelNombre }}</div>
                                         <div class="nivel-bar-wrap">
-                                            <div class="nivel-bar" style="width: {{ $pct }}%"></div>
+                                            <div class="nivel-bar-custom" style="width: {{ $pct }}%; background: {{ $colorBarra }};"></div>
                                         </div>
                                     </div>
 
@@ -152,13 +261,13 @@
                                     @endif
 
                                     <div class="idioma-actions">
-                                    <button class="btn-sm" onclick="mostrarEditar({{ $idioma->id }})">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                            fill="currentColor" viewBox="0 0 16 16">
-                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                                        </svg>
-                                        Editar
-                                    </button>
+                                        <button class="btn-sm" onclick="mostrarEditar({{ $idioma->id }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                                            </svg>
+                                            Editar
+                                        </button>
                                         <button type="button" class="btn-sm danger"
                                                 onclick="openDeleteModalIdioma('{{ $idioma->id }}', '{{ addslashes($idioma->name) }}')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
@@ -205,7 +314,6 @@
                                         </div>
                                         @endif
 
-                                        
                                         <!-- Subir nueva evidencia -->
                                         <div class="form-group" style="margin-bottom:14px;">
                                             <label class="form-label">
@@ -255,19 +363,19 @@
     </div>
 
     {{-- Modal eliminar idioma --}}
-<div class="modal-backdrop" id="delete-modal-idioma">
-    <div class="modal-box">
-        <h3>Eliminar idioma</h3>
-        <p>¿Estás seguro de que deseas eliminar <strong id="modal-idioma-name"></strong>?<br>Esta acción no se puede deshacer.</p>
-        <form id="delete-form-idioma" method="POST">
-            @csrf @method('DELETE')
-            <div style="display:flex;gap:12px;justify-content:center;">
-                <button type="submit" class="btn-danger">Sí, eliminar</button>
-                <button type="button" class="btn" onclick="closeDeleteModalIdioma()">Cancelar</button>
-            </div>
-        </form>
+    <div class="modal-backdrop" id="delete-modal-idioma">
+        <div class="modal-box">
+            <h3>Eliminar idioma</h3>
+            <p>¿Estás seguro de que deseas eliminar <strong id="modal-idioma-name"></strong>?<br>Esta acción no se puede deshacer.</p>
+            <form id="delete-form-idioma" method="POST">
+                @csrf @method('DELETE')
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button type="submit" class="btn-danger">Sí, eliminar</button>
+                    <button type="button" class="btn" onclick="closeDeleteModalIdioma()">Cancelar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
     <script src="{{ asset('js/idiomas.js') }}"></script>
 </x-app-layout>

@@ -553,4 +553,93 @@ html, body { height: 100%; }
 .menu-toggle-btn {
     display: none;
 }
+/* ============================================ */
+/* MODAL DE ELIMINACIÓN (estilo imagen)         */
+/* ============================================ */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+}
+
+.modal-box h3 {
+    margin: 0 0 12px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.modal-box p {
+    margin: 0 0 20px 0;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-cancel-modal {
+    background: #d1d5db;
+    color: #374151;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel-modal:hover {
+    background: #cbd5e1;
+}
+
+/* Tooltip para botón eliminar */
+.btn-eliminar {
+    position: relative;
+}
+
+.btn-eliminar:hover::after {
+    content: "Eliminar";
+    position: absolute;
+    bottom: -25px;
+    right: 0;
+    background: #1e293b;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 10;
+}
 

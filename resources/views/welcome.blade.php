@@ -24,15 +24,42 @@
 
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">
-                <h2>DevFolio</h2>
-            </div>
+<div class="logo">
+    <h2 style="color:#0abf9e; font-weight:800; font-size:1.5rem; font-family:'Figtree',sans-serif; margin:0;">DevFolio</h2>
+</div>
 
             <div class="nav-links-center" id="navLinks">
-                <a href="#inicio" class="nav-link">Inicio</a>
-                <a href="#que-es" class="nav-link">Nuestro sistema</a>
-                <a href="#beneficios" class="nav-link">Beneficios</a>
-                <a href="#como-funciona" class="nav-link">Cómo funciona</a>
+<a href="#inicio" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 28px rgba(0,255,136,0.3);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+            <path fill="#2d0a1e" d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+            <path fill="#2d0a1e" d="M13 7.293l-5-5-5 5V14a1 1 0 0 0 1 1h3v-3h2v3h3a1 1 0 0 0 1-1z"/>
+        </svg>
+    </div>
+    <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Inicio</span>
+</a>
+
+
+<a href="#que-es" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+        <i class="bi bi-grid-fill" style="font-size:20px;color:#2d0a1e;"></i>
+    </div>
+    <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Nuestro sistema</span>
+</a>
+
+<a href="#beneficios" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+        <i class="bi bi-star-fill" style="font-size:20px;color:#2d0a1e;"></i>
+    </div>
+    <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Beneficios</span>
+</a>
+
+<a href="#como-funciona" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+        <i class="bi bi-lightning-fill" style="font-size:20px;color:#2d0a1e;"></i>
+    </div>
+    <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Cómo funciona</span>
+</a>
             </div>
 
             <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
@@ -43,23 +70,100 @@
                 @if (Route::has('login'))
                     @auth
                         <div class="nav-user-dropdown" id="userDropdown">
-                            <button class="nav-user-trigger" onclick="toggleUserMenu()">
-                                {{ Auth::user()->first_name ?? Auth::user()->name }}
-                                <i class="bi bi-chevron-down" id="dropdownChevron"></i>
-                            </button>
-                            <div class="nav-user-menu" id="userMenu">
-                                <a href="{{ url('/') }}"><i class="bi bi-house-fill"></i> Inicio</a>
-                                <a href="{{ route('dashboard') }}"><i class="bi bi-display-fill"></i> Mi espacio</a>
-                                <a href="{{ route('informacion.academica') }}"><i class="bi bi-pencil-fill"></i> Completar</a>
-                                <a href="{{ route('preview') }}"><i class="bi bi-eye-fill"></i> Ver perfil</a>
-                                <a href="{{ route('profile.edit') }}"><i class="bi bi-gear-fill"></i> Configuración</a>
-                                <a href="{{ route('cerrar.sesion') }}"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
-                            </div>
+                            <button class="nav-user-trigger" onclick="toggleUserMenu()" style="background:transparent;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:8px;">
+    <div style="position:relative;">
+        @if(Auth::user()->photo_base64)
+            <img src="{{ Auth::user()->photo_base64 }}" 
+                 style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:2.5px solid #0abf9e;box-shadow:0 0 12px rgba(10,191,158,0.6),0 0 24px rgba(0,255,136,0.25);">
+        @else
+            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);display:flex;align-items:center;justify-content:center;border:2.5px solid #0abf9e;box-shadow:0 0 12px rgba(10,191,158,0.6),0 0 24px rgba(0,255,136,0.25);font-weight:800;font-size:1.1rem;color:#2d0a1e;">
+                {{ strtoupper(substr(Auth::user()->first_name ?? Auth::user()->name, 0, 1)) }}
+            </div>
+        @endif
+        <div style="position:absolute;bottom:1px;right:1px;width:12px;height:12px;background:#00ff88;border-radius:50%;border:2px solid #2d0a1e;"></div>
+    </div>
+    <i class="bi bi-chevron-down" id="dropdownChevron" style="color:#0abf9e;font-size:12px;"></i>
+</button>
+                            <div class="nav-user-menu" id="userMenu" style="background:white; border-radius:16px; border:2px solid #a855f7; box-shadow:0 0 20px rgba(168,85,247,0.25); min-width:200px; padding:8px; display:flex; flex-direction:column; gap:6px;">
+
+    <a href="{{ url('/') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-house-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Inicio
+    </a>
+
+    <a href="{{ route('dashboard') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-display-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Mi espacio
+    </a>
+
+    <a href="{{ route('informacion.academica') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-pencil-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Completar
+    </a>
+
+    <a href="{{ route('preview') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-eye-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Ver perfil
+    </a>
+
+    <a href="{{ route('profile.edit') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-gear-fill" style="color:#2d0a1e;"></i>
+        </div>
+        Configuración
+    </a>
+
+    <a href="{{ route('cerrar.sesion') }}"
+    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#e53e3e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#f87171,#dc2626) border-box;box-shadow:0 2px 8px rgba(229,62,62,0.15);"
+    onmouseover="this.style.boxShadow='0 4px 16px rgba(229,62,62,0.3)'"
+    onmouseout="this.style.boxShadow='0 2px 8px rgba(229,62,62,0.15)'">
+        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#f87171,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="bi bi-box-arrow-right" style="color:white;"></i>
+        </div>
+        Cerrar sesión
+    </a>
+
+</div>
+
                         </div>
-                    @else
-                        <a href="{{ route('login') }}" class="btn-outline-nav">Iniciar sesión</a>
-                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
-                    @endauth
+        @else
+            <a href="{{ route('login') }}" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+                    <i class="bi bi-box-arrow-in-right" style="font-size:20px;color:#2d0a1e;"></i>
+                </div>
+                <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Iniciar sesión</span>
+            </a>
+
+            <a href="{{ route('register') }}" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+                <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+                    <i class="bi bi-person-plus-fill" style="font-size:20px;color:#2d0a1e;"></i>
+                </div>
+                <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Registrarse</span>
+            </a>
+        @endauth
                 @endif
             </div>
         </div>
@@ -72,16 +176,6 @@
                forma fácil, rápida y moderna para mostrar tus proyectos,
                habilidades y experiencia al mundo.</p>
 
-            <div class="hero-buttons">
-                @guest
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
-                    @endif
-                    @if (Route::has('login'))
-                        <a href="{{ route('login') }}" class="btn-outline">Iniciar sesión</a>
-                    @endif
-                @endguest
-            </div>
         </div>
     </section>
 
@@ -259,7 +353,7 @@
 <footer style="min-height: 80px; display: flex; align-items: center;">
     <div class="container">
         <div class="footer-bottom">
-            <p>© 2026 Todos los derechos reservados OctopuSoft SRL.Sudamérica-Bolivia</p>
+            <p>© 2026 Todos los derechos reservados OctopuSoft SRL. Cochabamba-Bolivia</p>
         </div>
     </div>
 </footer>

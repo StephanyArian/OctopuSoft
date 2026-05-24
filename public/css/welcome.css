@@ -283,12 +283,6 @@ body {
     line-height: 1.6;
 }
 
-.hero-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
 
 .hero-buttons .btn-outline { border-color: var(--white); color: var(--white); }
 .hero-buttons .btn-outline:hover { background: var(--white); color: var(--teal); border-color: var(--white); }
@@ -523,10 +517,13 @@ body {
     color: var(--gray-500);
     line-height: 1.55;
     margin-bottom: 12px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
     overflow: hidden;
+    display: -webkit-box;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    /* stylelint-disable-next-line property-no-vendor-prefix */
+    -webkit-box-orient: vertical;
 }
 
 .card-tags {
@@ -647,54 +644,90 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
 .footer-nav a:hover { color: var(--teal-light); }
 
 .footer-bottom { padding: 12px 0; text-align: center; }
-.footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.22); }
+.footer-bottom p { font-size: 0.9rem; color: rgba(255,255,255,0.45); }
 
 /* ---- RESPONSIVE GENERAL ---- */
+/* ===== FIX NAVBAR MÓVIL ===== */
 @media (max-width: 768px) {
-    .menu-toggle { display: block; }
 
+    .nav-container {
+        flex-wrap: nowrap;
+        padding: 10px 16px;
+        align-items: center;
+    }
+
+    /* Logo a la izquierda */
+    .logo {
+        flex-shrink: 0;
+    }
+
+    /* Hamburguesa visible y centrada */
+    .menu-toggle {
+        display: block !important;
+        order: 2;
+        margin-left: 12px;
+        flex-shrink: 0;
+    }
+
+    /* Links centrales ocultos por defecto, se abren con JS */
     .nav-links-center {
-        display: none;
+        display: none !important;
+        order: 4;
         width: 100%;
-        flex-direction: column;
-        gap: 16px;
-        padding: 20px 0 10px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        padding: 12px 0 4px;
         border-top: 1px solid rgba(255,255,255,0.1);
-        margin-top: 16px;
-    }
-    .nav-links.active { display: flex; }
-    .nav-link { width: 100%; text-align: center; padding: 10px; }
-
-    .navbar .btn-primary,
-    .navbar .btn-outline-nav { width: 100%; text-align: center; }
-
-    /* Dropdown en móvil: estático dentro del menú hamburguesa */
-    .nav-user-dropdown { width: 100%; }
-    .nav-user-trigger  { width: 100%; justify-content: center; }
-    .nav-user-menu {
-        position: static;
-        border: 1px solid var(--teal);
-        border-radius: 12px;
         margin-top: 8px;
-        box-shadow: none;
+        margin-right: 0 !important;
     }
-    .nav-user-menu.open { display: block; }
 
-    .hero h1       { font-size: 2rem; }
-    .section-title { font-size: 1.75rem; }
+    .nav-links-center.active {
+        display: flex !important;
+    }
 
-    .hero-buttons { flex-direction: column; align-items: center; }
-    .hero-buttons .btn-primary,
-    .hero-buttons .btn-outline { width: 80%; text-align: center; }
+    /* Íconos del centro más pequeños en móvil */
+    .nav-links-center .nav-link > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+        box-shadow: 0 0 8px rgba(10,191,158,0.5) !important;
+    }
 
-    .cta-section { flex-direction: column; text-align: center; padding: 32px 20px; }
+    .nav-links-center .nav-link > div:first-child i,
+    .nav-links-center .nav-link > div:first-child svg {
+        font-size: 15px !important;
+        width: 15px !important;
+        height: 15px !important;
+    }
 
-    .footer-main { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .footer-nav  { gap: 16px; }
+    /* Botones login/register pegados a la derecha */
+    .nav-links-right {
+        display: flex !important;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        margin-left: auto;   /* ← este es el fix clave */
+        order: 3;
+        flex-shrink: 0;
+    }
 
-    .hero { background-position: 65% center; }
+    /* Íconos login/register más pequeños */
+    .nav-links-right .nav-link > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+        box-shadow: 0 0 8px rgba(10,191,158,0.5) !important;
+    }
+
+    .nav-links-right .nav-link > div:first-child i {
+        font-size: 15px !important;
+    }
+
+    .nav-links-right .nav-link span {
+        font-size: 0.48rem !important;
+    }
 }
-
 /* ---- RESPONSIVE GENERAL del carrusel */
 @media (max-width: 900px) {
     .carousel-section .section-header {
@@ -735,4 +768,124 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
     .nav-container { padding: 12px 16px; }
     .logo h2       { font-size: 1.2rem; }
     .menu-toggle   { font-size: 1.5rem; }
+}
+
+/* ============================================
+   DROPDOWN DEL USUARIO - CORREGIDO
+   ============================================ */
+   .nav-user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.nav-user-trigger:hover {
+    background: rgba(10, 191, 158, 0.1);
+}
+
+.nav-user-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: white;
+    border-radius: 16px;
+    min-width: 220px;
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    border: 1px solid var(--gray-100);
+}
+
+.nav-user-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Flecha decorativa del dropdown */
+.nav-user-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+    z-index: 1001;
+}
+
+/* Estilos para los enlaces del menú */
+.nav-user-menu a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    text-decoration: none;
+    color: var(--burg-deep);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border-bottom: none;
+}
+
+.nav-user-menu a:hover {
+    background: rgba(10, 191, 158, 0.08);
+    padding-left: 16px;
+}
+
+/* Iconos dentro del menú */
+.nav-user-menu .menu-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0abf9e, #1de8c0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav-user-menu .menu-icon i {
+    color: #2d0a1e;
+    font-size: 14px;
+}
+
+/* Opción de cerrar sesión con color rojo */
+.nav-user-menu .logout-item {
+    color: #e53e3e;
+}
+
+.nav-user-menu .logout-item .menu-icon {
+    background: linear-gradient(135deg, #f87171, #dc2626);
+}
+
+.nav-user-menu .logout-item .menu-icon i {
+    color: white;
+}
+
+.nav-user-menu .logout-item:hover {
+    background: rgba(229, 62, 62, 0.08);
+}
+
+/* Icono de chevron animado */
+#dropdownChevron {
+    transition: transform 0.2s ease;
 }

@@ -105,8 +105,8 @@
     padding: 13px 24px;
     font-size: 13px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
+    display: flex !important;        /* añade !important */
+    align-items: center !important;  /* añade !important */
     gap: 10px;
     color: rgba(255,255,255,0.45);
     transition: all 0.2s ease;
@@ -117,17 +117,18 @@
 }
 
 .sidebar-item:hover {
-    background: rgba(255,255,255,0.05);
-    color: rgba(255,255,255,0.85);
+    color: rgba(255,255,255,0.85);  /* hover: icono Y texto juntos */
     border-left-color: rgba(10,191,158,0.4);
+    background: rgba(255,255,255,0.05);
 }
 
 .sidebar-item.active {
+    color: var(--teal);  /* activo: icono Y texto en teal */
+    border-left: 3px solid var(--teal);
     background: rgba(10,191,158,0.08);
     font-weight: 700;
-    color: var(--teal);
-    border-left: 3px solid var(--teal);
 }
+
 
 .main {
     flex: 1;
@@ -494,15 +495,16 @@
     font-size: 14px;
     border-radius: 40px;
     font-weight: 600;
-    background: var(--white);
-    border: 1.5px solid var(--gray-300);
+    background: #d1d5db;
+    border: 1.5px solid #d1d5db;
     color: var(--gray-700);
     height: auto;
     width: auto;
 }
 .modal-btns .btn-sm.cancel-modal:hover {
-    background: var(--off);
-    border-color: var(--gray-500);
+    background: #b8bfc9;
+    border-color: #b8bfc9;
+    color: #1f2937;
     transform: translateY(-1px);
 }
 
@@ -763,13 +765,13 @@
     pointer-events: none;
     position: absolute;
     right: 13px;
-    width: 16px;
-    height: 16px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23000000' viewBox='0 0 16 16'%3E%3Cpath d='M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2M1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857z'/%3E%3Cpath d='M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2m3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2'/%3E%3C/svg%3E");
+    width: 18px;
+    height: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23000000' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-size: 16px 16px;
+    background-size: 18px 18px;
     background-position: center;
-    opacity: 0.6;
+    opacity: 0.55;
     transition: opacity 0.2s ease;
 }
 
@@ -812,9 +814,9 @@
 }
 .btn-ver-mas:hover { color: var(--teal); }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   QUILL EDITOR â€” integraciÃ³n y personalizaciÃ³n de estilos
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* 
+   QUILL EDITOR ” integraciony personalizacion de estilos
+  */
 
 /* Contenedor que envuelve el editor Quill */
 .quill-editor-wrap {

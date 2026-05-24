@@ -18,17 +18,76 @@
                 </div>
                 <div class="body-row">
                     <div class="sidebar">
-                        <a href="{{ route('profile.create') }}" class="sidebar-item">Personal</a>
-                        <a href="{{ route('experiencia.laboral') }}" class="sidebar-item">Experiencia laboral</a>
-                        <a href="{{ route('informacion.academica') }}" class="sidebar-item">Información académica</a>
-                        <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">Habilidades técnicas</a>
-                        <a href="{{ route('skills.blandas') }}" class="sidebar-item">Habilidades blandas</a>
-                        <a href="{{ route('proyectos') }}" class="sidebar-item active">Proyectos</a>
-                        <a href="{{ route('idiomas.index') }}"        class="sidebar-item">Idiomas</a>
-                        <a href="{{ route('redes.index') }}" class="sidebar-item">Redes profesionales y contacto</a>
+                        <a href="{{ route('profile.create') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+            Personal
+    </a>
+
+    <a href="{{ route('experiencia.laboral') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </svg>
+        Experiencia laboral
+    </a>
+
+    <a href="{{ route('informacion.academica') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+        </svg>
+        Información académica
+    </a>
+
+    <a href="{{ route('skills.tecnicas') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+        </svg>
+        Habilidades técnicas
+    </a>
+
+    <a href="{{ route('skills.blandas') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        Habilidades blandas
+    </a>
+
+    <a href="{{ route('proyectos') }}" class="sidebar-item active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        Proyectos
+    </a>
+
+    <a href="{{ route('idiomas.index') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h4M15 9h2M9 9h2"/><path d="M2 9h20"/>
+        </svg>
+        Idiomas
+    </a>
+
+    <a href="{{ route('redes.index') }}" class="sidebar-item">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Redes profesionales y contacto
+    </a>
                     </div>
 
                     <div class="main-panel" id="mainPanel">
+
+                        {{-- ============================================================ --}}
+                        {{-- BANNER DE ÉXITO (estilo habilidades blandas)                --}}
+                        {{-- ============================================================ --}}
+                        <div id="proyBannerExito" style="display:none; align-items:center; gap:10px; background:#d1fae5; border:1px solid #6ee7b7; border-radius:8px; padding:12px 16px; margin-bottom:16px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
+                                <circle cx="12" cy="12" r="10" fill="#10b981"/>
+                                <path d="M7 13l3 3 7-7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span id="proyBannerTexto" style="color:#065f46; font-size:14px; font-weight:500;"></span>
+                        </div>
+
                         <div class="proy-header" id="proyHeader">
                             <div class="proy-title-wrap">
                                 <h2>Mis Proyectos</h2>
@@ -115,6 +174,21 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- MODAL ELIMINAR PROYECTO --}}
+    <div class="modal-backdrop" id="delete-project-modal">
+        <div class="modal-box">
+            <h3>Eliminar proyecto</h3>
+            <p>¿Estás seguro de que deseas eliminar <strong id="modal-project-name"></strong>?<br>Esta acción no se puede deshacer.</p>
+            <form id="delete-project-form" method="POST">
+                @csrf @method('DELETE')
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button type="submit" class="btn-danger">Sí, eliminar</button>
+                    <button type="button" class="btn-cancel-modal" onclick="closeDeleteProjectModal()">Cancelar</button>
+                </div>
+            </form>
         </div>
     </div>
 

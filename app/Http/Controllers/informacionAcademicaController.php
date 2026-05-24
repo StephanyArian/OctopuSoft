@@ -20,7 +20,7 @@ class InformacionAcademicaController extends Controller
 
     public function store(Request $request)
     {
-        
+        // Validación incluyendo el campo otro_tipo_formacion
         $request->validate([
             'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'nullable|string|max:30|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
@@ -30,9 +30,10 @@ class InformacionAcademicaController extends Controller
             'estudio_actual'  => 'nullable',
             'especialidad'    => 'nullable|string|max:50|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'tipo_formacion' => 'required|string|max:50',
+            'otro_tipo_formacion' => 'required_if:tipo_formacion,Otro|string|max:50|nullable', // NUEVA VALIDACIÓN
             'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
 
-         ], [
+        ], [
             'institucion.required'     => 'La institución es obligatoria',
             'institucion.max'          => 'La institución no puede tener más de 60 caracteres',
             'institucion.regex'        => 'La institución no parece ser un nombre válido',
@@ -46,14 +47,21 @@ class InformacionAcademicaController extends Controller
             'fecha_fin.date_format'    => 'La fecha de fin debe tener formato Año-Mes (ej: 2024-12)',
             'especialidad.max'         => 'La especialidad no puede tener más de 30 caracteres',
             'especialidad.regex'       => 'La especialidad solo debe contener letras',
-            'evidencias.*.mimes'           => 'Solo se permiten archivos JPG, PNG o PDF',
-            'evidencias.*.max'             => 'Cada archivo no puede superar los 2MB',
-         ]);
+            'evidencias.*.mimes'       => 'Solo se permiten archivos JPG, PNG o PDF',
+            'evidencias.*.max'         => 'Cada archivo no puede superar los 2MB',
+            'otro_tipo_formacion.required_if' => 'Por favor, especifica el tipo de formación', // NUEVO MENSAJE
+        ]);
 
-         if (!$request->has('estudio_actual') && empty($request->fecha_fin)) {
+        if (!$request->has('estudio_actual') && empty($request->fecha_fin)) {
             return back()
                 ->withErrors(['fecha_fin' => 'Debes indicar una fecha de fin o marcar "Estudio actual"'])
                 ->withInput();
+        }
+
+        // 🔥 NUEVA LÓGICA: Determinar el tipo de formación final
+        $tipoFormacionFinal = $request->tipo_formacion;
+        if ($request->tipo_formacion === 'Otro' && $request->filled('otro_tipo_formacion')) {
+            $tipoFormacionFinal = $request->otro_tipo_formacion;
         }
 
         // Normalizar fechas
@@ -77,8 +85,8 @@ class InformacionAcademicaController extends Controller
             'type'        => 'education',
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
-            'specialty'    => $request->especialidad,  
-            'formation_type' => $request->tipo_formacion,
+            'specialty'   => $request->especialidad,  
+            'formation_type' => $tipoFormacionFinal, // 🔥 USAR EL VALOR FINAL
             'description' => $request->descripcion,
             'evidence_url' => !empty($evidenciasUrls) ? json_encode($evidenciasUrls) : null,
             'start_date'  => $startDate,
@@ -93,34 +101,40 @@ class InformacionAcademicaController extends Controller
 
     public function update(Request $request, $id)
     {
-
         $request->validate([
             'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
             'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
             'especialidad' => 'nullable|string|max:50', 
             'tipo_formacion' => 'required|string|max:50',
-
+            'otro_tipo_formacion' => 'required_if:tipo_formacion,Otro|string|max:50|nullable', // NUEVA VALIDACIÓN
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
             'descripcion'     => 'nullable|string|max:500',
             'estudio_actual'  => 'nullable',
             'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'evidencias_eliminar' => 'nullable|string',
-            'evidencias.*.mimes' => 'Solo se permiten archivos JPG, PNG o PDF',
-            'evidencias.*.max'   => 'Cada archivo no puede superar los 2MB',
+        ], [
+            'otro_tipo_formacion.required_if' => 'Por favor, especifica el tipo de formación', // NUEVO MENSAJE
         ]);
+
         $formacion = Experience::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-            $startDate = Carbon::createFromFormat('Y-m-d', $request->fecha_inicio);
-        
-            $endDate = null;
-            if (!$request->has('estudio_actual') && $request->fecha_fin) {
-            $endDate = Carbon::parse($request->fecha_fin);   
-            }   
+        // 🔥 NUEVA LÓGICA: Determinar el tipo de formación final
+        $tipoFormacionFinal = $request->tipo_formacion;
+        if ($request->tipo_formacion === 'Otro' && $request->filled('otro_tipo_formacion')) {
+            $tipoFormacionFinal = $request->otro_tipo_formacion;
+        }
 
-            $evidenciasActuales = $formacion->evidence_url
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->fecha_inicio);
+        
+        $endDate = null;
+        if (!$request->has('estudio_actual') && $request->fecha_fin) {
+            $endDate = Carbon::parse($request->fecha_fin);   
+        }   
+
+        $evidenciasActuales = $formacion->evidence_url
             ? json_decode($formacion->evidence_url, true)
             : [];
  
@@ -146,8 +160,8 @@ class InformacionAcademicaController extends Controller
         $formacion->update([
             'institution' => $request->institucion,
             'title'       => $request->titulo_obtenido,
-            'specialty'    => $request->especialidad,  
-            'formation_type' => $request->tipo_formacion,
+            'specialty'   => $request->especialidad,  
+            'formation_type' => $tipoFormacionFinal, // 🔥 USAR EL VALOR FINAL
             'description' => $request->descripcion,
             'evidence_url' => !empty($evidenciasActuales) ? json_encode($evidenciasActuales) : null,
             'start_date'  => $startDate,
@@ -164,13 +178,12 @@ class InformacionAcademicaController extends Controller
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-            if ($formacion->evidence_url) {
-                $urls = json_decode($formacion->evidence_url, true);
-                foreach ($urls as $url) {
-                    \Storage::disk('public')->delete($url);
-                }
+        if ($formacion->evidence_url) {
+            $urls = json_decode($formacion->evidence_url, true);
+            foreach ($urls as $url) {
+                \Storage::disk('public')->delete($url);
             }
-     
+        }
 
         $formacion->delete();
 
