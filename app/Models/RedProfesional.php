@@ -21,13 +21,8 @@ class RedProfesional extends Model
     ];
 
     // Relación con la plataforma
-    public function plataforma()
+    public function platform()
     {
         return $this->belongsTo(PlataformaRed::class, 'platform_id');
     }
-
-public function platform()
-{
-    return $this->belongsTo(PlataformaRed::class, 'platform_id');
 }
-    }

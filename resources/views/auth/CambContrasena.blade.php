@@ -19,7 +19,7 @@
      <link rel="stylesheet" href="{{ asset('css/CambContrasena.css') }}">
 
      {{-- después (usa el CSS compartido) --}}
-     <link rel="stylesheet" href="{{ asset('css/RecupCont.css') }}">
+     <link rel="stylesheet" href="{{ asset('css/Recupcont.css') }}">
     {{-- ─── Estilos inline (fallback si el asset aún no está publicado) ─── --}}
     {{-- Borra este bloque cuando hayas colocado CambContrasena.css en public/css/ --}}
     <style>

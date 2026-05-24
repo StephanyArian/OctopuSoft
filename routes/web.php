@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\SessionController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\InformacionAcademicaController;
 use App\Http\Controllers\ExperienciaLaboralController;
@@ -35,13 +34,6 @@ Route::get('/dashboard', function () {
         ->header('Pragma', 'no-cache')
         ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
-// RESET PASSWORD
-Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
-    ->middleware('guest')->name('password.request');
-
-Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
-    ->middleware('guest')->name('password.email');
 
 Route::get('/reset-password/{token}', function ($token) {
     return view('auth.reset-password', [
@@ -129,7 +121,7 @@ Route::middleware('auth')->group(function () {
 
     // EVIDENCIAS
     Route::get('/mis-evidencias', function () {
-        return view('evidencia');
+    return view('secciones.evidencia');
     })->name('evidencias');
 
     Route::get('/proyectos/{proyectoId}/evidencias',  [EvidenciaController::class, 'index'])->name('evidencias.index');

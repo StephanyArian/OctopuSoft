@@ -1,6 +1,6 @@
 <x-app-layout>
     @push('styles')
-        <link rel="stylesheet" href="{{ asset('css/updateContra.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/UpdateContra.css') }}">
     @endpush
 
     <div class="profile-page">

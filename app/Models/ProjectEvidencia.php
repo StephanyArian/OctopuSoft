@@ -14,6 +14,8 @@ class ProjectEvidencia extends Model
         'titulo',
         'url',
         'imagen_path',
+        'descripcion',
+        'plataforma',
     ];
 
     public function project()

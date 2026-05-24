@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     {{-- CSS compartido del flujo de recuperación --}}
-    <link rel="stylesheet" href="{{ asset('css/RecupCont.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Recupcont.css') }}">
 </head>
 <body>
 
