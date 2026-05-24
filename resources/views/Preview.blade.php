@@ -380,48 +380,209 @@
         @endif
     </div>
 
-    <!-- IDIOMAS -->
-    <div class="section">
-        <h2><i class="fas fa-language"></i> Idiomas</h2>
-        @if($idiomas->isEmpty())
-            <div class="empty-message">No hay idiomas registrados</div>
-        @else
-            <div class="idiomas-preview-grid">
-                @foreach($idiomasRecientes as $idioma)
-                    <div class="idioma-preview-card">
-                        <div class="idioma-preview-header">
-                            <div class="idioma-preview-left">
-                                <span class="idioma-bandera">{{ $idioma->bandera }}</span>
-                                <div class="idioma-preview-info">
-                                    <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
-                                    <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
-                                </div>
-                            </div>
-                            @if($idioma->certificado)
-                                <a href="javascript:void(0)"
-                                   onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')"
-                                   class="idioma-cert-link">
-                                    <i class="fas fa-certificate"></i> Cert.
-                                </a>
-                            @endif
-                        </div>
-                        <div class="idioma-barra-wrap">
-                            <div class="idioma-barra-fill" style="width: {{ $idioma->porcentaje }}%"></div>
+   <!-- IDIOMAS -->
+<div class="section">
+    <h2><i class="fas fa-language"></i> Idiomas</h2>
+    @if($idiomas->isEmpty())
+        <div class="empty-message">No hay idiomas registrados</div>
+    @else
+        <div class="idiomas-preview-grid">
+            @foreach($idiomasRecientes as $index => $idioma)
+            @php
+                // Banderas emoji para idiomas reconocidos
+                $banderas = [
+                    'inglés'=>'🇬🇧','ingles'=>'🇬🇧',
+                    'español'=>'🇧🇴','espanol'=>'🇧🇴',
+                    'portugués'=>'🇧🇷','portugues'=>'🇧🇷',
+                    'francés'=>'🇫🇷','frances'=>'🇫🇷',
+                    'alemán'=>'🇩🇪','aleman'=>'🇩🇪',
+                    'italiano'=>'🇮🇹',
+                    'chino'=>'🇨🇳',
+                    'japonés'=>'🇯🇵','japones'=>'🇯🇵',
+                    'coreano'=>'🇰🇷',
+                    'árabe'=>'🇸🇦','arabe'=>'🇸🇦',
+                    'ruso'=>'🇷🇺',
+                    'hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
+                    'holandés'=>'🇳🇱','holandes'=>'🇳🇱',
+                    'sueco'=>'🇸🇪',
+                    'noruego'=>'🇳🇴',
+                    'danés'=>'🇩🇰','danes'=>'🇩🇰',
+                    'polaco'=>'🇵🇱',
+                    'turco'=>'🇹🇷',
+                    'griego'=>'🇬🇷',
+                    'hebreo'=>'🇮🇱',
+                    'tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
+                    'vietnamita'=>'🇻🇳',
+                    'indonesio'=>'🇮🇩',
+                    'catalán'=>'🏳️','catalan'=>'🏳️',
+                    'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
+                ];
+                $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                
+                // Código para idiomas sin bandera
+                $codigos = [
+                    'inglés'=>'EN','ingles'=>'EN',
+                    'español'=>'ES','espanol'=>'ES',
+                    'francés'=>'FR','frances'=>'FR',
+                    'alemán'=>'DE','aleman'=>'DE',
+                    'portugués'=>'PT','portugues'=>'PT',
+                    'italiano'=>'IT','chino'=>'ZH',
+                    'japonés'=>'JP','japones'=>'JP',
+                    'coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
+                    'ruso'=>'RU','hindi'=>'HI','indu'=>'HI',
+                    'mandarin'=>'ZH','mandarín'=>'ZH',
+                ];
+                $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                
+                // Colores para badges de código
+                $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
+                $colorFondo = $colorFondos[$index % count($colorFondos)];
+                
+                // Colores para barras de progreso
+                $coloresBarra = [
+                    'linear-gradient(90deg,#07866e,#0abf9e)',
+                    'linear-gradient(90deg,#1d4ed8,#3b82f6)',
+                    'linear-gradient(90deg,#7c3aed,#a855f7)',
+                    'linear-gradient(90deg,#b45309,#f59e0b)',
+                    'linear-gradient(90deg,#be123c,#f43f5e)',
+                    'linear-gradient(90deg,#0e7490,#22d3ee)',
+                    'linear-gradient(90deg,#15803d,#4ade80)',
+                    'linear-gradient(90deg,#9a3412,#fb923c)',
+                ];
+                $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+            @endphp
+            <div class="idioma-preview-card">
+                <div class="idioma-preview-header">
+                    <div class="idioma-preview-left">
+                        @if($banderaEmoji)
+                            <span class="idioma-bandera">{{ $banderaEmoji }}</span>
+                        @else
+                            <span class="idioma-flag-code-preview" style="background: {{ $colorFondo }}; width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; margin-right: 10px;">
+                                {{ $codigo }}
+                            </span>
+                        @endif
+                        <div class="idioma-preview-info">
+                            <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
+                            <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
                         </div>
                     </div>
-                @endforeach
-            </div>
-            
-            @if($idiomasRestantes->count() > 0)
-                <div class="btn-ver-todos">
-                    <button onclick="abrirModalIdiomas()">
-                        <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
-                    </button>
+                    @if($idioma->certificado)
+                        <a href="javascript:void(0)" onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')" class="idioma-cert-link">
+                            <i class="fas fa-certificate"></i> Cert.
+                        </a>
+                    @endif
                 </div>
-            @endif
+                <div class="idioma-barra-wrap">
+                    <div class="idioma-barra-fill-custom" style="width: {{ $idioma->porcentaje }}%; background: {{ $colorBarra }};"></div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        
+        @if($idiomasRestantes->count() > 0)
+            <div class="btn-ver-todos">
+                <button onclick="abrirModalIdiomas()">
+                    <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
+                </button>
+            </div>
         @endif
-    </div>
+    @endif
+</div>
 
+<!-- MODAL TODOS LOS IDIOMAS -->
+<div id="modal-todos-idiomas" class="modal-todos-proyectos">
+    <div class="modal-todos-content">
+        <div class="modal-todos-header">
+            <h2><i class="fas fa-language"></i> Todos los idiomas ({{ $idiomas->count() }})</h2>
+            <button class="close-todos-modal" onclick="cerrarModalIdiomas()">✕</button>
+        </div>
+        <div class="todos-proyectos-grid">
+            @foreach($idiomas as $index => $idioma)
+            @php
+                // Banderas emoji para idiomas reconocidos
+                $banderas = [
+                    'inglés'=>'🇬🇧','ingles'=>'🇬🇧',
+                    'español'=>'🇧🇴','espanol'=>'🇧🇴',
+                    'portugués'=>'🇧🇷','portugues'=>'🇧🇷',
+                    'francés'=>'🇫🇷','frances'=>'🇫🇷',
+                    'alemán'=>'🇩🇪','aleman'=>'🇩🇪',
+                    'italiano'=>'🇮🇹',
+                    'chino'=>'🇨🇳',
+                    'japonés'=>'🇯🇵','japones'=>'🇯🇵',
+                    'coreano'=>'🇰🇷',
+                    'árabe'=>'🇸🇦','arabe'=>'🇸🇦',
+                    'ruso'=>'🇷🇺',
+                    'hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
+                    'holandés'=>'🇳🇱','holandes'=>'🇳🇱',
+                    'sueco'=>'🇸🇪',
+                    'noruego'=>'🇳🇴',
+                    'danés'=>'🇩🇰','danes'=>'🇩🇰',
+                    'polaco'=>'🇵🇱',
+                    'turco'=>'🇹🇷',
+                    'griego'=>'🇬🇷',
+                    'hebreo'=>'🇮🇱',
+                    'tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
+                    'vietnamita'=>'🇻🇳',
+                    'indonesio'=>'🇮🇩',
+                    'catalán'=>'🏳️','catalan'=>'🏳️',
+                    'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
+                ];
+                $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                
+                // Código para idiomas sin bandera
+                $codigos = [
+                    'inglés'=>'EN','ingles'=>'EN',
+                    'español'=>'ES','espanol'=>'ES',
+                    'francés'=>'FR','frances'=>'FR',
+                    'alemán'=>'DE','aleman'=>'DE',
+                    'portugués'=>'PT','portugues'=>'PT',
+                    'italiano'=>'IT','chino'=>'ZH',
+                    'japonés'=>'JP','japones'=>'JP',
+                    'coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
+                    'ruso'=>'RU','hindi'=>'HI','indu'=>'HI',
+                    'mandarin'=>'ZH','mandarín'=>'ZH',
+                ];
+                $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                
+                // Colores para badges de código
+                $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
+                $colorFondo = $colorFondos[$index % count($colorFondos)];
+                
+                // Colores para barras de progreso
+                $coloresBarra = [
+                    'linear-gradient(90deg,#07866e,#0abf9e)',
+                    'linear-gradient(90deg,#1d4ed8,#3b82f6)',
+                    'linear-gradient(90deg,#7c3aed,#a855f7)',
+                    'linear-gradient(90deg,#b45309,#f59e0b)',
+                    'linear-gradient(90deg,#be123c,#f43f5e)',
+                    'linear-gradient(90deg,#0e7490,#22d3ee)',
+                    'linear-gradient(90deg,#15803d,#4ade80)',
+                    'linear-gradient(90deg,#9a3412,#fb923c)',
+                ];
+                $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+            @endphp
+            <div class="proyecto-card-modal">
+                <h4>
+                    @if($banderaEmoji)
+                        {{ $banderaEmoji }} {{ $idioma->nombre }}
+                    @else
+                        <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:{{ $colorFondo }};color:white;font-size:11px;font-weight:700;margin-right:8px;">
+                            {{ $codigo }}
+                        </span>
+                        {{ $idioma->nombre }}
+                    @endif
+                </h4>
+                <div class="proyecto-fecha" style="margin-top: 4px;">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</div>
+                <div class="idioma-barra-wrap" style="margin-top: 10px;">
+                    <div style="height: 8px; background: #edf0f4; border-radius: 10px; overflow: hidden;">
+                        <div style="width: {{ $idioma->porcentaje }}%; height: 100%; background: {{ $colorBarra }}; border-radius: 10px; transition: width 0.8s ease;"></div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
     <!-- PROYECTOS -->
     <div class="section">
         <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>

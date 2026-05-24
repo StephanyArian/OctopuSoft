@@ -4,10 +4,6 @@
     <div class="main-content">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-        
-
-            
-
             <div class="shell">
                 <div class="navbar">
                     <div class="nav-tab active">COMPLETAR</div>
@@ -126,20 +122,86 @@
                                 $nivelNombre = $nivelesNombre[$nivelLabel] ?? '';
                                 $porcentaje = ['A1'=>15,'A2'=>30,'B1'=>50,'B2'=>65,'C1'=>80,'C2'=>95,'Nativo'=>100];
                                 $pct = $porcentaje[$nivelLabel] ?? 50;
-                                $banderas = ['inglés'=>'🇬🇧','español'=>'🇧🇴','portugués'=>'🇧🇷','francés'=>'🇫🇷','alemán'=>'🇩🇪','italiano'=>'🇮🇹','chino'=>'🇨🇳','japonés'=>'🇯🇵'];
-                                $bandera = $banderas[strtolower($idioma->name)] ?? '🌐';
+
+                                // Banderas emoji para idiomas reconocidos
+                                $banderas = [
+                                    'inglés'=>'🇬🇧','ingles'=>'🇬🇧',
+                                    'español'=>'🇧🇴','espanol'=>'🇧🇴',
+                                    'portugués'=>'🇧🇷','portugues'=>'🇧🇷',
+                                    'francés'=>'🇫🇷','frances'=>'🇫🇷',
+                                    'alemán'=>'🇩🇪','aleman'=>'🇩🇪',
+                                    'italiano'=>'🇮🇹',
+                                    'chino'=>'🇨🇳',
+                                    'japonés'=>'🇯🇵','japones'=>'🇯🇵',
+                                    'coreano'=>'🇰🇷',
+                                    'árabe'=>'🇸🇦','arabe'=>'🇸🇦',
+                                    'ruso'=>'🇷🇺',
+                                    'hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
+                                    'holandés'=>'🇳🇱','holandes'=>'🇳🇱',
+                                    'sueco'=>'🇸🇪',
+                                    'noruego'=>'🇳🇴',
+                                    'danés'=>'🇩🇰','danes'=>'🇩🇰',
+                                    'polaco'=>'🇵🇱',
+                                    'turco'=>'🇹🇷',
+                                    'griego'=>'🇬🇷',
+                                    'hebreo'=>'🇮🇱',
+                                    'tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
+                                    'vietnamita'=>'🇻🇳',
+                                    'indonesio'=>'🇮🇩',
+                                    'catalán'=>'🏳️','catalan'=>'🏳️',
+                                    'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
+                                ];
+                                $bandera = $banderas[strtolower($idioma->name)] ?? null;
+
+                                // Código de idioma para mostrar en lugar de bandera si no hay emoji
+                                $codigos = [
+                                    'inglés'=>'EN','ingles'=>'EN',
+                                    'español'=>'ES','espanol'=>'ES',
+                                    'francés'=>'FR','frances'=>'FR',
+                                    'alemán'=>'DE','aleman'=>'DE',
+                                    'portugués'=>'PT','portugues'=>'PT',
+                                    'italiano'=>'IT','chino'=>'ZH',
+                                    'japonés'=>'JP','japones'=>'JP',
+                                    'coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
+                                    'ruso'=>'RU','hindi'=>'HI','indu'=>'HI',
+                                    'mandarin'=>'ZH','mandarín'=>'ZH',
+                                ];
+                                $codigo = $codigos[strtolower($idioma->name)] ?? strtoupper(substr($idioma->name, 0, 2));
+
+                                // Colores de barra por índice
+                                $coloresBarra = [
+                                    'linear-gradient(90deg,#07866e,#0abf9e)',
+                                    'linear-gradient(90deg,#1d4ed8,#3b82f6)',
+                                    'linear-gradient(90deg,#7c3aed,#a855f7)',
+                                    'linear-gradient(90deg,#b45309,#f59e0b)',
+                                    'linear-gradient(90deg,#be123c,#f43f5e)',
+                                    'linear-gradient(90deg,#0e7490,#22d3ee)',
+                                    'linear-gradient(90deg,#15803d,#4ade80)',
+                                    'linear-gradient(90deg,#9a3412,#fb923c)',
+                                ];
+                                $colorBarra = $coloresBarra[$loop->index % count($coloresBarra)];
+
+                                // Colores de fondo para el código (cuando no hay bandera)
+                                $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
+                                $colorFondo = $colorFondos[$loop->index % count($colorFondos)];
                             @endphp
 
                             <div class="idioma-card" id="idioma-{{ $idioma->id }}">
 
                                 {{-- MODO VISTA --}}
                                 <div class="idioma-vista" id="vista-{{ $idioma->id }}">
-                                    <div class="idioma-flag">{{ $bandera }}</div>
+                                    {{-- Flag o código --}}
+                                    @if($bandera)
+                                        <div class="idioma-flag">{{ $bandera }}</div>
+                                    @else
+                                        <div class="idioma-flag-code" style="background: {{ $colorFondo }};">{{ $codigo }}</div>
+                                    @endif
+
                                     <div class="idioma-info">
                                         <div class="idioma-nombre">{{ $idioma->name }}</div>
                                         <div class="idioma-nivel">{{ $nivelLabel }} — {{ $nivelNombre }}</div>
                                         <div class="nivel-bar-wrap">
-                                            <div class="nivel-bar" style="width: {{ $pct }}%"></div>
+                                            <div class="nivel-bar-custom" style="width: {{ $pct }}%; background: {{ $colorBarra }};"></div>
                                         </div>
                                     </div>
 
@@ -152,13 +214,13 @@
                                     @endif
 
                                     <div class="idioma-actions">
-                                    <button class="btn-sm" onclick="mostrarEditar({{ $idioma->id }})">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                            fill="currentColor" viewBox="0 0 16 16">
-                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                                        </svg>
-                                        Editar
-                                    </button>
+                                        <button class="btn-sm" onclick="mostrarEditar({{ $idioma->id }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                                            </svg>
+                                            Editar
+                                        </button>
                                         <button type="button" class="btn-sm danger"
                                                 onclick="openDeleteModalIdioma('{{ $idioma->id }}', '{{ addslashes($idioma->name) }}')">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16">
@@ -205,7 +267,6 @@
                                         </div>
                                         @endif
 
-                                        
                                         <!-- Subir nueva evidencia -->
                                         <div class="form-group" style="margin-bottom:14px;">
                                             <label class="form-label">
@@ -255,19 +316,19 @@
     </div>
 
     {{-- Modal eliminar idioma --}}
-<div class="modal-backdrop" id="delete-modal-idioma">
-    <div class="modal-box">
-        <h3>Eliminar idioma</h3>
-        <p>¿Estás seguro de que deseas eliminar <strong id="modal-idioma-name"></strong>?<br>Esta acción no se puede deshacer.</p>
-        <form id="delete-form-idioma" method="POST">
-            @csrf @method('DELETE')
-            <div style="display:flex;gap:12px;justify-content:center;">
-                <button type="submit" class="btn-danger">Sí, eliminar</button>
-                <button type="button" class="btn" onclick="closeDeleteModalIdioma()">Cancelar</button>
-            </div>
-        </form>
+    <div class="modal-backdrop" id="delete-modal-idioma">
+        <div class="modal-box">
+            <h3>Eliminar idioma</h3>
+            <p>¿Estás seguro de que deseas eliminar <strong id="modal-idioma-name"></strong>?<br>Esta acción no se puede deshacer.</p>
+            <form id="delete-form-idioma" method="POST">
+                @csrf @method('DELETE')
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    <button type="submit" class="btn-danger">Sí, eliminar</button>
+                    <button type="button" class="btn" onclick="closeDeleteModalIdioma()">Cancelar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
     <script src="{{ asset('js/idiomas.js') }}"></script>
 </x-app-layout>

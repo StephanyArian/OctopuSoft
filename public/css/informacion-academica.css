@@ -976,3 +976,16 @@
     margin: 2px;
     border-radius: 4px;
 }
+
+/* Botón Cancelar - color gris #d1d5db */
+.btn {
+    background-color: #d1d5db;
+    border-color: #d1d5db;
+    color: #4a5568;
+}
+
+.btn:hover {
+    background-color: #b0b5bf;
+    border-color: #b0b5bf;
+    color: #2d3748;
+}
