@@ -43,7 +43,6 @@
             }
         }
 
-        /* Botón ver todos los proyectos - ABAJO */
         .btn-ver-todos {
             display: flex;
             justify-content: center;
@@ -68,7 +67,6 @@
             transform: translateY(-2px);
         }
 
-        /* Modal de todos los proyectos */
         .modal-todos-proyectos {
             display: none;
             position: fixed;
@@ -150,7 +148,6 @@
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 8px;
-            color: #1abc9c;
         }
         .proyecto-card-modal .proyecto-tech {
             display: flex;
@@ -181,7 +178,6 @@
         .estado-curso { background: #fef3c7; color: #92400e; }
         .estado-default { background: #f1f5f9; color: #64748b; }
 
-        /* ⭐ EFECTO HOVER PROFESIONAL PARA TARJETAS DE PROYECTOS ⭐ */
         .card {
             transition: all 0.25s ease;
             cursor: pointer;
@@ -203,7 +199,6 @@
             display: inline-block;
         }
 
-        /* Lightbox */
         #lightbox-modal {
             display: none;
             position: fixed;
@@ -213,6 +208,19 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+        }
+
+        .idioma-barra-wrap {
+            height: 8px;
+            background: #edf0f4;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .idioma-barra-fill-custom {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s ease;
         }
 
         @media (max-width: 768px) {
@@ -235,9 +243,58 @@
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
     
-    // Separar proyectos: los 2 más recientes para mostrar, el resto para el modal
     $proyectosRecientes = $proyectos->take(2);
     $proyectosRestantes = $proyectos->skip(2);
+    
+    $limiteMostrar = 2;
+    
+    $experienciasRecientes = $experiencias->take($limiteMostrar);
+    $experienciasRestantes = $experiencias->skip($limiteMostrar);
+    
+    $academicasRecientes = $academicas->take($limiteMostrar);
+    $academicasRestantes = $academicas->skip($limiteMostrar);
+    
+    $habilidadesFrontendRecientes = ($habilidadesTecnicasFrontend ?? collect())->take($limiteMostrar);
+    $habilidadesFrontendRestantes = ($habilidadesTecnicasFrontend ?? collect())->skip($limiteMostrar);
+    $habilidadesBackendRecientes = ($habilidadesTecnicasBackend ?? collect())->take($limiteMostrar);
+    $habilidadesBackendRestantes = ($habilidadesTecnicasBackend ?? collect())->skip($limiteMostrar);
+    
+    $habilidadesBlandasRecientes = $habilidadesBlandas->take($limiteMostrar);
+    $habilidadesBlandasRestantes = $habilidadesBlandas->skip($limiteMostrar);
+    
+    $idiomasRecientes = $idiomas->take($limiteMostrar);
+    $idiomasRestantes = $idiomas->skip($limiteMostrar);
+    
+    $banderas = [
+        'inglés'=>'🇬🇧','ingles'=>'🇬🇧','español'=>'🇧🇴','espanol'=>'🇧🇴',
+        'portugués'=>'🇧🇷','portugues'=>'🇧🇷','francés'=>'🇫🇷','frances'=>'🇫🇷',
+        'alemán'=>'🇩🇪','aleman'=>'🇩🇪','italiano'=>'🇮🇹','chino'=>'🇨🇳',
+        'japonés'=>'🇯🇵','japones'=>'🇯🇵','coreano'=>'🇰🇷','árabe'=>'🇸🇦','arabe'=>'🇸🇦',
+        'ruso'=>'🇷🇺','hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
+        'holandés'=>'🇳🇱','holandes'=>'🇳🇱','sueco'=>'🇸🇪','noruego'=>'🇳🇴',
+        'danés'=>'🇩🇰','danes'=>'🇩🇰','polaco'=>'🇵🇱','turco'=>'🇹🇷',
+        'griego'=>'🇬🇷','hebreo'=>'🇮🇱','tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
+        'vietnamita'=>'🇻🇳','indonesio'=>'🇮🇩','catalán'=>'🏳️','catalan'=>'🏳️',
+        'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
+    ];
+    $codigos = [
+        'inglés'=>'EN','ingles'=>'EN','español'=>'ES','espanol'=>'ES',
+        'francés'=>'FR','frances'=>'FR','alemán'=>'DE','aleman'=>'DE',
+        'portugués'=>'PT','portugues'=>'PT','italiano'=>'IT','chino'=>'ZH',
+        'japonés'=>'JP','japones'=>'JP','coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
+        'ruso'=>'RU','hindi'=>'HI','indu'=>'HI','mandarin'=>'ZH','mandarín'=>'ZH',
+    ];
+    $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
+    $coloresBarra = [
+        'linear-gradient(90deg,#07866e,#0abf9e)',
+        'linear-gradient(90deg,#1d4ed8,#3b82f6)',
+        'linear-gradient(90deg,#7c3aed,#a855f7)',
+        'linear-gradient(90deg,#b45309,#f59e0b)',
+        'linear-gradient(90deg,#be123c,#f43f5e)',
+        'linear-gradient(90deg,#0e7490,#22d3ee)',
+        'linear-gradient(90deg,#15803d,#4ade80)',
+        'linear-gradient(90deg,#9a3412,#fb923c)',
+    ];
 @endphp
 
 <div class="preview-container">
@@ -278,7 +335,6 @@
                 @endif
             </div>
 
-            <!-- Iconos de redes sociales -->
             <div class="profile-social-icons">
                 @if($redes['linkedin'])
                     <a href="{{ $redes['linkedin'] }}" target="_blank" title="LinkedIn">
@@ -319,7 +375,6 @@
             </div>
         </div>
 
-        <!-- Lado derecho: foto -->
         <div class="profile-avatar-side">
             @if($user->photo_base64)
                 <img src="{{ $user->photo_base64 }}" alt="Foto de perfil">
@@ -335,7 +390,7 @@
     <div class="section">
         <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
         <div class="cards-grid">
-            @forelse($experiencias as $exp)
+            @forelse($experienciasRecientes as $exp)
             <div class="card">
                 <h3>{{ $exp->empresa }}</h3>
                 <div class="subtitle">
@@ -378,13 +433,21 @@
                 <div class="empty-message" style="grid-column: 1 / -1;">No hay experiencias laborales registradas</div>
             @endforelse
         </div>
+        
+        @if($experienciasRestantes->count() > 0)
+            <div class="btn-ver-todos">
+                <button onclick="abrirModalExperiencias()">
+                    <i class="fas fa-briefcase"></i> Ver todas las experiencias ({{ $experiencias->count() }})
+                </button>
+            </div>
+        @endif
     </div>
 
     <!-- INFORMACIÓN ACADÉMICA -->
     <div class="section">
         <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
         <div class="cards-grid">
-            @forelse($academicas as $aca)
+            @forelse($academicasRecientes as $aca)
                 <div class="card">
                     <h3>{{ $aca->institucion }}</h3>
                     <div class="subtitle">{{ $aca->titulo }}</div>
@@ -415,33 +478,30 @@
                     </div>
                     @endif
                     
-                    <!-- MOSTRAR EVIDENCIAS ACADÉMICAS -->
                     @if(isset($aca->evidence_url) && $aca->evidence_url)
                         @php 
                             $evidencias = is_array($aca->evidence_url) ? $aca->evidence_url : (json_decode($aca->evidence_url, true) ?? []);
                         @endphp
                         @if(!empty($evidencias))
-                            <div class="academic-evidences">
-                                <div class="evidences-title">
-                                    <i class="fas fa-paperclip"></i> Evidencias
-                                </div>
-                                <div class="evidences-grid-preview">
-                                    @foreach($evidencias as $evidencia)
-                                        @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
-                                            <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="pdf-card-preview" title="{{ basename($evidencia) }}">
-                                                <div class="pdf-icon-preview">
-                                                    <i class="fas fa-file-pdf"></i>
-                                                    <span>PDF</span>
-                                                </div>
-                                                <span class="pdf-name">{{ \Illuminate\Support\Str::limit(basename($evidencia), 20) }}</span>
-                                            </a>
-                                        @else
-                                            <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="img-card-preview">
-                                                <img src="{{ asset('storage/' . $evidencia) }}" alt="Evidencia">
-                                            </a>
-                                        @endif
-                                    @endforeach
-                                </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                                @foreach($evidencias as $evidencia)
+                                    @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
+                                        <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" 
+                                           style="display: inline-flex; align-items: center; gap: 6px; color: #0abf9e; font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: #f0fdf9; border: 1px solid #d1fae5; transition: all 0.2s;"
+                                           onmouseover="this.style.background='#d1fae5';"
+                                           onmouseout="this.style.background='#f0fdf9';">
+                                            <i class="fas fa-file-pdf"></i> Ver PDF
+                                        </a>
+                                    @else
+                                        <a href="javascript:void(0)" 
+                                           onclick="abrirLightbox('{{ asset('storage/' . $evidencia) }}')" 
+                                           style="display: inline-flex; align-items: center; gap: 6px; color: #0abf9e; font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: #f0fdf9; border: 1px solid #d1fae5; transition: all 0.2s;"
+                                           onmouseover="this.style.background='#d1fae5';"
+                                           onmouseout="this.style.background='#f0fdf9';">
+                                            <i class="fas fa-certificate"></i> Ver certificado
+                                        </a>
+                                    @endif
+                                @endforeach
                             </div>
                         @endif
                     @endif
@@ -450,6 +510,14 @@
                 <div class="empty-message" style="grid-column: 1 / -1;">No hay información académica registrada</div>
             @endforelse
         </div>
+        
+        @if($academicasRestantes->count() > 0)
+            <div class="btn-ver-todos">
+                <button onclick="abrirModalAcademicas()">
+                    <i class="fas fa-graduation-cap"></i> Ver toda la formación académica ({{ $academicas->count() }})
+                </button>
+            </div>
+        @endif
     </div>
 
     <!-- HABILIDADES TÉCNICAS -->
@@ -458,10 +526,10 @@
         @if(($habilidadesTecnicasFrontend ?? collect())->count() === 0 && ($habilidadesTecnicasBackend ?? collect())->count() === 0)
             <div class="empty-message" style="margin:0 40px;">No hay habilidades técnicas registradas</div>
         @else
-            @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0)
+            @if(($habilidadesFrontendRecientes ?? collect())->count() > 0)
                 <div class="tech-category-title">Frontend</div>
                 <div class="tech-skills-grid">
-                    @foreach($habilidadesTecnicasFrontend as $skill)
+                    @foreach($habilidadesFrontendRecientes as $skill)
                         @php
                             $nivel = $skill->nivel ?? 'Intermedio';
                             if ($nivel == 'Avanzado') $claseNivel = 'advanced';
@@ -494,10 +562,10 @@
                 </div>
             @endif
 
-            @if(($habilidadesTecnicasBackend ?? collect())->count() > 0)
+            @if(($habilidadesBackendRecientes ?? collect())->count() > 0)
                 <div class="tech-category-title">Backend</div>
                 <div class="tech-skills-grid">
-                    @foreach($habilidadesTecnicasBackend as $skill)
+                    @foreach($habilidadesBackendRecientes as $skill)
                         @php
                             $nivel = $skill->nivel ?? 'Intermedio';
                             if ($nivel == 'Avanzado') $claseNivel = 'advanced';
@@ -529,6 +597,34 @@
                     @endforeach
                 </div>
             @endif
+            
+            @if(($habilidadesFrontendRestantes->count() > 0) || ($habilidadesBackendRestantes->count() > 0))
+                <div class="btn-ver-todos">
+                    <button onclick="abrirModalTecnicas()">
+                        <i class="fas fa-code"></i> Ver todas las habilidades técnicas
+                    </button>
+                </div>
+            @endif
+        @endif
+    </div>
+
+    <!-- HABILIDADES BLANDAS -->
+    <div class="section">
+        <h2><i class="fas fa-heart"></i> Habilidades blandas</h2>
+        <div class="skills-container">
+            @forelse($habilidadesBlandasRecientes as $skill)
+                <span class="soft-skill-tag"><i class="fas fa-star" style="color:#0abf9e;"></i> {{ $skill->nombre }}</span>
+            @empty
+                <div class="empty-message">No hay habilidades blandas registradas</div>
+            @endforelse
+        </div>
+        
+        @if($habilidadesBlandasRestantes->count() > 0)
+            <div class="btn-ver-todos">
+                <button onclick="abrirModalBlandas()">
+                    <i class="fas fa-heart"></i> Ver todas las habilidades blandas ({{ $habilidadesBlandas->count() }})
+                </button>
+            </div>
         @endif
     </div>
 
@@ -539,46 +635,54 @@
             <div class="empty-message">No hay idiomas registrados</div>
         @else
             <div class="idiomas-preview-grid">
-                @foreach($idiomas as $idioma)
+                @foreach($idiomasRecientes as $index => $idioma)
+                @php
+                    $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                    $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                    $colorFondo = $colorFondos[$index % count($colorFondos)];
+                    $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+                @endphp
                 <div class="idioma-preview-card">
                     <div class="idioma-preview-header">
                         <div class="idioma-preview-left">
-                            <span class="idioma-bandera">{{ $idioma->bandera }}</span>
+                            @if($banderaEmoji)
+                                <span class="idioma-bandera">{{ $banderaEmoji }}</span>
+                            @else
+                                <span class="idioma-flag-code-preview" style="background: {{ $colorFondo }}; width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; margin-right: 10px;">
+                                    {{ $codigo }}
+                                </span>
+                            @endif
                             <div class="idioma-preview-info">
                                 <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
                                 <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
                             </div>
                         </div>
                         @if($idioma->certificado)
-                       <a href="javascript:void(0)"
-   onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')"
-   class="idioma-cert-link">
-    <i class="fas fa-certificate"></i> Cert.
-</a>
+                        <a href="javascript:void(0)"
+                           onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')"
+                           class="idioma-cert-link">
+                            <i class="fas fa-certificate"></i> Cert.
+                        </a>
                         @endif
                     </div>
                     <div class="idioma-barra-wrap">
-                        <div class="idioma-barra-fill" style="width: {{ $idioma->porcentaje }}%"></div>
+                        <div class="idioma-barra-fill-custom" style="width: {{ $idioma->porcentaje }}%; background: {{ $colorBarra }};"></div>
                     </div>
                 </div>
                 @endforeach
             </div>
+            
+            @if($idiomasRestantes->count() > 0)
+                <div class="btn-ver-todos">
+                    <button onclick="abrirModalIdiomas()">
+                        <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
+                    </button>
+                </div>
+            @endif
         @endif
     </div>
 
-    <!-- HABILIDADES BLANDAS -->
-    <div class="section">
-        <h2><i class="fas fa-heart"></i> Habilidades blandas</h2>
-        <div class="skills-container">
-            @forelse($habilidadesBlandas as $skill)
-                <span class="soft-skill-tag"><i class="fas fa-star" style="color:#0abf9e;"></i> {{ $skill->nombre }}</span>
-            @empty
-                <div class="empty-message">No hay habilidades blandas registradas</div>
-            @endforelse
-        </div>
-    </div>
-
-    <!-- PROYECTOS - SOLO 2 PROYECTOS + BOTÓN VER TODOS ABAJO -->
+    <!-- PROYECTOS -->
     <div class="section">
         <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
         
@@ -649,7 +753,9 @@
         @endif
     </div>
 
-    <!-- MODAL "TODOS LOS PROYECTOS" -->
+    <!-- ==================== MODALES ==================== -->
+
+    <!-- MODAL TODOS LOS PROYECTOS -->
     <div id="modal-todos-proyectos" class="modal-todos-proyectos">
         <div class="modal-todos-content">
             <div class="modal-todos-header">
@@ -703,6 +809,156 @@
         </div>
     </div>
 
+    <!-- MODAL TODAS LAS EXPERIENCIAS -->
+    <div id="modal-todos-experiencias" class="modal-todos-proyectos">
+        <div class="modal-todos-content">
+            <div class="modal-todos-header">
+                <h2><i class="fas fa-briefcase"></i> Todas las experiencias ({{ $experiencias->count() }})</h2>
+                <button class="close-todos-modal" onclick="cerrarModalExperiencias()">✕</button>
+            </div>
+            <div class="todos-proyectos-grid">
+                @foreach($experiencias as $exp)
+                    <div class="proyecto-card-modal">
+                        <h4>{{ $exp->empresa }}</h4>
+                        <div class="proyecto-fecha">
+                            <i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d/m/Y') }}
+                            @if($exp->fecha_fin) → {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d/m/Y') }} 
+                            @elseif($exp->trabajo_actual) → Actualidad @endif
+                        </div>
+                        <div class="description" style="font-size:0.75rem; margin: 8px 0; color:#475569;">
+                            {{ $exp->cargo }}
+                            @if($exp->ubicacion) | {{ $exp->ubicacion }} @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TODAS LAS ACADÉMICAS -->
+    <div id="modal-todos-academicas" class="modal-todos-proyectos">
+        <div class="modal-todos-content">
+            <div class="modal-todos-header">
+                <h2><i class="fas fa-graduation-cap"></i> Toda la formación académica ({{ $academicas->count() }})</h2>
+                <button class="close-todos-modal" onclick="cerrarModalAcademicas()">✕</button>
+            </div>
+            <div class="todos-proyectos-grid">
+                @foreach($academicas as $aca)
+                    <div class="proyecto-card-modal">
+                        <h4>{{ $aca->institucion }}</h4>
+                        <div class="proyecto-fecha">
+                            <i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y') }}
+                            @if($aca->fecha_fin) → {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') }}
+                            @elseif($aca->estudio_actual) → Actualidad @endif
+                        </div>
+                        <div class="description" style="font-size:0.75rem; margin: 8px 0; color:#475569;">
+                            {{ $aca->titulo }}
+                            @if($aca->specialty) | {{ $aca->specialty }} @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TODAS LAS HABILIDADES TÉCNICAS -->
+    <div id="modal-todos-tecnicas" class="modal-todos-proyectos">
+        <div class="modal-todos-content">
+            <div class="modal-todos-header">
+                <h2><i class="fas fa-code"></i> Todas las habilidades técnicas</h2>
+                <button class="close-todos-modal" onclick="cerrarModalTecnicas()">✕</button>
+            </div>
+            <div class="todos-proyectos-grid">
+                @foreach($habilidadesTecnicasFrontend ?? [] as $skill)
+                    <div class="proyecto-card-modal">
+                        <h4>🎨 Frontend - {{ $skill->nombre }}</h4>
+                        <div class="proyecto-fecha">Nivel: {{ $skill->nivel ?? 'Intermedio' }}</div>
+                        @if(isset($skill->proyectos) && count($skill->proyectos) > 0)
+                            <div class="proyecto-tech" style="margin-top: 8px;">
+                                <span>📁 {{ count($skill->proyectos) }} proyecto(s)</span>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+                @foreach($habilidadesTecnicasBackend ?? [] as $skill)
+                    <div class="proyecto-card-modal">
+                        <h4>⚙️ Backend - {{ $skill->nombre }}</h4>
+                        <div class="proyecto-fecha">Nivel: {{ $skill->nivel ?? 'Intermedio' }}</div>
+                        @if(isset($skill->proyectos) && count($skill->proyectos) > 0)
+                            <div class="proyecto-tech" style="margin-top: 8px;">
+                                <span>📁 {{ count($skill->proyectos) }} proyecto(s)</span>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TODAS LAS HABILIDADES BLANDAS -->
+    <div id="modal-todos-blandas" class="modal-todos-proyectos">
+        <div class="modal-todos-content">
+            <div class="modal-todos-header">
+                <h2><i class="fas fa-heart"></i> Todas las habilidades blandas ({{ $habilidadesBlandas->count() }})</h2>
+                <button class="close-todos-modal" onclick="cerrarModalBlandas()">✕</button>
+            </div>
+            <div class="todos-proyectos-grid">
+                @foreach($habilidadesBlandas as $skill)
+                    <div class="proyecto-card-modal">
+                        <h4><i class="fas fa-star" style="color:#0abf9e;"></i> {{ $skill->nombre }}</h4>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TODOS LOS IDIOMAS -->
+    <div id="modal-todos-idiomas" class="modal-todos-proyectos">
+        <div class="modal-todos-content">
+            <div class="modal-todos-header">
+                <h2><i class="fas fa-language"></i> Todos los idiomas ({{ $idiomas->count() }})</h2>
+                <button class="close-todos-modal" onclick="cerrarModalIdiomas()">✕</button>
+            </div>
+            <div class="todos-proyectos-grid">
+                @foreach($idiomas as $index => $idioma)
+                @php
+                    $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                    $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                    $colorFondo = $colorFondos[$index % count($colorFondos)];
+                    $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+                @endphp
+                <div class="proyecto-card-modal">
+                    <h4>
+                        @if($banderaEmoji)
+                            {{ $banderaEmoji }} {{ $idioma->nombre }}
+                        @else
+                            <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:{{ $colorFondo }};color:white;font-size:11px;font-weight:700;margin-right:8px;">
+                                {{ $codigo }}
+                            </span>
+                            {{ $idioma->nombre }}
+                        @endif
+                    </h4>
+                    <div class="proyecto-fecha" style="margin-top: 4px;">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</div>
+                    <div class="idioma-barra-wrap" style="margin-top: 10px;">
+                        <div style="height: 8px; background: #edf0f4; border-radius: 10px; overflow: hidden;">
+                            <div style="width: {{ $idioma->porcentaje }}%; height: 100%; background: {{ $colorBarra }}; border-radius: 10px; transition: width 0.8s ease;"></div>
+                        </div>
+                    </div>
+                    @if($idioma->certificado)
+                        <a href="javascript:void(0)" 
+                           onclick="event.stopPropagation(); abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')" 
+                           style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; color: #0abf9e; font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: #f0fdf9; border: 1px solid #d1fae5; transition: all 0.2s;"
+                           onmouseover="this.style.background='#d1fae5';"
+                           onmouseout="this.style.background='#f0fdf9';">
+                            <i class="fas fa-certificate"></i> Ver certificado
+                        </a>
+                    @endif
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL COMPARTIR -->
     <div id="modal-compartir" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(2px);">
         <div style="background:#fff; border-radius:12px; width:450px; max-width:90%; position:relative; padding:24px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
@@ -745,7 +1001,7 @@
         </div>
     </div>
 
-    <!-- MODAL PROYECTO (detalle) - CON EVIDENCIAS MEJORADAS -->
+    <!-- MODAL PROYECTO (detalle) -->
     <div id="modal-proyecto" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
         <div style="background:#fff; border-radius:12px; max-width:680px; width:90%; max-height:88vh; overflow-y:auto; position:relative;">
             <div style="padding:24px 28px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:flex-start;">
@@ -780,7 +1036,6 @@
 </div>
 
 <script>
-    // Lightbox para ver imágenes en grande
     function abrirLightbox(imagenSrc) {
         let lightbox = document.getElementById('lightbox-modal');
         if (!lightbox) {
@@ -895,7 +1150,6 @@
             data.evidencias.forEach(ev => {
                 let item = document.createElement('div');
                 
-                // IMAGEN
                 if (ev.tipo === 'imagen' && ev.imagen) {
                     let nombreImagen = ev.titulo || 'Imagen del proyecto';
                     if (nombreImagen.match(/\.(jpg|jpeg|png|gif|webp)$/i) || nombreImagen.length > 30) {
@@ -929,7 +1183,6 @@
                         </div>
                     `;
                 }
-                // ENLACE
                 else if (ev.tipo === 'enlace' && ev.url) {
                     item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
                     item.innerHTML = `
@@ -955,7 +1208,6 @@
                         </div>
                     `;
                 }
-                // REPOSITORIO
                 else if (ev.tipo === 'repositorio' && ev.url) {
                     let icon = 'fa-github';
                     if (ev.plataforma === 'GitLab') icon = 'fa-gitlab';
@@ -1007,15 +1259,69 @@
         if (e.target === this) cerrarModal();
     });
 
+    function abrirModalTodosProyectos() {
+        document.getElementById('modal-todos-proyectos').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        window.desdeModalTodos = true;
+    }
+    function cerrarModalTodosProyectos() {
+        document.getElementById('modal-todos-proyectos').style.display = 'none';
+        document.body.style.overflow = '';
+        window.desdeModalTodos = false;
+    }
+
+    function abrirModalExperiencias() {
+        document.getElementById('modal-todos-experiencias').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalExperiencias() {
+        document.getElementById('modal-todos-experiencias').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function abrirModalAcademicas() {
+        document.getElementById('modal-todos-academicas').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalAcademicas() {
+        document.getElementById('modal-todos-academicas').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function abrirModalTecnicas() {
+        document.getElementById('modal-todos-tecnicas').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalTecnicas() {
+        document.getElementById('modal-todos-tecnicas').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function abrirModalBlandas() {
+        document.getElementById('modal-todos-blandas').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalBlandas() {
+        document.getElementById('modal-todos-blandas').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    function abrirModalIdiomas() {
+        document.getElementById('modal-todos-idiomas').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function cerrarModalIdiomas() {
+        document.getElementById('modal-todos-idiomas').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
     function abrirModalCompartir() {
         document.getElementById('modal-compartir').style.display = 'flex';
     }
-
     function cerrarModalCompartir() {
         document.getElementById('modal-compartir').style.display = 'none';
         document.getElementById('btn-copiar-link').textContent = 'Copiar';
     }
-
     document.getElementById('modal-compartir').addEventListener('click', function(e) {
         if (e.target === this) cerrarModalCompartir();
     });
@@ -1054,20 +1360,23 @@
         if(url) window.open(url, '_blank', 'width=600,height=400');
     }
 
-    function abrirModalTodosProyectos() {
-        document.getElementById('modal-todos-proyectos').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        window.desdeModalTodos = true;
-    }
-
-    function cerrarModalTodosProyectos() {
-        document.getElementById('modal-todos-proyectos').style.display = 'none';
-        document.body.style.overflow = '';
-        window.desdeModalTodos = false;
-    }
-
     document.getElementById('modal-todos-proyectos')?.addEventListener('click', function(e) {
         if (e.target === this) cerrarModalTodosProyectos();
+    });
+    document.getElementById('modal-todos-experiencias')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalExperiencias();
+    });
+    document.getElementById('modal-todos-academicas')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalAcademicas();
+    });
+    document.getElementById('modal-todos-tecnicas')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalTecnicas();
+    });
+    document.getElementById('modal-todos-blandas')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalBlandas();
+    });
+    document.getElementById('modal-todos-idiomas')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalIdiomas();
     });
 </script>
 

@@ -7,40 +7,61 @@
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
     
-    // Separar proyectos: los 2 más recientes para mostrar, el resto para el modal
     $proyectosRecientes = $proyectos->take(2);
     $proyectosRestantes = $proyectos->skip(2);
     
-    // ========== PARA TODAS LAS SECCIONES ==========
-    $limiteMostrar = 2; // Cambia este número según cuántos quieras mostrar
+    $limiteMostrar = 2;
     
-    // Experiencia laboral
     $experienciasRecientes = $experiencias->take($limiteMostrar);
     $experienciasRestantes = $experiencias->skip($limiteMostrar);
     
-    // Información académica
     $academicasRecientes = $academicas->take($limiteMostrar);
     $academicasRestantes = $academicas->skip($limiteMostrar);
     
-    // Habilidades técnicas (Frontend)
     $habilidadesFrontendRecientes = ($habilidadesTecnicasFrontend ?? collect())->take($limiteMostrar);
     $habilidadesFrontendRestantes = ($habilidadesTecnicasFrontend ?? collect())->skip($limiteMostrar);
-    
-    // Habilidades técnicas (Backend)
     $habilidadesBackendRecientes = ($habilidadesTecnicasBackend ?? collect())->take($limiteMostrar);
     $habilidadesBackendRestantes = ($habilidadesTecnicasBackend ?? collect())->skip($limiteMostrar);
     
-    // Habilidades blandas
     $habilidadesBlandasRecientes = $habilidadesBlandas->take($limiteMostrar);
     $habilidadesBlandasRestantes = $habilidadesBlandas->skip($limiteMostrar);
     
-    // Idiomas
     $idiomasRecientes = $idiomas->take($limiteMostrar);
     $idiomasRestantes = $idiomas->skip($limiteMostrar);
+    
+    $banderas = [
+        'inglés'=>'🇬🇧','ingles'=>'🇬🇧','español'=>'🇧🇴','espanol'=>'🇧🇴',
+        'portugués'=>'🇧🇷','portugues'=>'🇧🇷','francés'=>'🇫🇷','frances'=>'🇫🇷',
+        'alemán'=>'🇩🇪','aleman'=>'🇩🇪','italiano'=>'🇮🇹','chino'=>'🇨🇳',
+        'japonés'=>'🇯🇵','japones'=>'🇯🇵','coreano'=>'🇰🇷','árabe'=>'🇸🇦','arabe'=>'🇸🇦',
+        'ruso'=>'🇷🇺','hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
+        'holandés'=>'🇳🇱','holandes'=>'🇳🇱','sueco'=>'🇸🇪','noruego'=>'🇳🇴',
+        'danés'=>'🇩🇰','danes'=>'🇩🇰','polaco'=>'🇵🇱','turco'=>'🇹🇷',
+        'griego'=>'🇬🇷','hebreo'=>'🇮🇱','tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
+        'vietnamita'=>'🇻🇳','indonesio'=>'🇮🇩','catalán'=>'🏳️','catalan'=>'🏳️',
+        'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
+    ];
+    $codigos = [
+        'inglés'=>'EN','ingles'=>'EN','español'=>'ES','espanol'=>'ES',
+        'francés'=>'FR','frances'=>'FR','alemán'=>'DE','aleman'=>'DE',
+        'portugués'=>'PT','portugues'=>'PT','italiano'=>'IT','chino'=>'ZH',
+        'japonés'=>'JP','japones'=>'JP','coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
+        'ruso'=>'RU','hindi'=>'HI','indu'=>'HI','mandarin'=>'ZH','mandarín'=>'ZH',
+    ];
+    $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
+    $coloresBarra = [
+        'linear-gradient(90deg,#07866e,#0abf9e)',
+        'linear-gradient(90deg,#1d4ed8,#3b82f6)',
+        'linear-gradient(90deg,#7c3aed,#a855f7)',
+        'linear-gradient(90deg,#b45309,#f59e0b)',
+        'linear-gradient(90deg,#be123c,#f43f5e)',
+        'linear-gradient(90deg,#0e7490,#22d3ee)',
+        'linear-gradient(90deg,#15803d,#4ade80)',
+        'linear-gradient(90deg,#9a3412,#fb923c)',
+    ];
 @endphp
 
 <a href="javascript:history.back()" class="btn-flotante">
@@ -85,7 +106,6 @@
                 @endif
             </div>
 
-            <!-- Iconos de redes sociales -->
             <div class="profile-social-icons">
                 @if($redes['linkedin'])
                     <a href="{{ $redes['linkedin'] }}" target="_blank" title="LinkedIn">
@@ -126,7 +146,6 @@
             </div>
         </div>
 
-        <!-- Lado derecho: foto -->
         <div class="profile-avatar-side">
             @if($user->photo_base64)
                 <img src="{{ $user->photo_base64 }}" alt="Foto de perfil">
@@ -233,27 +252,25 @@
                     @if(isset($aca->evidence_url) && $aca->evidence_url)
                         @php $evidencias = json_decode($aca->evidence_url, true); @endphp
                         @if(!empty($evidencias))
-                            <div class="academic-evidences">
-                                <div class="evidences-title">
-                                    <i class="fas fa-paperclip"></i> Evidencias
-                                </div>
-                                <div class="evidences-grid-preview">
-                                    @foreach($evidencias as $evidencia)
-                                        @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
-                                            <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="pdf-card-preview" title="{{ basename($evidencia) }}">
-                                                <div class="pdf-icon-preview">
-                                                    <i class="fas fa-file-pdf"></i>
-                                                    <span>PDF</span>
-                                                </div>
-                                                <span class="pdf-name">{{ \Illuminate\Support\Str::limit(basename($evidencia), 20) }}</span>
-                                            </a>
-                                        @else
-                                            <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" class="img-card-preview">
-                                                <img src="{{ asset('storage/' . $evidencia) }}" alt="Evidencia">
-                                            </a>
-                                        @endif
-                                    @endforeach
-                                </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                                @foreach($evidencias as $evidencia)
+                                    @if(pathinfo($evidencia, PATHINFO_EXTENSION) === 'pdf')
+                                        <a href="{{ asset('storage/' . $evidencia) }}" target="_blank" 
+                                           style="display: inline-flex; align-items: center; gap: 6px; color: #0abf9e; font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: #f0fdf9; border: 1px solid #d1fae5; transition: all 0.2s;"
+                                           onmouseover="this.style.background='#d1fae5';"
+                                           onmouseout="this.style.background='#f0fdf9';">
+                                            <i class="fas fa-file-pdf"></i> Ver PDF
+                                        </a>
+                                    @else
+                                        <a href="javascript:void(0)" 
+                                           onclick="abrirLightbox('{{ asset('storage/' . $evidencia) }}')" 
+                                           style="display: inline-flex; align-items: center; gap: 6px; color: #0abf9e; font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: #f0fdf9; border: 1px solid #d1fae5; transition: all 0.2s;"
+                                           onmouseover="this.style.background='#d1fae5';"
+                                           onmouseout="this.style.background='#f0fdf9';">
+                                            <i class="fas fa-certificate"></i> Ver certificado
+                                        </a>
+                                    @endif
+                                @endforeach
                             </div>
                         @endif
                     @endif
@@ -380,209 +397,58 @@
         @endif
     </div>
 
-   <!-- IDIOMAS -->
-<div class="section">
-    <h2><i class="fas fa-language"></i> Idiomas</h2>
-    @if($idiomas->isEmpty())
-        <div class="empty-message">No hay idiomas registrados</div>
-    @else
-        <div class="idiomas-preview-grid">
-            @foreach($idiomasRecientes as $index => $idioma)
-            @php
-                // Banderas emoji para idiomas reconocidos
-                $banderas = [
-                    'inglés'=>'🇬🇧','ingles'=>'🇬🇧',
-                    'español'=>'🇧🇴','espanol'=>'🇧🇴',
-                    'portugués'=>'🇧🇷','portugues'=>'🇧🇷',
-                    'francés'=>'🇫🇷','frances'=>'🇫🇷',
-                    'alemán'=>'🇩🇪','aleman'=>'🇩🇪',
-                    'italiano'=>'🇮🇹',
-                    'chino'=>'🇨🇳',
-                    'japonés'=>'🇯🇵','japones'=>'🇯🇵',
-                    'coreano'=>'🇰🇷',
-                    'árabe'=>'🇸🇦','arabe'=>'🇸🇦',
-                    'ruso'=>'🇷🇺',
-                    'hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
-                    'holandés'=>'🇳🇱','holandes'=>'🇳🇱',
-                    'sueco'=>'🇸🇪',
-                    'noruego'=>'🇳🇴',
-                    'danés'=>'🇩🇰','danes'=>'🇩🇰',
-                    'polaco'=>'🇵🇱',
-                    'turco'=>'🇹🇷',
-                    'griego'=>'🇬🇷',
-                    'hebreo'=>'🇮🇱',
-                    'tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
-                    'vietnamita'=>'🇻🇳',
-                    'indonesio'=>'🇮🇩',
-                    'catalán'=>'🏳️','catalan'=>'🏳️',
-                    'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
-                ];
-                $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
-                
-                // Código para idiomas sin bandera
-                $codigos = [
-                    'inglés'=>'EN','ingles'=>'EN',
-                    'español'=>'ES','espanol'=>'ES',
-                    'francés'=>'FR','frances'=>'FR',
-                    'alemán'=>'DE','aleman'=>'DE',
-                    'portugués'=>'PT','portugues'=>'PT',
-                    'italiano'=>'IT','chino'=>'ZH',
-                    'japonés'=>'JP','japones'=>'JP',
-                    'coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
-                    'ruso'=>'RU','hindi'=>'HI','indu'=>'HI',
-                    'mandarin'=>'ZH','mandarín'=>'ZH',
-                ];
-                $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
-                
-                // Colores para badges de código
-                $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
-                $colorFondo = $colorFondos[$index % count($colorFondos)];
-                
-                // Colores para barras de progreso
-                $coloresBarra = [
-                    'linear-gradient(90deg,#07866e,#0abf9e)',
-                    'linear-gradient(90deg,#1d4ed8,#3b82f6)',
-                    'linear-gradient(90deg,#7c3aed,#a855f7)',
-                    'linear-gradient(90deg,#b45309,#f59e0b)',
-                    'linear-gradient(90deg,#be123c,#f43f5e)',
-                    'linear-gradient(90deg,#0e7490,#22d3ee)',
-                    'linear-gradient(90deg,#15803d,#4ade80)',
-                    'linear-gradient(90deg,#9a3412,#fb923c)',
-                ];
-                $colorBarra = $coloresBarra[$index % count($coloresBarra)];
-            @endphp
-            <div class="idioma-preview-card">
-                <div class="idioma-preview-header">
-                    <div class="idioma-preview-left">
-                        @if($banderaEmoji)
-                            <span class="idioma-bandera">{{ $banderaEmoji }}</span>
-                        @else
-                            <span class="idioma-flag-code-preview" style="background: {{ $colorFondo }}; width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; margin-right: 10px;">
-                                {{ $codigo }}
-                            </span>
-                        @endif
-                        <div class="idioma-preview-info">
-                            <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
-                            <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+    <!-- IDIOMAS -->
+    <div class="section">
+        <h2><i class="fas fa-language"></i> Idiomas</h2>
+        @if($idiomas->isEmpty())
+            <div class="empty-message">No hay idiomas registrados</div>
+        @else
+            <div class="idiomas-preview-grid">
+                @foreach($idiomasRecientes as $index => $idioma)
+                @php
+                    $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                    $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                    $colorFondo = $colorFondos[$index % count($colorFondos)];
+                    $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+                @endphp
+                <div class="idioma-preview-card">
+                    <div class="idioma-preview-header">
+                        <div class="idioma-preview-left">
+                            @if($banderaEmoji)
+                                <span class="idioma-bandera">{{ $banderaEmoji }}</span>
+                            @else
+                                <span class="idioma-flag-code-preview" style="background: {{ $colorFondo }}; width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; margin-right: 10px;">
+                                    {{ $codigo }}
+                                </span>
+                            @endif
+                            <div class="idioma-preview-info">
+                                <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
+                                <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+                            </div>
                         </div>
+                        @if($idioma->certificado)
+                            <a href="javascript:void(0)" onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')" class="idioma-cert-link">
+                                <i class="fas fa-certificate"></i> Cert.
+                            </a>
+                        @endif
                     </div>
-                    @if($idioma->certificado)
-                        <a href="javascript:void(0)" onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')" class="idioma-cert-link">
-                            <i class="fas fa-certificate"></i> Cert.
-                        </a>
-                    @endif
+                    <div class="idioma-barra-wrap">
+                        <div class="idioma-barra-fill-custom" style="width: {{ $idioma->porcentaje }}%; background: {{ $colorBarra }};"></div>
+                    </div>
                 </div>
-                <div class="idioma-barra-wrap">
-                    <div class="idioma-barra-fill-custom" style="width: {{ $idioma->porcentaje }}%; background: {{ $colorBarra }};"></div>
+                @endforeach
+            </div>
+            
+            @if($idiomasRestantes->count() > 0)
+                <div class="btn-ver-todos">
+                    <button onclick="abrirModalIdiomas()">
+                        <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
+                    </button>
                 </div>
-            </div>
-            @endforeach
-        </div>
-        
-        @if($idiomasRestantes->count() > 0)
-            <div class="btn-ver-todos">
-                <button onclick="abrirModalIdiomas()">
-                    <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
-                </button>
-            </div>
+            @endif
         @endif
-    @endif
-</div>
-
-<!-- MODAL TODOS LOS IDIOMAS -->
-<div id="modal-todos-idiomas" class="modal-todos-proyectos">
-    <div class="modal-todos-content">
-        <div class="modal-todos-header">
-            <h2><i class="fas fa-language"></i> Todos los idiomas ({{ $idiomas->count() }})</h2>
-            <button class="close-todos-modal" onclick="cerrarModalIdiomas()">✕</button>
-        </div>
-        <div class="todos-proyectos-grid">
-            @foreach($idiomas as $index => $idioma)
-            @php
-                // Banderas emoji para idiomas reconocidos
-                $banderas = [
-                    'inglés'=>'🇬🇧','ingles'=>'🇬🇧',
-                    'español'=>'🇧🇴','espanol'=>'🇧🇴',
-                    'portugués'=>'🇧🇷','portugues'=>'🇧🇷',
-                    'francés'=>'🇫🇷','frances'=>'🇫🇷',
-                    'alemán'=>'🇩🇪','aleman'=>'🇩🇪',
-                    'italiano'=>'🇮🇹',
-                    'chino'=>'🇨🇳',
-                    'japonés'=>'🇯🇵','japones'=>'🇯🇵',
-                    'coreano'=>'🇰🇷',
-                    'árabe'=>'🇸🇦','arabe'=>'🇸🇦',
-                    'ruso'=>'🇷🇺',
-                    'hindi'=>'🇮🇳','hindú'=>'🇮🇳','indu'=>'🇮🇳',
-                    'holandés'=>'🇳🇱','holandes'=>'🇳🇱',
-                    'sueco'=>'🇸🇪',
-                    'noruego'=>'🇳🇴',
-                    'danés'=>'🇩🇰','danes'=>'🇩🇰',
-                    'polaco'=>'🇵🇱',
-                    'turco'=>'🇹🇷',
-                    'griego'=>'🇬🇷',
-                    'hebreo'=>'🇮🇱',
-                    'tailandés'=>'🇹🇭','tailandes'=>'🇹🇭',
-                    'vietnamita'=>'🇻🇳',
-                    'indonesio'=>'🇮🇩',
-                    'catalán'=>'🏳️','catalan'=>'🏳️',
-                    'mandarin'=>'🇨🇳','mandarín'=>'🇨🇳',
-                ];
-                $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
-                
-                // Código para idiomas sin bandera
-                $codigos = [
-                    'inglés'=>'EN','ingles'=>'EN',
-                    'español'=>'ES','espanol'=>'ES',
-                    'francés'=>'FR','frances'=>'FR',
-                    'alemán'=>'DE','aleman'=>'DE',
-                    'portugués'=>'PT','portugues'=>'PT',
-                    'italiano'=>'IT','chino'=>'ZH',
-                    'japonés'=>'JP','japones'=>'JP',
-                    'coreano'=>'KO','árabe'=>'AR','arabe'=>'AR',
-                    'ruso'=>'RU','hindi'=>'HI','indu'=>'HI',
-                    'mandarin'=>'ZH','mandarín'=>'ZH',
-                ];
-                $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
-                
-                // Colores para badges de código
-                $colorFondos = ['#0abf9e','#3b82f6','#a855f7','#f59e0b','#f43f5e','#22d3ee','#4ade80','#fb923c'];
-                $colorFondo = $colorFondos[$index % count($colorFondos)];
-                
-                // Colores para barras de progreso
-                $coloresBarra = [
-                    'linear-gradient(90deg,#07866e,#0abf9e)',
-                    'linear-gradient(90deg,#1d4ed8,#3b82f6)',
-                    'linear-gradient(90deg,#7c3aed,#a855f7)',
-                    'linear-gradient(90deg,#b45309,#f59e0b)',
-                    'linear-gradient(90deg,#be123c,#f43f5e)',
-                    'linear-gradient(90deg,#0e7490,#22d3ee)',
-                    'linear-gradient(90deg,#15803d,#4ade80)',
-                    'linear-gradient(90deg,#9a3412,#fb923c)',
-                ];
-                $colorBarra = $coloresBarra[$index % count($coloresBarra)];
-            @endphp
-            <div class="proyecto-card-modal">
-                <h4>
-                    @if($banderaEmoji)
-                        {{ $banderaEmoji }} {{ $idioma->nombre }}
-                    @else
-                        <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:{{ $colorFondo }};color:white;font-size:11px;font-weight:700;margin-right:8px;">
-                            {{ $codigo }}
-                        </span>
-                        {{ $idioma->nombre }}
-                    @endif
-                </h4>
-                <div class="proyecto-fecha" style="margin-top: 4px;">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</div>
-                <div class="idioma-barra-wrap" style="margin-top: 10px;">
-                    <div style="height: 8px; background: #edf0f4; border-radius: 10px; overflow: hidden;">
-                        <div style="width: {{ $idioma->porcentaje }}%; height: 100%; background: {{ $colorBarra }}; border-radius: 10px; transition: width 0.8s ease;"></div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
     </div>
-</div>
+
     <!-- PROYECTOS -->
     <div class="section">
         <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
@@ -818,14 +684,40 @@
                 <button class="close-todos-modal" onclick="cerrarModalIdiomas()">✕</button>
             </div>
             <div class="todos-proyectos-grid">
-                @foreach($idiomas as $idioma)
-                    <div class="proyecto-card-modal">
-                        <h4>{{ $idioma->bandera }} {{ $idioma->nombre }}</h4>
-                        <div class="proyecto-fecha">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</div>
-                        <div class="idioma-barra-wrap" style="margin-top: 8px;">
-                            <div class="idioma-barra-fill" style="width: {{ $idioma->porcentaje }}%"></div>
+                @foreach($idiomas as $index => $idioma)
+                @php
+                    $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                    $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                    $colorFondo = $colorFondos[$index % count($colorFondos)];
+                    $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+                @endphp
+                <div class="proyecto-card-modal">
+                    <h4>
+                        @if($banderaEmoji)
+                            {{ $banderaEmoji }} {{ $idioma->nombre }}
+                        @else
+                            <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;background:{{ $colorFondo }};color:white;font-size:11px;font-weight:700;margin-right:8px;">
+                                {{ $codigo }}
+                            </span>
+                            {{ $idioma->nombre }}
+                        @endif
+                    </h4>
+                    <div class="proyecto-fecha" style="margin-top: 4px;">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</div>
+                    <div class="idioma-barra-wrap" style="margin-top: 10px;">
+                        <div style="height: 8px; background: #edf0f4; border-radius: 10px; overflow: hidden;">
+                            <div style="width: {{ $idioma->porcentaje }}%; height: 100%; background: {{ $colorBarra }}; border-radius: 10px; transition: width 0.8s ease;"></div>
                         </div>
                     </div>
+                    @if($idioma->certificado)
+                        <a href="javascript:void(0)" 
+                           onclick="event.stopPropagation(); abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')" 
+                           style="margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; color: #0abf9e; font-size: 12px; font-weight: 600; text-decoration: none; padding: 6px 14px; border-radius: 20px; background: #f0fdf9; border: 1px solid #d1fae5; transition: all 0.2s;"
+                           onmouseover="this.style.background='#d1fae5';"
+                           onmouseout="this.style.background='#f0fdf9';">
+                            <i class="fas fa-certificate"></i> Ver certificado
+                        </a>
+                    @endif
+                </div>
                 @endforeach
             </div>
         </div>
@@ -917,7 +809,6 @@
 </div>
 
 <script>
-// Toggle descripción
 function toggleDesc(id, btn) {
     const el = document.getElementById(id);
     if (el.classList.contains('collapsed')) {
@@ -931,7 +822,6 @@ function toggleDesc(id, btn) {
     }
 }
 
-// Lightbox
 function abrirLightbox(imagenSrc) {
     let lightbox = document.getElementById('lightbox-modal');
     if (!lightbox) {
@@ -941,7 +831,7 @@ function abrirLightbox(imagenSrc) {
         lightbox.innerHTML = `
             <div style="position:relative; max-width:90vw; max-height:90vh;">
                 <img id="lightbox-img" style="max-width:100%; max-height:90vh; object-fit:contain; border-radius:8px;">
-                <button id="lightbox-close" style="position:absolute; top:-40px; right:0; background:none; border:none; color:white; font-size:28px; cursor:pointer;">✕</button>
+                <button id="lightbox-close" style="position:absolute; top:-40px; right:0; background:none; border:none; color:white; font-size:28px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(0,0,0,0.5);">✕</button>
             </div>
         `;
         document.body.appendChild(lightbox);
@@ -958,7 +848,6 @@ function abrirLightbox(imagenSrc) {
     }
 }
 
-// Publicar
 document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
     e.preventDefault();
     Swal.fire({
@@ -977,7 +866,6 @@ document.getElementById('formPublicar')?.addEventListener('submit', function(e) 
     });
 });
 
-// Proyectos
 window.previewProjectsById = {!! json_encode(
     collect($proyectos)->keyBy('id')->map(function($p) use ($allowedHtmlTags) {
         return [
@@ -1012,18 +900,21 @@ function abrirModal(data) {
     document.getElementById('modal-nombre').textContent = data.nombre;
     let badgesDiv = document.getElementById('modal-badges');
     badgesDiv.innerHTML = '';
+    const badge = (texto, bg, color) => `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};">${texto}</span>`;
+    const badgeIcon = (iconClass, texto, bg, color) => `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};"><i class="${iconClass}" style="font-size:10px;opacity:.9;"></i>${texto}</span>`;
+
     if (data.estado) {
         let bg = data.estado === 'Completado' ? '#d1fae5' : data.estado === 'En curso' ? '#fef3c7' : '#f1f5f9';
         let color = data.estado === 'Completado' ? '#065f46' : data.estado === 'En curso' ? '#92400e' : '#64748b';
-        badgesDiv.innerHTML += `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;background:${bg};color:${color};">${previewEscapeHtml(data.estado)}</span>`;
+        badgesDiv.innerHTML += badge(previewEscapeHtml(data.estado), bg, color);
     }
-    if (data.rol) badgesDiv.innerHTML += `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;background:#ede9fe;color:#5b21b6;">${previewEscapeHtml(data.rol)}</span>`;
-    if (data.cliente) badgesDiv.innerHTML += `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;background:#f1f5f9;color:#475569;">${previewEscapeHtml(data.cliente)}</span>`;
+    if (data.rol) badgesDiv.innerHTML += badgeIcon('fas fa-user-check', previewEscapeHtml(data.rol), '#ede9fe', '#5b21b6');
+    if (data.cliente) badgesDiv.innerHTML += badgeIcon('fas fa-building', previewEscapeHtml(data.cliente), '#f1f5f9', '#475569');
     
     let fechasDiv = document.getElementById('modal-fechas');
     fechasDiv.innerHTML = '';
-    if (data.fecha_inicio) fechasDiv.innerHTML += `<span>Inicio: ${previewEscapeHtml(data.fecha_inicio)}</span>`;
-    if (data.fecha_fin) fechasDiv.innerHTML += `<span>Fin: ${previewEscapeHtml(data.fecha_fin)}</span>`;
+    if (data.fecha_inicio) fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Inicio: <strong>${previewEscapeHtml(data.fecha_inicio)}</strong></span>`;
+    if (data.fecha_fin) fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Fin: <strong>${previewEscapeHtml(data.fecha_fin)}</strong></span>`;
     
     document.getElementById('modal-descripcion').innerHTML = data.descripcion ?? '';
     let tecDiv = document.getElementById('modal-tecnologias');
@@ -1042,10 +933,92 @@ function abrirModal(data) {
         document.getElementById('modal-ev-count').textContent = '(' + data.evidencias.length + ')';
         data.evidencias.forEach(ev => {
             let item = document.createElement('div');
+            
             if (ev.tipo === 'imagen' && ev.imagen) {
-                item.innerHTML = `<div><img src="${ev.imagen}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; cursor:pointer;" onclick="abrirLightbox('${ev.imagen}')"></div>`;
-            } else if ((ev.tipo === 'enlace' || ev.tipo === 'repositorio') && ev.url) {
-                item.innerHTML = `<div><a href="${ev.url}" target="_blank">${ev.titulo || ev.url}</a></div>`;
+                let nombreImagen = ev.titulo || 'Imagen del proyecto';
+                if (nombreImagen.match(/\.(jpg|jpeg|png|gif|webp)$/i) || nombreImagen.length > 30) {
+                    nombreImagen = 'Imagen del proyecto';
+                }
+                item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                        <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-image" style="color: #0abf9e; font-size: 18px;"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(nombreImagen)}</strong>
+                        </div>
+                    </div>
+                    <div style="padding: 16px; background: white; position: relative;">
+                        <div style="position: relative; display: inline-block; width: 100%; border-radius: 16px; overflow: hidden;">
+                            <img src="${ev.imagen}" style="width:100%; max-height:280px; object-fit:cover; border-radius: 16px; cursor: pointer; transition: transform 0.2s;" 
+                                 onclick="abrirLightbox('${ev.imagen}')"
+                                 onmouseover="this.style.transform='scale(1.01)'"
+                                 onmouseout="this.style.transform='scale(1)'"
+                                 onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:#ef4444;font-size:12px;padding:16px;text-align:center;\'>❌ No se pudo cargar la imagen</p>'">
+                            <div onclick="abrirLightbox('${ev.imagen}')" style="position: absolute; bottom: 16px; right: 16px; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); border-radius: 40px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <span style="color: white; font-size: 12px; font-weight: 500;">Ver imagen</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (ev.tipo === 'enlace' && ev.url) {
+                item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                        <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-link" style="color: #0abf9e; font-size: 18px;"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Enlace')}</strong>
+                            ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
+                        </div>
+                    </div>
+                    <div style="padding: 16px; background: white;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
+                                <i class="fas fa-globe" style="font-size: 12px; color: #0abf9e;"></i>
+                                <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
+                            </div>
+                            <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                Abrir enlace <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (ev.tipo === 'repositorio' && ev.url) {
+                let icon = 'fa-github';
+                if (ev.plataforma === 'GitLab') icon = 'fa-gitlab';
+                else if (ev.plataforma === 'Bitbucket') icon = 'fa-bitbucket';
+                item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                        <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fab ${icon}" style="color: #0abf9e; font-size: 18px;"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Repositorio')}</strong>
+                            ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
+                        </div>
+                    </div>
+                    <div style="padding: 16px; background: white;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
+                                <i class="fab ${icon}" style="font-size: 12px;"></i>
+                                <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
+                            </div>
+                            <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                Ver repositorio <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
             }
             evDiv.appendChild(item);
         });
@@ -1060,7 +1033,6 @@ function cerrarModal() {
     document.body.style.overflow = '';
 }
 
-// Modales de proyectos
 function abrirModalTodosProyectos() {
     document.getElementById('modal-todos-proyectos').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1070,7 +1042,6 @@ function cerrarModalTodosProyectos() {
     document.body.style.overflow = '';
 }
 
-// Modales de experiencias
 function abrirModalExperiencias() {
     document.getElementById('modal-todos-experiencias').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1080,7 +1051,6 @@ function cerrarModalExperiencias() {
     document.body.style.overflow = '';
 }
 
-// Modales de académicas
 function abrirModalAcademicas() {
     document.getElementById('modal-todos-academicas').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1090,7 +1060,6 @@ function cerrarModalAcademicas() {
     document.body.style.overflow = '';
 }
 
-// Modales de habilidades técnicas
 function abrirModalTecnicas() {
     document.getElementById('modal-todos-tecnicas').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1100,7 +1069,6 @@ function cerrarModalTecnicas() {
     document.body.style.overflow = '';
 }
 
-// Modales de habilidades blandas
 function abrirModalBlandas() {
     document.getElementById('modal-todos-blandas').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1110,7 +1078,6 @@ function cerrarModalBlandas() {
     document.body.style.overflow = '';
 }
 
-// Modales de idiomas
 function abrirModalIdiomas() {
     document.getElementById('modal-todos-idiomas').style.display = 'flex';
     document.body.style.overflow = 'hidden';
@@ -1120,7 +1087,6 @@ function cerrarModalIdiomas() {
     document.body.style.overflow = '';
 }
 
-// Compartir
 function abrirModalCompartir() {
     document.getElementById('modal-compartir').style.display = 'flex';
 }
@@ -1148,6 +1114,31 @@ function shareTo(platform) {
     }
     if(url) window.open(url, '_blank');
 }
+
+document.getElementById('modal-proyecto').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal();
+});
+document.getElementById('modal-compartir').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalCompartir();
+});
+document.getElementById('modal-todos-proyectos')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalTodosProyectos();
+});
+document.getElementById('modal-todos-experiencias')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalExperiencias();
+});
+document.getElementById('modal-todos-academicas')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalAcademicas();
+});
+document.getElementById('modal-todos-tecnicas')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalTecnicas();
+});
+document.getElementById('modal-todos-blandas')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalBlandas();
+});
+document.getElementById('modal-todos-idiomas')?.addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalIdiomas();
+});
 </script>
 
 @endsection
