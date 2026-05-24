@@ -353,22 +353,50 @@ body {
     font-size: 13px;
     line-height: 1.6;
     margin: 0;
-}
-
-.description.collapsed {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.description.expanded {
-    display: block;
-    overflow: visible;
-}
-.description.collapsed,
-.description.expanded {
     word-break: break-word;
     overflow-wrap: break-word;
+}
+
+/* Estado cerrado: recorta la descripción */
+.card .description.collapsed {
+    display: block;
+    max-height: 6.4em; /* aprox. 4 líneas */
+    overflow: hidden;
+    position: relative;
+}
+
+/* Degradado inferior para indicar que hay más texto */
+.card .description.collapsed::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2em;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), #ffffff);
+    pointer-events: none;
+}
+
+/* Estado abierto: muestra todo */
+.card .description.expanded {
+    display: block;
+    max-height: none;
+    overflow: visible;
+}
+
+.card .description.expanded::after {
+    display: none;
+}
+
+/* Quitar estilos de Quill que hacen que el recorte falle */
+.card .description .ql-snow {
+    border: none !important;
+}
+
+.card .description .ql-editor {
+    padding: 0 !important;
+    min-height: 0 !important;
+    line-height: 1.6;
 }
 
 /* Descripción de proyecto (HTML de Quill) en tarjetas del preview */
