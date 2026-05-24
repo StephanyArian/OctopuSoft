@@ -283,12 +283,6 @@ body {
     line-height: 1.6;
 }
 
-.hero-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
 
 .hero-buttons .btn-outline { border-color: var(--white); color: var(--white); }
 .hero-buttons .btn-outline:hover { background: var(--white); color: var(--teal); border-color: var(--white); }

@@ -176,16 +176,6 @@
                forma fácil, rápida y moderna para mostrar tus proyectos,
                habilidades y experiencia al mundo.</p>
 
-            <div class="hero-buttons">
-                @guest
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn-primary">Registrarse</a>
-                    @endif
-                    @if (Route::has('login'))
-                        <a href="{{ route('login') }}" class="btn-outline">Iniciar sesión</a>
-                    @endif
-                @endguest
-            </div>
         </div>
     </section>
 

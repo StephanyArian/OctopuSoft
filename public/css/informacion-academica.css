@@ -33,9 +33,33 @@
 
 /* â”€â”€ FIX: sidebar oscuro â”€â”€ */
 .sidebar { position: sticky; top: 110px; height: calc(100vh - 110px); overflow-y: auto; align-self: flex-start;  width: 240px; min-width: 240px; background: var(--burg-deep); border-right: none; padding: 20px 0; }
-.sidebar-item { padding: 13px 24px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.45); transition: all 0.2s ease; font-weight: 500; position: relative; text-decoration: none !important; border-left: 3px solid transparent; }
-.sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); border-left-color: rgba(10,191,158,0.4); }
-.sidebar-item.active { background: rgba(10,191,158,0.08); font-weight: 700; color: var(--teal); border-left: 3px solid var(--teal); }
+.sidebar-item {
+    padding: 13px 24px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex !important;        /* añade !important */
+    align-items: center !important;  /* añade !important */
+    gap: 10px;
+    color: rgba(255,255,255,0.45);
+    transition: all 0.2s ease;
+    font-weight: 500;
+    position: relative;
+    text-decoration: none !important;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-item:hover {
+    color: rgba(255,255,255,0.85);  /* hover: icono Y texto juntos */
+    border-left-color: rgba(10,191,158,0.4);
+    background: rgba(255,255,255,0.05);
+}
+
+.sidebar-item.active {
+    color: var(--teal);  /* activo: icono Y texto en teal */
+    border-left: 3px solid var(--teal);
+    background: rgba(10,191,158,0.08);
+    font-weight: 700;
+}
 
 .main { flex: 1; padding: 32px 40px; background: var(--off); }
 
