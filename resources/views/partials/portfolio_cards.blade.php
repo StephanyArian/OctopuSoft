@@ -59,7 +59,7 @@
         </div>
     </div>
 @empty
-    <div class="empty-state" style="grid-column: 1 / -1;">
+    <div class="empty-state empty-results">
         <i class="fas fa-folder-open"></i>
         <h3>No se encontraron resultados</h3>
         <p>Intenta cambiar los criterios o filtros de búsqueda.</p>

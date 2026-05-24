@@ -61,7 +61,12 @@
 
             {{-- FILTROS --}}
             <div class="filter-container">
-                <div class="filters-row">
+                    <button type="button" class="mobile-filter-toggle" id="mobileFilterToggle">
+        <span>Filtrar portafolios</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+                <div class="filters-row" id="filtersRow">
 
                     {{-- Categorías --}}
 <div class="custom-dropdown" id="categoryDropdown">
@@ -314,24 +319,22 @@
 
             {{-- GRILLA DE PORTAFOLIOS --}}
             <div id="portfoliosGrid" class="explore-grid">
-                @if($portfolios->isEmpty())
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <h3>No hay portafolios aún</h3>
-                        <p>Sé el primero en crear y publicar tu portafolio profesional.</p>
+    @if($portfolios->isEmpty())
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
 
-                        <br>
-
-                        @if(Route::has('register'))
-                            <a href="{{ route('register') }}" class="btn-primary">
-                                Crear mi portafolio
-                            </a>
-                        @endif
-                    </div>
-                @else
-                    @include('partials.portfolio_cards')
-                @endif
-            </div>
+            @if(request()->hasAny(['search', 'category', 'skills', 'min_projects', 'language', 'sort']))
+                <h3>No se encontraron resultados</h3>
+                <p>Intenta cambiar los criterios o filtros de búsqueda.</p>
+            @else
+                <h3>No hay portafolios aún</h3>
+                <p>Aún no existen portafolios públicos disponibles para explorar.</p>
+            @endif
+        </div>
+    @else
+        @include('partials.portfolio_cards')
+    @endif
+</div>
 
         </div>
     </div>

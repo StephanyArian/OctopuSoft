@@ -14,6 +14,8 @@ function toggleUserMenu() {
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchRepo');
     const btnClear = document.getElementById('btnClearFilters');
+    const filterContainer = document.querySelector('.filter-container');
+const mobileFilterToggle = document.getElementById('mobileFilterToggle');
 
     const portfoliosGrid = document.getElementById('portfoliosGrid');
     const totalResults = document.getElementById('totalResults');
@@ -312,6 +314,130 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+        // ── Buscador flotante compacto ──
+    const floatingSearchBtn = document.createElement('button');
+    floatingSearchBtn.type = 'button';
+    floatingSearchBtn.className = 'floating-search-btn';
+    floatingSearchBtn.innerHTML = '<i class="fas fa-search"></i>';
+    floatingSearchBtn.setAttribute('aria-label', 'Abrir buscador');
+
+    const floatingSearchPanel = document.createElement('div');
+    floatingSearchPanel.className = 'floating-search-panel';
+    floatingSearchPanel.innerHTML = `
+        <i class="fas fa-search"></i>
+        <input
+            type="text"
+            class="floating-search-input"
+            maxlength="50"
+            placeholder="Buscar portafolios..."
+        >
+        <button type="button" class="floating-search-close" aria-label="Cerrar buscador">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+
+    document.body.appendChild(floatingSearchBtn);
+    document.body.appendChild(floatingSearchPanel);
+
+    const floatingSearchInput = floatingSearchPanel.querySelector('.floating-search-input');
+    const floatingSearchClose = floatingSearchPanel.querySelector('.floating-search-close');
+
+    let searchStartPosition = searchInput
+        ? searchInput.getBoundingClientRect().top + window.scrollY
+        : 0;
+
+    function shouldShowFloatingSearch() {
+        if (!searchInput) return false;
+
+        const triggerPoint = searchStartPosition + 80;
+        return window.scrollY > triggerPoint;
+    }
+
+    function updateFloatingSearchVisibility() {
+        if (shouldShowFloatingSearch()) {
+            floatingSearchBtn.classList.add('visible');
+        } else {
+            floatingSearchBtn.classList.remove('visible');
+            floatingSearchPanel.classList.remove('open');
+        }
+    }
+
+    function openFloatingSearch() {
+        if (searchInput && floatingSearchInput) {
+            floatingSearchInput.value = searchInput.value;
+        }
+
+        floatingSearchPanel.classList.add('open');
+        floatingSearchBtn.classList.remove('visible');
+
+        setTimeout(() => {
+            floatingSearchInput.focus();
+        }, 80);
+    }
+
+    function closeFloatingSearch() {
+        floatingSearchPanel.classList.remove('open');
+
+        if (shouldShowFloatingSearch()) {
+            floatingSearchBtn.classList.add('visible');
+        }
+    }
+
+    floatingSearchBtn.addEventListener('click', openFloatingSearch);
+
+    floatingSearchClose.addEventListener('click', e => {
+        e.preventDefault();
+        closeFloatingSearch();
+    });
+
+    floatingSearchInput.addEventListener('input', () => {
+        if (searchInput) {
+            searchInput.value = floatingSearchInput.value.slice(0, 50);
+        }
+
+        clearTimeout(debounceTimer);
+
+        debounceTimer = setTimeout(() => {
+            fetchFilteredPortfolios();
+        }, 350);
+    });
+
+    floatingSearchInput.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            closeFloatingSearch();
+        }
+    });
+
+    document.addEventListener('click', e => {
+        const clickedInsideFloatingSearch =
+            floatingSearchPanel.contains(e.target) ||
+            floatingSearchBtn.contains(e.target);
+
+        if (!clickedInsideFloatingSearch && floatingSearchPanel.classList.contains('open')) {
+            closeFloatingSearch();
+        }
+    });
+
+    window.addEventListener('scroll', updateFloatingSearchVisibility);
+
+    window.addEventListener('resize', () => {
+        searchStartPosition = searchInput
+            ? searchInput.getBoundingClientRect().top + window.scrollY
+            : 0;
+
+        updateFloatingSearchVisibility();
+    });
+
+    updateFloatingSearchVisibility();
+    // Mostrar/ocultar filtros en responsive
+if (mobileFilterToggle && filterContainer) {
+    mobileFilterToggle.addEventListener('click', e => {
+        e.preventDefault();
+
+        filterContainer.classList.toggle('filters-open');
+        mobileFilterToggle.classList.toggle('active');
+    });
+}
     updateDropdownTexts();
 });
 

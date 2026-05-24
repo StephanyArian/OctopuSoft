@@ -28,8 +28,7 @@
 
 /* ── Buscador sticky ── */
 .search-sticky-wrapper {
-    position: sticky;
-    top: 10px;
+    position: relative;
     z-index: 100;
     margin-bottom: 14px;
     background: transparent;
@@ -456,4 +455,227 @@
 .custom-option-reset.active span {
     color: var(--teal);
     background: rgba(10, 191, 158, 0.12);
+}
+
+/* ── Estado vacío centrado dentro del grid ── */
+.explore-grid > .empty-state,
+.explore-grid > .empty-results {
+    grid-column: 1 / -1;
+    width: 100%;
+    max-width: 520px;
+    margin: 70px auto 90px;
+    text-align: center;
+    justify-self: center;
+}
+
+.explore-grid > .empty-state i,
+.explore-grid > .empty-results i {
+    display: block;
+    font-size: 3.4rem;
+    color: var(--gray-300);
+    margin-bottom: 18px;
+}
+
+.explore-grid > .empty-state h3,
+.explore-grid > .empty-results h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--gray-700);
+    margin-bottom: 10px;
+}
+
+.explore-grid > .empty-state p,
+.explore-grid > .empty-results p {
+    max-width: 460px;
+    margin: 0 auto;
+    font-size: 1rem;
+    color: var(--gray-500);
+    line-height: 1.6;
+}
+
+/* ── Buscador flotante compacto ── */
+.floating-search-btn {
+    position: fixed;
+    right: 26px;
+    bottom: 28px;
+    width: 58px;
+    height: 58px;
+    border-radius: 999px;
+    border: none;
+    background: var(--teal);
+    color: #ffffff;
+    font-size: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1400;
+    box-shadow: 0 14px 32px rgba(10, 191, 158, 0.35);
+    transition: all 0.25s ease;
+}
+
+.floating-search-btn.visible {
+    display: inline-flex;
+}
+
+.floating-search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 38px rgba(10, 191, 158, 0.42);
+}
+
+.floating-search-panel {
+    position: fixed;
+    right: 26px;
+    bottom: 96px;
+    width: min(520px, calc(100% - 52px));
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 22px;
+    background: #ffffff;
+    border: 2px solid rgba(10, 191, 158, 0.25);
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.18);
+    z-index: 1401;
+}
+
+.floating-search-panel.open {
+    display: flex;
+}
+
+.floating-search-panel i {
+    color: #8b93a7;
+    font-size: 18px;
+    margin-left: 8px;
+}
+
+.floating-search-input {
+    flex: 1;
+    height: 44px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--burg-deep);
+}
+
+.floating-search-input::placeholder {
+    color: #7b8296;
+    font-weight: 500;
+}
+
+.floating-search-close {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(10, 191, 158, 0.12);
+    color: var(--teal);
+    cursor: pointer;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.floating-search-close:hover {
+    background: var(--teal);
+    color: #ffffff;
+}
+
+/* En responsive queda centrado abajo */
+@media (max-width: 700px) {
+    .floating-search-btn {
+        right: 20px;
+        bottom: 22px;
+        width: 54px;
+        height: 54px;
+        font-size: 18px;
+    }
+
+    .floating-search-panel {
+        left: 16px;
+        right: 16px;
+        bottom: 88px;
+        width: auto;
+        border-radius: 18px;
+    }
+}
+
+/* ── Botón para mostrar filtros en responsive ── */
+.mobile-filter-toggle {
+    display: none;
+    width: 100%;
+    height: 52px;
+    padding: 0 18px;
+    border-radius: 16px;
+    border: 2px solid #d8dde8;
+    background: #ffffff;
+    color: var(--burg-deep);
+    font-size: 15px;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: all 0.25s ease;
+}
+
+.mobile-filter-toggle:hover,
+.mobile-filter-toggle.active {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 4px rgba(10, 191, 158, 0.14);
+}
+
+.mobile-filter-toggle i {
+    transition: transform 0.25s ease;
+}
+
+.mobile-filter-toggle.active i {
+    transform: rotate(180deg);
+}
+
+/* Ajustar limpiar filtros en responsive */
+@media (max-width: 900px) {
+    .search-actions-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .btn-clear-inline {
+        width: 100%;
+        height: 52px;
+        border-radius: 16px;
+        font-size: 15px;
+        padding: 0 18px;
+    }
+
+    .filter-container {
+        padding: 20px 18px;
+        border-radius: 20px;
+    }
+
+    .mobile-filter-toggle {
+        display: flex;
+    }
+
+    .filters-row {
+        display: none;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 14px;
+    }
+
+    .filter-container.filters-open .filters-row {
+        display: grid;
+    }
+
+    .custom-dropdown-btn {
+        height: 52px;
+        border-radius: 16px;
+        font-size: 15px;
+    }
 }
