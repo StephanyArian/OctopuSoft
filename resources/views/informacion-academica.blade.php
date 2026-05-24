@@ -1,19 +1,15 @@
-<x-app-layout>
-    
-    <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
- 
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@extends('layouts.app-completar')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
+@endpush
+
+@section('content')
+    
  
-            <div class="shell">
-                <div class="header-bar" style="display: none;"></div>
-            
-                <div class="body-row">
-                    @include('partials.sidebar-completar')
-                    <div class="main">
+    
                         <div class="page-title">Información académica</div>
  
                         <!-- Formulario -->
@@ -207,14 +203,10 @@
                         </div>
 
                         <div id="historial-react" data-formaciones='@json($formaciones)'></div>
-
-                    </div>{{-- /main --}}
-                </div>{{-- /body-row --}}
-            </div>{{-- /shell --}}
-        </div>
-    </div>
+@endsection
  
+@push('scripts')
     <script src="{{ asset('js/informacion-academica.js') }}"></script>
     @viteReactRefresh
     @vite('resources/js/informacion-academica.jsx')
-</x-app-layout>
+@endpush 

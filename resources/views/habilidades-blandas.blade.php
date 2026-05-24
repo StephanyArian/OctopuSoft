@@ -1,21 +1,11 @@
-{{-- resources/views/habilidades-blandas.blade.php --}}
-<x-app-layout>
-    
-    <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
+@extends('layouts.app-completar')
+
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/skills.css') }}">
+@endpush
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-            <div class="shell">
-                <div class="header-bar" style="display: none;"></div>
-
-                <div class="body-row">
-                    {{-- Sidebar --}}
-                    @include('partials.sidebar-completar')
-                    {{-- Contenido --}}
-                    <div class="main">
-                        <div class="page-title">Habilidades blandas</div>
+@section('content')
+                    <div class="page-title">Habilidades blandas</div>
 
                         <div class="section-card">
                             <div class="section-subtitle">
@@ -143,13 +133,10 @@
                                 </div>
                             @endif
 
-                        </div>{{-- /section-card --}}
-                    </div>{{-- /main --}}
-                </div>{{-- /body-row --}}
-            </div>{{-- /shell --}}
-        </div>
-    </div>
-
+                        
+                        </div>
+    @endsection
+    @push('modals')
     {{-- Modal eliminar --}}
     <div class="modal-backdrop" id="delete-modal">
         <div class="modal-box">
@@ -164,7 +151,8 @@
             </form>
         </div>
     </div>
+    @endpush
 
+    @push('scripts')
     <script src="{{ asset('js/habilidades-blandas.js') }}"></script>
-
-</x-app-layout>
+@endpush

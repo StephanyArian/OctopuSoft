@@ -31,36 +31,7 @@
 .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--teal); }
 .nav-tab.muted { color: var(--gray-300); background: rgba(255,255,255,.05); }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€ SIDEBAR â”€â”€â”€â”€â”€â”€â”€â”€ */
-.sidebar { 
-    position: sticky; 
-    top: 72px; 
-    height: calc(100vh - 72px); 
-    overflow-y: auto;
-    scrollbar-gutter: stable; 
-    align-self: flex-start; 
-    width: 240px !important;
-    min-width: 240px !important;
-    max-width: 240px !important;
-    flex: 0 0 240px !important;
-    flex-shrink: 0 !important;
-    background: var(--burg-deep);
-    border-right: none;
-    padding: 20px 0;
-}
 
-.sidebar.sidebar-restoring {
-    background: var(--burg-deep);
-}
-
-.sidebar.sidebar-restoring .sidebar-profile,
-.sidebar.sidebar-restoring .sidebar-item,
-.sidebar.sidebar-restoring .sidebar-footer-actions {
-    opacity: 0;
-}
-.sidebar-item { padding: 12px 20px; font-size: 13px; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.6) !important; transition: all .3s ease; font-weight: 500; text-decoration: none; }
-.sidebar-item:hover { background: rgba(255,255,255,.08) !important; color: white !important; }
-.sidebar-item.active { background: rgba(10,191,158,.12) !important; color: #0abf9e !important; border-left: 3px solid #0abf9e !important; font-weight: 700; }
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€ HEADER â”€â”€â”€â”€â”€â”€â”€â”€ */
 .proy-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
@@ -543,35 +514,7 @@ html, body { height: 100%; }
     }
 
     /* Overlay para cerrar el menÃº */
-    .sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 999;
-    }
-
-    .sidebar-overlay.open {
-        display: block;
-    }
-
-    /* Sidebar cuando estÃ¡ abierto */
-    .sidebar.open {
-        display: block !important;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 80%;
-        max-width: 280px;
-        height: 100%;
-        background: #2d0a1e !important;
-        z-index: 1000;
-        overflow-y: auto;
-        padding-top: 60px;
-    }
+    
 }
 
 /* BotÃ³n hamburguesa oculto en escritorio */
@@ -668,95 +611,3 @@ html, body { height: 100%; }
     z-index: 10;
 }
 
-/* PERFIL DEL USUARIO EN SIDEBAR */
-.sidebar-profile {
-    padding: 22px 18px 20px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 14px;
-}
-
-.sidebar-profile-photo {
-    width: 82px;
-    height: 82px;
-    margin: 0 auto 12px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 3px solid var(--teal);
-    box-shadow: 0 0 18px rgba(10, 191, 158, 0.35);
-    background: linear-gradient(135deg, var(--teal), var(--teal-light));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.sidebar-profile-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.sidebar-profile-photo span {
-    color: var(--burg-deep);
-    font-size: 32px;
-    font-weight: 800;
-}
-
-.sidebar-profile-name {
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 1.25;
-    max-width: 190px;
-    margin: 0 auto 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.sidebar-profile-email {
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 12px;
-    line-height: 1.25;
-    max-width: 190px;
-    margin: 0 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.sidebar-item i {
-    font-size: 18px;
-    width: 20px;
-    min-width: 20px;
-    text-align: center;
-}
-
-.sidebar-footer-actions {
-    margin-top: 16px;
-    padding: 16px 18px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-preview-link {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center;
-    gap: 8px !important;
-    width: 100%;
-    padding: 11px 14px !important;
-    border-radius: 999px;
-    background: linear-gradient(135deg, var(--teal), var(--teal-light));
-    color: var(--burg-deep) !important;
-    font-size: 13px !important;
-    font-weight: 800 !important;
-    text-decoration: none !important;
-    border-left: none !important;
-    box-shadow: 0 8px 18px rgba(10, 191, 158, 0.24);
-}
-
-.sidebar-preview-link:hover {
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, var(--teal-light), var(--teal));
-    color: var(--burg-deep) !important;
-}

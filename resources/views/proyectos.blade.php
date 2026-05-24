@@ -1,20 +1,13 @@
-{{-- ===================================================================== --}}
-{{-- resources/views/proyectos.blade.php --}}
-{{-- Módulo: Gestión de Proyectos del Portafolio --}}
-{{-- ===================================================================== --}}
-<x-app-layout>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/Proyectos.css') }}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@extends('layouts.app-completar')
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="shell">
-                <div class="body-row">
-                    @include('partials.sidebar-completar')
-                    <div class="main-panel" id="mainPanel">
+@push('styles')
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Proyectos.css') }}">
+@endpush
+
+@section('content')
+
 
                         {{-- ============================================================ --}}
                         {{-- BANNER DE ÉXITO (estilo habilidades blandas)                --}}
@@ -110,11 +103,9 @@
                         <div class="proy-grid" id="proyGrid"></div>
                         {{-- VISTA PREVIA --}}
                         <div class="preview-page" id="previewPage"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+ @endsection
+
+@push('modals')               
 
     {{-- MODAL ELIMINAR PROYECTO --}}
     <div class="modal-backdrop" id="delete-project-modal">
@@ -130,6 +121,10 @@
             </form>
         </div>
     </div>
+
+    @endpush   
+
+    @push('scripts')
 
     <script src="{{ asset('js/proyectos.js') }}"></script>
     <script src="{{ asset('js/evidencia.js') }}"></script>
@@ -149,4 +144,4 @@
             }, 100);
         });
     </script>
-</x-app-layout>
+@endpush

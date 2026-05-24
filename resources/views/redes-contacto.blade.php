@@ -1,19 +1,6 @@
-<x-app-layout>
+@extends('layouts.app-completar')
 
-    {{-- ESTILOS --}}
-    <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/redes-contacto.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="shell">
-                <div class="header-bar" style="display: none;"></div>
-                <div class="body-row">
-                    {{-- SIDEBAR --}}
-                    @include('partials.sidebar-completar')
-                    {{-- CONTENIDO PRINCIPAL --}}
-                    <div class="main">
+@section('content')
 
                         <div class="page-title">Redes profesionales y contacto</div>
                         <div class="title-underline"></div>
@@ -280,12 +267,7 @@
                             </form>
 
                         </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
+                    
 
     {{-- MODAL MAPA GRANDE — fuera del formulario pero dentro del layout --}}
     <div id="map-modal">
@@ -300,10 +282,18 @@
             <div id="leaflet-map-modal"></div>
         </div>
     </div>
+    @endsection
 
-    {{-- Leaflet JS --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    {{-- JS de la vista --}}
-    <script src="{{ asset('js/redes-contacto.js') }}"></script>
+    @push('styles')
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 
-</x-app-layout>
+<link rel="stylesheet" href="{{ asset('css/redes-contacto.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+
+<script src="{{ asset('js/redes-contacto.js') }}"></script>
+@endpush

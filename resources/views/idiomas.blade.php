@@ -1,15 +1,13 @@
-<x-app-layout>
+@extends('layouts.app-completar')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/idiomas.css') }}">
+@endpush
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@section('content')
+    
 
-            <div class="shell">
-
-                <div class="body-row">
-                    <!-- SIDEBAR -->
-                    @include('partials.sidebar-completar')
-                    <div class="main">
                         <div class="page-title">Idiomas</div>
 
                         <!-- FORMULARIO AGREGAR -->
@@ -295,12 +293,9 @@
                         </div>
                         @endif
 
-                    </div>{{-- /main --}}
-                </div>{{-- /body-row --}}
-            </div>{{-- /shell --}}
-        </div>
-    </div>
+@endsection             
 
+@push('modals')
     {{-- Modal eliminar idioma --}}
     <div class="modal-backdrop" id="delete-modal-idioma">
         <div class="modal-box">
@@ -316,5 +311,10 @@
         </div>
     </div>
 
+    @endpush
+
+@push('scripts')
     <script src="{{ asset('js/idiomas.js') }}"></script>
-</x-app-layout>
+@endpush
+
+   

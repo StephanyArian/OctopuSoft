@@ -1,249 +1,191 @@
+// ── FOTO DE PERFIL ──────────────────────────────────────────
+function previewPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-        function previewPhoto(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('photoPreview');
-            const photoIcon = document.getElementById('photoIcon');
-            const photoLabel = document.getElementById('photoLabel');
-            const photoLink = document.getElementById('photoLink');
-            
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    if (photoLink) {
-                        photoLink.dataset.src = e.target.result;
-                        photoLink.style.display = 'block';
-                    }
-                    if (photoIcon) photoIcon.style.display = 'none';
-                    if (photoLabel) photoLabel.style.display = 'none';
-                }
-                reader.readAsDataURL(file);
-            }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview  = document.getElementById('photoPreview');
+        const photoLink = document.getElementById('photoLink');
+        const photoIcon  = document.getElementById('photoIcon');
+        const photoLabel = document.getElementById('photoLabel');
+
+        if (preview)   { preview.src = e.target.result; preview.style.display = 'block'; }
+        if (photoLink) { photoLink.dataset.src = e.target.result; photoLink.style.display = 'block'; }
+        if (photoIcon)  photoIcon.style.display  = 'none';
+        if (photoLabel) photoLabel.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+function openDeleteModal() {
+    document.getElementById('delete-modal')?.classList.add('active');
+}
+
+function closeDeleteModal() {
+    document.getElementById('delete-modal')?.classList.remove('active');
+}
+
+function openPhotoPreview(src) {
+    if (!src || src === '#') return;
+    const lightbox = document.getElementById('photo-lightbox');
+    const img      = document.getElementById('lightbox-img');
+    if (lightbox && img) {
+        img.src = src;
+        lightbox.classList.add('active');
+    }
+}
+
+// ── VALIDACIÓN DEL FORMULARIO ───────────────────────────────
+document.getElementById('profileForm')?.addEventListener('submit', function(e) {
+    let isValid = true;
+
+    // Nombre
+    const name      = document.getElementById('name').value.trim();
+    const nameError = document.getElementById('nameError');
+    const nameRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
+
+    if (!name) {
+        nameError.classList.remove('hidden');
+        nameError.textContent = 'El nombre es obligatorio';
+        isValid = false;
+    } else if (name.length > 30) {
+        nameError.classList.remove('hidden');
+        nameError.textContent = 'El nombre no puede exceder los 30 caracteres';
+        isValid = false;
+    } else if (!nameRegex.test(name)) {
+        nameError.classList.remove('hidden');
+        nameError.textContent = 'El nombre solo puede contener letras y espacios';
+        isValid = false;
+    } else {
+        nameError.classList.add('hidden');
+    }
+
+    // Título profesional
+    const title = document.getElementById('title').value.trim();
+    let titleError = document.getElementById('titleError');
+    if (!titleError) {
+        titleError = document.createElement('div');
+        titleError.id = 'titleError';
+        titleError.className = 'error-message hidden';
+        document.getElementById('title').parentNode.appendChild(titleError);
+    }
+    const titleRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
+
+    if (title.length > 30) {
+        titleError.classList.remove('hidden');
+        titleError.textContent = 'El título no puede exceder los 30 caracteres';
+        isValid = false;
+    } else if (title && !titleRegex.test(title)) {
+        titleError.classList.remove('hidden');
+        titleError.textContent = 'El título solo puede contener letras y espacios';
+        isValid = false;
+    } else {
+        titleError.classList.add('hidden');
+    }
+
+    // Ubicación
+    const location = document.getElementById('location').value.trim();
+    let locationError = document.getElementById('locationError');
+    if (!locationError) {
+        locationError = document.createElement('div');
+        locationError.id = 'locationError';
+        locationError.className = 'error-message hidden';
+        document.getElementById('location').parentNode.appendChild(locationError);
+    }
+    const locationRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s.,\-]+$/;
+
+    if (location.length > 30) {
+        locationError.classList.remove('hidden');
+        locationError.textContent = 'La ubicación no puede exceder los 30 caracteres';
+        isValid = false;
+    } else if (location && !locationRegex.test(location)) {
+        locationError.classList.remove('hidden');
+        locationError.textContent = 'La ubicación solo puede contener letras, números, puntos, comas y guiones';
+        isValid = false;
+    } else {
+        locationError.classList.add('hidden');
+    }
+
+    // Biografía
+    const bio      = document.getElementById('bio').value;
+    const bioError = document.getElementById('bioError');
+    if (bio.length > 5000) {
+        bioError.classList.remove('hidden');
+        isValid = false;
+    } else {
+        bioError.classList.add('hidden');
+    }
+
+    // Foto
+    const photo      = document.getElementById('photoInput').files[0];
+    const photoError = document.getElementById('photoError');
+    if (photo) {
+        if (!['image/jpeg','image/png'].includes(photo.type)) {
+            photoError.classList.remove('hidden');
+            photoError.textContent = 'Formato no permitido. Use JPG o PNG';
+            isValid = false;
+        } else if (photo.size > 2 * 1024 * 1024) {
+            photoError.classList.remove('hidden');
+            photoError.textContent = 'La imagen no puede superar los 2MB';
+            isValid = false;
+        } else {
+            photoError.classList.add('hidden');
         }
+    }
 
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
-            let isValid = true;
-            
-            // Validación de NOMBRE COMPLETO (solo letras, espacios y acentos)
-            const name = document.getElementById('name').value.trim();
-            const nameError = document.getElementById('nameError');
-            const nameRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
-            
-            if (name === '') {
-                nameError.classList.remove('hidden');
-                nameError.textContent = 'El nombre es obligatorio';
-                isValid = false;
-            } 
-            else if (name.length > 30) {
-                nameError.classList.remove('hidden');
-                nameError.textContent = 'El nombre no puede exceder los 30 caracteres';
-                isValid = false;
-            }
-            else if (!nameRegex.test(name)) {
-                nameError.classList.remove('hidden');
-                nameError.textContent = 'El nombre solo puede contener letras y espacios';
-                isValid = false;
-            }
-            else {
-                nameError.classList.add('hidden');
-            }
-            
-            // Validación de TÍTULO PROFESIONAL (solo letras y espacios)
-            const title = document.getElementById('title').value.trim();
-            let titleError = document.getElementById('titleError');
-            if (!titleError) {
-                titleError = document.createElement('div');
-                titleError.id = 'titleError';
-                titleError.className = 'error-message hidden';
-                document.getElementById('title').parentNode.appendChild(titleError);
-            }
-            
-            const titleRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
-            
-            if (title.length > 30) {
-                titleError.classList.remove('hidden');
-                titleError.textContent = 'El título profesional no puede exceder los 30 caracteres';
-                isValid = false;
-            }
-            else if (title !== '' && !titleRegex.test(title)) {
-                titleError.classList.remove('hidden');
-                titleError.textContent = 'El título profesional solo puede contener letras y espacios';
-                isValid = false;
-            }
-            else {
-                titleError.classList.add('hidden');
-            }
-            
-            // Validación de UBICACIÓN (letras, números, espacios, comas y guiones)
-            const location = document.getElementById('location').value.trim();
-            let locationError = document.getElementById('locationError');
-            if (!locationError) {
-                locationError = document.createElement('div');
-                locationError.id = 'locationError';
-                locationError.className = 'error-message hidden';
-                document.getElementById('location').parentNode.appendChild(locationError);
-            }
-            
-            const locationRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s.,\-]+$/;
-            
-            if (location.length > 30) {
-                locationError.classList.remove('hidden');
-                locationError.textContent = 'La ubicación no puede exceder los 30 caracteres';
-                isValid = false;
-            }
-            else if (location !== '' && !locationRegex.test(location)) {
-                locationError.classList.remove('hidden');
-                locationError.textContent = 'La ubicación solo puede contener letras, números, espacios, puntos, comas y guiones';
-                isValid = false;
-            }
-            else {
-                locationError.classList.add('hidden');
-            }
-            
-            // Validación de BIOGRAFÍA
-            const bio = document.getElementById('bio').value;
-            const bioError = document.getElementById('bioError');
-            if (bio.length > 5000) {
-                bioError.classList.remove('hidden');
-                isValid = false;
-            } else {
-                bioError.classList.add('hidden');
-            }
-            
-            // Validación de FOTO
-            const photo = document.getElementById('photoInput').files[0];
-            const photoError = document.getElementById('photoError');
-            if (photo) {
-                const validTypes = ['image/jpeg', 'image/png'];
-                if (!validTypes.includes(photo.type)) {
-                    photoError.classList.remove('hidden');
-                    photoError.textContent = 'Formato no permitido. Use JPG o PNG';
-                    isValid = false;
-                } else if (photo.size > 2 * 1024 * 1024) {
-                    photoError.classList.remove('hidden');
-                    photoError.textContent = 'La imagen no puede superar los 2MB';
-                    isValid = false;
-                } else {
-                    photoError.classList.add('hidden');
-                }
-            }
-            
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
+    if (!isValid) e.preventDefault();
+});
 
-       
+// ── QUILL (BIOGRAFÍA) ───────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof Quill === 'undefined') return;
+    const qc = document.getElementById('quillEditor');
+    if (!qc) return;
 
-        // Función para cargar perfil personal (vista por defecto)
-        function cargarPerfilPersonal() {
-            // El perfil personal ya está cargado por defecto
-            // Esta función se puede usar para recargar si es necesario
-            location.reload();
+    const Font = Quill.import('formats/font');
+    Font.whitelist = ['sans-serif','serif','monospace','arial','times','courier'];
+    Quill.register(Font, true);
+
+    const quill = new Quill('#quillEditor', {
+        theme: 'snow',
+        placeholder: 'Escribe una breve presentación sobre ti...',
+        modules: {
+            toolbar: [
+                [{ font: ['sans-serif','serif','monospace','arial','times','courier'] }, { size: [] }],
+                ['bold','italic','underline','strike'],
+                [{ color: [] }, { background: [] }],
+                [{ script: 'super' }, { script: 'sub' }],
+                [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+                [{ align: [] }],
+                ['link'],
+                ['clean']
+            ]
         }
+    });
 
-        // Evento click en Proyectos
-       // document.getElementById('proyectosLink')?.addEventListener('click', function(e) {
-         //   e.preventDefault();
-           // cargarProyectos();
-            
-            // Actualizar clase activa en el sidebar
-            //document.querySelectorAll('.sidebar-item').forEach(item => {
-              //  item.classList.remove('active');
-            //});
-            //this.classList.add('active');
-        //});
+    const inputBio    = document.getElementById('bio');
+    const contadorBio = document.getElementById('contadorBio');
+    let lastValidHtml = quill.root.innerHTML;
 
-        // Evento click en Personal (recargar página)
-        document.getElementById('personalLink')?.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = '{{ url("/dashboard") }}';
-        });
-        // Funciones para el modal de eliminar foto
-        function openDeleteModal() {
-            const modal = document.getElementById('delete-modal');
-            if (modal) {
-                modal.classList.add('active');
-            }
+    function actualizarContador() {
+        const len = Math.max(0, quill.getText().length - 1);
+        if (contadorBio) {
+            contadorBio.textContent = len + '/5000 caracteres';
+            contadorBio.style.color = len > 5000 ? '#ef4444' : '#94a3b8';
         }
+    }
 
-        function closeDeleteModal() {
-            const modal = document.getElementById('delete-modal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
+    quill.on('text-change', function() {
+        const len = Math.max(0, quill.getText().length - 1);
+        if (len > 5000) {
+            quill.root.innerHTML = lastValidHtml;
+        } else {
+            lastValidHtml = quill.root.innerHTML;
+            if (inputBio) inputBio.value = quill.root.innerHTML;
         }
-        
-        // Función para abrir la foto en el lightbox
-        function openPhotoPreview(src) {
-            if (!src || src === '#') return;
-            const lightbox = document.getElementById('photo-lightbox');
-            const lightboxImg = document.getElementById('lightbox-img');
-            if (lightbox && lightboxImg) {
-                lightboxImg.src = src;
-                lightbox.classList.add('active');
-            }
-        }
-        
-        // Inicializar Quill para biografía
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof Quill === 'undefined') return;
-            const qc = document.getElementById('quillEditor');
-            if (!qc) return;
+        actualizarContador();
+    });
 
-            const Font = Quill.import('formats/font');
-            Font.whitelist = ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'];
-            Quill.register(Font, true);
-
-            const quill = new Quill('#quillEditor', {
-                theme: 'snow',
-                placeholder: 'Escribe una breve presentación sobre ti, tu experiencia y lo que te apasiona profesionalmente...',
-                modules: {
-                    toolbar: [
-                        [{ 'font': ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'] }, { 'size': [] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'script': 'super' }, { 'script': 'sub' }],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
-                        [{ 'align': [] }],
-                        ['link'],
-                        ['clean']
-                    ]
-                }
-            });
-
-            const inputBio = document.getElementById('bio');
-            const contadorBio = document.getElementById('contadorBio');
-            let lastValidHtml = quill.root.innerHTML;
-
-            function actualizarContador() {
-                const currentText = quill.getText();
-                const length = currentText.length > 0 ? currentText.length - 1 : 0;
-                if (contadorBio) contadorBio.textContent = length + '/5000 caracteres';
-                if (length > 5000) {
-                    if (contadorBio) contadorBio.style.color = '#ef4444';
-                } else {
-                    if (contadorBio) contadorBio.style.color = '#94a3b8';
-                }
-            }
-
-            quill.on('text-change', function() {
-                const currentText = quill.getText();
-                const length = currentText.length > 0 ? currentText.length - 1 : 0;
-                if (length > 5000) {
-                    const selection = quill.getSelection();
-                    quill.root.innerHTML = lastValidHtml;
-                    if (selection) {
-                        quill.setSelection(selection.index, 0);
-                    }
-                } else {
-                    lastValidHtml = quill.root.innerHTML;
-                    if (inputBio) inputBio.value = quill.root.innerHTML;
-                }
-                actualizarContador();
-            });
-
-            actualizarContador();
-        });
-    
+    actualizarContador();
+});

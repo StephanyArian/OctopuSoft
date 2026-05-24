@@ -1,21 +1,10 @@
-{{-- resources/views/habilidades-tecnicas.blade.php --}}
-<x-app-layout>
-   
+@extends('layouts.app-completar')
 
-    <link rel="stylesheet" href="{{ asset('css/informacion-academica.css') }}">
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/skills.css') }}">
+@endpush
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-            <div class="shell">
-                <div class="header-bar" style="display: none;"></div>
-
-                <div class="body-row">
-                    {{-- Sidebar --}}
-                    @include('partials.sidebar-completar')
-                    {{-- Contenido --}}
-                    <div class="main">
+@section('content')
                         <div class="page-title">Habilidades técnicas</div>
 
                         <div class="section-card">
@@ -329,11 +318,9 @@
                                 @endforelse
                             </div>
                         </div>{{-- /section-card --}}
-                    </div>{{-- /main --}}
-                </div>{{-- /body-row --}}
-            </div>{{-- /shell --}}
-        </div>
-    </div>
+                        @endsection
+
+@push('modals')
 
     {{-- Modal selector de proyectos (HU-24) --}}
     <div class="modal-backdrop" id="project-selector-modal">
@@ -370,11 +357,15 @@
             </form>
         </div>
     </div>
-     {{-- Datos para JS --}}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    @endpush
+    
+    @push('scripts')
     <script>
-        window.userProjects = {!! json_encode($userProjects->map(fn($p) => ['id' => $p->id, 'name' => $p->name, 'technologies' => $p->technologies->pluck('name')->toArray()])->values()) !!};
+        window.userProjects = {!! json_encode($userProjects->map(fn($p) => [
+            'id'           => $p->id,
+            'name'         => $p->name,
+            'technologies' => $p->technologies->pluck('name')->toArray()
+        ])->values()) !!};
     </script>
     <script src="{{ asset('js/habilidades-tecnicas.js') }}"></script>
-</x-app-layout>
-
+@endpush

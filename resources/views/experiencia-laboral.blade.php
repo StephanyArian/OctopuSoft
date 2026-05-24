@@ -1,16 +1,13 @@
-<x-app-layout>
-    {{-- Quill CSS --}}
+@extends('layouts.app-completar')
+
+@push('styles')
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/experiencia-laboral.css') }}">
+@endpush
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@section('content')
 
-            <div class="shell">
-
-                <div class="body-row">
-                    @include('partials.sidebar-completar')
-                    <div class="main">
 
                         
 
@@ -177,13 +174,8 @@
                         </div>
 
                         <div id="historial-laboral-react" data-experiencias="{{ json_encode($experiencias) }}"></div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+     @endsection        
+     @push('scripts')
     {{-- Quill JS --}}
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="{{ asset('js/experiencia-laboral.js') }}"></script>
@@ -258,5 +250,4 @@
         };
     })();
     </script>
-
-</x-app-layout>
+@endpush

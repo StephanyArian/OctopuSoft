@@ -1,22 +1,8 @@
-<x-app-layout>
-    
+@extends('layouts.app-completar')
 
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/skills.css') }}">
-    <style>
-        .ql-editor { font-family: 'Arial', sans-serif; }
-    </style>
 
-    <div class="main-content">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
-            <div class="shell">
-                <div class="body-row">
-                    @include('partials.sidebar-completar')
-                    <div class="main" id="mainContent">
+
+@section('content')
                         <!-- Contenido dinámico se cargará aquí -->
                         <div class="page-title">Perfil Personal</div>
                         <div class="section-card">
@@ -128,11 +114,9 @@
                                 @method('DELETE')
                             </form>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                        @endsection
+
+@push('modals')   
 
     {{-- Modal eliminar foto --}}
     <div class="modal-backdrop" id="delete-modal">
@@ -158,6 +142,8 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/dashboard.js') }}"></script>
-   
-</x-app-layout>
+    @endpush
+
+@push('scripts')
+<script src="{{ asset('js/dashboard.js') }}"></script>
+@endpush
