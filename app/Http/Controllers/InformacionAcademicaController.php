@@ -22,13 +22,13 @@ class InformacionAcademicaController extends Controller
     {
         // Validación incluyendo el campo otro_tipo_formacion
         $request->validate([
-            'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
-            'titulo_obtenido' => 'nullable|string|max:30|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
+            'institucion' => 'required|string|max:60',
+            'titulo_obtenido' => 'nullable|string|max:30',
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
-            'descripcion'     => 'nullable|string|max:500|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,}).+$/u',
+            'descripcion'     => 'nullable|string|max:500',
             'estudio_actual'  => 'nullable',
-            'especialidad'    => 'nullable|string|max:50|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'especialidad'    => 'nullable|string|max:50',
             'tipo_formacion' => 'required|string|max:50',
             'otro_tipo_formacion' => 'required_if:tipo_formacion,Otro|string|max:50|nullable', // NUEVA VALIDACIÓN
             'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
