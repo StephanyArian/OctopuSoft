@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    DASHBOARD.CSS - ESTILOS GLOBALES
    Layout, sidebar, formularios base, botones, modales
    ============================================ */
@@ -420,6 +420,41 @@
 }
 
 /* ============================================
+   PROFILE EDIT (PERSONAL)
+   ============================================ */
+.profile-edit-row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.profile-photo-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.profile-inputs-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    min-width: 0; /* Prevents overflow in flex child */
+}
+
+.photo-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* ============================================
    BOTONES
    ============================================ */
 .btn-row {
@@ -728,6 +763,9 @@
 .ql-toolbar.ql-snow {
     border-radius: 12px 12px 0 0;
     border-color: var(--gray-100);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
 }
 
 .ql-container.ql-snow {
@@ -775,6 +813,14 @@
     .form-row {
         flex-direction: column;
         gap: 16px;
+    }
+    .profile-edit-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .profile-photo-col {
+        width: 100%;
+        margin-bottom: 8px;
     }
     .modal-box {
         width: 90%;

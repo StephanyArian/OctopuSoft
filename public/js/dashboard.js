@@ -4,15 +4,15 @@ function previewPhoto(event) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(e) {
-        const preview  = document.getElementById('photoPreview');
+    reader.onload = function (e) {
+        const preview = document.getElementById('photoPreview');
         const photoLink = document.getElementById('photoLink');
-        const photoIcon  = document.getElementById('photoIcon');
+        const photoIcon = document.getElementById('photoIcon');
         const photoLabel = document.getElementById('photoLabel');
 
-        if (preview)   { preview.src = e.target.result; preview.style.display = 'block'; }
+        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
         if (photoLink) { photoLink.dataset.src = e.target.result; photoLink.style.display = 'block'; }
-        if (photoIcon)  photoIcon.style.display  = 'none';
+        if (photoIcon) photoIcon.style.display = 'none';
         if (photoLabel) photoLabel.style.display = 'none';
     };
     reader.readAsDataURL(file);
@@ -29,7 +29,7 @@ function closeDeleteModal() {
 function openPhotoPreview(src) {
     if (!src || src === '#') return;
     const lightbox = document.getElementById('photo-lightbox');
-    const img      = document.getElementById('lightbox-img');
+    const img = document.getElementById('lightbox-img');
     if (lightbox && img) {
         img.src = src;
         lightbox.classList.add('active');
@@ -37,11 +37,11 @@ function openPhotoPreview(src) {
 }
 
 // ── VALIDACIÓN DEL FORMULARIO ───────────────────────────────
-document.getElementById('profileForm')?.addEventListener('submit', function(e) {
+document.getElementById('profileForm')?.addEventListener('submit', function (e) {
     let isValid = true;
 
     // Nombre
-    const name      = document.getElementById('name').value.trim();
+    const name = document.getElementById('name').value.trim();
     const nameError = document.getElementById('nameError');
     const nameRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
 
@@ -108,7 +108,7 @@ document.getElementById('profileForm')?.addEventListener('submit', function(e) {
     }
 
     // Biografía
-    const bio      = document.getElementById('bio').value;
+    const bio = document.getElementById('bio').value;
     const bioError = document.getElementById('bioError');
     if (bio.length > 5000) {
         bioError.classList.remove('hidden');
@@ -118,10 +118,10 @@ document.getElementById('profileForm')?.addEventListener('submit', function(e) {
     }
 
     // Foto
-    const photo      = document.getElementById('photoInput').files[0];
+    const photo = document.getElementById('photoInput').files[0];
     const photoError = document.getElementById('photoError');
     if (photo) {
-        if (!['image/jpeg','image/png'].includes(photo.type)) {
+        if (!['image/jpeg', 'image/png'].includes(photo.type)) {
             photoError.classList.remove('hidden');
             photoError.textContent = 'Formato no permitido. Use JPG o PNG';
             isValid = false;
@@ -138,13 +138,13 @@ document.getElementById('profileForm')?.addEventListener('submit', function(e) {
 });
 
 // ── QUILL (BIOGRAFÍA) ───────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     if (typeof Quill === 'undefined') return;
     const qc = document.getElementById('quillEditor');
     if (!qc) return;
 
     const Font = Quill.import('formats/font');
-    Font.whitelist = ['sans-serif','serif','monospace','arial','times','courier'];
+    Font.whitelist = ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'];
     Quill.register(Font, true);
 
     const quill = new Quill('#quillEditor', {
@@ -152,8 +152,8 @@ document.addEventListener('DOMContentLoaded', function() {
         placeholder: 'Escribe una breve presentación sobre ti...',
         modules: {
             toolbar: [
-                [{ font: ['sans-serif','serif','monospace','arial','times','courier'] }, { size: [] }],
-                ['bold','italic','underline','strike'],
+                [{ font: ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'] }, { size: [] }],
+                ['bold', 'italic', 'underline', 'strike'],
                 [{ color: [] }, { background: [] }],
                 [{ script: 'super' }, { script: 'sub' }],
                 [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
@@ -164,19 +164,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const inputBio    = document.getElementById('bio');
+    const inputBio = document.getElementById('bio');
     const contadorBio = document.getElementById('contadorBio');
     let lastValidHtml = quill.root.innerHTML;
 
     function actualizarContador() {
         const len = Math.max(0, quill.getText().length - 1);
         if (contadorBio) {
-            contadorBio.textContent = len + '/5000 caracteres';
+            contadorBio.textContent = len + '/500 caracteres';
             contadorBio.style.color = len > 5000 ? '#ef4444' : '#94a3b8';
         }
     }
 
-    quill.on('text-change', function() {
+    quill.on('text-change', function () {
         const len = Math.max(0, quill.getText().length - 1);
         if (len > 5000) {
             quill.root.innerHTML = lastValidHtml;

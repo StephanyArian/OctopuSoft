@@ -27,8 +27,8 @@
                             <form id="profileForm" action="{{ route('profile.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="form-grid">
-                                    <div class="form-row">
-                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                    <div class="form-row profile-edit-row">
+                                        <div class="profile-photo-col">
                                             <div class="photo-box">
                                                 @php $user = Auth::user(); @endphp
                                                 @if($user->photo_base64)
@@ -49,7 +49,7 @@
                                             </div>
                                             
                                             <!-- Íconos pequeños debajo de la foto -->
-                                            <div style="display: flex; gap: 8px; margin-top: 8px; justify-content: center;">
+                                            <div class="photo-actions">
                                                 <!-- Ícono para cambiar foto -->
                                                 <button type="button" onclick="document.getElementById('photoInput').click()" style="background: var(--teal); border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; color: white; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
@@ -70,7 +70,7 @@
                                             </div>
                                         </div>
                                         
-                                        <div style="flex:1;display:flex;flex-direction:column;gap:16px">
+                                        <div class="profile-inputs-col">
                                             <div class="form-group">
                                                 <label class="form-label">Nombre completo <span class="required">*</span></label>
                                                 <input class="form-input" type="text" id="name" name="name" placeholder="Ej. Juan Pérez García" value="{{ old('name', $user->first_name . ' ' . $user->last_name) }}" maxlength="30" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">
@@ -92,12 +92,12 @@
                                     <div class="form-group">
                                         <label class="form-label">Biografía profesional</label>
                                         <div class="textarea-wrapper" style="position: relative;">
-                                            <div id="quillEditor" style="min-height:120px;background:white;border-radius:12px;">{!! old('bio', $user->biography) !!}</div>
+                                            <div id="quillEditor" style="height:250px;background:white;">{!! old('bio', $user->biography) !!}</div>
                                             <textarea id="bio" name="bio" style="display:none;">{{ old('bio', $user->biography) }}</textarea>
-                                            <span class="word-count" id="contadorBio" style="display:block; text-align:left; font-size:12px; color:#94a3b8; margin-top:4px;">0/5000 caracteres</span>
+                                            <span class="word-count" id="contadorBio" style="display:block; text-align:left; font-size:12px; color:#94a3b8; margin-top:4px;">0/500 caracteres</span>
                                         </div>
-                                        <div id="bioError" class="error-message hidden">La biografía no puede exceder los 5000 caracteres</div>
-                                        <span class="text-xs text-gray-400 mt-1">Máximo 5000 caracteres</span>
+                                        <div id="bioError" class="error-message hidden">La biografía no puede exceder los 500 caracteres</div>
+                                        <span class="text-xs text-gray-400 mt-1">Máximo 500 caracteres</span>
                                     </div>
                                 </div>
                                 
