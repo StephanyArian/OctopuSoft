@@ -1090,3 +1090,486 @@ body {
     flex-shrink: 0;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+
+/* ============================================
+   TEMAS DE COLORES PERSONALIZABLES (ESTILO CANVA)
+   ============================================ */
+
+/* 1. Tema Sunset Glow (Atardecer) */
+.theme-sunset {
+    --burg-deep: #1e1b4b;
+    --burg-mid: #312e81;
+    --burg-soft: #4338ca;
+    --teal: #f97316;
+    --teal-light: #ffedd5;
+    --teal-dim: #ea580c;
+}
+.theme-sunset .tech-skill-project-chip {
+    background: rgba(249, 115, 22, 0.10);
+    border-color: rgba(249, 115, 22, 0.28);
+    color: #ea580c;
+}
+.theme-sunset .tech-skill-project-chip:hover {
+    background: rgba(249, 115, 22, 0.16);
+}
+.theme-sunset .soft-skill-tag:hover {
+    border-color: #f97316;
+    background: #fff7ed;
+}
+.theme-sunset .card {
+    border-left-color: #f97316;
+}
+.theme-sunset .card:hover {
+    border-color: #f97316;
+    box-shadow: 0 6px 24px rgba(249, 115, 22, 0.12);
+}
+.theme-sunset .card:hover h3 {
+    color: #f97316 !important;
+}
+.theme-sunset .ver-mas-btn {
+    color: #f97316;
+}
+.theme-sunset .btn-volver-flotante, 
+.theme-sunset .btn-ver-todos button, 
+.theme-sunset .btn-publicar {
+    background: #f97316;
+    border-color: #f97316;
+}
+.theme-sunset .btn-volver-flotante:hover, 
+.theme-sunset .btn-ver-todos button:hover, 
+.theme-sunset .btn-publicar:hover {
+    background: #ea580c;
+    border-color: #ea580c;
+}
+.theme-sunset .btn-editar {
+    color: #f97316;
+    border-color: #f97316;
+}
+.theme-sunset .btn-editar:hover {
+    background: #f97316;
+    color: #fff;
+}
+.theme-sunset .profile-contact-list .contact-row i {
+    color: #f97316;
+}
+.theme-sunset .profile-social-icons a:hover {
+    background: #f97316;
+    border-color: #f97316;
+}
+
+/* 2. Tema Emerald Mint (Bosque Místico) */
+.theme-emerald {
+    --burg-deep: #022c22;
+    --burg-mid: #064e3b;
+    --burg-soft: #0f766e;
+    --teal: #10b981;
+    --teal-light: #d1fae5;
+    --teal-dim: #047857;
+}
+.theme-emerald .tech-skill-project-chip {
+    background: rgba(16, 185, 129, 0.10);
+    border-color: rgba(16, 185, 129, 0.28);
+    color: #047857;
+}
+.theme-emerald .tech-skill-project-chip:hover {
+    background: rgba(16, 185, 129, 0.16);
+}
+.theme-emerald .soft-skill-tag:hover {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+.theme-emerald .card {
+    border-left-color: #10b981;
+}
+.theme-emerald .card:hover {
+    border-color: #10b981;
+    box-shadow: 0 6px 24px rgba(16, 185, 129, 0.12);
+}
+.theme-emerald .card:hover h3 {
+    color: #10b981 !important;
+}
+.theme-emerald .ver-mas-btn {
+    color: #10b981;
+}
+.theme-emerald .btn-volver-flotante, 
+.theme-emerald .btn-ver-todos button, 
+.theme-emerald .btn-publicar {
+    background: #10b981;
+    border-color: #10b981;
+}
+.theme-emerald .btn-volver-flotante:hover, 
+.theme-emerald .btn-ver-todos button:hover, 
+.theme-emerald .btn-publicar:hover {
+    background: #047857;
+    border-color: #047857;
+}
+.theme-emerald .btn-editar {
+    color: #10b981;
+    border-color: #10b981;
+}
+.theme-emerald .btn-editar:hover {
+    background: #10b981;
+    color: #fff;
+}
+.theme-emerald .profile-contact-list .contact-row i {
+    color: #10b981;
+}
+.theme-emerald .profile-social-icons a:hover {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+/* 3. Tema Midnight Neon (Ciberpunk) */
+.theme-midnight {
+    --burg-deep: #0f172a;
+    --burg-mid: #1e293b;
+    --burg-soft: #334155;
+    --teal: #a855f7;
+    --teal-light: #f3e8ff;
+    --teal-dim: #7e22ce;
+}
+.theme-midnight .tech-skill-project-chip {
+    background: rgba(168, 85, 247, 0.10);
+    border-color: rgba(168, 85, 247, 0.28);
+    color: #7e22ce;
+}
+.theme-midnight .tech-skill-project-chip:hover {
+    background: rgba(168, 85, 247, 0.16);
+}
+.theme-midnight .soft-skill-tag:hover {
+    border-color: #a855f7;
+    background: #faf5ff;
+}
+.theme-midnight .card {
+    border-left-color: #a855f7;
+}
+.theme-midnight .card:hover {
+    border-color: #a855f7;
+    box-shadow: 0 6px 24px rgba(168, 85, 247, 0.12);
+}
+.theme-midnight .card:hover h3 {
+    color: #a855f7 !important;
+}
+.theme-midnight .ver-mas-btn {
+    color: #a855f7;
+}
+.theme-midnight .btn-volver-flotante, 
+.theme-midnight .btn-ver-todos button, 
+.theme-midnight .btn-publicar {
+    background: #a855f7;
+    border-color: #a855f7;
+}
+.theme-midnight .btn-volver-flotante:hover, 
+.theme-midnight .btn-ver-todos button:hover, 
+.theme-midnight .btn-publicar:hover {
+    background: #7e22ce;
+    border-color: #7e22ce;
+}
+.theme-midnight .btn-editar {
+    color: #a855f7;
+    border-color: #a855f7;
+}
+.theme-midnight .btn-editar:hover {
+    background: #a855f7;
+    color: #fff;
+}
+.theme-midnight .profile-contact-list .contact-row i {
+    color: #a855f7;
+}
+.theme-midnight .profile-social-icons a:hover {
+    background: #a855f7;
+    border-color: #a855f7;
+}
+
+/* 4. Tema Ocean Breeze (Brisa Marina) */
+.theme-ocean {
+    --burg-deep: #0b132b;
+    --burg-mid: #1c2541;
+    --burg-soft: #3a506b;
+    --teal: #00b4d8;
+    --teal-light: #caf0f8;
+    --teal-dim: #0077b6;
+}
+.theme-ocean .tech-skill-project-chip {
+    background: rgba(0, 180, 216, 0.10);
+    border-color: rgba(0, 180, 216, 0.28);
+    color: #0077b6;
+}
+.theme-ocean .tech-skill-project-chip:hover {
+    background: rgba(0, 180, 216, 0.16);
+}
+.theme-ocean .soft-skill-tag:hover {
+    border-color: #00b4d8;
+    background: #f0fdfa;
+}
+.theme-ocean .card {
+    border-left-color: #00b4d8;
+}
+.theme-ocean .card:hover {
+    border-color: #00b4d8;
+    box-shadow: 0 6px 24px rgba(0, 180, 216, 0.12);
+}
+.theme-ocean .card:hover h3 {
+    color: #00b4d8 !important;
+}
+.theme-ocean .ver-mas-btn {
+    color: #00b4d8;
+}
+.theme-ocean .btn-volver-flotante, 
+.theme-ocean .btn-ver-todos button, 
+.theme-ocean .btn-publicar {
+    background: #00b4d8;
+    border-color: #00b4d8;
+}
+.theme-ocean .btn-volver-flotante:hover, 
+.theme-ocean .btn-ver-todos button:hover, 
+.theme-ocean .btn-publicar:hover {
+    background: #0077b6;
+    border-color: #0077b6;
+}
+.theme-ocean .btn-editar {
+    color: #00b4d8;
+    border-color: #00b4d8;
+}
+.theme-ocean .btn-editar:hover {
+    background: #00b4d8;
+    color: #fff;
+}
+.theme-ocean .profile-contact-list .contact-row i {
+    color: #00b4d8;
+}
+.theme-ocean .profile-social-icons a:hover {
+    background: #00b4d8;
+    border-color: #00b4d8;
+}
+
+/* 5. Tema Sakura Dream (Sueño de Cerezo) */
+.theme-sakura {
+    --burg-deep: #3b0764;
+    --burg-mid: #581c87;
+    --burg-soft: #701a75;
+    --teal: #ec4899;
+    --teal-light: #fce7f3;
+    --teal-dim: #db2777;
+}
+.theme-sakura .tech-skill-project-chip {
+    background: rgba(236, 72, 153, 0.10);
+    border-color: rgba(236, 72, 153, 0.28);
+    color: #db2777;
+}
+.theme-sakura .tech-skill-project-chip:hover {
+    background: rgba(236, 72, 153, 0.16);
+}
+.theme-sakura .soft-skill-tag:hover {
+    border-color: #ec4899;
+    background: #fdf2f8;
+}
+.theme-sakura .card {
+    border-left-color: #ec4899;
+}
+.theme-sakura .card:hover {
+    border-color: #ec4899;
+    box-shadow: 0 6px 24px rgba(236, 72, 153, 0.12);
+}
+.theme-sakura .card:hover h3 {
+    color: #ec4899 !important;
+}
+.theme-sakura .ver-mas-btn {
+    color: #ec4899;
+}
+.theme-sakura .btn-volver-flotante, 
+.theme-sakura .btn-ver-todos button, 
+.theme-sakura .btn-publicar {
+    background: #ec4899;
+    border-color: #ec4899;
+}
+.theme-sakura .btn-volver-flotante:hover, 
+.theme-sakura .btn-ver-todos button:hover, 
+.theme-sakura .btn-publicar:hover {
+    background: #db2777;
+    border-color: #db2777;
+}
+.theme-sakura .btn-editar {
+    color: #ec4899;
+    border-color: #ec4899;
+}
+.theme-sakura .btn-editar:hover {
+    background: #ec4899;
+    color: #fff;
+}
+.theme-sakura .profile-contact-list .contact-row i {
+    color: #ec4899;
+}
+.theme-sakura .profile-social-icons a:hover {
+    background: #ec4899;
+    border-color: #ec4899;
+}
+
+/* ============================================
+   ELEMENTOS DE INTERFAZ DEL SELECTOR DE VIBRA (CANVA-STYLE)
+   ============================================ */
+.vibe-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 10001; /* Above all content, including navigation and cards */
+    background: var(--white);
+    color: var(--burg-mid);
+    border: 2px solid var(--burg-mid);
+    padding: 11px 22px;
+    border-radius: 8px; /* Matching layout style */
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transition: all 0.25s ease;
+    font-family: inherit;
+}
+.vibe-floating-btn:hover {
+    background: var(--burg-mid);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.vibe-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 320px;
+    height: 100vh;
+    background: var(--white);
+    box-shadow: -4px 0 25px rgba(0,0,0,0.15);
+    z-index: 10000;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.vibe-sidebar.open {
+    right: 0;
+}
+
+.vibe-sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.vibe-sidebar-header h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--burg-deep);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.vibe-sidebar-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--gray-500);
+    transition: color 0.2s;
+}
+.vibe-sidebar-close:hover {
+    color: #ef4444;
+}
+
+.vibe-sidebar-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.vibe-card {
+    border: 2px solid var(--gray-100);
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--white);
+}
+.vibe-card:hover {
+    border-color: var(--gray-300);
+    transform: translateY(-1px);
+}
+.vibe-card.active {
+    border-color: var(--teal);
+    background: rgba(10, 191, 158, 0.03);
+}
+
+.vibe-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.vibe-card.active .vibe-card-title {
+    color: var(--teal-dim);
+}
+
+.vibe-palette {
+    display: flex;
+    height: 24px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.vibe-color-box {
+    flex: 1;
+}
+
+.vibe-sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--gray-100);
+    background: var(--off);
+}
+.vibe-save-btn {
+    width: 100%;
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    padding: 12px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(10, 191, 158, 0.2);
+}
+.vibe-save-btn:hover {
+    background: var(--teal-dim);
+    transform: translateY(-1px);
+}
+
+.vibe-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(1px);
+}
+.vibe-sidebar-backdrop.show {
+    display: block;
+    opacity: 1;
+}

@@ -6,7 +6,7 @@
     <title>{{ $user->first_name ?? 'Portafolio' }} {{ $user->last_name ?? '' }} | Portafolio Profesional</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/preview.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/preview.css') }}?v={{ time() }}">
     <style>
         .btn-volver-flotante {
             position: fixed;
@@ -295,9 +295,11 @@
         'linear-gradient(90deg,#15803d,#4ade80)',
         'linear-gradient(90deg,#9a3412,#fb923c)',
     ];
+    $temaActual = $portfolio->color_theme ?? 'default';
+    $claseTema = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
 
-<div class="preview-container">
+<div class="preview-container {{ $claseTema }}">
     
     <!-- CABECERA CON DATOS PERSONALES -->
     <div class="profile-header">

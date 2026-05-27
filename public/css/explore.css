@@ -679,3 +679,112 @@
         font-size: 15px;
     }
 }
+
+/* ============================================
+   TEMAS PARA LAS TARJETAS DE PORTAFOLIOS DESTACADOS (VIBES)
+   ============================================ */
+
+.portfolio-card.card-theme-sunset {
+    border-top: 4px solid #f97316 !important;
+}
+.portfolio-card.card-theme-sunset:hover {
+    box-shadow: 0 16px 32px rgba(249, 115, 22, 0.2) !important;
+}
+.portfolio-card.card-theme-sunset .card-profession-main,
+.portfolio-card.card-theme-sunset .card-link {
+    color: #f97316 !important;
+    border-color: #f97316 !important;
+}
+.portfolio-card.card-theme-sunset .card-link:hover {
+    background: #f97316 !important;
+    color: white !important;
+}
+.portfolio-card.card-theme-sunset .card-tag {
+    background: rgba(249, 115, 22, 0.08) !important;
+    color: #ea580c !important;
+    border-color: rgba(249, 115, 22, 0.15) !important;
+}
+
+.portfolio-card.card-theme-emerald {
+    border-top: 4px solid #10b981 !important;
+}
+.portfolio-card.card-theme-emerald:hover {
+    box-shadow: 0 16px 32px rgba(16, 185, 129, 0.2) !important;
+}
+.portfolio-card.card-theme-emerald .card-profession-main,
+.portfolio-card.card-theme-emerald .card-link {
+    color: #10b981 !important;
+    border-color: #10b981 !important;
+}
+.portfolio-card.card-theme-emerald .card-link:hover {
+    background: #10b981 !important;
+    color: white !important;
+}
+.portfolio-card.card-theme-emerald .card-tag {
+    background: rgba(16, 185, 129, 0.08) !important;
+    color: #047857 !important;
+    border-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.portfolio-card.card-theme-midnight {
+    border-top: 4px solid #a855f7 !important;
+}
+.portfolio-card.card-theme-midnight:hover {
+    box-shadow: 0 16px 32px rgba(168, 85, 247, 0.2) !important;
+}
+.portfolio-card.card-theme-midnight .card-profession-main,
+.portfolio-card.card-theme-midnight .card-link {
+    color: #a855f7 !important;
+    border-color: #a855f7 !important;
+}
+.portfolio-card.card-theme-midnight .card-link:hover {
+    background: #a855f7 !important;
+    color: white !important;
+}
+.portfolio-card.card-theme-midnight .card-tag {
+    background: rgba(168, 85, 247, 0.08) !important;
+    color: #7e22ce !important;
+    border-color: rgba(168, 85, 247, 0.15) !important;
+}
+
+.portfolio-card.card-theme-ocean {
+    border-top: 4px solid #00b4d8 !important;
+}
+.portfolio-card.card-theme-ocean:hover {
+    box-shadow: 0 16px 32px rgba(0, 180, 216, 0.2) !important;
+}
+.portfolio-card.card-theme-ocean .card-profession-main,
+.portfolio-card.card-theme-ocean .card-link {
+    color: #00b4d8 !important;
+    border-color: #00b4d8 !important;
+}
+.portfolio-card.card-theme-ocean .card-link:hover {
+    background: #00b4d8 !important;
+    color: white !important;
+}
+.portfolio-card.card-theme-ocean .card-tag {
+    background: rgba(0, 180, 216, 0.08) !important;
+    color: #0077b6 !important;
+    border-color: rgba(0, 180, 216, 0.15) !important;
+}
+
+.portfolio-card.card-theme-sakura {
+    border-top: 4px solid #ec4899 !important;
+}
+.portfolio-card.card-theme-sakura:hover {
+    box-shadow: 0 16px 32px rgba(236, 72, 153, 0.2) !important;
+}
+.portfolio-card.card-theme-sakura .card-profession-main,
+.portfolio-card.card-theme-sakura .card-link {
+    color: #ec4899 !important;
+    border-color: #ec4899 !important;
+}
+.portfolio-card.card-theme-sakura .card-link:hover {
+    background: #ec4899 !important;
+    color: white !important;
+}
+.portfolio-card.card-theme-sakura .card-tag {
+    background: rgba(236, 72, 153, 0.08) !important;
+    color: #db2777 !important;
+    border-color: rgba(236, 72, 153, 0.15) !important;
+}

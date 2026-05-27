@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<link rel="stylesheet" href="{{ asset('css/preview.css') }}">
+<link rel="stylesheet" href="{{ asset('css/preview.css') }}?v={{ time() }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @php
@@ -62,13 +62,19 @@
         'linear-gradient(90deg,#15803d,#4ade80)',
         'linear-gradient(90deg,#9a3412,#fb923c)',
     ];
+    $temaActual = $user->portfolio->color_theme ?? 'default';
+    $claseTema = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
 
 <a href="javascript:history.back()" class="btn-flotante">
     <i class="fas fa-edit"></i> Continuar editando
 </a>
 
-<div class="preview-container">
+<button class="vibe-floating-btn" onclick="toggleVibeSidebar(true)">
+    <i class="fas fa-palette"></i> Elegir Vibe
+</button>
+
+<div class="preview-container {{ $claseTema }}" id="previewContainer">
     
     <!-- CABECERA CON DATOS PERSONALES -->
     <div class="profile-header">
@@ -1141,6 +1147,217 @@ document.getElementById('modal-todos-blandas')?.addEventListener('click', functi
 document.getElementById('modal-todos-idiomas')?.addEventListener('click', function(e) {
     if (e.target === this) cerrarModalIdiomas();
 });
+</script>
+
+<!-- Sidebar para elegir Vibe de color -->
+<div class="vibe-sidebar-backdrop" id="vibeBackdrop" onclick="toggleVibeSidebar(false)"></div>
+<div class="vibe-sidebar" id="vibeSidebar">
+    <div class="vibe-sidebar-header">
+        <h3><i class="fas fa-palette"></i> Personalizar Vibe</h3>
+        <button class="vibe-sidebar-close" onclick="toggleVibeSidebar(false)">✕</button>
+    </div>
+    <div class="vibe-sidebar-body">
+        <!-- Tarjeta: Clásico -->
+        <div class="vibe-card {{ $temaActual === 'default' ? 'active' : '' }}" data-theme="default" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Clásico (Predeterminado)
+                @if($temaActual === 'default') <i class="fas fa-check-circle" style="color: #0abf9e;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #2d0a1e;"></div>
+                <div class="vibe-color-box" style="background: #4a1030;"></div>
+                <div class="vibe-color-box" style="background: #6b1f45;"></div>
+                <div class="vibe-color-box" style="background: #0abf9e;"></div>
+            </div>
+        </div>
+        <!-- Tarjeta: Sunset Glow -->
+        <div class="vibe-card {{ $temaActual === 'sunset' ? 'active' : '' }}" data-theme="sunset" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Sunset Glow (Atardecer)
+                @if($temaActual === 'sunset') <i class="fas fa-check-circle" style="color: #f97316;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #1e1b4b;"></div>
+                <div class="vibe-color-box" style="background: #312e81;"></div>
+                <div class="vibe-color-box" style="background: #4338ca;"></div>
+                <div class="vibe-color-box" style="background: #f97316;"></div>
+            </div>
+        </div>
+        <!-- Tarjeta: Emerald Mint -->
+        <div class="vibe-card {{ $temaActual === 'emerald' ? 'active' : '' }}" data-theme="emerald" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Emerald Mint (Bosque Místico)
+                @if($temaActual === 'emerald') <i class="fas fa-check-circle" style="color: #10b981;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #022c22;"></div>
+                <div class="vibe-color-box" style="background: #064e3b;"></div>
+                <div class="vibe-color-box" style="background: #0f766e;"></div>
+                <div class="vibe-color-box" style="background: #10b981;"></div>
+            </div>
+        </div>
+        <!-- Tarjeta: Midnight Neon -->
+        <div class="vibe-card {{ $temaActual === 'midnight' ? 'active' : '' }}" data-theme="midnight" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Midnight Neon (Ciberpunk)
+                @if($temaActual === 'midnight') <i class="fas fa-check-circle" style="color: #a855f7;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #0f172a;"></div>
+                <div class="vibe-color-box" style="background: #1e293b;"></div>
+                <div class="vibe-color-box" style="background: #334155;"></div>
+                <div class="vibe-color-box" style="background: #a855f7;"></div>
+            </div>
+        </div>
+        <!-- Tarjeta: Ocean Breeze -->
+        <div class="vibe-card {{ $temaActual === 'ocean' ? 'active' : '' }}" data-theme="ocean" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Ocean Breeze (Brisa Marina)
+                @if($temaActual === 'ocean') <i class="fas fa-check-circle" style="color: #00b4d8;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #0b132b;"></div>
+                <div class="vibe-color-box" style="background: #1c2541;"></div>
+                <div class="vibe-color-box" style="background: #3a506b;"></div>
+                <div class="vibe-color-box" style="background: #00b4d8;"></div>
+            </div>
+        </div>
+        <!-- Tarjeta: Sakura Dream -->
+        <div class="vibe-card {{ $temaActual === 'sakura' ? 'active' : '' }}" data-theme="sakura" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Sakura Dream (Sueño de Cerezo)
+                @if($temaActual === 'sakura') <i class="fas fa-check-circle" style="color: #ec4899;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #3b0764;"></div>
+                <div class="vibe-color-box" style="background: #581c87;"></div>
+                <div class="vibe-color-box" style="background: #701a75;"></div>
+                <div class="vibe-color-box" style="background: #ec4899;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="vibe-sidebar-footer">
+        <button class="vibe-save-btn" id="saveVibeBtn" onclick="saveVibeTheme()">
+            <i class="fas fa-save"></i> Guardar Vibra
+        </button>
+    </div>
+</div>
+
+<script>
+let selectedTheme = "{{ $temaActual }}";
+
+function toggleVibeSidebar(show) {
+    const sidebar = document.getElementById('vibeSidebar');
+    const backdrop = document.getElementById('vibeBackdrop');
+    if (show) {
+        sidebar.classList.add('open');
+        backdrop.classList.add('show');
+    } else {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+        // revert preview container to the last saved theme
+        applyThemeClass(selectedTheme);
+        // revert active class in cards
+        document.querySelectorAll('.vibe-card').forEach(c => {
+            if (c.dataset.theme === selectedTheme) {
+                c.classList.add('active');
+            } else {
+                c.classList.remove('active');
+            }
+        });
+    }
+}
+
+function selectVibe(card) {
+    // Remove active from all cards
+    document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('active'));
+    // Add active to clicked card
+    card.classList.add('active');
+    
+    // Live preview!
+    const theme = card.dataset.theme;
+    applyThemeClass(theme);
+}
+
+function applyThemeClass(theme) {
+    const container = document.getElementById('previewContainer');
+    // Remove all theme classes
+    container.classList.remove('theme-sunset', 'theme-emerald', 'theme-midnight', 'theme-ocean', 'theme-sakura');
+    // Add new theme class if not default
+    if (theme !== 'default') {
+        container.classList.add('theme-' + theme);
+    }
+}
+
+function saveVibeTheme() {
+    const activeCard = document.querySelector('.vibe-card.active');
+    if (!activeCard) return;
+    const theme = activeCard.dataset.theme;
+    
+    const saveBtn = document.getElementById('saveVibeBtn');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+    
+    fetch("{{ route('portfolio.theme.update') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ theme: theme })
+    })
+    .then(response => response.json())
+    .then(data => {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Vibra';
+        if (data.success) {
+            selectedTheme = theme;
+            Swal.fire({
+                icon: 'success',
+                title: '¡Vibra actualizada!',
+                text: 'El color de tu portafolio se ha guardado de manera permanente.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+            // Update check icons in titles
+            document.querySelectorAll('.vibe-card').forEach(c => {
+                const title = c.querySelector('.vibe-card-title');
+                // Remove existing check marks
+                const check = title.querySelector('i');
+                if (check) check.remove();
+                if (c.dataset.theme === theme) {
+                    let color = '#0abf9e';
+                    if (theme === 'sunset') color = '#f97316';
+                    else if (theme === 'emerald') color = '#10b981';
+                    else if (theme === 'midnight') color = '#a855f7';
+                    else if (theme === 'ocean') color = '#00b4d8';
+                    else if (theme === 'sakura') color = '#ec4899';
+                    title.innerHTML += ` <i class="fas fa-check-circle" style="color: ${color};"></i>`;
+                }
+            });
+            toggleVibeSidebar(false);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un error al guardar el tema.'
+            });
+        }
+    })
+    .catch(error => {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Vibra';
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo conectar con el servidor.'
+        });
+    });
+}
 </script>
 
 @endsection

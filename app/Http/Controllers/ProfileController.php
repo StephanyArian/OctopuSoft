@@ -158,4 +158,27 @@ class ProfileController extends Controller
         ->with('success', '✅ ¡Perfil publicado exitosamente!');
 }
 
+    public function updateTheme(Request $request)
+    {
+        $request->validate([
+            'theme' => 'required|string|in:default,sunset,emerald,midnight,ocean,sakura'
+        ]);
+
+        $user = $request->user();
+        
+        if (!$user->portfolio) {
+            $user->portfolio()->create([
+                'slug' => \Illuminate\Support\Str::slug($user->first_name . '-' . $user->last_name . '-' . $user->id),
+                'title' => 'Portafolio de ' . $user->first_name . ' ' . $user->last_name,
+                'description' => $user->biography ?? '',
+                'is_public' => false,
+                'color_theme' => $request->theme
+            ]);
+        } else {
+            $user->portfolio->update(['color_theme' => $request->theme]);
+        }
+
+        return response()->json(['success' => true, 'message' => '¡Vibra de color actualizada con éxito!']);
+    }
+
 }

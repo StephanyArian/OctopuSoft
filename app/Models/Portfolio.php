@@ -16,6 +16,7 @@ class Portfolio extends Model
         'is_public',
         'show_email',
         'show_phone',
+        'color_theme',
     ];
 
     /**

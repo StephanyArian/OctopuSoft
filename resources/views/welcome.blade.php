@@ -18,7 +18,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     {{-- Estilos de la landing --}}
-    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/welcome.css') }}?v={{ time() }}">
 </head>
 <body>
 
@@ -221,7 +221,11 @@
             <div class="carousel-wrapper">
                 <div class="carousel-track" id="carouselTrack">
                     @forelse($portfolios as $portfolio)
-                    <div class="portfolio-card">
+                    @php
+                        $cardTheme = $portfolio->color_theme ?? 'default';
+                        $cardThemeClass = $cardTheme !== 'default' ? 'card-theme-' . $cardTheme : '';
+                    @endphp
+                    <div class="portfolio-card {{ $cardThemeClass }}">
                         @php
                             $colors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5'];
                             $colorIndex = $loop->index % 5;

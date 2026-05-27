@@ -134,6 +134,7 @@ Route::middleware('auth')->group(function () {
     ->name('preview');
 
     Route::post('/perfil/publicar', [ProfileController::class, 'publish'])->name('perfil.publicar');
+    Route::post('/portfolio/theme', [ProfileController::class, 'updateTheme'])->name('portfolio.theme.update');
 
     // IDIOMAS
     Route::get('/idiomas',         [IdiomasController::class, 'index'])->name('idiomas.index');
