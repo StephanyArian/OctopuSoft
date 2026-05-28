@@ -659,14 +659,35 @@ class PreviewController extends Controller
             }
         }
 
-        // FILTRO POR CANTIDAD MÍNIMA DE PROYECTOS
-if ($request->filled('min_projects')) {
-    $minProjects = (int) $request->input('min_projects');
+        // FILTRO POR AÑOS MÍNIMOS DE EXPERIENCIA LABORAL
+if ($request->filled('min_experience')) {
+    $minExperience = (int) $request->input('min_experience');
 
-    if (in_array($minProjects, [1, 3, 5])) {
-        $query->whereHas('projects', function ($p) {
-            $p->where('is_visible', true);
-        }, '>=', $minProjects);
+    if (in_array($minExperience, [1, 5, 10])) {
+        $query->whereRaw("
+            (
+                SELECT COALESCE(
+                    FLOOR(
+                        SUM(
+                            DATEDIFF(
+                                CASE
+                                    WHEN experiences.is_current = 1 THEN CURDATE()
+                                    WHEN experiences.end_date IS NOT NULL THEN experiences.end_date
+                                    ELSE CURDATE()
+                                END,
+                                experiences.start_date
+                            )
+                        ) / 365
+                    ),
+                    0
+                )
+                FROM experiences
+                WHERE experiences.user_id = portfolios.user_id
+                AND experiences.type = 'work'
+                AND experiences.is_visible = 1
+                AND experiences.start_date IS NOT NULL
+            ) >= ?
+        ", [$minExperience]);
     }
 }
 
@@ -843,10 +864,7 @@ switch ($sort) {
 $portfolios = $query->paginate(12)->appends($request->query());
 
 // RESPUESTA AJAX: solo cuando venga desde fetch()
-if (
-    $request->header('X-Requested-With') === 'XMLHttpRequest'
-    && $request->expectsJson()
-) {
+if ($request->header('X-Requested-With') === 'XMLHttpRequest') {
     return response()->json([
         'html' => view('partials.portfolio_cards', [
             'portfolios' => $portfolios,

@@ -128,52 +128,52 @@
     </div>
 </div>
 
-{{-- Proyectos --}}
-<div class="custom-dropdown" id="projectsDropdown">
-    <button type="button" class="custom-dropdown-btn" id="projectsDropdownBtn">
-        <span id="projectsDropdownText">Proyectos</span>
+{{-- Experiencia --}}
+<div class="custom-dropdown" id="experienceDropdown">
+    <button type="button" class="custom-dropdown-btn" id="experienceDropdownBtn">
+        <span id="experienceDropdownText">Experiencia</span>
         <i class="fas fa-chevron-down"></i>
     </button>
 
-    <div class="custom-dropdown-menu" id="projectsDropdownMenu">
+    <div class="custom-dropdown-menu" id="experienceDropdownMenu">
         <label class="custom-option">
             <input
                 type="radio"
-                name="min_projects"
+                name="min_experience"
                 value=""
-                {{ request('min_projects') ? '' : 'checked' }}
+                {{ request('min_experience') ? '' : 'checked' }}
             >
-            <span>Proyectos</span>
+            <span>Experiencia</span>
         </label>
 
         <label class="custom-option">
             <input
                 type="radio"
-                name="min_projects"
+                name="min_experience"
                 value="1"
-                {{ request('min_projects') == '1' ? 'checked' : '' }}
+                {{ request('min_experience') == '1' ? 'checked' : '' }}
             >
-            <span>1 o más proyectos</span>
+            <span>1 o más años</span>
         </label>
 
         <label class="custom-option">
             <input
                 type="radio"
-                name="min_projects"
-                value="3"
-                {{ request('min_projects') == '3' ? 'checked' : '' }}
-            >
-            <span>3 o más proyectos</span>
-        </label>
-
-        <label class="custom-option">
-            <input
-                type="radio"
-                name="min_projects"
+                name="min_experience"
                 value="5"
-                {{ request('min_projects') == '5' ? 'checked' : '' }}
+                {{ request('min_experience') == '5' ? 'checked' : '' }}
             >
-            <span>5 o más proyectos</span>
+            <span>5 o más años</span>
+        </label>
+
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="min_experience"
+                value="10"
+                {{ request('min_experience') == '10' ? 'checked' : '' }}
+            >
+            <span>10 o más años</span>
         </label>
     </div>
 </div>
@@ -323,7 +323,7 @@
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>
 
-            @if(request()->hasAny(['search', 'category', 'skills', 'min_projects', 'language', 'sort']))
+            @if(request()->hasAny(['search', 'category', 'skills', 'min_experience', 'language', 'sort']))
                 <h3>No se encontraron resultados</h3>
                 <p>Intenta cambiar los criterios o filtros de búsqueda.</p>
             @else

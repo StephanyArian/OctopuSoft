@@ -25,13 +25,13 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
 
     const categoryRadios = document.querySelectorAll('input[name="category"]');
     const skillCheckboxes = document.querySelectorAll('input[name="skills[]"]');
-    const projectRadios = document.querySelectorAll('input[name="min_projects"]');
+    const experienceRadios = document.querySelectorAll('input[name="min_experience"]');
     const languageRadios = document.querySelectorAll('input[name="language"]');
     const sortRadios = document.querySelectorAll('input[name="sort"]');
 
     const categoryText = document.getElementById('categoryDropdownText');
     const skillsText = document.getElementById('skillsDropdownText');
-    const projectsText = document.getElementById('projectsDropdownText');
+    const experienceText = document.getElementById('experienceDropdownText');
     const languageText = document.getElementById('languageDropdownText');
     const sortText = document.getElementById('sortDropdownText');
     const clearSkillsOption = document.getElementById('clearSkillsOption');
@@ -65,8 +65,8 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
             categoryText.textContent = getCheckedLabel(categoryRadios, 'Categorías');
         }
 
-        if (projectsText) {
-            projectsText.textContent = getCheckedLabel(projectRadios, 'Proyectos');
+        if (experienceText) {
+            experienceText.textContent = getCheckedLabel(experienceRadios, 'Experiencia');
         }
 
         if (languageText) {
@@ -111,7 +111,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
             : '';
 
         const category = getCheckedValue(categoryRadios);
-        const minProjects = getCheckedValue(projectRadios);
+        const minExperience = getCheckedValue(experienceRadios);
         const language = getCheckedValue(languageRadios);
         const sort = getCheckedValue(sortRadios, 'desc');
         const selectedSkills = getSelectedSkills();
@@ -127,7 +127,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
             }
         });
 
-        if (minProjects) params.append('min_projects', minProjects);
+        if (minExperience) params.append('min_experience', minExperience);
         if (language) params.append('language', language);
         if (sort) params.append('sort', sort);
 
@@ -227,7 +227,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
         });
     });
 
-    projectRadios.forEach(radio => {
+    experienceRadios.forEach(radio => {
         radio.addEventListener('change', () => {
             updateDropdownTexts();
             closeAllDropdowns();
@@ -292,7 +292,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
                 radio.checked = radio.value === '';
             });
 
-            projectRadios.forEach(radio => {
+            experienceRadios.forEach(radio => {
                 radio.checked = radio.value === '';
             });
 
