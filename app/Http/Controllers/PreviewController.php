@@ -8,6 +8,8 @@ use App\Models\Portfolio;
 use App\Models\Profession;
 use App\Models\Skill;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Carbon\Carbon;
 
 class PreviewController extends Controller
 {
@@ -586,7 +588,12 @@ class PreviewController extends Controller
                         $u->whereRaw($normalizeColumn('first_name') . " LIKE ?", [$like])
                           ->orWhereRaw($normalizeColumn('last_name') . " LIKE ?", [$like])
                           ->orWhereRaw($normalizeColumn("CONCAT(first_name, ' ', last_name)") . " LIKE ?", [$like])
-                          ->orWhereRaw($normalizeColumn('biography') . " LIKE ?", [$like]);
+                          ->orWhereRaw($normalizeColumn('biography') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('city') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('country') . " LIKE ?", [$like]);
+                    })
+                    ->orWhereHas('user.location', function ($location) use ($like, $normalizeColumn) {
+                        $location->whereRaw($normalizeColumn('address') . " LIKE ?", [$like]);
                     })
                     ->orWhereHas('user.profession', function ($p) use ($like, $normalizeColumn) {
                         $p->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
@@ -660,34 +667,13 @@ class PreviewController extends Controller
         }
 
         // FILTRO POR AÑOS MÍNIMOS DE EXPERIENCIA LABORAL
+$minExperience = null;
+
 if ($request->filled('min_experience')) {
     $minExperience = (int) $request->input('min_experience');
 
-    if (in_array($minExperience, [1, 5, 10])) {
-        $query->whereRaw("
-            (
-                SELECT COALESCE(
-                    FLOOR(
-                        SUM(
-                            DATEDIFF(
-                                CASE
-                                    WHEN experiences.is_current = 1 THEN CURDATE()
-                                    WHEN experiences.end_date IS NOT NULL THEN experiences.end_date
-                                    ELSE CURDATE()
-                                END,
-                                experiences.start_date
-                            )
-                        ) / 365
-                    ),
-                    0
-                )
-                FROM experiences
-                WHERE experiences.user_id = portfolios.user_id
-                AND experiences.type = 'work'
-                AND experiences.is_visible = 1
-                AND experiences.start_date IS NOT NULL
-            ) >= ?
-        ", [$minExperience]);
+    if (!in_array($minExperience, [1, 5, 10])) {
+        $minExperience = null;
     }
 }
 
@@ -861,10 +847,43 @@ switch ($sort) {
 }
 
 // PAGINACIÓN
-$portfolios = $query->paginate(12)->appends($request->query());
+// PAGINACIÓN
+$query->with([
+    'user.experiences' => function ($experienceQuery) {
+        $experienceQuery
+            ->where('type', 'work')
+            ->where('is_visible', true)
+            ->whereNotNull('start_date');
+    }
+]);
 
-// RESPUESTA AJAX: solo cuando venga desde fetch()
-if ($request->header('X-Requested-With') === 'XMLHttpRequest') {
+if ($minExperience !== null) {
+    $allPortfolios = $query->get();
+
+    $filteredPortfolios = $allPortfolios->filter(function ($portfolio) use ($minExperience) {
+        $years = $this->calculateRealExperienceYears($portfolio->user->experiences ?? collect());
+
+        return $years >= $minExperience;
+    })->values();
+
+    $page = request()->get('page', 1);
+    $perPage = 12;
+
+    $portfolios = new LengthAwarePaginator(
+        $filteredPortfolios->forPage($page, $perPage),
+        $filteredPortfolios->count(),
+        $perPage,
+        $page,
+        [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]
+    );
+} else {
+    $portfolios = $query->paginate(12)->appends($request->query());
+}
+// RESPUESTA AJAX: solo cuando el filtro JS pide JSON explícitamente
+if ($request->ajax() && $request->wantsJson()) {
     return response()->json([
         'html' => view('partials.portfolio_cards', [
             'portfolios' => $portfolios,
@@ -876,5 +895,79 @@ if ($request->header('X-Requested-With') === 'XMLHttpRequest') {
 
 // RESPUESTA NORMAL: cuando entras o vuelves desde un portafolio
 return view('portafolio.explore', compact('portfolios', 'categories', 'skills'));
+    }
+
+    private function calculateRealExperienceYears($experiences): int
+    {
+        $today = Carbon::today();
+
+        $intervals = [];
+
+        foreach ($experiences as $experience) {
+            if (!$experience->start_date) {
+                continue;
+            }
+
+            $start = Carbon::parse($experience->start_date)->startOfDay();
+
+            if ($experience->is_current || !$experience->end_date) {
+                $end = $today->copy();
+            } else {
+                $end = Carbon::parse($experience->end_date)->startOfDay();
+            }
+
+            if ($start->greaterThan($today)) {
+                continue;
+            }
+
+            if ($end->greaterThan($today)) {
+                $end = $today->copy();
+            }
+
+            if ($end->lessThan($start)) {
+                continue;
+            }
+
+            $intervals[] = [
+                'start' => $start,
+                'end' => $end,
+            ];
+        }
+
+        if (empty($intervals)) {
+            return 0;
+        }
+
+        usort($intervals, function ($a, $b) {
+            return $a['start']->timestamp <=> $b['start']->timestamp;
+        });
+
+        $merged = [];
+
+        foreach ($intervals as $interval) {
+            if (empty($merged)) {
+                $merged[] = $interval;
+                continue;
+            }
+
+            $lastIndex = count($merged) - 1;
+            $last = $merged[$lastIndex];
+
+            if ($interval['start']->lessThanOrEqualTo($last['end'])) {
+                if ($interval['end']->greaterThan($last['end'])) {
+                    $merged[$lastIndex]['end'] = $interval['end'];
+                }
+            } else {
+                $merged[] = $interval;
+            }
+        }
+
+        $totalDays = 0;
+
+        foreach ($merged as $interval) {
+            $totalDays += $interval['start']->diffInDays($interval['end']);
+        }
+
+        return (int) floor($totalDays / 365);
     }
 }

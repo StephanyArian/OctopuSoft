@@ -186,46 +186,92 @@
     </button>
 
     <div class="custom-dropdown-menu" id="languageDropdownMenu">
-        <label class="custom-option">
-            <input
-                type="radio"
-                name="language"
-                value=""
-                {{ request('language') ? '' : 'checked' }}
-            >
-            <span>Idiomas</span>
-        </label>
+    <label class="custom-option">
+        <input type="radio" name="language" value="" {{ request('language') ? '' : 'checked' }}>
+        <span>Idiomas</span>
+    </label>
 
-        <label class="custom-option">
-            <input
-                type="radio"
-                name="language"
-                value="Español"
-                {{ request('language') == 'Español' ? 'checked' : '' }}
-            >
-            <span>Español</span>
-        </label>
+    <label class="custom-option">
+        <input type="radio" name="language" value="Español" {{ request('language') == 'Español' ? 'checked' : '' }}>
+        <span>Español</span>
+    </label>
 
-        <label class="custom-option">
-            <input
-                type="radio"
-                name="language"
-                value="Inglés"
-                {{ request('language') == 'Inglés' ? 'checked' : '' }}
-            >
-            <span>Inglés</span>
-        </label>
+    <label class="custom-option">
+        <input type="radio" name="language" value="Inglés" {{ request('language') == 'Inglés' ? 'checked' : '' }}>
+        <span>Inglés</span>
+    </label>
 
-        <label class="custom-option">
-            <input
-                type="radio"
-                name="language"
-                value="Portugués"
-                {{ request('language') == 'Portugués' ? 'checked' : '' }}
-            >
-            <span>Portugués</span>
-        </label>
-    </div>
+    <label class="custom-option">
+        <input type="radio" name="language" value="Portugués" {{ request('language') == 'Portugués' ? 'checked' : '' }}>
+        <span>Portugués</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Francés" {{ request('language') == 'Francés' ? 'checked' : '' }}>
+        <span>Francés</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Alemán" {{ request('language') == 'Alemán' ? 'checked' : '' }}>
+        <span>Alemán</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Italiano" {{ request('language') == 'Italiano' ? 'checked' : '' }}>
+        <span>Italiano</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Chino" {{ request('language') == 'Chino' ? 'checked' : '' }}>
+        <span>Chino</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Japonés" {{ request('language') == 'Japonés' ? 'checked' : '' }}>
+        <span>Japonés</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Ruso" {{ request('language') == 'Ruso' ? 'checked' : '' }}>
+        <span>Ruso</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Arabe" {{ request('language') == 'Arabe' ? 'checked' : '' }}>
+        <span>Arabe</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Hindi" {{ request('language') == 'Hindi' ? 'checked' : '' }}>
+        <span>Hindi</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Turco" {{ request('language') == 'Turco' ? 'checked' : '' }}>
+        <span>Turco</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Catalán" {{ request('language') == 'Catalán' ? 'checked' : '' }}>
+        <span>Catalán</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Griego" {{ request('language') == 'Griego' ? 'checked' : '' }}>
+        <span>Griego</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Ucraniano" {{ request('language') == 'Ucraniano' ? 'checked' : '' }}>
+        <span>Ucraniano</span>
+    </label>
+
+    <label class="custom-option">
+        <input type="radio" name="language" value="Rumano" {{ request('language') == 'Rumano' ? 'checked' : '' }}>
+        <span>Rumano</span>
+    </label>
+
+</div>
 </div>
 
 {{-- Ordenamiento --}}
