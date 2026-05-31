@@ -6,6 +6,8 @@
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/preview.css') }}?v={{ time() }}">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -65,14 +67,6 @@
     $temaActual = $user->portfolio->color_theme ?? 'default';
     $claseTema = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
-
-<a href="javascript:history.back()" class="btn-flotante">
-    <i class="fas fa-edit"></i> Continuar editando
-</a>
-
-<button class="vibe-floating-btn" onclick="toggleVibeSidebar(true)">
-    <i class="fas fa-palette"></i> Elegir Vibe
-</button>
 
 <div class="preview-container {{ $claseTema }}" id="previewContainer">
     
@@ -219,6 +213,22 @@
                     <i class="fas fa-briefcase"></i> Ver todas las experiencias ({{ $experiencias->count() }})
                 </button>
             </div>
+            <!-- CONTENEDOR OCULTO CON TODAS LAS EXPERIENCIAS -->
+            <div id="experiencias-completas" style="display:none;">
+                <div class="cards-grid">
+                    @foreach($experiencias as $exp)
+                    <div class="card">
+                        <h3>{{ $exp->empresa }}</h3>
+                        <div class="subtitle">{{ $exp->ubicacion ?? '' }}</div>
+                        <div class="role-single">{{ $exp->cargo }}</div>
+                        <div class="date">{{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d/m/Y') }} @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d/m/Y') }} @elseif($exp->trabajo_actual) — Actualidad @endif</div>
+                        @if($exp->descripcion)
+                        <div class="description">{{ strip_tags($exp->descripcion) }}</div>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
         @endif
     </div>
 
@@ -293,6 +303,20 @@
                 <button onclick="abrirModalAcademicas()">
                     <i class="fas fa-graduation-cap"></i> Ver toda la formación académica ({{ $academicas->count() }})
                 </button>
+            </div>
+            <!-- CONTENEDOR OCULTO CON TODAS LAS ACADÉMICAS -->
+            <div id="academicas-completas" style="display:none;">
+                <div class="cards-grid">
+                    @foreach($academicas as $aca)
+                    <div class="card">
+                        <h3>{{ $aca->institucion }}</h3>
+                        <div class="subtitle">{{ $aca->titulo }}</div>
+                        @if($aca->specialty)<div class="specialty-badge">{{ $aca->specialty }}</div>@endif
+                        <div class="date">{{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y') }} @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') }} @elseif($aca->estudio_actual) — Actualidad @endif</div>
+                        @if($aca->descripcion)<div class="description">{{ strip_tags($aca->descripcion) }}</div>@endif
+                    </div>
+                    @endforeach
+                </div>
             </div>
         @endif
     </div>
@@ -381,6 +405,41 @@
                         <i class="fas fa-code"></i> Ver todas las habilidades técnicas
                     </button>
                 </div>
+                <!-- CONTENEDOR OCULTO CON TODAS LAS TÉCNICAS -->
+                <div id="tecnicas-completas" style="display:none;">
+                    @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0)
+                        <div class="tech-category-title">Frontend</div>
+                        <div class="tech-skills-grid">
+                            @foreach($habilidadesTecnicasFrontend as $skill)
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $skill->nivel ?? 'Intermedio' }}</span>
+                                </div>
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill @if(($skill->nivel ?? 'Intermedio') == 'Avanzado') advanced @elseif(($skill->nivel ?? 'Intermedio') == 'Intermedio') intermediate @else basic @endif"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if(($habilidadesTecnicasBackend ?? collect())->count() > 0)
+                        <div class="tech-category-title">Backend</div>
+                        <div class="tech-skills-grid">
+                            @foreach($habilidadesTecnicasBackend as $skill)
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $skill->nivel ?? 'Intermedio' }}</span>
+                                </div>
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill @if(($skill->nivel ?? 'Intermedio') == 'Avanzado') advanced @elseif(($skill->nivel ?? 'Intermedio') == 'Intermedio') intermediate @else basic @endif"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
             @endif
         @endif
     </div>
@@ -401,6 +460,14 @@
                 <button onclick="abrirModalBlandas()">
                     <i class="fas fa-heart"></i> Ver todas las habilidades blandas ({{ $habilidadesBlandas->count() }})
                 </button>
+            </div>
+            <!-- CONTENEDOR OCULTO CON TODAS LAS BLANDAS -->
+            <div id="blandas-completas" style="display:none;">
+                <div class="skills-container">
+                    @foreach($habilidadesBlandas as $skill)
+                    <span class="soft-skill-tag"><i class="fas fa-star"></i> {{ $skill->nombre }}</span>
+                    @endforeach
+                </div>
             </div>
         @endif
     </div>
@@ -452,6 +519,42 @@
                     <button onclick="abrirModalIdiomas()">
                         <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
                     </button>
+                </div>
+                <!-- CONTENEDOR OCULTO CON TODOS LOS IDIOMAS -->
+                <div id="idiomas-completos" style="display:none;">
+                    <div class="idiomas-preview-grid">
+                        @foreach($idiomas as $index => $idioma)
+                        @php
+                            $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                            $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                            $colorFondo = $colorFondos[$index % count($colorFondos)];
+                            $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+                        @endphp
+                        <div class="idioma-preview-card">
+                            <div class="idioma-preview-header">
+                                <div class="idioma-preview-left">
+                                    @if($banderaEmoji)
+                                        <span class="idioma-bandera">{{ $banderaEmoji }}</span>
+                                    @else
+                                        <span class="idioma-flag-code-preview" style="background: {{ $colorFondo }};">{{ $codigo }}</span>
+                                    @endif
+                                    <div class="idioma-preview-info">
+                                        <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
+                                        <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+                                    </div>
+                                </div>
+                                @if($idioma->certificado)
+                                    <a href="javascript:void(0)" class="idioma-cert-link">
+                                        <i class="fas fa-certificate"></i> Cert.
+                                    </a>
+                                @endif
+                            </div>
+                            <div class="idioma-barra-wrap">
+                                <div class="idioma-barra-fill-custom" style="width: {{ $idioma->porcentaje }}%; background: {{ $colorBarra }};"></div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
         @endif
@@ -520,6 +623,18 @@
                     <button onclick="abrirModalTodosProyectos()">
                         <i class="fas fa-th-large"></i> Ver todos los proyectos ({{ $proyectos->count() }})
                     </button>
+                </div>
+                <!-- CONTENEDOR OCULTO CON TODOS LOS PROYECTOS -->
+                <div id="proyectos-completos" style="display:none;">
+                    <div class="cards-grid">
+                        @foreach($proyectos as $proyecto)
+                        <div class="card">
+                            <h3>{{ $proyecto->nombre }}</h3>
+                            <div class="date">{{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }} @if($proyecto->fecha_fin) — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif | {{ $proyecto->estado ?? 'En progreso' }}</div>
+                            <div class="description">Rol: {{ $proyecto->rol ?? '' }}</div>
+                        </div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
         @endif
@@ -805,18 +920,137 @@
         </div>
     </div>
 
-    <!-- BOTONES -->
-    <div class="buttons-container">
+    <!-- ==================== BOTÓN FLOTANTE "MÁS OPCIONES" (ABAJO IZQUIERDA) ==================== -->
+    <div class="fab-container" id="fabContainer">
+        <div class="fab-menu" id="fabMenu">
+            <button class="fab-item" onclick="descargarPDF()">
+                <i class="fas fa-file-pdf"></i>
+                <span>Descargar PDF</span>
+            </button>
+            <button class="fab-item" onclick="descargarImagen()">
+                <i class="fas fa-image"></i>
+                <span>Descargar imagen</span>
+            </button>
+            <div class="fab-divider"></div>
+            <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');">
+                <i class="fas fa-palette"></i>
+                <span>Elegir Vibe</span>
+            </button>
+            <a class="fab-item" href="javascript:history.back()">
+                <i class="fas fa-edit"></i>
+                <span>Continuar editando</span>
+            </a>
+        </div>
+        <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
+            <i class="fas fa-ellipsis-h" id="fabIcon"></i>
+            <span class="fab-label">Más opciones</span>
+        </button>
+    </div>
+
+    <!-- ==================== BARRA INFERIOR — PUBLICAR (NO FLOTANTE, ABAJO DERECHA) ==================== -->
+    <div class="preview-bottom-bar" id="previewBottomBar">
         <form action="{{ route('perfil.publicar') }}" method="POST" style="margin: 0;" id="formPublicar">
             @csrf
-            <button type="submit" class="btn btn-publicar">
+            <button type="submit" class="btn-publicar-main">
                 <i class="fas fa-globe"></i> Publicar perfil
             </button>
         </form>
     </div>
+
+</div>
+
+{{-- Sidebar Vibe --}}
+<div class="vibe-sidebar-backdrop" id="vibeBackdrop" onclick="toggleVibeSidebar(false)"></div>
+<div class="vibe-sidebar" id="vibeSidebar">
+    <div class="vibe-sidebar-header">
+        <h3><i class="fas fa-palette"></i> Personalizar Vibe</h3>
+        <button class="vibe-sidebar-close" onclick="toggleVibeSidebar(false)">✕</button>
+    </div>
+    <div class="vibe-sidebar-body">
+        <div class="vibe-card {{ $temaActual === 'default' ? 'active' : '' }}" data-theme="default" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Clásico (Predeterminado)
+                @if($temaActual === 'default') <i class="fas fa-check-circle" style="color: #0abf9e;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #2d0a1e;"></div>
+                <div class="vibe-color-box" style="background: #4a1030;"></div>
+                <div class="vibe-color-box" style="background: #6b1f45;"></div>
+                <div class="vibe-color-box" style="background: #0abf9e;"></div>
+            </div>
+        </div>
+        <div class="vibe-card {{ $temaActual === 'sunset' ? 'active' : '' }}" data-theme="sunset" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Sunset Glow (Atardecer)
+                @if($temaActual === 'sunset') <i class="fas fa-check-circle" style="color: #f97316;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #1e1b4b;"></div>
+                <div class="vibe-color-box" style="background: #312e81;"></div>
+                <div class="vibe-color-box" style="background: #4338ca;"></div>
+                <div class="vibe-color-box" style="background: #f97316;"></div>
+            </div>
+        </div>
+        <div class="vibe-card {{ $temaActual === 'emerald' ? 'active' : '' }}" data-theme="emerald" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Emerald Mint (Bosque Místico)
+                @if($temaActual === 'emerald') <i class="fas fa-check-circle" style="color: #10b981;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #022c22;"></div>
+                <div class="vibe-color-box" style="background: #064e3b;"></div>
+                <div class="vibe-color-box" style="background: #0f766e;"></div>
+                <div class="vibe-color-box" style="background: #10b981;"></div>
+            </div>
+        </div>
+        <div class="vibe-card {{ $temaActual === 'midnight' ? 'active' : '' }}" data-theme="midnight" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Midnight Neon (Ciberpunk)
+                @if($temaActual === 'midnight') <i class="fas fa-check-circle" style="color: #a855f7;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #0f172a;"></div>
+                <div class="vibe-color-box" style="background: #1e293b;"></div>
+                <div class="vibe-color-box" style="background: #334155;"></div>
+                <div class="vibe-color-box" style="background: #a855f7;"></div>
+            </div>
+        </div>
+        <div class="vibe-card {{ $temaActual === 'ocean' ? 'active' : '' }}" data-theme="ocean" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Ocean Breeze (Brisa Marina)
+                @if($temaActual === 'ocean') <i class="fas fa-check-circle" style="color: #00b4d8;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #0b132b;"></div>
+                <div class="vibe-color-box" style="background: #1c2541;"></div>
+                <div class="vibe-color-box" style="background: #3a506b;"></div>
+                <div class="vibe-color-box" style="background: #00b4d8;"></div>
+            </div>
+        </div>
+        <div class="vibe-card {{ $temaActual === 'sakura' ? 'active' : '' }}" data-theme="sakura" onclick="selectVibe(this)">
+            <div class="vibe-card-title">
+                Sakura Dream (Sueño de Cerezo)
+                @if($temaActual === 'sakura') <i class="fas fa-check-circle" style="color: #ec4899;"></i> @endif
+            </div>
+            <div class="vibe-palette">
+                <div class="vibe-color-box" style="background: #3b0764;"></div>
+                <div class="vibe-color-box" style="background: #581c87;"></div>
+                <div class="vibe-color-box" style="background: #701a75;"></div>
+                <div class="vibe-color-box" style="background: #ec4899;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="vibe-sidebar-footer">
+        <button class="vibe-save-btn" id="saveVibeBtn" onclick="saveVibeTheme()">
+            <i class="fas fa-save"></i> Guardar Vibra
+        </button>
+    </div>
 </div>
 
 <script>
+/* ============================================================
+   UTILIDADES GENERALES
+   ============================================================ */
 function toggleDesc(id, btn) {
     const el = document.getElementById(id);
     if (el.classList.contains('collapsed')) {
@@ -856,23 +1090,326 @@ function abrirLightbox(imagenSrc) {
     }
 }
 
-document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    Swal.fire({
-        title: '¿Publicar portafolio?',
-        text: 'Tu perfil será visible para todos los usuarios.',
-        showCancelButton: true,
-        confirmButtonColor: '#0abf9e',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Publicar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({ title: 'Publicando...', showConfirmButton: false, allowOutsideClick: false });
-            document.getElementById('formPublicar').submit();
-        }
-    });
+function toggleFabMenu() {
+    const menu   = document.getElementById('fabMenu');
+    const icon   = document.getElementById('fabIcon');
+    const isOpen = menu.classList.contains('open');
+    menu.classList.toggle('open');
+    if (!isOpen) {
+        icon.className = 'fas fa-times';
+    } else {
+        icon.className = 'fas fa-ellipsis-h';
+    }
+}
+
+document.addEventListener('click', function(e) {
+    const container = document.getElementById('fabContainer');
+    if (container && !container.contains(e.target)) {
+        const menu = document.getElementById('fabMenu');
+        const icon = document.getElementById('fabIcon');
+        if (menu) menu.classList.remove('open');
+        if (icon) icon.className = 'fas fa-ellipsis-h';
+    }
 });
+
+/* ============================================================
+   FUNCIONES PARA COPIA COMPLETA Y DESCARGA
+   ============================================================ */
+
+function crearCopiaCompleta() {
+    const original = document.getElementById('previewContainer');
+    const clone = original.cloneNode(true);
+    
+    // Expandir todas las descripciones colapsadas
+    const descripcionesColapsadas = clone.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed');
+    descripcionesColapsadas.forEach(el => {
+        el.classList.remove('collapsed');
+        el.classList.add('expanded');
+        el.style.maxHeight = 'none';
+        el.style.overflow = 'visible';
+    });
+    
+    // Eliminar botones "Ver más" (solo en la copia)
+    const verMasBtns = clone.querySelectorAll('.ver-mas-btn');
+    verMasBtns.forEach(btn => btn.remove());
+    
+    // Ocultar botones "Ver todos" (solo en la copia)
+    const btnVerTodos = clone.querySelectorAll('.btn-ver-todos');
+    btnVerTodos.forEach(btn => btn.style.display = 'none');
+    
+    // ========== REEMPLAZAR CON CONTENIDO COMPLETO ==========
+    
+    // 1. EXPERIENCIAS COMPLETAS
+    const experienciasCompletas = document.getElementById('experiencias-completas');
+    if (experienciasCompletas) {
+        const secciones = clone.querySelectorAll('.section');
+        let seccionExp = null;
+        for (let i = 0; i < secciones.length; i++) {
+            if (secciones[i].querySelector('h2 .fa-briefcase')) {
+                seccionExp = secciones[i];
+                break;
+            }
+        }
+        if (seccionExp) {
+            const gridExp = seccionExp.querySelector('.cards-grid');
+            if (gridExp) {
+                const contenido = experienciasCompletas.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.cards-grid');
+                if (gridCompleto) gridExp.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+    }
+    
+    // 2. ACADÉMICAS COMPLETAS
+    const academicasCompletas = document.getElementById('academicas-completas');
+    if (academicasCompletas) {
+        const secciones = clone.querySelectorAll('.section');
+        let seccionAca = null;
+        for (let i = 0; i < secciones.length; i++) {
+            if (secciones[i].querySelector('h2 .fa-graduation-cap')) {
+                seccionAca = secciones[i];
+                break;
+            }
+        }
+        if (seccionAca) {
+            const gridAca = seccionAca.querySelector('.cards-grid');
+            if (gridAca) {
+                const contenido = academicasCompletas.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.cards-grid');
+                if (gridCompleto) gridAca.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+    }
+    
+    // 3. HABILIDADES TÉCNICAS COMPLETAS
+    const tecnicasCompletas = document.getElementById('tecnicas-completas');
+    if (tecnicasCompletas) {
+        const secciones = clone.querySelectorAll('.section');
+        let seccionTec = null;
+        for (let i = 0; i < secciones.length; i++) {
+            if (secciones[i].querySelector('h2 .fa-code')) {
+                seccionTec = secciones[i];
+                break;
+            }
+        }
+        if (seccionTec) {
+            const contenido = tecnicasCompletas.cloneNode(true);
+            const nuevoFrontend = contenido.querySelector('.tech-category-title');
+            const nuevoGrid = contenido.querySelector('.tech-skills-grid');
+            if (nuevoFrontend && nuevoGrid) {
+                const oldFrontend = seccionTec.querySelector('.tech-category-title');
+                const oldGrid = seccionTec.querySelector('.tech-skills-grid');
+                if (oldFrontend) oldFrontend.remove();
+                if (oldGrid) oldGrid.remove();
+                seccionTec.insertBefore(nuevoFrontend.cloneNode(true), seccionTec.querySelector('.tech-category-title, .btn-ver-todos, .empty-message'));
+                seccionTec.insertBefore(nuevoGrid.cloneNode(true), seccionTec.querySelector('.btn-ver-todos, .empty-message'));
+            }
+        }
+    }
+    
+    // 4. HABILIDADES BLANDAS COMPLETAS
+    const blandasCompletas = document.getElementById('blandas-completas');
+    if (blandasCompletas) {
+        const secciones = clone.querySelectorAll('.section');
+        let seccionBlandas = null;
+        for (let i = 0; i < secciones.length; i++) {
+            if (secciones[i].querySelector('h2 .fa-heart') && !secciones[i].querySelector('h2 .fa-code')) {
+                seccionBlandas = secciones[i];
+                break;
+            }
+        }
+        if (seccionBlandas) {
+            const containerBlandas = seccionBlandas.querySelector('.skills-container');
+            if (containerBlandas) {
+                const contenido = blandasCompletas.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.skills-container');
+                if (gridCompleto) containerBlandas.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+    }
+    
+    // 5. IDIOMAS COMPLETOS
+    const idiomasCompletos = document.getElementById('idiomas-completos');
+    if (idiomasCompletos) {
+        const secciones = clone.querySelectorAll('.section');
+        let seccionIdiomas = null;
+        for (let i = 0; i < secciones.length; i++) {
+            if (secciones[i].querySelector('h2 .fa-language')) {
+                seccionIdiomas = secciones[i];
+                break;
+            }
+        }
+        if (seccionIdiomas) {
+            const gridIdiomas = seccionIdiomas.querySelector('.idiomas-preview-grid');
+            if (gridIdiomas) {
+                const contenido = idiomasCompletos.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.idiomas-preview-grid');
+                if (gridCompleto) gridIdiomas.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+    }
+    
+    // 6. PROYECTOS COMPLETOS
+    const proyectosCompletos = document.getElementById('proyectos-completos');
+    if (proyectosCompletos) {
+        const secciones = clone.querySelectorAll('.section');
+        let seccionProyectos = null;
+        for (let i = 0; i < secciones.length; i++) {
+            if (secciones[i].querySelector('h2 .fa-project-diagram')) {
+                seccionProyectos = secciones[i];
+                break;
+            }
+        }
+        if (seccionProyectos) {
+            const gridProyectos = seccionProyectos.querySelector('.cards-grid');
+            if (gridProyectos) {
+                const contenido = proyectosCompletos.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.cards-grid');
+                if (gridCompleto) gridProyectos.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+    }
+    
+    // Ocultar elementos flotantes
+    const fabClone = clone.querySelector('#fabContainer');
+    if (fabClone) fabClone.style.display = 'none';
+    const bottomBarClone = clone.querySelector('#previewBottomBar');
+    if (bottomBarClone) bottomBarClone.style.display = 'none';
+    
+    return clone;
+}
+
+// DESCARGAR PDF - Directo sin abrir nueva pestaña
+async function descargarPDF() {
+    const menu = document.getElementById('fabMenu');
+    const icon = document.getElementById('fabIcon');
+    if (menu) menu.classList.remove('open');
+    if (icon) icon.className = 'fas fa-ellipsis-h';
+    
+    Swal.fire({
+        title: 'Generando PDF...',
+        text: 'Por favor espera...',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+    
+    try {
+        const clone = crearCopiaCompleta();
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '1200px';
+        tempDiv.style.backgroundColor = 'white';
+        tempDiv.appendChild(clone);
+        document.body.appendChild(tempDiv);
+        clone.style.maxWidth = '1200px';
+        clone.style.margin = '0 auto';
+        
+        setTimeout(async () => {
+            try {
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 2.5,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    windowWidth: tempDiv.scrollWidth,
+                    windowHeight: tempDiv.scrollHeight
+                });
+                
+                const { jsPDF } = window.jspdf;
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pdfWidth - 20;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                let position = 10;
+                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                
+                let heightLeft = imgHeight - (pdfHeight - 20);
+                let currentPage = 1;
+                while (heightLeft > 0) {
+                    pdf.addPage();
+                    position = 10 - (currentPage * (pdfHeight - 20));
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= (pdfHeight - 20);
+                    currentPage++;
+                }
+                
+                pdf.save('portafolio.pdf');
+                document.body.removeChild(tempDiv);
+                
+                Swal.fire({ icon: 'success', title: '¡PDF descargado!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            } catch (err) {
+                document.body.removeChild(tempDiv);
+                throw err;
+            }
+        }, 800);
+    } catch (error) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo generar el PDF.' });
+    }
+}
+
+// DESCARGAR IMAGEN
+async function descargarImagen() {
+    const menu = document.getElementById('fabMenu');
+    const icon = document.getElementById('fabIcon');
+    if (menu) menu.classList.remove('open');
+    if (icon) icon.className = 'fas fa-ellipsis-h';
+    
+    Swal.fire({
+        title: 'Generando imagen...',
+        text: 'Por favor espera...',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => { Swal.showLoading(); }
+    });
+    
+    try {
+        const clone = crearCopiaCompleta();
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.style.top = '-9999px';
+        tempDiv.style.width = '1200px';
+        tempDiv.style.backgroundColor = 'white';
+        tempDiv.appendChild(clone);
+        document.body.appendChild(tempDiv);
+        clone.style.maxWidth = '1200px';
+        clone.style.margin = '0 auto';
+        
+        setTimeout(async () => {
+            try {
+                const canvas = await html2canvas(tempDiv, {
+                    scale: 2.5,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    windowWidth: tempDiv.scrollWidth,
+                    windowHeight: tempDiv.scrollHeight
+                });
+                const link = document.createElement('a');
+                link.download = 'portafolio.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                document.body.removeChild(tempDiv);
+                Swal.fire({ icon: 'success', title: '¡Imagen descargada!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            } catch (err) {
+                document.body.removeChild(tempDiv);
+                throw err;
+            }
+        }, 800);
+    } catch (error) {
+        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo generar la imagen.' });
+    }
+}
+
+/* ============================================================
+   MODALES Y PROYECTOS (TUS FUNCIONES ORIGINALES)
+   ============================================================ */
 
 window.previewProjectsById = {!! json_encode(
     collect($proyectos)->keyBy('id')->map(function($p) use ($allowedHtmlTags) {
@@ -908,24 +1445,24 @@ function abrirModal(data) {
     document.getElementById('modal-nombre').textContent = data.nombre;
     let badgesDiv = document.getElementById('modal-badges');
     badgesDiv.innerHTML = '';
-    const badge = (texto, bg, color) => `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};">${texto}</span>`;
+    const badge     = (texto, bg, color) => `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};">${texto}</span>`;
     const badgeIcon = (iconClass, texto, bg, color) => `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};"><i class="${iconClass}" style="font-size:10px;opacity:.9;"></i>${texto}</span>`;
 
     if (data.estado) {
-        let bg = data.estado === 'Completado' ? '#d1fae5' : data.estado === 'En curso' ? '#fef3c7' : '#f1f5f9';
+        let bg    = data.estado === 'Completado' ? '#d1fae5' : data.estado === 'En curso' ? '#fef3c7' : '#f1f5f9';
         let color = data.estado === 'Completado' ? '#065f46' : data.estado === 'En curso' ? '#92400e' : '#64748b';
         badgesDiv.innerHTML += badge(previewEscapeHtml(data.estado), bg, color);
     }
-    if (data.rol) badgesDiv.innerHTML += badgeIcon('fas fa-user-check', previewEscapeHtml(data.rol), '#ede9fe', '#5b21b6');
-    if (data.cliente) badgesDiv.innerHTML += badgeIcon('fas fa-building', previewEscapeHtml(data.cliente), '#f1f5f9', '#475569');
+    if (data.rol)     badgesDiv.innerHTML += badgeIcon('fas fa-user-check', previewEscapeHtml(data.rol),     '#ede9fe', '#5b21b6');
+    if (data.cliente) badgesDiv.innerHTML += badgeIcon('fas fa-building',   previewEscapeHtml(data.cliente), '#f1f5f9', '#475569');
     
     let fechasDiv = document.getElementById('modal-fechas');
     fechasDiv.innerHTML = '';
     if (data.fecha_inicio) fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Inicio: <strong>${previewEscapeHtml(data.fecha_inicio)}</strong></span>`;
-    if (data.fecha_fin) fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Fin: <strong>${previewEscapeHtml(data.fecha_fin)}</strong></span>`;
+    if (data.fecha_fin)    fechasDiv.innerHTML += `<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Fin: <strong>${previewEscapeHtml(data.fecha_fin)}</strong></span>`;
     
     document.getElementById('modal-descripcion').innerHTML = data.descripcion ?? '';
-    let tecDiv = document.getElementById('modal-tecnologias');
+    let tecDiv     = document.getElementById('modal-tecnologias');
     let tecSection = document.getElementById('modal-tec-section');
     tecDiv.innerHTML = '';
     if (data.tecnologias && data.tecnologias.length) {
@@ -941,92 +1478,49 @@ function abrirModal(data) {
         document.getElementById('modal-ev-count').textContent = '(' + data.evidencias.length + ')';
         data.evidencias.forEach(ev => {
             let item = document.createElement('div');
-            
             if (ev.tipo === 'imagen' && ev.imagen) {
                 let nombreImagen = ev.titulo || 'Imagen del proyecto';
-                if (nombreImagen.match(/\.(jpg|jpeg|png|gif|webp)$/i) || nombreImagen.length > 30) {
-                    nombreImagen = 'Imagen del proyecto';
-                }
-                item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                if (nombreImagen.match(/\.(jpg|jpeg|png|gif|webp)$/i) || nombreImagen.length > 30) nombreImagen = 'Imagen del proyecto';
+                item.style.cssText = 'margin-bottom:12px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;';
                 item.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                        <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-image" style="color: #0abf9e; font-size: 18px;"></i>
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                        <div style="width:36px;height:36px;background:#0abf9e15;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-image" style="color:#0abf9e;font-size:18px;"></i>
                         </div>
-                        <div>
-                            <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(nombreImagen)}</strong>
-                        </div>
+                        <strong style="font-size:14px;color:#0f172a;">${previewEscapeHtml(nombreImagen)}</strong>
                     </div>
-                    <div style="padding: 16px; background: white; position: relative;">
-                        <div style="position: relative; display: inline-block; width: 100%; border-radius: 16px; overflow: hidden;">
-                            <img src="${ev.imagen}" style="width:100%; max-height:280px; object-fit:cover; border-radius: 16px; cursor: pointer; transition: transform 0.2s;" 
-                                 onclick="abrirLightbox('${ev.imagen}')"
-                                 onmouseover="this.style.transform='scale(1.01)'"
-                                 onmouseout="this.style.transform='scale(1)'"
-                                 onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:#ef4444;font-size:12px;padding:16px;text-align:center;\'>❌ No se pudo cargar la imagen</p>'">
-                            <div onclick="abrirLightbox('${ev.imagen}')" style="position: absolute; bottom: 16px; right: 16px; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); border-radius: 40px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                                <span style="color: white; font-size: 12px; font-weight: 500;">Ver imagen</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            else if (ev.tipo === 'enlace' && ev.url) {
-                item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    <div style="padding:16px;">
+                        <img src="${ev.imagen}" style="width:100%;max-height:280px;object-fit:cover;border-radius:16px;cursor:pointer;" onclick="abrirLightbox('${ev.imagen}')">
+                    </div>`;
+            } else if (ev.tipo === 'enlace' && ev.url) {
+                item.style.cssText = 'margin-bottom:12px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;';
                 item.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                        <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-link" style="color: #0abf9e; font-size: 18px;"></i>
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                        <div style="width:36px;height:36px;background:#0abf9e15;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-link" style="color:#0abf9e;font-size:18px;"></i>
                         </div>
-                        <div>
-                            <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Enlace')}</strong>
-                            ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
-                        </div>
+                        <strong style="font-size:14px;color:#0f172a;">${previewEscapeHtml(ev.titulo || 'Enlace')}</strong>
                     </div>
-                    <div style="padding: 16px; background: white;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
-                                <i class="fas fa-globe" style="font-size: 12px; color: #0abf9e;"></i>
-                                <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
-                            </div>
-                            <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
-                                Abrir enlace <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
-                            </a>
-                        </div>
-                    </div>
-                `;
-            }
-            else if (ev.tipo === 'repositorio' && ev.url) {
-                let icon = 'fa-github';
-                if (ev.plataforma === 'GitLab') icon = 'fa-gitlab';
-                else if (ev.plataforma === 'Bitbucket') icon = 'fa-bitbucket';
-                item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    <div style="padding:16px;display:flex;justify-content:flex-end;">
+                        <a href="${ev.url}" target="_blank" style="background:#0abf9e;color:white;padding:8px 18px;border-radius:40px;font-size:12px;font-weight:500;text-decoration:none;">
+                            Abrir enlace <i class="fas fa-external-link-alt" style="font-size:10px;"></i>
+                        </a>
+                    </div>`;
+            } else if (ev.tipo === 'repositorio' && ev.url) {
+                let icon = ev.plataforma === 'GitLab' ? 'fa-gitlab' : ev.plataforma === 'Bitbucket' ? 'fa-bitbucket' : 'fa-github';
+                item.style.cssText = 'margin-bottom:12px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;';
                 item.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                        <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fab ${icon}" style="color: #0abf9e; font-size: 18px;"></i>
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                        <div style="width:36px;height:36px;background:#0abf9e15;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fab ${icon}" style="color:#0abf9e;font-size:18px;"></i>
                         </div>
-                        <div>
-                            <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Repositorio')}</strong>
-                            ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
-                        </div>
+                        <strong style="font-size:14px;color:#0f172a;">${previewEscapeHtml(ev.titulo || 'Repositorio')}</strong>
                     </div>
-                    <div style="padding: 16px; background: white;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                            <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
-                                <i class="fab ${icon}" style="font-size: 12px;"></i>
-                                <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
-                            </div>
-                            <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
-                                Ver repositorio <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
-                            </a>
-                        </div>
-                    </div>
-                `;
+                    <div style="padding:16px;display:flex;justify-content:flex-end;">
+                        <a href="${ev.url}" target="_blank" style="background:#0abf9e;color:white;padding:8px 18px;border-radius:40px;font-size:12px;font-weight:500;text-decoration:none;">
+                            Ver repositorio <i class="fas fa-external-link-alt" style="font-size:10px;"></i>
+                        </a>
+                    </div>`;
             }
             evDiv.appendChild(item);
         });
@@ -1041,66 +1535,27 @@ function cerrarModal() {
     document.body.style.overflow = '';
 }
 
-function abrirModalTodosProyectos() {
-    document.getElementById('modal-todos-proyectos').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-function cerrarModalTodosProyectos() {
-    document.getElementById('modal-todos-proyectos').style.display = 'none';
-    document.body.style.overflow = '';
-}
+function abrirModalTodosProyectos()  { document.getElementById('modal-todos-proyectos').style.display = 'flex';   document.body.style.overflow = 'hidden'; }
+function cerrarModalTodosProyectos() { document.getElementById('modal-todos-proyectos').style.display = 'none';   document.body.style.overflow = ''; }
 
-function abrirModalExperiencias() {
-    document.getElementById('modal-todos-experiencias').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-function cerrarModalExperiencias() {
-    document.getElementById('modal-todos-experiencias').style.display = 'none';
-    document.body.style.overflow = '';
-}
+function abrirModalExperiencias()    { document.getElementById('modal-todos-experiencias').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+function cerrarModalExperiencias()   { document.getElementById('modal-todos-experiencias').style.display = 'none'; document.body.style.overflow = ''; }
 
-function abrirModalAcademicas() {
-    document.getElementById('modal-todos-academicas').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-function cerrarModalAcademicas() {
-    document.getElementById('modal-todos-academicas').style.display = 'none';
-    document.body.style.overflow = '';
-}
+function abrirModalAcademicas()      { document.getElementById('modal-todos-academicas').style.display = 'flex';  document.body.style.overflow = 'hidden'; }
+function cerrarModalAcademicas()     { document.getElementById('modal-todos-academicas').style.display = 'none';  document.body.style.overflow = ''; }
 
-function abrirModalTecnicas() {
-    document.getElementById('modal-todos-tecnicas').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-function cerrarModalTecnicas() {
-    document.getElementById('modal-todos-tecnicas').style.display = 'none';
-    document.body.style.overflow = '';
-}
+function abrirModalTecnicas()        { document.getElementById('modal-todos-tecnicas').style.display = 'flex';    document.body.style.overflow = 'hidden'; }
+function cerrarModalTecnicas()       { document.getElementById('modal-todos-tecnicas').style.display = 'none';    document.body.style.overflow = ''; }
 
-function abrirModalBlandas() {
-    document.getElementById('modal-todos-blandas').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-function cerrarModalBlandas() {
-    document.getElementById('modal-todos-blandas').style.display = 'none';
-    document.body.style.overflow = '';
-}
+function abrirModalBlandas()         { document.getElementById('modal-todos-blandas').style.display = 'flex';     document.body.style.overflow = 'hidden'; }
+function cerrarModalBlandas()        { document.getElementById('modal-todos-blandas').style.display = 'none';     document.body.style.overflow = ''; }
 
-function abrirModalIdiomas() {
-    document.getElementById('modal-todos-idiomas').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-}
-function cerrarModalIdiomas() {
-    document.getElementById('modal-todos-idiomas').style.display = 'none';
-    document.body.style.overflow = '';
-}
+function abrirModalIdiomas()         { document.getElementById('modal-todos-idiomas').style.display = 'flex';     document.body.style.overflow = 'hidden'; }
+function cerrarModalIdiomas()        { document.getElementById('modal-todos-idiomas').style.display = 'none';     document.body.style.overflow = ''; }
 
-function abrirModalCompartir() {
-    document.getElementById('modal-compartir').style.display = 'flex';
-}
-function cerrarModalCompartir() {
-    document.getElementById('modal-compartir').style.display = 'none';
-}
+function abrirModalCompartir()       { document.getElementById('modal-compartir').style.display = 'flex'; }
+function cerrarModalCompartir()      { document.getElementById('modal-compartir').style.display = 'none'; }
+
 function copiarLinkPortafolio() {
     const input = document.getElementById('share-link-input');
     input.select();
@@ -1110,6 +1565,7 @@ function copiarLinkPortafolio() {
         setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
     });
 }
+
 function shareTo(platform) {
     const link = encodeURIComponent(document.getElementById('share-link-input').value);
     const text = encodeURIComponent('¡Mira mi portafolio profesional!');
@@ -1117,245 +1573,103 @@ function shareTo(platform) {
     switch(platform) {
         case 'whatsapp': url = `https://api.whatsapp.com/send?text=${text} ${link}`; break;
         case 'facebook': url = `https://www.facebook.com/sharer/sharer.php?u=${link}`; break;
-        case 'twitter': url = `https://twitter.com/intent/tweet?text=${text}&url=${link}`; break;
-        case 'email': url = `mailto:?subject=${text}&body=${link}`; break;
+        case 'twitter':  url = `https://twitter.com/intent/tweet?text=${text}&url=${link}`; break;
+        case 'email':    url = `mailto:?subject=${text}&body=${link}`; break;
     }
-    if(url) window.open(url, '_blank');
+    if (url) window.open(url, '_blank');
 }
 
-document.getElementById('modal-proyecto').addEventListener('click', function(e) {
-    if (e.target === this) cerrarModal();
-});
-document.getElementById('modal-compartir').addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalCompartir();
-});
-document.getElementById('modal-todos-proyectos')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalTodosProyectos();
-});
-document.getElementById('modal-todos-experiencias')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalExperiencias();
-});
-document.getElementById('modal-todos-academicas')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalAcademicas();
-});
-document.getElementById('modal-todos-tecnicas')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalTecnicas();
-});
-document.getElementById('modal-todos-blandas')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalBlandas();
-});
-document.getElementById('modal-todos-idiomas')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModalIdiomas();
-});
-</script>
+// Cerrar modales al hacer clic en el fondo
+document.getElementById('modal-proyecto').addEventListener('click', function(e) { if (e.target === this) cerrarModal(); });
+document.getElementById('modal-compartir').addEventListener('click', function(e) { if (e.target === this) cerrarModalCompartir(); });
+document.getElementById('modal-todos-proyectos')?.addEventListener('click', function(e) { if (e.target === this) cerrarModalTodosProyectos(); });
+document.getElementById('modal-todos-experiencias')?.addEventListener('click', function(e) { if (e.target === this) cerrarModalExperiencias(); });
+document.getElementById('modal-todos-academicas')?.addEventListener('click', function(e) { if (e.target === this) cerrarModalAcademicas(); });
+document.getElementById('modal-todos-tecnicas')?.addEventListener('click', function(e) { if (e.target === this) cerrarModalTecnicas(); });
+document.getElementById('modal-todos-blandas')?.addEventListener('click', function(e) { if (e.target === this) cerrarModalBlandas(); });
+document.getElementById('modal-todos-idiomas')?.addEventListener('click', function(e) { if (e.target === this) cerrarModalIdiomas(); });
 
-<!-- Sidebar para elegir Vibe de color -->
-<div class="vibe-sidebar-backdrop" id="vibeBackdrop" onclick="toggleVibeSidebar(false)"></div>
-<div class="vibe-sidebar" id="vibeSidebar">
-    <div class="vibe-sidebar-header">
-        <h3><i class="fas fa-palette"></i> Personalizar Vibe</h3>
-        <button class="vibe-sidebar-close" onclick="toggleVibeSidebar(false)">✕</button>
-    </div>
-    <div class="vibe-sidebar-body">
-        <!-- Tarjeta: Clásico -->
-        <div class="vibe-card {{ $temaActual === 'default' ? 'active' : '' }}" data-theme="default" onclick="selectVibe(this)">
-            <div class="vibe-card-title">
-                Clásico (Predeterminado)
-                @if($temaActual === 'default') <i class="fas fa-check-circle" style="color: #0abf9e;"></i> @endif
-            </div>
-            <div class="vibe-palette">
-                <div class="vibe-color-box" style="background: #2d0a1e;"></div>
-                <div class="vibe-color-box" style="background: #4a1030;"></div>
-                <div class="vibe-color-box" style="background: #6b1f45;"></div>
-                <div class="vibe-color-box" style="background: #0abf9e;"></div>
-            </div>
-        </div>
-        <!-- Tarjeta: Sunset Glow -->
-        <div class="vibe-card {{ $temaActual === 'sunset' ? 'active' : '' }}" data-theme="sunset" onclick="selectVibe(this)">
-            <div class="vibe-card-title">
-                Sunset Glow (Atardecer)
-                @if($temaActual === 'sunset') <i class="fas fa-check-circle" style="color: #f97316;"></i> @endif
-            </div>
-            <div class="vibe-palette">
-                <div class="vibe-color-box" style="background: #1e1b4b;"></div>
-                <div class="vibe-color-box" style="background: #312e81;"></div>
-                <div class="vibe-color-box" style="background: #4338ca;"></div>
-                <div class="vibe-color-box" style="background: #f97316;"></div>
-            </div>
-        </div>
-        <!-- Tarjeta: Emerald Mint -->
-        <div class="vibe-card {{ $temaActual === 'emerald' ? 'active' : '' }}" data-theme="emerald" onclick="selectVibe(this)">
-            <div class="vibe-card-title">
-                Emerald Mint (Bosque Místico)
-                @if($temaActual === 'emerald') <i class="fas fa-check-circle" style="color: #10b981;"></i> @endif
-            </div>
-            <div class="vibe-palette">
-                <div class="vibe-color-box" style="background: #022c22;"></div>
-                <div class="vibe-color-box" style="background: #064e3b;"></div>
-                <div class="vibe-color-box" style="background: #0f766e;"></div>
-                <div class="vibe-color-box" style="background: #10b981;"></div>
-            </div>
-        </div>
-        <!-- Tarjeta: Midnight Neon -->
-        <div class="vibe-card {{ $temaActual === 'midnight' ? 'active' : '' }}" data-theme="midnight" onclick="selectVibe(this)">
-            <div class="vibe-card-title">
-                Midnight Neon (Ciberpunk)
-                @if($temaActual === 'midnight') <i class="fas fa-check-circle" style="color: #a855f7;"></i> @endif
-            </div>
-            <div class="vibe-palette">
-                <div class="vibe-color-box" style="background: #0f172a;"></div>
-                <div class="vibe-color-box" style="background: #1e293b;"></div>
-                <div class="vibe-color-box" style="background: #334155;"></div>
-                <div class="vibe-color-box" style="background: #a855f7;"></div>
-            </div>
-        </div>
-        <!-- Tarjeta: Ocean Breeze -->
-        <div class="vibe-card {{ $temaActual === 'ocean' ? 'active' : '' }}" data-theme="ocean" onclick="selectVibe(this)">
-            <div class="vibe-card-title">
-                Ocean Breeze (Brisa Marina)
-                @if($temaActual === 'ocean') <i class="fas fa-check-circle" style="color: #00b4d8;"></i> @endif
-            </div>
-            <div class="vibe-palette">
-                <div class="vibe-color-box" style="background: #0b132b;"></div>
-                <div class="vibe-color-box" style="background: #1c2541;"></div>
-                <div class="vibe-color-box" style="background: #3a506b;"></div>
-                <div class="vibe-color-box" style="background: #00b4d8;"></div>
-            </div>
-        </div>
-        <!-- Tarjeta: Sakura Dream -->
-        <div class="vibe-card {{ $temaActual === 'sakura' ? 'active' : '' }}" data-theme="sakura" onclick="selectVibe(this)">
-            <div class="vibe-card-title">
-                Sakura Dream (Sueño de Cerezo)
-                @if($temaActual === 'sakura') <i class="fas fa-check-circle" style="color: #ec4899;"></i> @endif
-            </div>
-            <div class="vibe-palette">
-                <div class="vibe-color-box" style="background: #3b0764;"></div>
-                <div class="vibe-color-box" style="background: #581c87;"></div>
-                <div class="vibe-color-box" style="background: #701a75;"></div>
-                <div class="vibe-color-box" style="background: #ec4899;"></div>
-            </div>
-        </div>
-    </div>
-    <div class="vibe-sidebar-footer">
-        <button class="vibe-save-btn" id="saveVibeBtn" onclick="saveVibeTheme()">
-            <i class="fas fa-save"></i> Guardar Vibra
-        </button>
-    </div>
-</div>
+// Publicar
+document.getElementById('formPublicar')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    Swal.fire({
+        title: '¿Publicar portafolio?',
+        text: 'Tu perfil será visible para todos los usuarios.',
+        showCancelButton: true,
+        confirmButtonColor: '#0abf9e',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Publicar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({ title: 'Publicando...', showConfirmButton: false, allowOutsideClick: false });
+            document.getElementById('formPublicar').submit();
+        }
+    });
+});
 
-<script>
+// Vibe selector
 let selectedTheme = "{{ $temaActual }}";
 
 function toggleVibeSidebar(show) {
-    const sidebar = document.getElementById('vibeSidebar');
+    const sidebar  = document.getElementById('vibeSidebar');
     const backdrop = document.getElementById('vibeBackdrop');
     if (show) {
         sidebar.classList.add('open');
         backdrop.classList.add('show');
+        document.getElementById('fabMenu')?.classList.remove('open');
+        document.getElementById('fabIcon').className = 'fas fa-ellipsis-h';
     } else {
         sidebar.classList.remove('open');
         backdrop.classList.remove('show');
-        // revert preview container to the last saved theme
         applyThemeClass(selectedTheme);
-        // revert active class in cards
         document.querySelectorAll('.vibe-card').forEach(c => {
-            if (c.dataset.theme === selectedTheme) {
-                c.classList.add('active');
-            } else {
-                c.classList.remove('active');
-            }
+            c.classList.toggle('active', c.dataset.theme === selectedTheme);
         });
     }
 }
 
 function selectVibe(card) {
-    // Remove active from all cards
     document.querySelectorAll('.vibe-card').forEach(c => c.classList.remove('active'));
-    // Add active to clicked card
     card.classList.add('active');
-    
-    // Live preview!
-    const theme = card.dataset.theme;
-    applyThemeClass(theme);
+    applyThemeClass(card.dataset.theme);
 }
 
 function applyThemeClass(theme) {
     const container = document.getElementById('previewContainer');
-    // Remove all theme classes
-    container.classList.remove('theme-sunset', 'theme-emerald', 'theme-midnight', 'theme-ocean', 'theme-sakura');
-    // Add new theme class if not default
-    if (theme !== 'default') {
-        container.classList.add('theme-' + theme);
-    }
+    container.classList.remove('theme-sunset','theme-emerald','theme-midnight','theme-ocean','theme-sakura');
+    if (theme !== 'default') container.classList.add('theme-' + theme);
 }
 
 function saveVibeTheme() {
     const activeCard = document.querySelector('.vibe-card.active');
     if (!activeCard) return;
-    const theme = activeCard.dataset.theme;
-    
+    const theme   = activeCard.dataset.theme;
     const saveBtn = document.getElementById('saveVibeBtn');
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
     
     fetch("{{ route('portfolio.theme.update') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-        },
-        body: JSON.stringify({ theme: theme })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: JSON.stringify({ theme })
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
         saveBtn.disabled = false;
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Vibra';
         if (data.success) {
             selectedTheme = theme;
-            Swal.fire({
-                icon: 'success',
-                title: '¡Vibra actualizada!',
-                text: 'El color de tu portafolio se ha guardado de manera permanente.',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true
-            });
-            // Update check icons in titles
-            document.querySelectorAll('.vibe-card').forEach(c => {
-                const title = c.querySelector('.vibe-card-title');
-                // Remove existing check marks
-                const check = title.querySelector('i');
-                if (check) check.remove();
-                if (c.dataset.theme === theme) {
-                    let color = '#0abf9e';
-                    if (theme === 'sunset') color = '#f97316';
-                    else if (theme === 'emerald') color = '#10b981';
-                    else if (theme === 'midnight') color = '#a855f7';
-                    else if (theme === 'ocean') color = '#00b4d8';
-                    else if (theme === 'sakura') color = '#ec4899';
-                    title.innerHTML += ` <i class="fas fa-check-circle" style="color: ${color};"></i>`;
-                }
-            });
+            Swal.fire({ icon:'success', title:'¡Vibra actualizada!', toast:true, position:'top-end', showConfirmButton:false, timer:3000 });
             toggleVibeSidebar(false);
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Ocurrió un error al guardar el tema.'
-            });
+            Swal.fire({ icon:'error', title:'Error', text:'Ocurrió un error al guardar el tema.' });
         }
     })
-    .catch(error => {
+    .catch(() => {
         saveBtn.disabled = false;
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Guardar Vibra';
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'No se pudo conectar con el servidor.'
-        });
+        Swal.fire({ icon:'error', title:'Error', text:'No se pudo conectar con el servidor.' });
     });
 }
 </script>

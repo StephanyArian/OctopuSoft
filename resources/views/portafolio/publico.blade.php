@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/preview.css') }}?v={{ time() }}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         .btn-volver-flotante {
             position: fixed;
@@ -34,11 +37,123 @@
             background: #07866e;
         }
         
+        /* BOTÓN FLOTANTE MÁS OPCIONES - ARRIBA DERECHA */
+        .fab-container-top {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0;
+        }
+        
+        .fab-button-top {
+            background: var(--white, #ffffff);
+            color: var(--burg-mid, #4a1030);
+            border: 2px solid var(--burg-mid, #4a1030);
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transition: all 0.25s ease;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .fab-button-top:hover {
+            background: var(--burg-mid, #4a1030);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        
+        .fab-menu-top {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: var(--white, #ffffff);
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+            border: 1px solid var(--gray-100, #edf0f4);
+            min-width: 200px;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.97);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        
+        .fab-menu-top.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+        
+        .fab-item-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 18px;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--burg-deep, #2d0a1e);
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+            text-decoration: none;
+        }
+        
+        .fab-item-top:hover {
+            background: var(--off, #f5f6f8);
+            color: var(--teal-dim, #07866e);
+        }
+        
+        .fab-item-top i {
+            width: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--teal, #0abf9e);
+            flex-shrink: 0;
+        }
+        
+        .fab-divider-top {
+            height: 1px;
+            background: var(--gray-100, #edf0f4);
+            margin: 0;
+        }
+        
         @media (max-width: 768px) {
             .btn-volver-flotante {
                 top: 10px;
                 left: 10px;
                 padding: 8px 16px;
+                font-size: 12px;
+            }
+            .fab-container-top {
+                top: 10px;
+                right: 10px;
+            }
+            .fab-button-top {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+            .fab-menu-top {
+                min-width: 180px;
+            }
+            .fab-item-top {
+                padding: 10px 14px;
                 font-size: 12px;
             }
         }
@@ -233,12 +348,31 @@
 </head>
 <body>
 
+<!-- Botón Volver (Izquierda) -->
 <button class="btn-volver-flotante" onclick="window.history.back()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
     </svg>
     Volver
 </button>
+
+<!-- Botón Más Opciones (Derecha) con menú desplegable -->
+<div class="fab-container-top" id="fabContainerTop">
+    <div class="fab-menu-top" id="fabMenuTop">
+        <button class="fab-item-top" onclick="descargarPDF()">
+            <i class="fas fa-file-pdf"></i>
+            <span>Descargar PDF</span>
+        </button>
+        <button class="fab-item-top" onclick="descargarImagen()">
+            <i class="fas fa-image"></i>
+            <span>Descargar imagen</span>
+        </button>
+    </div>
+    <button class="fab-button-top" id="fabButtonTop" onclick="toggleFabMenuTop()">
+        <i class="fas fa-ellipsis-h" id="fabIconTop"></i>
+        <span>Más opciones</span>
+    </button>
+</div>
 
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -390,10 +524,10 @@
         </div>
     </div>
     
-    <!-- EXPERIENCIA LABORAL -->
+    <!-- ==================== EXPERIENCIA LABORAL ==================== -->
     <div class="section">
         <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
-        <div class="cards-grid">
+        <div class="cards-grid" id="experiencias-grid">
             @forelse($experienciasRecientes as $exp)
             <div class="card">
                 <h3>{{ $exp->empresa }}</h3>
@@ -444,13 +578,27 @@
                     <i class="fas fa-briefcase"></i> Ver todas las experiencias ({{ $experiencias->count() }})
                 </button>
             </div>
+            <!-- CONTENEDOR OCULTO CON TODAS LAS EXPERIENCIAS -->
+            <div id="experiencias-completas" style="display:none;">
+                <div class="cards-grid">
+                    @foreach($experiencias as $exp)
+                    <div class="card">
+                        <h3>{{ $exp->empresa }}</h3>
+                        <div class="subtitle">{{ $exp->ubicacion ?? '' }}</div>
+                        <div class="role-single">{{ $exp->cargo }}</div>
+                        <div class="date">{{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d/m/Y') }} @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d/m/Y') }} @elseif($exp->trabajo_actual) — Actualidad @endif</div>
+                        @if($exp->descripcion)<div class="description">{{ strip_tags($exp->descripcion) }}</div>@endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
         @endif
     </div>
 
-    <!-- INFORMACIÓN ACADÉMICA -->
+    <!-- ==================== INFORMACIÓN ACADÉMICA ==================== -->
     <div class="section">
         <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
-        <div class="cards-grid">
+        <div class="cards-grid" id="academicas-grid">
             @forelse($academicasRecientes as $aca)
                 <div class="card">
                     <h3>{{ $aca->institucion }}</h3>
@@ -521,86 +669,102 @@
                     <i class="fas fa-graduation-cap"></i> Ver toda la formación académica ({{ $academicas->count() }})
                 </button>
             </div>
+            <!-- CONTENEDOR OCULTO CON TODAS LAS ACADÉMICAS -->
+            <div id="academicas-completas" style="display:none;">
+                <div class="cards-grid">
+                    @foreach($academicas as $aca)
+                    <div class="card">
+                        <h3>{{ $aca->institucion }}</h3>
+                        <div class="subtitle">{{ $aca->titulo }}</div>
+                        @if($aca->specialty)<div class="specialty-badge">{{ $aca->specialty }}</div>@endif
+                        <div class="date">{{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y') }} @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') }} @elseif($aca->estudio_actual) — Actualidad @endif</div>
+                        @if($aca->descripcion)<div class="description">{{ strip_tags($aca->descripcion) }}</div>@endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
         @endif
     </div>
 
-    <!-- HABILIDADES TÉCNICAS -->
+    <!-- ==================== HABILIDADES TÉCNICAS ==================== -->
     <div class="section">
         <h2><i class="fas fa-code"></i> Habilidades técnicas</h2>
         @if(($habilidadesTecnicasFrontend ?? collect())->count() === 0 && ($habilidadesTecnicasBackend ?? collect())->count() === 0)
             <div class="empty-message" style="margin:0 40px;">No hay habilidades técnicas registradas</div>
         @else
-            @if(($habilidadesFrontendRecientes ?? collect())->count() > 0)
-                <div class="tech-category-title">Frontend</div>
-                <div class="tech-skills-grid">
-                    @foreach($habilidadesFrontendRecientes as $skill)
-                        @php
-                            $nivel = $skill->nivel ?? 'Intermedio';
-                            if ($nivel == 'Avanzado') $claseNivel = 'advanced';
-                            elseif ($nivel == 'Intermedio') $claseNivel = 'intermediate';
-                            else $claseNivel = 'basic';
-                            $hasProjects = isset($skill->proyectos) && count($skill->proyectos) > 0;
-                        @endphp
-                        <div class="tech-skill-item">
-                            <div class="tech-skill-header">
-                                <span class="tech-skill-name">{{ $skill->nombre }}</span>
-                                <span class="tech-skill-level">{{ $nivel }}</span>
-                            </div>
-                            <div class="tech-skill-bar-bg">
-                                <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
-                            </div>
-                            @if($hasProjects)
-                                <div class="tech-skill-projects">
-                                    @foreach($skill->proyectos as $p)
-                                        <a href="javascript:void(0)"
-                                           class="tech-skill-project-chip"
-                                           onclick="abrirModalPorId({{ $p->id }});"
-                                           title="Ver proyecto: {{ $p->nombre }}">
-                                            {{ $p->nombre }}
-                                        </a>
-                                    @endforeach
+            <div id="tecnicas-grid">
+                @if(($habilidadesFrontendRecientes ?? collect())->count() > 0)
+                    <div class="tech-category-title">Frontend</div>
+                    <div class="tech-skills-grid">
+                        @foreach($habilidadesFrontendRecientes as $skill)
+                            @php
+                                $nivel = $skill->nivel ?? 'Intermedio';
+                                if ($nivel == 'Avanzado') $claseNivel = 'advanced';
+                                elseif ($nivel == 'Intermedio') $claseNivel = 'intermediate';
+                                else $claseNivel = 'basic';
+                                $hasProjects = isset($skill->proyectos) && count($skill->proyectos) > 0;
+                            @endphp
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $nivel }}</span>
                                 </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
+                                </div>
+                                @if($hasProjects)
+                                    <div class="tech-skill-projects">
+                                        @foreach($skill->proyectos as $p)
+                                            <a href="javascript:void(0)"
+                                               class="tech-skill-project-chip"
+                                               onclick="abrirModalPorId({{ $p->id }});"
+                                               title="Ver proyecto: {{ $p->nombre }}">
+                                                {{ $p->nombre }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
 
-            @if(($habilidadesBackendRecientes ?? collect())->count() > 0)
-                <div class="tech-category-title">Backend</div>
-                <div class="tech-skills-grid">
-                    @foreach($habilidadesBackendRecientes as $skill)
-                        @php
-                            $nivel = $skill->nivel ?? 'Intermedio';
-                            if ($nivel == 'Avanzado') $claseNivel = 'advanced';
-                            elseif ($nivel == 'Intermedio') $claseNivel = 'intermediate';
-                            else $claseNivel = 'basic';
-                            $hasProjects = isset($skill->proyectos) && count($skill->proyectos) > 0;
-                        @endphp
-                        <div class="tech-skill-item">
-                            <div class="tech-skill-header">
-                                <span class="tech-skill-name">{{ $skill->nombre }}</span>
-                                <span class="tech-skill-level">{{ $nivel }}</span>
-                            </div>
-                            <div class="tech-skill-bar-bg">
-                                <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
-                            </div>
-                            @if($hasProjects)
-                                <div class="tech-skill-projects">
-                                    @foreach($skill->proyectos as $p)
-                                        <a href="javascript:void(0)"
-                                           class="tech-skill-project-chip"
-                                           onclick="abrirModalPorId({{ $p->id }});"
-                                           title="Ver proyecto: {{ $p->nombre }}">
-                                            {{ $p->nombre }}
-                                        </a>
-                                    @endforeach
+                @if(($habilidadesBackendRecientes ?? collect())->count() > 0)
+                    <div class="tech-category-title">Backend</div>
+                    <div class="tech-skills-grid">
+                        @foreach($habilidadesBackendRecientes as $skill)
+                            @php
+                                $nivel = $skill->nivel ?? 'Intermedio';
+                                if ($nivel == 'Avanzado') $claseNivel = 'advanced';
+                                elseif ($nivel == 'Intermedio') $claseNivel = 'intermediate';
+                                else $claseNivel = 'basic';
+                                $hasProjects = isset($skill->proyectos) && count($skill->proyectos) > 0;
+                            @endphp
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $nivel }}</span>
                                 </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill {{ $claseNivel }}"></div>
+                                </div>
+                                @if($hasProjects)
+                                    <div class="tech-skill-projects">
+                                        @foreach($skill->proyectos as $p)
+                                            <a href="javascript:void(0)"
+                                               class="tech-skill-project-chip"
+                                               onclick="abrirModalPorId({{ $p->id }});"
+                                               title="Ver proyecto: {{ $p->nombre }}">
+                                                {{ $p->nombre }}
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
             
             @if(($habilidadesFrontendRestantes->count() > 0) || ($habilidadesBackendRestantes->count() > 0))
                 <div class="btn-ver-todos">
@@ -608,14 +772,49 @@
                         <i class="fas fa-code"></i> Ver todas las habilidades técnicas
                     </button>
                 </div>
+                <!-- CONTENEDOR OCULTO CON TODAS LAS TÉCNICAS -->
+                <div id="tecnicas-completas" style="display:none;">
+                    @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0)
+                        <div class="tech-category-title">Frontend</div>
+                        <div class="tech-skills-grid">
+                            @foreach($habilidadesTecnicasFrontend as $skill)
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $skill->nivel ?? 'Intermedio' }}</span>
+                                </div>
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill @if(($skill->nivel ?? 'Intermedio') == 'Avanzado') advanced @elseif(($skill->nivel ?? 'Intermedio') == 'Intermedio') intermediate @else basic @endif"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
+                    @if(($habilidadesTecnicasBackend ?? collect())->count() > 0)
+                        <div class="tech-category-title">Backend</div>
+                        <div class="tech-skills-grid">
+                            @foreach($habilidadesTecnicasBackend as $skill)
+                            <div class="tech-skill-item">
+                                <div class="tech-skill-header">
+                                    <span class="tech-skill-name">{{ $skill->nombre }}</span>
+                                    <span class="tech-skill-level">{{ $skill->nivel ?? 'Intermedio' }}</span>
+                                </div>
+                                <div class="tech-skill-bar-bg">
+                                    <div class="tech-skill-bar-fill @if(($skill->nivel ?? 'Intermedio') == 'Avanzado') advanced @elseif(($skill->nivel ?? 'Intermedio') == 'Intermedio') intermediate @else basic @endif"></div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
             @endif
         @endif
     </div>
 
-    <!-- HABILIDADES BLANDAS -->
+    <!-- ==================== HABILIDADES BLANDAS ==================== -->
     <div class="section">
         <h2><i class="fas fa-heart"></i> Habilidades blandas</h2>
-        <div class="skills-container">
+        <div class="skills-container" id="blandas-grid">
             @forelse($habilidadesBlandasRecientes as $skill)
                 <span class="soft-skill-tag"><i class="fas fa-star" style="color:#0abf9e;"></i> {{ $skill->nombre }}</span>
             @empty
@@ -629,16 +828,24 @@
                     <i class="fas fa-heart"></i> Ver todas las habilidades blandas ({{ $habilidadesBlandas->count() }})
                 </button>
             </div>
+            <!-- CONTENEDOR OCULTO CON TODAS LAS BLANDAS -->
+            <div id="blandas-completas" style="display:none;">
+                <div class="skills-container">
+                    @foreach($habilidadesBlandas as $skill)
+                    <span class="soft-skill-tag"><i class="fas fa-star"></i> {{ $skill->nombre }}</span>
+                    @endforeach
+                </div>
+            </div>
         @endif
     </div>
 
-    <!-- IDIOMAS -->
+    <!-- ==================== IDIOMAS ==================== -->
     <div class="section">
         <h2><i class="fas fa-language"></i> Idiomas</h2>
         @if($idiomas->isEmpty())
             <div class="empty-message">No hay idiomas registrados</div>
         @else
-            <div class="idiomas-preview-grid">
+            <div class="idiomas-preview-grid" id="idiomas-grid">
                 @foreach($idiomasRecientes as $index => $idioma)
                 @php
                     $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
@@ -682,18 +889,54 @@
                         <i class="fas fa-language"></i> Ver todos los idiomas ({{ $idiomas->count() }})
                     </button>
                 </div>
+                <!-- CONTENEDOR OCULTO CON TODOS LOS IDIOMAS -->
+                <div id="idiomas-completos" style="display:none;">
+                    <div class="idiomas-preview-grid">
+                        @foreach($idiomas as $index => $idioma)
+                        @php
+                            $banderaEmoji = $banderas[strtolower($idioma->nombre)] ?? null;
+                            $codigo = $codigos[strtolower($idioma->nombre)] ?? strtoupper(substr($idioma->nombre, 0, 2));
+                            $colorFondo = $colorFondos[$index % count($colorFondos)];
+                            $colorBarra = $coloresBarra[$index % count($coloresBarra)];
+                        @endphp
+                        <div class="idioma-preview-card">
+                            <div class="idioma-preview-header">
+                                <div class="idioma-preview-left">
+                                    @if($banderaEmoji)
+                                        <span class="idioma-bandera">{{ $banderaEmoji }}</span>
+                                    @else
+                                        <span class="idioma-flag-code-preview" style="background: {{ $colorFondo }};">{{ $codigo }}</span>
+                                    @endif
+                                    <div class="idioma-preview-info">
+                                        <span class="idioma-preview-nombre">{{ $idioma->nombre }}</span>
+                                        <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
+                                    </div>
+                                </div>
+                                @if($idioma->certificado)
+                                    <a href="javascript:void(0)" class="idioma-cert-link">
+                                        <i class="fas fa-certificate"></i> Cert.
+                                    </a>
+                                @endif
+                            </div>
+                            <div class="idioma-barra-wrap">
+                                <div class="idioma-barra-fill-custom" style="width: {{ $idioma->porcentaje }}%; background: {{ $colorBarra }};"></div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             @endif
         @endif
     </div>
 
-    <!-- PROYECTOS -->
+    <!-- ==================== PROYECTOS ==================== -->
     <div class="section">
         <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
         
         @if($proyectos->isEmpty())
             <div class="empty-message">No hay proyectos registrados</div>
         @else
-            <div class="cards-grid">
+            <div class="cards-grid" id="proyectos-grid">
                 @foreach($proyectosRecientes as $proyecto)
                     @php
                         $modalProyectoPayload = [
@@ -753,11 +996,23 @@
                         <i class="fas fa-th-large"></i> Ver todos los proyectos ({{ $proyectos->count() }})
                     </button>
                 </div>
+                <!-- CONTENEDOR OCULTO CON TODOS LOS PROYECTOS -->
+                <div id="proyectos-completos" style="display:none;">
+                    <div class="cards-grid">
+                        @foreach($proyectos as $proyecto)
+                        <div class="card">
+                            <h3>{{ $proyecto->nombre }}</h3>
+                            <div class="date">{{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }} @if($proyecto->fecha_fin) — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif | {{ $proyecto->estado ?? 'En progreso' }}</div>
+                            <div class="description">Rol: {{ $proyecto->rol ?? '' }}</div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
             @endif
         @endif
     </div>
 
-    <!-- ==================== MODALES ==================== -->
+    <!-- ==================== MODALES (MANTENIDOS) ==================== -->
 
     <!-- MODAL TODOS LOS PROYECTOS -->
     <div id="modal-todos-proyectos" class="modal-todos-proyectos">
@@ -1040,6 +1295,274 @@
 </div>
 
 <script>
+    // ============================================================
+    // FUNCIONES PARA EL MENÚ FLOTANTE
+    // ============================================================
+    function toggleFabMenuTop() {
+        const menu = document.getElementById('fabMenuTop');
+        const icon = document.getElementById('fabIconTop');
+        const isOpen = menu.classList.contains('open');
+        
+        if (isOpen) {
+            menu.classList.remove('open');
+            if (icon) icon.className = 'fas fa-ellipsis-h';
+        } else {
+            menu.classList.add('open');
+            if (icon) icon.className = 'fas fa-times';
+        }
+    }
+    
+    // Cerrar menú al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        const container = document.getElementById('fabContainerTop');
+        if (container && !container.contains(e.target)) {
+            const menu = document.getElementById('fabMenuTop');
+            const icon = document.getElementById('fabIconTop');
+            if (menu) menu.classList.remove('open');
+            if (icon) icon.className = 'fas fa-ellipsis-h';
+        }
+    });
+    
+    // Prevenir que el clic dentro del menú lo cierre
+    document.querySelectorAll('.fab-item-top').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+    
+    // ============================================================
+    // FUNCIONES PARA PDF E IMAGEN (CON CONTENEDORES OCULTOS)
+    // ============================================================
+    
+    function crearCopiaCompleta() {
+        const original = document.querySelector('.preview-container');
+        const clone = original.cloneNode(true);
+        
+        // Expandir todas las descripciones colapsadas
+        const descripcionesColapsadas = clone.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed');
+        descripcionesColapsadas.forEach(el => {
+            el.classList.remove('collapsed');
+            el.classList.add('expanded');
+            el.style.maxHeight = 'none';
+            el.style.overflow = 'visible';
+        });
+        
+        // Eliminar botones "Ver más"
+        const verMasBtns = clone.querySelectorAll('.ver-mas-btn');
+        verMasBtns.forEach(btn => btn.remove());
+        
+        // Ocultar botones "Ver todos"
+        const btnVerTodos = clone.querySelectorAll('.btn-ver-todos');
+        btnVerTodos.forEach(btn => btn.style.display = 'none');
+        
+        // ========== REEMPLAZAR CON CONTENIDO COMPLETO DESDE CONTENEDORES OCULTOS ==========
+        
+        // 1. EXPERIENCIAS COMPLETAS
+        const experienciasCompletas = document.getElementById('experiencias-completas');
+        if (experienciasCompletas) {
+            const gridExperiencias = clone.querySelector('#experiencias-grid');
+            if (gridExperiencias) {
+                const contenido = experienciasCompletas.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.cards-grid');
+                if (gridCompleto) gridExperiencias.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+        
+        // 2. ACADÉMICAS COMPLETAS
+        const academicasCompletas = document.getElementById('academicas-completas');
+        if (academicasCompletas) {
+            const gridAcademicas = clone.querySelector('#academicas-grid');
+            if (gridAcademicas) {
+                const contenido = academicasCompletas.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.cards-grid');
+                if (gridCompleto) gridAcademicas.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+        
+        // 3. HABILIDADES TÉCNICAS COMPLETAS
+        const tecnicasCompletas = document.getElementById('tecnicas-completas');
+        if (tecnicasCompletas) {
+            const contenedorTecnicas = clone.querySelector('#tecnicas-grid');
+            if (contenedorTecnicas) {
+                const contenido = tecnicasCompletas.cloneNode(true);
+                // Limpiar y agregar todo
+                contenedorTecnicas.innerHTML = contenido.innerHTML;
+            }
+        }
+        
+        // 4. HABILIDADES BLANDAS COMPLETAS
+        const blandasCompletas = document.getElementById('blandas-completas');
+        if (blandasCompletas) {
+            const containerBlandas = clone.querySelector('#blandas-grid');
+            if (containerBlandas) {
+                const contenido = blandasCompletas.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.skills-container');
+                if (gridCompleto) containerBlandas.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+        
+        // 5. IDIOMAS COMPLETOS
+        const idiomasCompletos = document.getElementById('idiomas-completos');
+        if (idiomasCompletos) {
+            const gridIdiomas = clone.querySelector('#idiomas-grid');
+            if (gridIdiomas) {
+                const contenido = idiomasCompletos.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.idiomas-preview-grid');
+                if (gridCompleto) gridIdiomas.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+        
+        // 6. PROYECTOS COMPLETOS
+        const proyectosCompletos = document.getElementById('proyectos-completos');
+        if (proyectosCompletos) {
+            const gridProyectos = clone.querySelector('#proyectos-grid');
+            if (gridProyectos) {
+                const contenido = proyectosCompletos.cloneNode(true);
+                const gridCompleto = contenido.querySelector('.cards-grid');
+                if (gridCompleto) gridProyectos.innerHTML = gridCompleto.innerHTML;
+            }
+        }
+        
+        // Ocultar elementos flotantes de UI
+        const fabClone = clone.querySelector('.fab-container-top');
+        if (fabClone) fabClone.style.display = 'none';
+        
+        const btnVolverClone = clone.querySelector('.btn-volver-flotante');
+        if (btnVolverClone) btnVolverClone.style.display = 'none';
+        
+        return clone;
+    }
+    
+    async function descargarPDF() {
+        const menu = document.getElementById('fabMenuTop');
+        const icon = document.getElementById('fabIconTop');
+        if (menu) menu.classList.remove('open');
+        if (icon) icon.className = 'fas fa-ellipsis-h';
+        
+        Swal.fire({
+            title: 'Generando PDF...',
+            text: 'Por favor espera...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        
+        try {
+            const clone = crearCopiaCompleta();
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '-9999px';
+            tempDiv.style.width = '1200px';
+            tempDiv.style.backgroundColor = 'white';
+            tempDiv.appendChild(clone);
+            document.body.appendChild(tempDiv);
+            clone.style.maxWidth = '1200px';
+            clone.style.margin = '0 auto';
+            
+            setTimeout(async () => {
+                try {
+                    const canvas = await html2canvas(tempDiv, {
+                        scale: 2.5,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        windowWidth: tempDiv.scrollWidth,
+                        windowHeight: tempDiv.scrollHeight
+                    });
+                    
+                    const { jsPDF } = window.jspdf;
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    const imgWidth = pdfWidth - 20;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    let position = 10;
+                    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                    
+                    let heightLeft = imgHeight - (pdfHeight - 20);
+                    let currentPage = 1;
+                    while (heightLeft > 0) {
+                        pdf.addPage();
+                        position = 10 - (currentPage * (pdfHeight - 20));
+                        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                        heightLeft -= (pdfHeight - 20);
+                        currentPage++;
+                    }
+                    
+                    pdf.save('portafolio.pdf');
+                    document.body.removeChild(tempDiv);
+                    
+                    Swal.fire({ icon: 'success', title: '¡PDF descargado!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                } catch (err) {
+                    document.body.removeChild(tempDiv);
+                    throw err;
+                }
+            }, 800);
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo generar el PDF.' });
+        }
+    }
+    
+    async function descargarImagen() {
+        const menu = document.getElementById('fabMenuTop');
+        const icon = document.getElementById('fabIconTop');
+        if (menu) menu.classList.remove('open');
+        if (icon) icon.className = 'fas fa-ellipsis-h';
+        
+        Swal.fire({
+            title: 'Generando imagen...',
+            text: 'Por favor espera...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+        
+        try {
+            const clone = crearCopiaCompleta();
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.top = '-9999px';
+            tempDiv.style.width = '1200px';
+            tempDiv.style.backgroundColor = 'white';
+            tempDiv.appendChild(clone);
+            document.body.appendChild(tempDiv);
+            clone.style.maxWidth = '1200px';
+            clone.style.margin = '0 auto';
+            
+            setTimeout(async () => {
+                try {
+                    const canvas = await html2canvas(tempDiv, {
+                        scale: 2.5,
+                        useCORS: true,
+                        backgroundColor: '#ffffff',
+                        logging: false,
+                        windowWidth: tempDiv.scrollWidth,
+                        windowHeight: tempDiv.scrollHeight
+                    });
+                    const link = document.createElement('a');
+                    link.download = 'portafolio.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    document.body.removeChild(tempDiv);
+                    Swal.fire({ icon: 'success', title: '¡Imagen descargada!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                } catch (err) {
+                    document.body.removeChild(tempDiv);
+                    throw err;
+                }
+            }, 800);
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo generar la imagen.' });
+        }
+    }
+    
+    // ============================================================
+    // FUNCIONES ORIGINALES
+    // ============================================================
+    
     function abrirLightbox(imagenSrc) {
         let lightbox = document.getElementById('lightbox-modal');
         if (!lightbox) {
@@ -1053,14 +1576,12 @@
                 </div>
             `;
             document.body.appendChild(lightbox);
-            
             lightbox.addEventListener('click', function(e) {
                 if (e.target === lightbox || e.target.id === 'lightbox-close') {
                     lightbox.style.display = 'none';
                 }
             });
         }
-        
         const img = document.getElementById('lightbox-img');
         if (img) {
             img.src = imagenSrc;
@@ -1113,7 +1634,6 @@
 
     function abrirModal(data) {
         document.getElementById('modal-nombre').textContent = data.nombre;
-
         let badgesDiv = document.getElementById('modal-badges');
         badgesDiv.innerHTML = '';
         const badge = (texto, bg, color) => `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;background:${bg};color:${color};">${texto}</span>`;
@@ -1153,92 +1673,53 @@
             document.getElementById('modal-ev-count').textContent = '(' + data.evidencias.length + ')';
             data.evidencias.forEach(ev => {
                 let item = document.createElement('div');
-                
                 if (ev.tipo === 'imagen' && ev.imagen) {
                     let nombreImagen = ev.titulo || 'Imagen del proyecto';
                     if (nombreImagen.match(/\.(jpg|jpeg|png|gif|webp)$/i) || nombreImagen.length > 30) {
                         nombreImagen = 'Imagen del proyecto';
                     }
-                    item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    item.style.cssText = 'margin-bottom:12px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;';
                     item.innerHTML = `
-                        <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                            <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-image" style="color: #0abf9e; font-size: 18px;"></i>
+                        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                            <div style="width:36px;height:36px;background:#0abf9e15;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-image" style="color:#0abf9e;font-size:18px;"></i>
                             </div>
-                            <div>
-                                <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(nombreImagen)}</strong>
-                            </div>
+                            <strong style="font-size:14px;color:#0f172a;">${previewEscapeHtml(nombreImagen)}</strong>
                         </div>
-                        <div style="padding: 16px; background: white; position: relative;">
-                            <div style="position: relative; display: inline-block; width: 100%; border-radius: 16px; overflow: hidden;">
-                                <img src="${ev.imagen}" style="width:100%; max-height:280px; object-fit:cover; border-radius: 16px; cursor: pointer; transition: transform 0.2s;" 
-                                     onclick="abrirLightbox('${ev.imagen}')"
-                                     onmouseover="this.style.transform='scale(1.01)'"
-                                     onmouseout="this.style.transform='scale(1)'"
-                                     onerror="this.style.display='none'; this.parentElement.innerHTML+='<p style=\'color:#ef4444;font-size:12px;padding:16px;text-align:center;\'>❌ No se pudo cargar la imagen</p>'">
-                                <div onclick="abrirLightbox('${ev.imagen}')" style="position: absolute; bottom: 16px; right: 16px; background: rgba(0,0,0,0.65); backdrop-filter: blur(8px); border-radius: 40px; padding: 8px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                        <circle cx="12" cy="12" r="3"/>
-                                    </svg>
-                                    <span style="color: white; font-size: 12px; font-weight: 500;">Ver imagen</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                else if (ev.tipo === 'enlace' && ev.url) {
-                    item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                        <div style="padding:16px;">
+                            <img src="${ev.imagen}" style="width:100%;max-height:280px;object-fit:cover;border-radius:16px;cursor:pointer;" onclick="abrirLightbox('${ev.imagen}')">
+                        </div>`;
+                } else if (ev.tipo === 'enlace' && ev.url) {
+                    item.style.cssText = 'margin-bottom:12px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;';
                     item.innerHTML = `
-                        <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                            <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-link" style="color: #0abf9e; font-size: 18px;"></i>
+                        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                            <div style="width:36px;height:36px;background:#0abf9e15;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-link" style="color:#0abf9e;font-size:18px;"></i>
                             </div>
-                            <div>
-                                <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Enlace')}</strong>
-                                ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
-                            </div>
+                            <strong style="font-size:14px;color:#0f172a;">${previewEscapeHtml(ev.titulo || 'Enlace')}</strong>
                         </div>
-                        <div style="padding: 16px; background: white;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                                <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
-                                    <i class="fas fa-globe" style="font-size: 12px; color: #0abf9e;"></i>
-                                    <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
-                                </div>
-                                <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
-                                    Abrir enlace <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                }
-                else if (ev.tipo === 'repositorio' && ev.url) {
+                        <div style="padding:16px;display:flex;justify-content:flex-end;">
+                            <a href="${ev.url}" target="_blank" style="background:#0abf9e;color:white;padding:8px 18px;border-radius:40px;font-size:12px;font-weight:500;text-decoration:none;">
+                                Abrir enlace <i class="fas fa-external-link-alt" style="font-size:10px;"></i>
+                            </a>
+                        </div>`;
+                } else if (ev.tipo === 'repositorio' && ev.url) {
                     let icon = 'fa-github';
                     if (ev.plataforma === 'GitLab') icon = 'fa-gitlab';
                     else if (ev.plataforma === 'Bitbucket') icon = 'fa-bitbucket';
-                    item.style.cssText = 'margin-bottom:12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
+                    item.style.cssText = 'margin-bottom:12px; background:#fff; border:1px solid #e2e8f0; border-radius:20px; overflow:hidden;';
                     item.innerHTML = `
-                        <div style="display:flex;align-items:center;gap:12px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                            <div style="width: 36px; height: 36px; background: #0abf9e15; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                                <i class="fab ${icon}" style="color: #0abf9e; font-size: 18px;"></i>
+                        <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+                            <div style="width:36px;height:36px;background:#0abf9e15;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                                <i class="fab ${icon}" style="color:#0abf9e;font-size:18px;"></i>
                             </div>
-                            <div>
-                                <strong style="font-size: 14px; color: #0f172a;">${previewEscapeHtml(ev.titulo || 'Repositorio')}</strong>
-                                ${ev.descripcion ? `<p style="font-size: 11px; color: #64748b; margin-top: 2px;">${previewEscapeHtml(ev.descripcion)}</p>` : ''}
-                            </div>
+                            <strong style="font-size:14px;color:#0f172a;">${previewEscapeHtml(ev.titulo || 'Repositorio')}</strong>
                         </div>
-                        <div style="padding: 16px; background: white;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                                <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #64748b; word-break: break-all; max-width: 65%; background: #f8fafc; padding: 8px 12px; border-radius: 12px;">
-                                    <i class="fab ${icon}" style="font-size: 12px;"></i>
-                                    <a href="${ev.url}" target="_blank" style="color: #0abf9e; text-decoration: none;">${previewEscapeHtml(ev.url)}</a>
-                                </div>
-                                <a href="${ev.url}" target="_blank" style="background: #0abf9e; color: white; padding: 8px 18px; border-radius: 40px; font-size: 12px; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
-                                    Ver repositorio <i class="fas fa-external-link-alt" style="font-size: 10px;"></i>
-                                </a>
-                            </div>
-                        </div>
-                    `;
+                        <div style="padding:16px;display:flex;justify-content:flex-end;">
+                            <a href="${ev.url}" target="_blank" style="background:#0abf9e;color:white;padding:8px 18px;border-radius:40px;font-size:12px;font-weight:500;text-decoration:none;">
+                                Ver repositorio <i class="fas fa-external-link-alt" style="font-size:10px;"></i>
+                            </a>
+                        </div>`;
                 }
                 evDiv.appendChild(item);
             });
