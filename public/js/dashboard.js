@@ -107,11 +107,17 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
         locationError.classList.add('hidden');
     }
 
-    // Biografía
+    // Biografía (500 caracteres - CORREGIDO)
     const bio = document.getElementById('bio').value;
     const bioError = document.getElementById('bioError');
-    if (bio.length > 5000) {
+    // Eliminar etiquetas HTML y contar caracteres reales
+    const plainText = bio.replace(/<[^>]*>/g, '');
+    // Quitar el salto de línea final que añade Quill
+    const cleanText = plainText.replace(/\n$/, '');
+    
+    if (cleanText.length > 500) {
         bioError.classList.remove('hidden');
+        bioError.textContent = 'La biografía no puede exceder los 500 caracteres';
         isValid = false;
     } else {
         bioError.classList.add('hidden');
@@ -168,23 +174,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const contadorBio = document.getElementById('contadorBio');
     let lastValidHtml = quill.root.innerHTML;
 
+    function getCharacterCount() {
+        // Obtener texto plano y eliminar el salto de línea final de Quill
+        let text = quill.getText();
+        // Quitar el carácter de nueva línea al final si existe
+        if (text.length > 0 && text.charCodeAt(text.length - 1) === 10) {
+            text = text.slice(0, -1);
+        }
+        return text.length;
+    }
+
     function actualizarContador() {
-        const len = Math.max(0, quill.getText().length - 1);
+        const len = getCharacterCount();
         if (contadorBio) {
             contadorBio.textContent = len + '/500 caracteres';
-            contadorBio.style.color = len > 5000 ? '#ef4444' : '#94a3b8';
+            contadorBio.style.color = len > 500 ? '#ef4444' : '#94a3b8';
         }
     }
 
     quill.on('text-change', function () {
-        const len = Math.max(0, quill.getText().length - 1);
-        if (len > 5000) {
+        const len = getCharacterCount();
+        if (len > 500) {
+            // Revertir al último HTML válido
             quill.root.innerHTML = lastValidHtml;
+            actualizarContador();
         } else {
             lastValidHtml = quill.root.innerHTML;
             if (inputBio) inputBio.value = quill.root.innerHTML;
+            actualizarContador();
         }
-        actualizarContador();
     });
 
     actualizarContador();

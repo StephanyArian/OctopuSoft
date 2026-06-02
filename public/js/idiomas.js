@@ -199,7 +199,7 @@ function quitarEvidenciaEdit(id) {
 
 function openDeleteModalIdioma(id, name) {
     document.getElementById('modal-idioma-name').textContent = name;
-    document.getElementById('delete-form-idioma').action = '/idiomas/' + id;
+    document.getElementById('delete-form-idioma').action = '/idiomas-info/' + id;
     document.getElementById('delete-modal-idioma').classList.add('active');
 }
 function closeDeleteModalIdioma() {
