@@ -72,7 +72,7 @@ class IdiomasController extends Controller
         // Subir evidencia
         $evidenciaUrl = null;
         if ($request->hasFile('evidencia')) {
-            $evidenciaUrl = $request->file('evidencia')->store('idiomas', 'public');
+            $evidenciaUrl = $request->file('evidencia')->store('idiomas', 'uploads');
         }
  
         // Nivel a número para display_order
@@ -148,7 +148,7 @@ class IdiomasController extends Controller
             if ($evidenciaUrl) {
                 \Storage::disk('public')->delete($evidenciaUrl);
             }
-            $evidenciaUrl = $request->file('evidencia')->store('idiomas', 'public');
+            $evidenciaUrl = $request->file('evidencia')->store('idiomas', 'uploads');
         }
  
         $idioma->update([
