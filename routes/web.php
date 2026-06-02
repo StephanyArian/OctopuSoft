@@ -137,10 +137,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/portfolio/theme', [ProfileController::class, 'updateTheme'])->name('portfolio.theme.update');
 
     // IDIOMAS
-    Route::get('/idiomas',         [IdiomasController::class, 'index'])->name('idiomas.index');
-    Route::post('/idiomas',        [IdiomasController::class, 'store'])->name('idiomas.store');
-    Route::put('/idiomas/{id}',    [IdiomasController::class, 'update'])->name('idiomas.update');
-    Route::delete('/idiomas/{id}', [IdiomasController::class, 'destroy'])->name('idiomas.destroy');
+    Route::get('/idiomas-info',         [IdiomasController::class, 'index'])->name('idiomas.index');
+    Route::post('/idiomas-info',        [IdiomasController::class, 'store'])->name('idiomas.store');
+    Route::put('/idiomas-info/{id}',    [IdiomasController::class, 'update'])->name('idiomas.update');
+    Route::delete('/idiomas-info/{id}', [IdiomasController::class, 'destroy'])->name('idiomas.destroy');
     });
 
 require __DIR__.'/auth.php';

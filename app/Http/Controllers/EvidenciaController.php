@@ -33,7 +33,7 @@ class EvidenciaController extends Controller
 
             $guardadas = [];
             foreach ($request->file('imagenes') as $file) {
-                $path = $file->store('evidencias', 'uploads');
+                $path = $file->store('evidencias', 'public');
                 $ev = ProjectEvidencia::create([
                     'project_id'     => $proyectoId,
                     'tipo'           => 'imagen',

@@ -75,7 +75,7 @@ class InformacionAcademicaController extends Controller
         $evidenciasUrls = [];
         if ($request->hasFile('evidencias')) {
             foreach ($request->file('evidencias') as $archivo) {
-                $path = $archivo->store('evidencias', 'uploads');
+                $path = $archivo->store('evidencias', 'public');
                 $evidenciasUrls[] = $path;
             }
         }
@@ -150,7 +150,7 @@ class InformacionAcademicaController extends Controller
         // Agregar nuevas evidencias
         if ($request->hasFile('evidencias')) {
             foreach ($request->file('evidencias') as $archivo) {
-                $path = $archivo->store('evidencias', 'uploads');
+                $path = $archivo->store('evidencias', 'public');
                 $evidenciasActuales[] = $path;
             }
         }
