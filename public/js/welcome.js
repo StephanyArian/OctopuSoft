@@ -11,27 +11,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalResultsHero = document.getElementById('totalResultsHero');
 
     let debounceTimer;
+    
+        // ===== MENÚ HAMBURGUESA =====
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
 
-    /* ── MENÚ HAMBURGUESA ── */
-    const menuToggle = document.getElementById('menuToggle');
-    const navLinks   = document.getElementById('navLinks');
+if (menuToggle && navLinks) {
+    // Abrir/cerrar menú
+    menuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        navLinks.classList.toggle('active');
+    });
 
-    if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            const icon   = menuToggle.querySelector('i');
-            const isOpen = navLinks.classList.contains('active');
-            icon.classList.toggle('fa-bars',  !isOpen);
-            icon.classList.toggle('fa-times',  isOpen);
+    // Cerrar menú al hacer clic en cualquier enlace
+    const allLinks = document.querySelectorAll('.nav-link');
+    allLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            navLinks.classList.remove('active');
         });
+    });
 
-        navLinks.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                menuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
-            });
-        });
-    }
+    // Cerrar menú al hacer clic fuera de él
+    document.addEventListener('click', function(e) {
+        if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+            navLinks.classList.remove('active');
+        }
+    });
+}
+
+
+
 
     /* ── CARRUSEL ── */
     const track       = document.getElementById('carouselTrack');
@@ -191,13 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setup();
         }
     
-    const menuToggleWelcome = document.getElementById('menuToggle');
-    const navLinksWelcome = document.getElementById('navLinks');
-
-    if (menuToggleWelcome && navLinksWelcome) {
-        menuToggleWelcome.addEventListener('click', () => {
-            navLinksWelcome.classList.toggle('active');
-        });
-    }
+    
 
 });

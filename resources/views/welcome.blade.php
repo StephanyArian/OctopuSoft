@@ -86,16 +86,7 @@
 </button>
                             <div class="nav-user-menu" id="userMenu" style="background:white; border-radius:16px; border:2px solid #a855f7; box-shadow:0 0 20px rgba(168,85,247,0.25); min-width:200px; padding:8px; display:flex; flex-direction:column; gap:6px;">
 
-    <a href="{{ url('/') }}"
-    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
-    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
-    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
-        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <i class="bi bi-house-fill" style="color:#2d0a1e;"></i>
-        </div>
-        Inicio
-    </a>
-
+    
     <a href="{{ route('dashboard') }}"
     style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
     onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
@@ -104,16 +95,6 @@
             <i class="bi bi-display-fill" style="color:#2d0a1e;"></i>
         </div>
         Mi espacio
-    </a>
-
-    <a href="{{ route('informacion.academica') }}"
-    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);"
-    onmouseover="this.style.boxShadow='0 4px 16px rgba(168,85,247,0.35)'"
-    onmouseout="this.style.boxShadow='0 2px 8px rgba(168,85,247,0.15)'">
-        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <i class="bi bi-pencil-fill" style="color:#2d0a1e;"></i>
-        </div>
-        Completar
     </a>
 
     <a href="{{ route('preview') }}"

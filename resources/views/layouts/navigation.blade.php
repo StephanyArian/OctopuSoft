@@ -46,52 +46,40 @@
                         <i class="bi bi-chevron-down" id="dropdownChevron" style="color:#0abf9e;font-size:12px;transition:transform 0.2s;"></i>
                     </button>
 
-                    {{-- DROPDOWN MENU --}}
-                    <div id="userMenu" style="display:none;position:absolute;top:calc(100% + 12px);right:0;background:white;border-radius:16px;border:2px solid #a855f7;box-shadow:0 0 20px rgba(168,85,247,0.25);min-width:200px;padding:8px;flex-direction:column;gap:6px;z-index:9999;">
+                
 
-                        <a href="{{ url('/') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
-                            <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="bi bi-house-fill" style="color:#2d0a1e;"></i>
-                            </div>
-                            Inicio
-                        </a>
+                {{-- DROPDOWN MENU --}}
+                <div id="userMenu" style="display:none;position:absolute;top:calc(100% + 12px);right:0;background:white;border-radius:16px;border:2px solid #a855f7;box-shadow:0 0 20px rgba(168,85,247,0.25);min-width:200px;padding:8px;flex-direction:column;gap:6px;z-index:9999;">
 
-                        <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
-                            <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="bi bi-display-fill" style="color:#2d0a1e;"></i>
-                            </div>
-                            Mi espacio
-                        </a>
+                    <a href="{{ route('dashboard') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
+                        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-display-fill" style="color:#2d0a1e;"></i>
+                        </div>
+                        Mi espacio
+                    </a>
 
-                        <a href="{{ route('informacion.academica') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
-                            <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="bi bi-pencil-fill" style="color:#2d0a1e;"></i>
-                            </div>
-                            Completar
-                        </a>
+                    <a href="{{ route('preview') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
+                        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-eye-fill" style="color:#2d0a1e;"></i>
+                        </div>
+                        Ver perfil
+                    </a>
 
-                        <a href="{{ route('preview') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
-                            <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="bi bi-eye-fill" style="color:#2d0a1e;"></i>
-                            </div>
-                            Ver perfil
-                        </a>
+                    <a href="{{ route('profile.edit') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
+                        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-gear-fill" style="color:#2d0a1e;"></i>
+                        </div>
+                        Configuración
+                    </a>
 
-                        <a href="{{ route('profile.edit') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#2d0a1e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#a855f7,#7c3aed) border-box;box-shadow:0 2px 8px rgba(168,85,247,0.15);">
-                            <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#0abf9e,#1de8c0);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="bi bi-gear-fill" style="color:#2d0a1e;"></i>
-                            </div>
-                            Configuración
-                        </a>
+                    <a href="{{ route('cerrar.sesion') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#e53e3e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#f87171,#dc2626) border-box;box-shadow:0 2px 8px rgba(229,62,62,0.15);">
+                        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#f87171,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-box-arrow-right" style="color:white;"></i>
+                        </div>
+                        Cerrar sesión
+                    </a>
 
-                        <a href="{{ route('cerrar.sesion') }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#e53e3e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#f87171,#dc2626) border-box;box-shadow:0 2px 8px rgba(229,62,62,0.15);">
-                            <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#f87171,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="bi bi-box-arrow-right" style="color:white;"></i>
-                            </div>
-                            Cerrar sesión
-                        </a>
-
-                    </div>
+                    
                 </div>
 
                 {{-- HAMBURGER: solo en móvil --}}

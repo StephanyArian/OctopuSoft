@@ -998,3 +998,106 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
     color: #db2777 !important;
     border-color: rgba(236, 72, 153, 0.15) !important;
 }
+/* ===== MENÚ HAMBURGUESA MEJORADO - CON AJUSTE A LA IZQUIERDA ===== */
+.menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #0abf9e;
+    font-size: 24px;
+    padding: 8px;
+    z-index: 1001;
+    transition: all 0.3s ease;
+}
+
+.menu-toggle:hover {
+    color: #00ff88;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block !important;
+    }
+    
+    .nav-links-center {
+        position: fixed !important;
+        top: 72px !important;
+        right: auto !important;
+        left: 15px !important;  /* ← CAMBIADO: más a la izquierda */
+        width: 210px !important;
+        background: linear-gradient(135deg, #2d0a1e 0%, #1a0512 100%) !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        padding: 14px !important;
+        border-radius: 18px !important;
+        border: 1px solid rgba(10, 191, 158, 0.4) !important;
+        transform: translateX(-250px) !important;  /* ← CAMBIADO: sale desde izquierda */
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        z-index: 999 !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+    }
+    
+    .nav-links-center.active {
+        transform: translateX(0) !important;
+    }
+    
+    .nav-links-center .nav-link {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+        padding: 10px 14px !important;
+        border-radius: 12px !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .nav-links-center .nav-link:hover {
+        background: rgba(10, 191, 158, 0.15) !important;
+        transform: translateX(3px) !important;
+    }
+    
+    .nav-links-center .nav-link div {
+        width: 34px !important;
+        height: 34px !important;
+        background: linear-gradient(135deg, #0abf9e, #1de8c0) !important;
+        border-radius: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .nav-links-center .nav-link div svg,
+    .nav-links-center .nav-link div i {
+        width: 16px !important;
+        height: 16px !important;
+        font-size: 16px !important;
+        color: #2d0a1e !important;
+    }
+    
+    .nav-links-center .nav-link span {
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        color: white !important;
+        text-align: left !important;
+        flex: 1 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.2 !important;
+    }
+
+    .nav-links-center .nav-link > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        background: linear-gradient(135deg, #0abf9e, #1de8c0) !important;
+        border-radius: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+        
+}
+
