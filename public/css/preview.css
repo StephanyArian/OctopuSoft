@@ -282,8 +282,6 @@ body {
 }
 
 .card:hover {
-    box-shadow: 0 6px 24px rgba(10, 191, 158, 0.10);
-    transform: translateY(-2px);
     border-color: #0abf9e;
     box-shadow: 0 12px 28px -10px rgba(10, 191, 158, 0.25);
     transform: translateY(-4px);
@@ -357,9 +355,12 @@ body {
     overflow-wrap: break-word;
 }
 
+/* ============================================
+   DESCRIPCIÓN COLAPSADA — 3 LÍNEAS
+   ============================================ */
 .card .description.collapsed {
     display: block;
-    max-height: 6.4em;
+    max-height: 4.8em; /* exactamente 3 líneas a line-height:1.6 */
     overflow: hidden;
     position: relative;
 }
@@ -397,8 +398,7 @@ body {
 
 .card .proyecto-desc-wrap.description.collapsed {
     display: block;
-    -webkit-line-clamp: unset;
-    max-height: 5.5em;
+    max-height: 4.8em;
     overflow: hidden;
 }
 .card .proyecto-desc-wrap.description.expanded {
@@ -972,7 +972,7 @@ body {
 }
 
 /* ============================================
-   BOTÓN FLOTANTE FAB — MENÚ DESPLEGABLE (FUNCIONAL EN MÓVIL)
+   BOTÓN FLOTANTE FAB — MENÚ DESPLEGABLE
    ============================================ */
 .fab-container {
     position: fixed;
@@ -985,7 +985,6 @@ body {
     gap: 0;
 }
 
-/* Botón principal */
 .fab-button {
     background: var(--white);
     color: var(--burg-mid);
@@ -1018,7 +1017,6 @@ body {
     transition: transform 0.3s ease;
 }
 
-/* Menú desplegable */
 .fab-menu {
     position: absolute;
     bottom: calc(100% + 10px);
@@ -1081,9 +1079,6 @@ body {
     margin: 0;
 }
 
-/* ============================================
-   RESPONSIVE: FAB FUNCIONAL EN MÓVIL
-   ============================================ */
 @media (max-width: 768px) {
     .fab-container {
         position: fixed !important;
@@ -1091,7 +1086,6 @@ body {
         left: 20px !important;
         z-index: 99999 !important;
     }
-    
     .fab-button {
         padding: 10px 18px !important;
         font-size: 12px !important;
@@ -1099,30 +1093,22 @@ body {
         border: 2px solid var(--burg-mid) !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
     }
-    
-    .fab-button:active {
-        transform: scale(0.96);
-    }
-    
+    .fab-button:active { transform: scale(0.96); }
     .fab-menu {
         min-width: 190px !important;
         bottom: calc(100% + 8px) !important;
         left: 0 !important;
         right: auto !important;
     }
-    
     .fab-item {
         padding: 12px 16px !important;
         font-size: 12px !important;
     }
-    
-    .fab-item:active {
-        background: var(--off);
-    }
+    .fab-item:active { background: var(--off); }
 }
 
 /* ============================================
-   BARRA INFERIOR — PUBLICAR (NO FLOTANTE)
+   BARRA INFERIOR — PUBLICAR
    ============================================ */
 .preview-bottom-bar {
     text-align: right;
@@ -1300,7 +1286,7 @@ body {
 }
 
 /* ============================================
-   TEMAS DE COLOR PERSONALIZABLES
+   TEMAS DE COLOR
    ============================================ */
 
 /* 1. Sunset Glow */
