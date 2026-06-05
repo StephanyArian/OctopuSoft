@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Función para actualizar contador y validar
         function actualizarDescripcion() {
             const html = quillDescripcion.root.innerHTML;
-            const text = quillDescripcion.getText();
+            const text = quillDescripcion.getText().trim();
             const longitud = text.length;
             
             // Actualizar hidden

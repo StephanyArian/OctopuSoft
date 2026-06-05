@@ -26,7 +26,16 @@ class InformacionAcademicaController extends Controller
             'titulo_obtenido' => 'nullable|string|max:30',
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
-            'descripcion'     => 'nullable|string|max:500',
+            'descripcion' => [
+                                    'nullable',
+                                    'string',
+                                    function ($attribute, $value, $fail) {
+                                        $textoPuro = trim(strip_tags($value));
+                                        if (mb_strlen($textoPuro) > 500) {
+                                            $fail('La descripción no puede exceder los 500 caracteres.');
+                                        }
+                                    }
+                                ],
             'estudio_actual'  => 'nullable',
             'especialidad'    => 'nullable|string|max:50',
             'tipo_formacion' => 'required|string|max:50',
@@ -109,7 +118,16 @@ class InformacionAcademicaController extends Controller
             'otro_tipo_formacion' => 'required_if:tipo_formacion,Otro|string|max:50|nullable', // NUEVA VALIDACIÓN
             'fecha_inicio'    => 'required|date_format:Y-m-d|before_or_equal:today',
             'fecha_fin'       => 'nullable|date_format:Y-m-d|after:fecha_inicio',
-            'descripcion'     => 'nullable|string|max:500',
+            'descripcion' => [
+                                'nullable',
+                                'string',
+                                function ($attribute, $value, $fail) {
+                                    $textoPuro = trim(strip_tags($value));
+                                    if (mb_strlen($textoPuro) > 500) {
+                                        $fail('La descripción no puede exceder los 500 caracteres.');
+                                    }
+                                }
+                            ],
             'estudio_actual'  => 'nullable',
             'evidencias.*'    => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'evidencias_eliminar' => 'nullable|string',
