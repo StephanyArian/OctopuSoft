@@ -998,7 +998,8 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
     color: #db2777 !important;
     border-color: rgba(236, 72, 153, 0.15) !important;
 }
-/* ===== MENÚ HAMBURGUESA MEJORADO - CON AJUSTE A LA IZQUIERDA ===== */
+
+/* ===== MENÚ HAMBURGUESA ===== */
 .menu-toggle {
     display: none;
     background: transparent;
@@ -1016,88 +1017,147 @@ footer { background: var(--burg-deep); color: var(--gray-300); }
 }
 
 @media (max-width: 768px) {
+
+    .nav-container {
+        position: relative !important;
+        flex-wrap: nowrap !important;
+        padding: 10px 16px !important;
+        align-items: center !important;
+    }
+
+    .logo {
+        flex-shrink: 0;
+    }
+
     .menu-toggle {
         display: block !important;
+        order: 2;
+        margin-left: 12px;
+        flex-shrink: 0;
     }
-    
-    .nav-links-center {
-        position: fixed !important;
-        top: 72px !important;
-        right: auto !important;
-        left: 15px !important;  /* ← CAMBIADO: más a la izquierda */
-        width: 210px !important;
-        background: linear-gradient(135deg, #2d0a1e 0%, #1a0512 100%) !important;
-        flex-direction: column !important;
-        gap: 6px !important;
-        padding: 14px !important;
-        border-radius: 18px !important;
-        border: 1px solid rgba(10, 191, 158, 0.4) !important;
-        transform: translateX(-250px) !important;  /* ← CAMBIADO: sale desde izquierda */
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        z-index: 999 !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
-    }
-    
-    .nav-links-center.active {
-        transform: translateX(0) !important;
-    }
-    
-    .nav-links-center .nav-link {
+
+    /* Botones login/register a la derecha */
+    .nav-links-right {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 12px !important;
-        padding: 10px 14px !important;
-        border-radius: 12px !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    .nav-links-center .nav-link:hover {
-        background: rgba(10, 191, 158, 0.15) !important;
-        transform: translateX(3px) !important;
-    }
-    
-    .nav-links-center .nav-link div {
-        width: 34px !important;
-        height: 34px !important;
-        background: linear-gradient(135deg, #0abf9e, #1de8c0) !important;
-        border-radius: 10px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
+        gap: 8px !important;
+        margin-left: auto !important;
+        order: 3 !important;
         flex-shrink: 0 !important;
     }
-    
-    .nav-links-center .nav-link div svg,
-    .nav-links-center .nav-link div i {
-        width: 16px !important;
-        height: 16px !important;
-        font-size: 16px !important;
-        color: #2d0a1e !important;
-    }
-    
-    .nav-links-center .nav-link span {
-        font-size: 0.85rem !important;
-        font-weight: 500 !important;
-        color: white !important;
-        text-align: left !important;
-        flex: 1 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        line-height: 1.2 !important;
+
+    .nav-links-right .nav-link {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 3px !important;
+        text-decoration: none !important;
     }
 
-    .nav-links-center .nav-link > div:first-child {
+    .nav-links-right .nav-link > div:first-child {
         width: 36px !important;
         height: 36px !important;
         min-width: 36px !important;
-        background: linear-gradient(135deg, #0abf9e, #1de8c0) !important;
-        border-radius: 10px !important;
+        border-radius: 50% !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0 !important;
     }
-        
+
+    .nav-links-right .nav-link > div:first-child i {
+        font-size: 16px !important;
+    }
+
+    .nav-links-right .nav-link span {
+        font-size: 0.5rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        -webkit-text-fill-color: white !important;
+        background: none !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+    }
+
+    /* Menú desplegable */
+    #navLinks {
+        position: absolute !important;
+        top: 100% !important;
+        left: 16px !important;
+        right: auto !important;
+        width: 220px !important;
+        background: linear-gradient(135deg, #2d0a1e 0%, #1a0512 100%) !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        padding: 10px !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(10,191,158,0.4) !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+        z-index: 999 !important;
+        margin-top: 8px !important;
+
+        /* Animación */
+        opacity: 0 !important;
+        visibility: hidden !important;
+        transform: translateY(-6px) !important;
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s !important;
+        pointer-events: none !important;
+        display: flex !important;
+    }
+
+    #navLinks.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+        pointer-events: auto !important;
+    }
+
+    /* Cada item del menú */
+    #navLinks .nav-link {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 12px !important;
+        padding: 9px 12px !important;
+        border-radius: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        text-decoration: none !important;
+    }
+
+    #navLinks .nav-link:hover {
+        background: rgba(10,191,158,0.12) !important;
+    }
+
+    /* Icono de cada item */
+    #navLinks .nav-link > div:first-child {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Texto de cada item */
+    #navLinks .nav-link span {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        -webkit-text-fill-color: white !important;
+        background: none !important;
+        text-align: left !important;
+        white-space: nowrap !important;
+        flex: 1 !important;
+    }
 }
 
+@media (max-width: 480px) {
+    .nav-container { padding: 12px 16px !important; }
+    .logo h2       { font-size: 1.2rem !important; }
+    .menu-toggle   { font-size: 1.5rem !important; }
+}

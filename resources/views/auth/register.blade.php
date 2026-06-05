@@ -13,13 +13,13 @@
             <div class="row-fields">
                 <div class="form-group">
                     <label for="first_name" class="form-label">Nombre</label>
-                    <input id="first_name" class="form-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '')">
+                    <input id="first_name" class="form-input" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus maxlength="30" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '')">
                     <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                 </div>
 
                 <div class="form-group">
                     <label for="last_name" class="form-label">Apellido</label>
-                    <input id="last_name" class="form-input" type="text" name="last_name" value="{{ old('last_name') }}" required maxlength="50"  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '')" >
+                    <input id="last_name" class="form-input" type="text" name="last_name" value="{{ old('last_name') }}" required maxlength="30"  oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]/g, '')" >
                     <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                 </div>
             </div>

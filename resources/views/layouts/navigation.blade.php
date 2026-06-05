@@ -135,38 +135,76 @@
          style="display:none;position:fixed;inset:0;top:72px;background:rgba(0,0,0,0.4);z-index:48;">
     </div>
 
-    <script>
-        // MENÚ MÓVIL
-        function toggleMobileMenu() {
-            const menu    = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('mobileOverlay');
-            const icon    = document.getElementById('hamburgerIcon');
-            const isOpen  = menu.style.display === 'block';
+   <script>
+    // MENÚ MÓVIL
+    function toggleMobileMenu() {
+        const menu    = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileOverlay');
+        const icon    = document.getElementById('hamburgerIcon');
+        const isOpen  = menu.style.display === 'block';
 
-            menu.style.display    = isOpen ? 'none' : 'block';
-            overlay.style.display = isOpen ? 'none' : 'block';
-            icon.className        = isOpen ? 'bi bi-list' : 'bi bi-x-lg';
+        // ← Cierra el dropdown del avatar si está abierto
+        cerrarDropdownAvatar();
+
+        menu.style.display    = isOpen ? 'none' : 'block';
+        overlay.style.display = isOpen ? 'none' : 'block';
+        icon.className        = isOpen ? 'bi bi-list' : 'bi bi-x-lg';
+    }
+
+    // DROPDOWN AVATAR
+    function toggleUserMenu() {
+        const menu    = document.getElementById('userMenu');
+        const chevron = document.getElementById('dropdownChevron');
+        const isOpen  = menu.style.display === 'flex';
+
+        // ← Cierra el menú móvil si está abierto
+        cerrarMenuMovil();
+
+        menu.style.display       = isOpen ? 'none' : 'flex';
+        menu.style.flexDirection = 'column';
+        chevron.style.transform  = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // HELPERS para cerrar cada menú sin toggle
+    function cerrarDropdownAvatar() {
+        const menu    = document.getElementById('userMenu');
+        const chevron = document.getElementById('dropdownChevron');
+        if (menu) menu.style.display = 'none';
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+
+    function cerrarMenuMovil() {
+        const menu    = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileOverlay');
+        const icon    = document.getElementById('hamburgerIcon');
+        if (menu)    menu.style.display    = 'none';
+        if (overlay) overlay.style.display = 'none';
+        if (icon)    icon.className        = 'bi bi-list';
+    }
+
+    // CERRAR AL HACER CLIC FUERA
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('userDropdown');
+        const hamburger = document.querySelector('.nav-hamburger');
+
+        // Clic fuera del avatar → cierra dropdown avatar
+        if (dropdown && !dropdown.contains(e.target)) {
+            cerrarDropdownAvatar();
         }
 
-        // DROPDOWN AVATAR
-        function toggleUserMenu() {
-            const menu    = document.getElementById('userMenu');
-            const chevron = document.getElementById('dropdownChevron');
-            const isOpen  = menu.style.display === 'flex';
-            menu.style.display       = isOpen ? 'none' : 'flex';
-            menu.style.flexDirection = 'column';
-            chevron.style.transform  = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+        // Clic fuera del menú móvil y fuera del hamburger → cierra menú móvil
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenu && hamburger &&
+            !mobileMenu.contains(e.target) &&
+            !hamburger.contains(e.target)) {
+            cerrarMenuMovil();
         }
+    });
 
-        // CERRAR AL HACER CLIC FUERA
-        document.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('userDropdown');
-            const menu     = document.getElementById('userMenu');
-            if (dropdown && !dropdown.contains(e.target)) {
-                menu.style.display = 'none';
-                const chevron = document.getElementById('dropdownChevron');
-                if (chevron) chevron.style.transform = 'rotate(0deg)';
-            }
-        });
-    </script>
+     // ← NUEVO: CERRAR AL HACER SCROLL
+    window.addEventListener('scroll', function() {
+        cerrarMenuMovil();
+        cerrarDropdownAvatar();
+    }, { passive: true });
+</script>
 </nav>
