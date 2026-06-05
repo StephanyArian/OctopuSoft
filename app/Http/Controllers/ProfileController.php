@@ -32,8 +32,45 @@ class ProfileController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:30', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
             'title' => ['nullable', 'string', 'max:30', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'],
-            'location' => 'nullable|string|max:30',
-            'bio' => 'nullable|string|max:500',
+            'location' => [
+                'nullable',
+                'string',
+                'max:30',
+                function ($attribute, $value, $fail) {
+                    $url = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($value) . '&limit=1';
+                    
+                    $opts = [
+                        'http' => [
+                            'method' => 'GET',
+                            'header' => "User-Agent: OctopuSoft-Portfolio-App\r\n",
+                            'timeout' => 2 // 2 segundos de timeout
+                        ]
+                    ];
+                    $context = stream_context_create($opts);
+                    $response = @file_get_contents($url, false, $context);
+                    
+                    if ($response) {
+                        $data = json_decode($response, true);
+                        if (empty($data)) {
+                            $fail('La ubicación ingresada no corresponde a un lugar geográfico real.');
+                        }
+                    }
+                }
+            ],
+            'bio' => [
+                'nullable',
+                'string',
+                function ($attribute, $value, $fail) {
+                    // Decodificar entidades HTML y quitar etiquetas HTML para obtener texto plano
+                    $plainText = html_entity_decode(strip_tags($value), ENT_QUOTES, 'UTF-8');
+                    // Quitar todos los espacios (incluyendo espacios de varios bytes/Unicode)
+                    $cleanText = preg_replace('/\s+/u', '', $plainText);
+                    
+                    if (mb_strlen($cleanText, 'UTF-8') > 500) {
+                        $fail('La biografía no puede exceder los 500 caracteres (sin contar espacios).');
+                    }
+                }
+            ],
             'photo' => 'nullable|image|mimes:jpeg,png|max:2048'
         ], [
             'name.regex' => 'El nombre solo debe contener letras y espacios.',

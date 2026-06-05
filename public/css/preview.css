@@ -67,6 +67,8 @@ body {
     flex-direction: column;
     gap: 4px;
     margin-bottom: 10px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .profile-contact-list .contact-row {
@@ -124,6 +126,12 @@ body {
     align-self: stretch;
     -webkit-clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
     clip-path: polygon(20% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .profile-avatar-side {
+        width: 280px;
+    }
 }
 
 .profile-avatar-side img {

@@ -84,10 +84,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="position: relative;">
                                         <label class="form-label">Ubicación</label>
-                                        <input class="form-input" type="text" id="location" name="location" placeholder="Ciudad, País" value="{{ old('location', $user->city . ($user->country ? ', ' . $user->country : '')) }}" maxlength="30">
-                                        <span class="text-xs text-gray-400 mt-1">Máximo 30 caracteres</span>
+                                        <input class="form-input" type="text" id="location" name="location" placeholder="Ej. Cochabamba, Bolivia" value="{{ old('location', $user->city . ($user->country ? ', ' . $user->country : '')) }}" maxlength="30" autocomplete="off">
+                                        <div id="locationSuggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #edf0f4; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                                        <div id="locationError" class="error-message hidden">Debes seleccionar una ubicación real de la lista de sugerencias.</div>
+                                        <span class="text-xs text-gray-400 mt-1">Escribe tu ciudad y país y selecciónala de la lista.</span>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Biografía profesional</label>

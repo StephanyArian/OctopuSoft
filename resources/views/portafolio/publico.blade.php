@@ -265,27 +265,131 @@
             .detail-modal-hero, .detail-modal-body { padding: 18px; }
             .modal-header { padding: 16px 18px; }
             .idiomas-modal-grid { grid-template-columns: 1fr; padding: 16px; }
+            
+            .top-actions-bar {
+                padding: 10px 20px !important;
+            }
+        }
+
+        /* ===== BARRA DE ACCIONES SUPERIOR ===== */
+        .top-actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 40px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--gray-100);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .top-actions-bar .btn-volver-flotante {
+            position: relative;
+            top: auto;
+            left: auto;
+            z-index: auto;
+            margin: 0;
+            box-shadow: none;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            transition: all 0.2s ease;
+        }
+        .top-actions-bar .btn-volver-flotante:hover {
+            background: #f0fdf9;
+            color: #0abf9e;
+            border-color: rgba(10, 191, 158, 0.3);
+            transform: translateY(-1px);
+        }
+        .top-actions-bar .btn-volver-flotante svg {
+            stroke: #475569;
+            transition: stroke 0.2s ease;
+        }
+        .top-actions-bar .btn-volver-flotante:hover svg {
+            stroke: #0abf9e;
+        }
+        
+        /* Theme overrides for hover state of Volver button */
+        .theme-sunset.top-actions-bar .btn-volver-flotante:hover { background: #fff7ed; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
+        .theme-sunset.top-actions-bar .btn-volver-flotante:hover svg { stroke: #f97316; }
+        
+        .theme-emerald.top-actions-bar .btn-volver-flotante:hover { background: #ecfdf5; color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+        .theme-emerald.top-actions-bar .btn-volver-flotante:hover svg { stroke: #10b981; }
+        
+        .theme-midnight.top-actions-bar .btn-volver-flotante:hover { background: #fdf4ff; color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
+        .theme-midnight.top-actions-bar .btn-volver-flotante:hover svg { stroke: #a855f7; }
+        
+        .theme-ocean.top-actions-bar .btn-volver-flotante:hover { background: #f0fdfa; color: #00b4d8; border-color: rgba(0, 180, 216, 0.3); }
+        .theme-ocean.top-actions-bar .btn-volver-flotante:hover svg { stroke: #00b4d8; }
+        
+        .theme-sakura.top-actions-bar .btn-volver-flotante:hover { background: #fdf2f8; color: #ec4899; border-color: rgba(236, 72, 153, 0.3); }
+        .theme-sakura.top-actions-bar .btn-volver-flotante:hover svg { stroke: #ec4899; }
+
+        .top-actions-bar .fab-container-top {
+            position: relative;
+            top: auto;
+            right: auto;
+            z-index: auto;
+        }
+        .top-actions-bar .fab-button-top {
+            position: relative;
+            box-shadow: none;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            padding: 10px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .top-actions-bar .fab-button-top:hover {
+            background: #f0fdf9;
+            color: #0abf9e;
+            border-color: rgba(10, 191, 158, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .theme-sunset.top-actions-bar .fab-button-top:hover { background: #fff7ed; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
+        .theme-emerald.top-actions-bar .fab-button-top:hover { background: #ecfdf5; color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+        .theme-midnight.top-actions-bar .fab-button-top:hover { background: #fdf4ff; color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
+        .theme-ocean.top-actions-bar .fab-button-top:hover { background: #f0fdfa; color: #00b4d8; border-color: rgba(0, 180, 216, 0.3); }
+        .theme-sakura.top-actions-bar .fab-button-top:hover { background: #fdf2f8; color: #ec4899; border-color: rgba(236, 72, 153, 0.3); }
+
+        .top-actions-bar .fab-menu-top {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            left: auto;
+            bottom: auto;
+            z-index: 1002;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0;
+            margin-top: 0;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.97);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .top-actions-bar .fab-menu-top.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
         }
     </style>
 </head>
 <body>
 
-<!-- Botón Volver -->
-<button class="btn-volver-flotante" onclick="window.history.back()">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-    Volver
-</button>
 
-<!-- Botón Más Opciones -->
-<div class="fab-container-top" id="fabContainerTop">
-    <div class="fab-menu-top" id="fabMenuTop">
-        <button class="fab-item-top" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
-        <button class="fab-item-top" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
-    </div>
-    <button class="fab-button-top" id="fabButtonTop" onclick="toggleFabMenuTop()">
-        <i class="fas fa-ellipsis-h" id="fabIconTop"></i><span>Más opciones</span>
-    </button>
-</div>
 
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -324,6 +428,26 @@
     $claseTema = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
 
+<!-- Barra de acciones superior (Volver y Más opciones) -->
+<div class="top-actions-bar {{ $claseTema }}">
+    <!-- Botón Volver -->
+    <button class="btn-volver-flotante" onclick="window.history.back()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Volver</span>
+    </button>
+
+    <!-- Botón Más Opciones -->
+    <div class="fab-container-top" id="fabContainerTop">
+        <div class="fab-menu-top" id="fabMenuTop">
+            <button class="fab-item-top" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
+            <button class="fab-item-top" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
+        </div>
+        <button class="fab-button-top" id="fabButtonTop" onclick="toggleFabMenuTop()">
+            <i class="fas fa-ellipsis-h" id="fabIconTop"></i><span>Más opciones</span>
+        </button>
+    </div>
+</div>
+
 <div class="preview-container {{ $claseTema }}">
 
     <!-- ==================== CABECERA ==================== -->
@@ -333,6 +457,7 @@
             @if(!empty($user->profession->name))
             <div class="title">{{ $user->profession->name }}</div>
             @endif
+
             <div class="profile-contact-list">
                 @if($user->city || $user->country)
                 <div class="contact-row"><i class="fas fa-map-marker-alt"></i><span>{{ $user->city ?? '' }}{{ $user->country ? ', ' . $user->country : '' }}</span></div>
@@ -350,6 +475,7 @@
                 </div>
                 @endif
             </div>
+
             <div class="profile-social-icons">
                 @if(!empty($redes['linkedin']))<a href="{{ $redes['linkedin'] }}" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>@endif
                 @if(!empty($redes['github']))<a href="{{ $redes['github'] }}" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>@endif

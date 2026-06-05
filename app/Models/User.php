@@ -67,10 +67,7 @@ class User extends Authenticatable
         $this->attributes['last_name'] = $value ? substr($value, 0, 30) : null;
     }
 
-    public function setBiographyAttribute($value)
-    {
-        $this->attributes['biography'] = $value ? substr($value, 0, 500) : null;
-    }
+
 
     public function setCityAttribute($value)
     {

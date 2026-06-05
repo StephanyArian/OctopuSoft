@@ -11,19 +11,31 @@ use App\Models\UserLocation;
 class RedContactoController extends Controller
 {
     public function index()
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $redes = RedProfesional::where('user_id', $user->id)
-        ->get()
-        ->keyBy('platform_id');
+        $defaultPlatforms = [
+            ['name' => 'LinkedIn', 'base_url' => 'https://linkedin.com/in/'],
+            ['name' => 'GitHub', 'base_url' => 'https://github.com/'],
+            ['name' => 'WhatsApp', 'base_url' => 'https://wa.me/'],
+            ['name' => 'Email', 'base_url' => 'mailto:'],
+            ['name' => 'Otros', 'base_url' => null],
+        ];
+        
+        foreach ($defaultPlatforms as $p) {
+            PlataformaRed::firstOrCreate(['name' => $p['name']], $p);
+        }
 
-    $platforms = \App\Models\PlataformaRed::pluck('id', 'name');
-    
-    $location = UserLocation::firstOrNew(['user_id' => $user->id]);
+        $redes = RedProfesional::where('user_id', $user->id)
+            ->get()
+            ->keyBy('platform_id');
 
-    return view('redes-contacto', compact('redes', 'platforms', 'location'));
-}
+        $platforms = PlataformaRed::pluck('id', 'name');
+        
+        $location = UserLocation::firstOrNew(['user_id' => $user->id]);
+
+        return view('redes-contacto', compact('redes', 'platforms', 'location'));
+    }
 
     public function store(Request $request)
     {
