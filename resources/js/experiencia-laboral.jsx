@@ -28,6 +28,7 @@ const QUILL_TOOLBAR = [
 ];
 
 const MAX_DESC_CHARS = 500;
+const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 
 /* ── Iconos ────────────────────────────────────────────── */
 const IconEdit = () => (
@@ -96,15 +97,12 @@ function agruparExperiencias(experiencias) {
 
 /* ══════════════════════════════════════════════════════════
    Hook: useQuillEditor
-   Monta Quill en un ref de div, devuelve getHTML / setHTML
    ══════════════════════════════════════════════════════════ */
 function useQuillEditor(containerRef, initialHTML, onChange) {
     const quillRef = useRef(null);
 
     useEffect(() => {
-        /* Quill ya está cargado globalmente vía CDN en el Blade */
         if (!window.Quill || !containerRef.current) return;
-        /* Evitar doble inicialización */
         if (quillRef.current) return;
 
         const quill = new window.Quill(containerRef.current, {
@@ -113,14 +111,12 @@ function useQuillEditor(containerRef, initialHTML, onChange) {
             modules: { toolbar: QUILL_TOOLBAR },
         });
 
-        /* Cargar contenido inicial */
         if (initialHTML && initialHTML.trim() && initialHTML !== '<p><br></p>') {
             quill.root.innerHTML = initialHTML;
         }
 
         quill.on('text-change', () => {
             const text = quill.getText().trim();
-            /* Limitar a MAX_DESC_CHARS caracteres de texto plano */
             if (text.length > MAX_DESC_CHARS) {
                 quill.deleteText(MAX_DESC_CHARS, text.length - MAX_DESC_CHARS);
                 return;
@@ -131,16 +127,87 @@ function useQuillEditor(containerRef, initialHTML, onChange) {
 
         quillRef.current = quill;
 
-        /* Cleanup: destruir el editor al desmontar */
-        return () => {
-            if (quillRef.current) {
-                quillRef.current = null;
-            }
-        };
+        return () => { quillRef.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); /* Solo al montar */
+    }, []);
 
     return quillRef;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Hook: useGeoAutocomplete
+   Fuente: OpenStreetMap Nominatim (sin API key, gratuito)
+   ══════════════════════════════════════════════════════════ */
+function useGeoAutocomplete(initialValue = '') {
+    const [value,       setValue]       = useState(initialValue);
+    const [suggestions, setSuggestions] = useState([]);
+    const [isValid,     setIsValid]     = useState(!!initialValue.trim());
+    const [showError,   setShowError]   = useState(false);
+    const [open,        setOpen]        = useState(false);
+    const timerRef = useRef(null);
+
+    function formatLabel(item) {
+        const a = item.address || {};
+        const partes = [];
+        if (a.city || a.town || a.village || a.municipality)
+            partes.push(a.city || a.town || a.village || a.municipality);
+        if (a.state || a.region) partes.push(a.state || a.region);
+        if (a.country) partes.push(a.country);
+        return partes.length
+            ? partes.join(', ')
+            : item.display_name.split(',').slice(0, 3).join(',').trim();
+    }
+
+    function handleChange(e) {
+        const q = e.target.value;
+        setValue(q);
+        setIsValid(false);
+        setShowError(false);
+        clearTimeout(timerRef.current);
+        if (q.trim().length < 3) { setSuggestions([]); setOpen(false); return; }
+        timerRef.current = setTimeout(async () => {
+            try {
+                const url = `${NOMINATIM_URL}?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6&accept-language=es`;
+                const res  = await fetch(url, { headers: { 'Accept-Language': 'es' } });
+                const data = await res.json();
+                const labels = data.map(formatLabel);
+                setSuggestions(labels);
+                setOpen(labels.length > 0);
+            } catch (_) { /* silencioso */ }
+        }, 350);
+    }
+
+    function handleSelect(label) {
+        setValue(label);
+        setIsValid(true);
+        setShowError(false);
+        setSuggestions([]);
+        setOpen(false);
+    }
+
+    function handleBlur() {
+        // Pequeño delay para que onMouseDown del <li> se procese primero
+        setTimeout(() => setOpen(false), 160);
+        if (value.trim() && !isValid) setShowError(true);
+    }
+
+    function handleFocus() {
+        setShowError(false);
+    }
+
+    /* Permite validar externamente antes del submit */
+    function validate() {
+        if (value.trim() && !isValid) {
+            setShowError(true);
+            return false;
+        }
+        return true;
+    }
+
+    return {
+        value, isValid, showError, suggestions, open,
+        handleChange, handleSelect, handleBlur, handleFocus, validate,
+    };
 }
 
 /* ── Dropdown personalizado para React ──────────────────── */
@@ -245,7 +312,7 @@ function ToggleActual({ defaultChecked, inicioDia, inicioMes, inicioAnio, finDia
 }
 
 /* ══════════════════════════════════════════════════════════
-   FormEdicionGrupo — con Quill integrado
+   FormEdicionGrupo — con Quill + geo-autocompletado
    ══════════════════════════════════════════════════════════ */
 function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
     const [error,           setError]          = useState('');
@@ -253,28 +320,25 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
     const [guardando,       setGuardando]      = useState(false);
     const [confirmEliminar, setConfirmEliminar] = useState(null);
     const [empresa,         setEmpresa]        = useState(grupo.institution || '');
-    const [ubicacion,       setUbicacion]      = useState(grupo.location || '');
+
+    /* ── Geo-autocompletado para ubicación ── */
+    const geo = useGeoAutocomplete(grupo.location || '');
 
     /* ── Estado de descripción (HTML de Quill) ── */
-    const [descripcion,     setDescripcion]    = useState(grupo.description || '');
-    const [descCharCount,   setDescCharCount]  = useState(0);
+    const [descripcion,   setDescripcion]   = useState(grupo.description || '');
+    const [descCharCount, setDescCharCount] = useState(0);
 
-    /* Ref del div donde montará Quill */
     const quillContainerRef = useRef(null);
 
-    /* Callback estable para el hook */
     const handleDescChange = useCallback((html, charCount) => {
         setDescripcion(html);
         setDescCharCount(charCount);
     }, []);
 
-    /* Montar Quill cuando el componente se monte */
     useQuillEditor(quillContainerRef, grupo.description || '', handleDescChange);
 
-    /* Calcular chars iniciales al montar */
     useEffect(() => {
         if (grupo.description) {
-            /* Contar texto plano del HTML inicial */
             const tmp = document.createElement('div');
             tmp.innerHTML = grupo.description;
             setDescCharCount(tmp.textContent.trim().length);
@@ -325,6 +389,12 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             return;
         }
 
+        /* Validar ubicación geográfica */
+        if (!geo.validate()) {
+            setError('La ubicación debe seleccionarse desde la lista de sugerencias.');
+            return;
+        }
+
         setErrorFin('');
         const form          = e.target;
         const trabajoActual = form.trabajo_actual.checked;
@@ -347,11 +417,10 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
             if (fin < ini) { setErrorFin('La fecha de fin no puede ser anterior a la de inicio.'); return; }
         }
 
-        /* descripcion ya tiene el HTML actualizado gracias al hook */
         const payload = {
             empresa,
-            location:          ubicacion,
-            descripcion:       descripcion,  /* ← HTML de Quill */
+            location:          geo.value,
+            descripcion:       descripcion,
             fecha_inicio_dia:  inicioDia,
             fecha_inicio_mes:  inicioMes,
             fecha_inicio_anio: inicioAnio,
@@ -410,7 +479,6 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 }
             }
 
-            /* Construir start_date / end_date para el payloadLocal */
             const startDate = (inicioAnio && inicioMes && inicioDia)
                 ? `${inicioAnio}-${String(inicioMes).padStart(2,'0')}-${String(inicioDia).padStart(2,'0')}`
                 : null;
@@ -418,15 +486,13 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 ? `${finAnio}-${String(finMes).padStart(2,'0')}-${String(finDia).padStart(2,'0')}`
                 : null;
 
-            /* IDs de TODOS los items del grupo: los que se actualizaron via PUT
-               y los que quedaron igual. Todos comparten description/empresa/fechas. */
             const idsGrupoCompleto = new Set(grupo.items.map(i => i.id));
 
             const payloadLocal = {
                 idsGrupo:    idsGrupoCompleto,
                 descripcion: descripcion,
                 empresa:     empresa,
-                location:    ubicacion,
+                location:    geo.value,
                 start_date:  startDate,
                 end_date:    endDate,
                 is_current:  trabajoActual,
@@ -526,14 +592,40 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 )}
             </div>
 
-            {/* Ubicación */}
+            {/* Ubicación con geo-autocompletado */}
             <div className="form-row" style={{ marginBottom: '14px' }}>
-                <div className="form-group">
+                <div className="form-group" style={{ position: 'relative' }}>
                     <label className="form-label">Ubicación</label>
-                    <input name="location" value={ubicacion} maxLength={100}
-                        placeholder="Ej. Cochabamba, Bolivia" className="form-input"
-                        onChange={e => setUbicacion(e.target.value)} />
-                    <div className="char-counter">{ubicacion.length}/100</div>
+                    <input
+                        name="location"
+                        value={geo.value}
+                        maxLength={100}
+                        placeholder="Ej. Cochabamba, Bolivia"
+                        className="form-input"
+                        autoComplete="off"
+                        onChange={geo.handleChange}
+                        onBlur={geo.handleBlur}
+                        onFocus={geo.handleFocus}
+                    />
+                    <div className="char-counter">{geo.value.length}/100</div>
+
+                    {/* Lista de sugerencias */}
+                    {geo.open && geo.suggestions.length > 0 && (
+                        <ul className="geo-dropdown">
+                            {geo.suggestions.map((label, i) => (
+                                <li key={i} onMouseDown={() => geo.handleSelect(label)}>
+                                    {label}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+
+                    {/* Error si escribió sin seleccionar */}
+                    {geo.showError && (
+                        <div className="error-message">
+                            Selecciona una ubicación válida de la lista de sugerencias.
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -545,16 +637,12 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                 errorFin={errorFin}
             />
 
-            {/* ── Descripción con Quill ── */}
+            {/* Descripción con Quill */}
             <div className="form-group" style={{ marginBottom: '14px' }}>
                 <label className="form-label">Descripción</label>
-
-                {/* Contador de caracteres sobre el editor */}
                 <div className="char-counter" style={{ textAlign: 'right', marginBottom: '4px' }}>
                     {descCharCount} / {MAX_DESC_CHARS} caracteres
                 </div>
-
-                {/* El div donde Quill se montará */}
                 <div ref={quillContainerRef} className="quill-editor-wrap" />
             </div>
 
@@ -576,11 +664,9 @@ function DescripcionExpandible({ texto }) {
     const [expandida, setExpandida] = useState(false);
     if (!texto) return null;
 
-    /* Si el texto es HTML (tiene tags), renderizar como HTML */
     const esHTML = /<[a-z][\s\S]*>/i.test(texto);
 
     if (esHTML) {
-        /* Extraer texto plano para saber si es largo */
         const tmp = document.createElement('div');
         tmp.innerHTML = texto;
         const plain = tmp.textContent || '';
@@ -617,7 +703,6 @@ function DescripcionExpandible({ texto }) {
         );
     }
 
-    /* Texto plano (compatibilidad con registros antiguos) */
     const corta = texto.length > DESC_LIMIT;
     return (
         <div className="historial-desc">
@@ -657,36 +742,33 @@ function ExperienciaLaboral({ experiencias, setExperiencias }) {
     }
 
     function handleGuardado(actualizados, idsEliminados, payloadLocal) {
-        console.log('actualizados:', actualizados);
-    console.log('idsEliminados:', idsEliminados);
-    console.log('payloadLocal:', payloadLocal);
-      setExperiencias(prev => {
-        let siguiente = prev.filter(e => !idsEliminados.has(e.id));
+        setExperiencias(prev => {
+            let siguiente = prev.filter(e => !idsEliminados.has(e.id));
 
-        siguiente = siguiente.map(e => {
-            const match = actualizados.find(a => String(a.id) === String(e.id)); // ← fix
-            if (match) return match;
+            siguiente = siguiente.map(e => {
+                const match = actualizados.find(a => String(a.id) === String(e.id));
+                if (match) return match;
 
-            if (payloadLocal?.idsGrupo?.has(e.id)) {
-                return {
-                    ...e,
-                    description: payloadLocal.descripcion ?? e.description,
-                    institution: payloadLocal.empresa     ?? e.institution,
-                    location:    payloadLocal.location    ?? e.location,
-                    start_date:  payloadLocal.start_date  ?? e.start_date,
-                    end_date:    payloadLocal.end_date    ?? e.end_date,
-                    is_current:  payloadLocal.is_current  ?? e.is_current,
-                };
-            }
-            return e;
+                if (payloadLocal?.idsGrupo?.has(e.id)) {
+                    return {
+                        ...e,
+                        description: payloadLocal.descripcion ?? e.description,
+                        institution: payloadLocal.empresa     ?? e.institution,
+                        location:    payloadLocal.location    ?? e.location,
+                        start_date:  payloadLocal.start_date  ?? e.start_date,
+                        end_date:    payloadLocal.end_date    ?? e.end_date,
+                        is_current:  payloadLocal.is_current  ?? e.is_current,
+                    };
+                }
+                return e;
+            });
+
+            const idsExistentes = new Set(prev.map(e => String(e.id)));
+            const nuevos = actualizados.filter(a => !idsExistentes.has(String(a.id)));
+            return [...siguiente, ...nuevos];
         });
-
-        const idsExistentes = new Set(prev.map(e => String(e.id))); // ← fix
-        const nuevos = actualizados.filter(a => !idsExistentes.has(String(a.id))); // ← fix
-        return [...siguiente, ...nuevos];
-    });
-    setEditandoGrupo(null);
-}
+        setEditandoGrupo(null);
+    }
 
     const grupos = agruparExperiencias(experiencias);
 
@@ -786,7 +868,6 @@ function ExperienciaLaboral({ experiencias, setExperiencias }) {
     );
 }
 
-/* ── Bootstrap ─────────────────────────────────────────── */
 /* ── Bootstrap ─────────────────────────────────────────── */
 const el = document.getElementById('historial-laboral-react');
 if (el) {

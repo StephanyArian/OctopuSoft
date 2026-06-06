@@ -93,12 +93,20 @@
 
                                     {{-- Ubicación --}}
                                     <div class="form-row">
-                                        <div class="form-group">
+                                        <div class="form-group" style="position:relative;">
                                             <label class="form-label">Ubicación</label>
-                                            <input class="form-input" type="text" name="location"
-                                                placeholder="Ej. Cochabamba, Bolivia" value="{{ old('location') }}"
-                                                maxlength="100" oninput="updateCounter('location','locationCount')">
+                                            <input class="form-input geo-autocomplete" type="text"
+                                                name="location" id="location"
+                                                placeholder="Ej. Cochabamba, Bolivia"
+                                                value="{{ old('location') }}"
+                                                maxlength="100"
+                                                autocomplete="off"
+                                                oninput="updateCounter('location','locationCount')">
                                             <div class="char-counter"><span id="locationCount">0</span>/100</div>
+                                            <ul id="geo-suggestions" class="geo-dropdown hidden"></ul>
+                                            <div id="locationError" class="error-message hidden">
+                                                Selecciona una ubicación válida de la lista.
+                                            </div>
                                         </div>
                                     </div>
 

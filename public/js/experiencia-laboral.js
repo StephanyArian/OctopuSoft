@@ -327,6 +327,101 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
     if (!isValid) e.preventDefault();
 });
 
+/* ══════════════════════════════════════════════════════════
+   GEO-AUTOCOMPLETE — formulario de alta (Blade)
+   Fuente: OpenStreetMap Nominatim (sin API key)
+   ══════════════════════════════════════════════════════════ */
+(function () {
+    const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
+    let debounceTimer = null;
+    let locationValid = false;   // ← bandera: el valor fue elegido de la lista
+
+    function buildQuery(q) {
+        return `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6&accept-language=es`;
+    }
+
+    function formatLabel(item) {
+        const a = item.address || {};
+        const partes = [];
+        if (a.city || a.town || a.village || a.municipality)
+            partes.push(a.city || a.town || a.village || a.municipality);
+        if (a.state || a.region) partes.push(a.state || a.region);
+        if (a.country) partes.push(a.country);
+        return partes.length ? partes.join(', ') : item.display_name.split(',').slice(0,3).join(',');
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+        const input   = document.getElementById('location');
+        const list    = document.getElementById('geo-suggestions');
+        const errEl   = document.getElementById('locationError');
+        const hidden  = document.querySelector('input[name="location"]'); // mismo input
+
+        if (!input || !list) return;
+
+        /* Si ya venía con valor (old()), asumirlo como válido */
+        if (input.value.trim()) locationValid = true;
+
+        function showSuggestions(items) {
+            list.innerHTML = '';
+            if (!items.length) { list.classList.add('hidden'); return; }
+            items.forEach(item => {
+                const label = formatLabel(item);
+                const li = document.createElement('li');
+                li.textContent = label;
+                li.dataset.value = label;
+                li.addEventListener('mousedown', function (e) {
+                    e.preventDefault();  // evitar blur antes de click
+                    input.value = label;
+                    document.getElementById('locationCount').textContent = label.length;
+                    locationValid = true;
+                    errEl.classList.add('hidden');
+                    list.classList.add('hidden');
+                    list.innerHTML = '';
+                });
+                list.appendChild(li);
+            });
+            list.classList.remove('hidden');
+        }
+
+        input.addEventListener('input', function () {
+            locationValid = false;  // el usuario escribió manualmente → inválido hasta elegir
+            const q = input.value.trim();
+            clearTimeout(debounceTimer);
+            if (q.length < 3) { list.classList.add('hidden'); return; }
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res  = await fetch(buildQuery(q), {
+                        headers: { 'Accept-Language': 'es' }
+                    });
+                    const data = await res.json();
+                    showSuggestions(data);
+                } catch (_) { /* silencioso */ }
+            }, 350);
+        });
+
+        input.addEventListener('blur', function () {
+            setTimeout(() => list.classList.add('hidden'), 150);
+            /* Si el campo tiene texto pero no fue elegido de la lista → error */
+            if (input.value.trim() && !locationValid) {
+                errEl.classList.remove('hidden');
+            }
+        });
+
+        input.addEventListener('focus', function () {
+            errEl.classList.add('hidden');
+        });
+
+        /* Bloquear submit si la ubicación no es válida */
+        const form = document.getElementById('experienciaForm');
+        form.addEventListener('submit', function (e) {
+            if (input.value.trim() && !locationValid) {
+                errEl.classList.remove('hidden');
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        }, false);   // false = fase de burbuja, DESPUÉS del listener de validación general
+    });
+})();
 /* ── Init ── */
 window.addEventListener('DOMContentLoaded', function () {
     const cb = document.getElementById('trabajoActual');
