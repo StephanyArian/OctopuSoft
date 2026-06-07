@@ -385,6 +385,79 @@
             transform: translateY(0) scale(1);
             pointer-events: all;
         }
+        /* ===== RESTAURAR FLOTANTES PÚBLICO ===== */
+.btn-volver-flotante {
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    z-index: 1100 !important;
+    background: #0abf9e !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 40px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    transition: all 0.2s !important;
+    font-family: inherit !important;
+    text-decoration: none !important;
+}
+.btn-volver-flotante:hover { transform: translateY(-2px) !important; background: #07866e !important; }
+
+.fab-container-top {
+    position: fixed !important;
+    bottom: 30px !important;
+    left: 30px !important;
+    top: auto !important;
+    right: auto !important;
+    z-index: 1100 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+.fab-menu-top {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin-bottom: 10px !important;
+    transform: none !important;
+}
+.fab-menu-top.open {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: all !important;
+}
+.fab-button-top {
+    background: #fff !important;
+    color: #4a1030 !important;
+    border: 2px solid #4a1030 !important;
+    padding: 12px 22px !important;
+    border-radius: 40px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+    transition: all 0.2s !important;
+    font-family: inherit !important;
+}
+.fab-button-top:hover { background: #4a1030 !important; color: white !important; transform: translateY(-2px) !important; }
+
+/* Quitar barra sticky */
+.top-actions-bar { display: none !important; }
+
+@media (max-width: 768px) {
+    .btn-volver-flotante { top: 12px !important; left: 12px !important; padding: 8px 16px !important; font-size: 12px !important; }
+    .fab-container-top { bottom: 20px !important; left: 20px !important; }
+}
     </style>
 </head>
 <body>
@@ -429,23 +502,21 @@
 @endphp
 
 <!-- Barra de acciones superior (Volver y Más opciones) -->
-<div class="top-actions-bar {{ $claseTema }}">
-    <!-- Botón Volver -->
-    <button class="btn-volver-flotante" onclick="window.history.back()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        <span>Volver</span>
-    </button>
+{{-- Botón Volver flotante --}}
+<button class="btn-volver-flotante" onclick="window.history.back()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    <span>Volver</span>
+</button>
 
-    <!-- Botón Más Opciones -->
-    <div class="fab-container-top" id="fabContainerTop">
-        <div class="fab-menu-top" id="fabMenuTop">
-            <button class="fab-item-top" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
-            <button class="fab-item-top" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
-        </div>
-        <button class="fab-button-top" id="fabButtonTop" onclick="toggleFabMenuTop()">
-            <i class="fas fa-ellipsis-h" id="fabIconTop"></i><span>Más opciones</span>
-        </button>
+{{-- FAB flotante abajo-izquierda --}}
+<div class="fab-container-top" id="fabContainerTop">
+    <div class="fab-menu-top" id="fabMenuTop">
+        <button class="fab-item-top" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
+        <button class="fab-item-top" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
     </div>
+    <button class="fab-button-top" id="fabButtonTop" onclick="toggleFabMenuTop()">
+        <i class="fas fa-ellipsis-h" id="fabIconTop"></i><span>Más opciones</span>
+    </button>
 </div>
 
 <div class="preview-container {{ $claseTema }}">

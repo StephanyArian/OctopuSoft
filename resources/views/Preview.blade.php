@@ -352,7 +352,85 @@
             transform: translateY(0) scale(1);
             pointer-events: all;
         }
+    /* ===== RESTAURAR FLOTANTES ===== */
+.btn-volver-flotante {
+    position: fixed !important;
+    top: 20px !important;
+    left: 20px !important;
+    z-index: 1100 !important;
+    background: var(--burg-mid, #4a1030) !important;
+    border: none !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 40px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+    transition: all 0.2s !important;
+    font-family: inherit !important;
+    text-decoration: none !important;
+}
+.btn-volver-flotante:hover {
+    transform: translateY(-2px) !important;
+    background: var(--burg-deep, #2d0a1e) !important;
+}
+.theme-sunset .btn-volver-flotante  { background: #f97316 !important; }
+.theme-sunset .btn-volver-flotante:hover  { background: #ea580c !important; }
+.theme-emerald .btn-volver-flotante { background: #10b981 !important; }
+.theme-emerald .btn-volver-flotante:hover { background: #047857 !important; }
+.theme-midnight .btn-volver-flotante { background: #a855f7 !important; }
+.theme-midnight .btn-volver-flotante:hover { background: #7e22ce !important; }
+.theme-ocean .btn-volver-flotante  { background: #00b4d8 !important; }
+.theme-ocean .btn-volver-flotante:hover  { background: #0077b6 !important; }
+.theme-sakura .btn-volver-flotante { background: #ec4899 !important; }
+.theme-sakura .btn-volver-flotante:hover { background: #db2777 !important; }
 
+.fab-container {
+    position: fixed !important;
+    bottom: 30px !important;
+    left: 30px !important;
+    top: auto !important;
+    right: auto !important;
+    z-index: 1100 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+.fab-menu {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    margin-bottom: 10px !important;
+}
+.fab-button {
+    background: #0abf9e !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 22px !important;
+    border-radius: 40px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-shadow: 0 4px 16px rgba(10,191,158,0.45) !important;
+    transition: all 0.2s !important;
+    font-family: inherit !important;
+}
+.fab-button:hover { background: #07866e !important; transform: translateY(-2px) !important; }
+
+/* Quitar top-actions-bar si quedó vacío */
+.top-actions-bar { display: none !important; }
+
+@media (max-width: 768px) {
+    .btn-volver-flotante { top: 12px !important; left: 12px !important; padding: 8px 16px !important; font-size: 12px !important; }
+    .fab-container { bottom: 20px !important; left: 20px !important; }
+}
         
     </style>
 </head>
@@ -418,25 +496,23 @@
     $claseTema  = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
 
-<div class="top-actions-bar {{ $claseTema }}">
-    <!-- Botón Volver -->
-    <button class="btn-volver-flotante" onclick="window.location.href='{{ url()->previous() }}'">
-        <i class="fas fa-arrow-left"></i>
-        <span>Volver</span>
-    </button>
+{{-- Botón Volver flotante --}}
+<button class="btn-volver-flotante" onclick="window.location.href='{{ url()->previous() }}'">
+    <i class="fas fa-arrow-left"></i>
+    <span>Volver</span>
+</button>
 
-    <!-- Botón Más Opciones (FAB) -->
-    <div class="fab-container" id="fabContainer">
-        <div class="fab-menu" id="fabMenu">
-            <button class="fab-item" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
-            <button class="fab-item" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
-            <div class="fab-divider"></div>
-            <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');"><i class="fas fa-palette"></i><span>Elegir Vibe</span></button>
-        </div>
-        <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
-            <i class="fas fa-ellipsis-h" id="fabIcon"></i><span class="fab-label">Más opciones</span>
-        </button>
+{{-- FAB flotante abajo-izquierda --}}
+<div class="fab-container" id="fabContainer">
+    <div class="fab-menu" id="fabMenu">
+        <button class="fab-item" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
+        <button class="fab-item" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
+        <div class="fab-divider"></div>
+        <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');"><i class="fas fa-palette"></i><span>Elegir Vibe</span></button>
     </div>
+    <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
+        <i class="fas fa-ellipsis-h" id="fabIcon"></i><span class="fab-label">Más opciones</span>
+    </button>
 </div>
 
 <div class="preview-container {{ $claseTema }}" id="previewContainer">
@@ -1069,8 +1145,63 @@ $folderColors = [
 </div>
 @endif
 
-    {{-- Modal todas las académicas --}}
-    {{-- Modal todas las académicas --}}
+{{-- Modal todas las experiencias --}}
+@if($experiencias->count() > 0)
+<div id="modal-todos-experiencias" class="modal-todos-proyectos">
+    <div class="modal-todos-content" style="max-width:700px;">
+        <div class="modal-todos-header">
+            <h2>
+                <i class="fas fa-briefcase"></i> Experiencia laboral
+                <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $experiencias->count() }}</span>
+            </h2>
+            <button class="close-todos-modal" onclick="cerrarModalExperiencias()">✕</button>
+        </div>
+        <div style="padding:32px 28px;">
+            <div style="position:relative;padding-left:48px;">
+                <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0abf9e 0%,#e2e8f0 100%);"></div>
+                @foreach($experiencias->values() as $i => $exp)
+                <div style="position:relative;margin-bottom:24px;">
+                    <div style="position:absolute;left:-39px;top:18px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0abf9e;display:flex;align-items:center;justify-content:center;z-index:2;">
+                        <div style="width:8px;height:8px;border-radius:50%;background:#0abf9e;"></div>
+                    </div>
+                    <div onclick="cerrarModalExperiencias(); abrirDetalleExp({{ $i }});"
+                         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px 20px;cursor:pointer;transition:all 0.22s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+                         onmouseover="this.style.borderColor='#0abf9e';this.style.transform='translateX(4px)';this.style.boxShadow='0 8px 24px -6px rgba(10,191,158,0.2)';"
+                         onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+                            <div>
+                                <div style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:3px;">{{ $exp->empresa }}</div>
+                                <div style="font-size:12px;color:#0abf9e;font-weight:600;">{{ $exp->cargo }}</div>
+                            </div>
+                            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;background:#f8fafc;padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('M Y') }}
+                                @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('M Y') }}
+                                @elseif($exp->trabajo_actual ?? false) — Actualidad @endif
+                            </div>
+                        </div>
+                        @if(!empty($exp->ubicacion))
+                        <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+                            <i class="fas fa-map-marker-alt" style="color:#0abf9e;font-size:10px;"></i> {{ $exp->ubicacion }}
+                        </div>
+                        @endif
+                        @if(!empty($aca->descripcion))
+                        <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                            {{ strip_tags($aca->descripcion) }}
+                        </div>
+                        @endif
+                        <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
+                            <i class="fas fa-mouse-pointer" style="font-size:9px;"></i>
+                            Clic para ver detalle completo
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 {{-- Modal todas las académicas --}}
 <div id="modal-todos-academicas" class="modal-todos-proyectos">
     <div class="modal-todos-content" style="max-width:700px;">
