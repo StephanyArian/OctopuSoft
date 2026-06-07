@@ -506,3 +506,105 @@
     .btn { padding: 8px 20px; font-size: 12px; }
     .main { padding: 16px; }
 }
+/* ==========================================
+   RESPONSIVE FIX — pantallas medianas (ventana dividida / ~768px–1100px)
+   Agregar al final de public/css/informacion-academica.css
+   ========================================== */
+
+/* En pantallas donde el sidebar empieza a invadir el contenido */
+@media (max-width: 1100px) {
+    /* Asegurar que el layout principal use flex y no se solape */
+    .main-layout,
+    .app-layout,
+    .dashboard-layout,
+    .layout-wrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        min-width: 0;
+    }
+
+    /* El área de contenido debe ocupar el espacio restante sin desbordarse */
+    .main-content,
+    .content-area,
+    .page-content,
+    .content-wrapper {
+        flex: 1 1 0%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    /* Evitar que el sidebar tenga ancho fijo muy grande */
+    .sidebar,
+    .left-sidebar,
+    .nav-sidebar {
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    /* El sidebar se oculta o colapsa */
+    .sidebar,
+    .left-sidebar,
+    .nav-sidebar {
+        display: none;
+    }
+
+    .main-content,
+    .content-area,
+    .page-content,
+    .content-wrapper {
+        width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+
+/* ==========================================
+   FIX ESPECÍFICO: perfil y title no se encimen
+   ========================================== */
+@media (max-width: 1100px) {
+    .profile-header,
+    .page-header-profile {
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-title {
+        position: relative;
+        z-index: 1;
+        /* evitar que quede debajo del sidebar */
+        margin-left: 0 !important;
+    }
+
+    /* El section-card del formulario no debe quedar truncado */
+    .section-card {
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+}
+
+/* ==========================================
+   FIX form-row: apilar columnas en pantallas pequeñas
+   ========================================== */
+@media (max-width: 700px) {
+    .form-row {
+        flex-direction: column !important;
+        gap: 12px;
+    }
+
+    .form-row .form-group {
+        width: 100% !important;
+    }
+
+    .historial-card {
+        padding: 14px 12px;
+    }
+
+    .historial-actions {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}

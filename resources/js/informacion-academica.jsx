@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 
-// Función para acortar nombres largos
 function acortarNombre(nombre) {
     if (!nombre) return '';
     if (nombre.length <= 25) return nombre;
@@ -10,6 +9,7 @@ function acortarNombre(nombre) {
 
 const MAX_SIZE_MB = 2;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+const LIMITE_DESC = 500;
 
 const IconEdit = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style={{flexShrink:0}}>
@@ -24,7 +24,19 @@ const IconTrash = () => (
     </svg>
 );
 
-// COMPONENTE DROPDOWN PARA TIPO DE FORMACIÓN
+// ==========================================
+// HELPER: extraer texto puro de HTML
+// ==========================================
+function htmlATextoPuro(html) {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+}
+
+// ==========================================
+// COMPONENTE DROPDOWN TIPO DE FORMACIÓN
+// ==========================================
 function TipoFormacionDropdown({ value, name, formacionId }) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState('');
@@ -45,7 +57,6 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
 
     const todasOpciones = Object.values(TIPO_FORMACION_OPTIONS).flat();
 
-    // Inicializar según el valor existente
     useEffect(() => {
         if (value && todasOpciones.includes(value) && value !== 'Otro') {
             setSelected(value);
@@ -55,8 +66,7 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
             setSelected('Otro');
             setMostrarOtroInput(true);
             setOtroValue('');
-        } else if (value && !todasOpciones.includes(value) && value !== 'Otro') {
-            // Valor personalizado (ej: "TALLER")
+        } else if (value && !todasOpciones.includes(value)) {
             setSelected('Otro');
             setMostrarOtroInput(true);
             setOtroValue(value);
@@ -67,7 +77,6 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
         }
     }, [value]);
 
-    // Cerrar dropdown al hacer clic fuera
     useEffect(() => {
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -81,7 +90,6 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
     const elegirOpcion = (opcion) => {
         setSelected(opcion);
         setOpen(false);
-        
         if (opcion === 'Otro') {
             setMostrarOtroInput(true);
         } else {
@@ -90,11 +98,6 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
         }
     };
 
-    const handleOtroChange = (e) => {
-        setOtroValue(e.target.value);
-    };
-
-    // Determinar el texto a mostrar en el botón
     const getButtonText = () => {
         if (!selected) return '— Seleccionar tipo —';
         if (selected === 'Otro' && otroValue) return `Otro: ${otroValue}`;
@@ -102,7 +105,6 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
         return selected;
     };
 
-    // Valor final a enviar
     const valorFinal = selected === 'Otro' && otroValue ? otroValue : selected;
 
     return (
@@ -110,15 +112,14 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
             <label className="form-label">
                 Tipo de formación <span className="required">*</span>
             </label>
-            
-            <div 
-                className={`custom-dropdown ${open ? 'open' : ''}`} 
-                id="tipoFormacionDropdown"  
+
+            <div
+                className={`custom-dropdown ${open ? 'open' : ''}`}
                 ref={dropdownRef}
                 style={{ position: 'relative', width: '100%' }}
             >
-                <button 
-                    type="button" 
+                <button
+                    type="button"
                     className="custom-dropdown-toggle"
                     onClick={() => setOpen(!open)}
                 >
@@ -127,21 +128,20 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
                     </span>
                     <span className="dropdown-arrow">{open ? '▼' : '▲'}</span>
                 </button>
-                
+
                 {open && (
                     <ul className="custom-dropdown-menu">
-                        <li 
+                        <li
                             className={`placeholder-opt ${!selected ? 'selected' : ''}`}
                             onClick={() => elegirOpcion('')}
                         >
                             — Seleccionar tipo —
                         </li>
-                        
                         {Object.entries(TIPO_FORMACION_OPTIONS).map(([grupo, opciones]) => (
                             <React.Fragment key={grupo}>
                                 <li className="dropdown-group-title">{grupo}</li>
                                 {opciones.map(opt => (
-                                    <li 
+                                    <li
                                         key={opt}
                                         className={selected === opt ? 'selected' : ''}
                                         onClick={() => elegirOpcion(opt)}
@@ -153,24 +153,23 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
                         ))}
                     </ul>
                 )}
-                
+
                 <input type="hidden" name={name} value={valorFinal} />
             </div>
-            
-            {/* Campo para especificar "Otro" */}
+
             {mostrarOtroInput && (
                 <div style={{ marginTop: '12px' }}>
                     <label className="form-label">
-                        Especificar otro tipo de formación 
+                        Especificar otro tipo de formación
                         <span className="required">*</span>
                     </label>
-                    <input 
+                    <input
                         type="text"
                         name="otro_tipo_formacion"
                         className="form-input"
                         placeholder="Ej. Microcredencial, Taller especializado, Curso presencial, etc."
                         value={otroValue}
-                        onChange={handleOtroChange}
+                        onChange={(e) => setOtroValue(e.target.value)}
                         maxLength="50"
                         autoFocus={selected === 'Otro'}
                     />
@@ -185,22 +184,29 @@ function TipoFormacionDropdown({ value, name, formacionId }) {
     );
 }
 
-function DescripcionColapsable({ texto, limite = 150 }) {
+// ==========================================
+// DESCRIPCIÓN COLAPSABLE — renderiza HTML sin etiquetas visibles
+// ==========================================
+function DescripcionColapsable({ html, limite = 150 }) {
     const [expandido, setExpandido] = useState(false);
-    const esMuyLargo = texto && texto.length > limite;
 
-    if (!texto) return null;
+    if (!html) return null;
+
+    const textoPuro = htmlATextoPuro(html);
+    const esMuyLargo = textoPuro.length > limite;
 
     return (
         <div>
-            <div className="historial-desc" style={{
-                display: '-webkit-box',
-                WebkitLineClamp: expandido ? 'unset' : 3,
-                WebkitBoxOrient: 'vertical',
-                overflow: expandido ? 'visible' : 'hidden',
-            }}>
-                {texto}
-            </div>
+            <div
+                className="historial-desc"
+                style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: expandido ? 'unset' : 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: expandido ? 'visible' : 'hidden',
+                }}
+                dangerouslySetInnerHTML={{ __html: html }}
+            />
             {esMuyLargo && (
                 <button
                     onClick={() => setExpandido(!expandido)}
@@ -221,6 +227,9 @@ function DescripcionColapsable({ texto, limite = 150 }) {
     );
 }
 
+// ==========================================
+// EDITOR DE EVIDENCIAS
+// ==========================================
 function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
     const [evidencias, setEvidencias] = useState(evidenciasIniciales);
     const [archivos, setArchivos] = useState([]);
@@ -249,7 +258,7 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
         setArchivos(prev => [...prev, ...validos]);
         e.target.value = '';
     }
-    
+
     function quitarPendiente(idx) {
         setArchivos(prev => prev.filter((_, i) => i !== idx));
     }
@@ -335,31 +344,34 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
     );
 }
 
+// ==========================================
+// HISTORIAL ACADÉMICO
+// ==========================================
 function HistorialAcademico({ formaciones: initialFormaciones }) {
     const [erroresEdicion, setErroresEdicion] = useState({});
     const [formaciones, setFormaciones] = useState(initialFormaciones);
     const [editando, setEditando] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
-    const quillInstances = useRef({}); // Para guardar instancias de Quill
+    const quillInstances = useRef({});
 
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     // ==========================================
-    // INICIALIZAR QUILL CUANDO SE ENTRA EN MODO EDICIÓN
+    // INICIALIZAR QUILL EN MODO EDICIÓN
     // ==========================================
     useEffect(() => {
         if (editando && typeof window !== 'undefined' && window.Quill) {
-            // Limpiar instancia anterior si existe
             if (quillInstances.current[editando]) {
                 delete quillInstances.current[editando];
             }
-            
+
             setTimeout(() => {
                 const editorId = `editorDescripcionEdit_${editando}`;
                 const editorElement = document.getElementById(editorId);
                 const hiddenInput = document.getElementById(`descripcionHidden_${editando}`);
                 const counterElement = document.getElementById(`descripcionCounter_${editando}`);
-                
+                const errorElement = document.getElementById(`descripcionError_${editando}`);
+
                 if (editorElement && !editorElement.querySelector('.ql-editor')) {
                     try {
                         const quill = new window.Quill(`#${editorId}`, {
@@ -378,39 +390,49 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 ]
                             }
                         });
-                        
-                        // Guardar instancia
+
                         quillInstances.current[editando] = quill;
-                        
-                        // Cargar contenido existente
+
                         if (hiddenInput && hiddenInput.value) {
                             quill.root.innerHTML = hiddenInput.value;
                         }
-                        
-                        // Función para actualizar
+
+                        function getTextoPuroEdit() {
+                            const raw = quill.getText();
+                            return raw.endsWith('\n') ? raw.slice(0, -1) : raw;
+                        }
+
                         const actualizarDescripcion = () => {
-                            const html = quill.root.innerHTML;
-                            const text = quill.getText();
-                            const longitud = text.length;
-                            
-                            if (hiddenInput) hiddenInput.value = html;
-                            
+                            const texto = getTextoPuroEdit();
+                            const longitud = texto.length;
+
+                            if (hiddenInput) hiddenInput.value = quill.root.innerHTML;
+
                             if (counterElement) {
-                                counterElement.textContent = `${longitud} / 500`;
-                                if (longitud > 500) {
+                                counterElement.textContent = `${longitud} / ${LIMITE_DESC}`;
+                                if (longitud >= LIMITE_DESC) {
                                     counterElement.style.color = '#e74c3c';
-                                } else if (longitud >= 490) {
-                                    counterElement.style.color = '#f39c12';
+                                    counterElement.style.fontWeight = 'bold';
+                                    if (errorElement) errorElement.classList.remove('hidden');
                                 } else {
                                     counterElement.style.color = '#6c757d';
+                                    counterElement.style.fontWeight = 'normal';
+                                    if (errorElement) errorElement.classList.add('hidden');
                                 }
                             }
                         };
-                        
-                        // Escuchar cambios
-                        quill.on('text-change', actualizarDescripcion);
+
+                        quill.on('text-change', function() {
+                            const texto = getTextoPuroEdit();
+                            if (texto.length > LIMITE_DESC) {
+                                quill.history.undo();
+                                return;
+                            }
+                            actualizarDescripcion();
+                        });
+
                         actualizarDescripcion();
-                        
+
                     } catch (error) {
                         console.error('Error inicializando Quill:', error);
                     }
@@ -435,18 +457,16 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
 
     async function guardarEdicion(e, id) {
         e.preventDefault();
-        
-        // Asegurar que Quill sincronice antes de guardar
+
         if (quillInstances.current[id]) {
             const quill = quillInstances.current[id];
-            const html = quill.root.innerHTML;
             const hiddenInput = document.getElementById(`descripcionHidden_${id}`);
-            if (hiddenInput) hiddenInput.value = html;
+            if (hiddenInput) hiddenInput.value = quill.root.innerHTML;
         }
-        
+
         const formData = new FormData(e.target);
         formData.append('_method', 'PUT');
-    
+
         const res = await fetch(`/informacion-academica/${id}`, {
             method: 'POST',
             headers: {
@@ -483,12 +503,12 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Institución <span className="required">*</span></label>
-                                        <input 
+                                        <input
                                             className={`form-input${erroresEdicion[f.id]?.institucion ? ' error' : ''}`}
-                                            name="institucion" 
-                                            defaultValue={f.institution} 
-                                            required 
-                                            maxLength="60" 
+                                            name="institucion"
+                                            defaultValue={f.institution}
+                                            required
+                                            maxLength="60"
                                         />
                                         {erroresEdicion[f.id]?.institucion && (
                                             <span className="error-message">{erroresEdicion[f.id].institucion[0]}</span>
@@ -496,12 +516,12 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Título obtenido <span className="required">*</span></label>
-                                        <input 
+                                        <input
                                             className={`form-input${erroresEdicion[f.id]?.titulo_obtenido ? ' error' : ''}`}
-                                            name="titulo_obtenido" 
-                                            defaultValue={f.title} 
-                                            required 
-                                            maxLength="30" 
+                                            name="titulo_obtenido"
+                                            defaultValue={f.title}
+                                            required
+                                            maxLength="30"
                                         />
                                         {erroresEdicion[f.id]?.titulo_obtenido && (
                                             <span className="error-message">{erroresEdicion[f.id].titulo_obtenido[0]}</span>
@@ -512,15 +532,15 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Especialidad (opcional)</label>
-                                        <input 
-                                            className="form-input" 
-                                            name="especialidad" 
-                                            defaultValue={f.specialty || ''} 
+                                        <input
+                                            className="form-input"
+                                            name="especialidad"
+                                            defaultValue={f.specialty || ''}
                                             maxLength="50"
                                             placeholder="Ej. Inteligencia Artificial, Redes, Desarrollo Web, QA, DevOps"
                                         />
                                     </div>
-                                    
+
                                     <TipoFormacionDropdown
                                         value={f.formation_type || ''}
                                         name="tipo_formacion"
@@ -531,34 +551,34 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="form-row" style={{ marginBottom: '12px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de inicio</label>
-                                        <input 
-                                            className="form-input" 
-                                            type="date" 
+                                        <input
+                                            className="form-input"
+                                            type="date"
                                             name="fecha_inicio"
-                                            defaultValue={f.start_date ? f.start_date.substring(0, 10) : ''} 
-                                            min="1950-01-01" 
-                                            max={new Date().toISOString().substring(0, 10)} 
-                                            required 
+                                            defaultValue={f.start_date ? f.start_date.substring(0, 10) : ''}
+                                            min="1950-01-01"
+                                            max={new Date().toISOString().substring(0, 10)}
+                                            required
                                         />
                                     </div>
                                     <div className="form-group">
                                         <label className="form-label">Fecha de fin</label>
-                                        <input 
-                                            className="form-input" 
-                                            type="date" 
-                                            name="fecha_fin" 
+                                        <input
+                                            className="form-input"
+                                            type="date"
+                                            name="fecha_fin"
                                             id={`fechaFin_${f.id}`}
-                                            defaultValue={f.end_date ? f.end_date.substring(0, 10) : ''} 
-                                            min="1950-01-01" 
-                                            max={new Date().toISOString().substring(0, 10)} 
+                                            defaultValue={f.end_date ? f.end_date.substring(0, 10) : ''}
+                                            min="1950-01-01"
+                                            max={new Date().toISOString().substring(0, 10)}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="form-checkbox-row" style={{ marginBottom: '12px' }}>
-                                    <input 
-                                        type="checkbox" 
-                                        name="estudio_actual" 
+                                    <input
+                                        type="checkbox"
+                                        name="estudio_actual"
                                         defaultChecked={f.is_current}
                                         onChange={(e) => {
                                             const fechaFinInput = document.getElementById(`fechaFin_${f.id}`);
@@ -574,9 +594,17 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 <div className="form-group" style={{ marginBottom: '12px' }}>
                                     <label className="form-label">Descripción</label>
                                     <div id={`editorDescripcionEdit_${f.id}`} style={{ height: '180px', marginBottom: '45px' }}></div>
-                                    <input type="hidden" name="descripcion" id={`descripcionHidden_${f.id}`} defaultValue={f.description || ''} />
+                                    <input
+                                        type="hidden"
+                                        name="descripcion"
+                                        id={`descripcionHidden_${f.id}`}
+                                        defaultValue={f.description || ''}
+                                    />
                                     <div id={`descripcionCounter_${f.id}`} className="char-counter">
-                                        {(f.description?.length || 0)} / 500
+                                        {htmlATextoPuro(f.description).length} / {LIMITE_DESC}
+                                    </div>
+                                    <div id={`descripcionError_${f.id}`} className="error-message hidden">
+                                        La descripción no puede exceder los 500 caracteres
                                     </div>
                                     {erroresEdicion[f.id]?.descripcion && (
                                         <span className="error-message">{erroresEdicion[f.id].descripcion[0]}</span>
@@ -629,24 +657,24 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                 </div>
 
                                 {f.description && (
-                                    <DescripcionColapsable texto={f.description} />
+                                    <DescripcionColapsable html={f.description} />
                                 )}
 
                                 {f.evidence_url && JSON.parse(f.evidence_url).length > 0 && (
                                     <div className="evidencias-grid">
                                         {JSON.parse(f.evidence_url).map((path, i) => (
                                             path.endsWith('.pdf') ? (
-                                                <a key={i} 
-                                                    href={`/storage/${path}`} 
-                                                    target="_blank" 
+                                                <a key={i}
+                                                    href={`/storage/${path}`}
+                                                    target="_blank"
                                                     rel="noreferrer"
                                                     className="pdf-icon-only">
                                                     <span className="pdf-icon-custom"></span>
                                                 </a>
                                             ) : (
-                                                <a key={i} 
-                                                    href={`/storage/${path}`} 
-                                                    target="_blank" 
+                                                <a key={i}
+                                                    href={`/storage/${path}`}
+                                                    target="_blank"
                                                     rel="noreferrer"
                                                     className="img-link">
                                                     <img src={`/storage/${path}`} alt="evidencia"
@@ -695,10 +723,8 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
     );
 }
 
-// Montar el componente
 const el = document.getElementById('historial-react');
 if (el) {
     const formaciones = JSON.parse(el.dataset.formaciones || '[]');
     ReactDOM.createRoot(el).render(<HistorialAcademico formaciones={formaciones} />);
 }
-
