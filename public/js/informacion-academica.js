@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (editorElement && typeof Quill !== 'undefined') {
         console.log('✓ Inicializando Quill editor');
         
-        // Crear el editor
         const quillDescripcion = new Quill('#editorDescripcion', {
             theme: 'snow',
             placeholder: 'Describe brevemente tus logros, materias destacadas o proyectos en esta formación...',
@@ -26,97 +25,69 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Sincronizar Quill con el textarea hidden
         const descripcionHidden = document.getElementById('descripcionHidden');
         const descripcionCounter = document.getElementById('descripcionCounter');
         const descripcionError = document.getElementById('descripcionError');
+        const LIMITE = 500;
 
-        // Cargar contenido existente si hay
         if (descripcionHidden && descripcionHidden.value) {
             quillDescripcion.root.innerHTML = descripcionHidden.value;
         }
 
-        // Función para actualizar contador y validar
+        function getTextoPuro() {
+            // getText() siempre agrega \n al final — restamos 1
+            const raw = quillDescripcion.getText();
+            return raw.endsWith('\n') ? raw.slice(0, -1) : raw;
+        }
+
         function actualizarDescripcion() {
-            const html = quillDescripcion.root.innerHTML;
-            const text = quillDescripcion.getText().trim();
-            const longitud = text.length;
-            
-            // Actualizar hidden
+            const texto = getTextoPuro();
+            const longitud = texto.length;
+
             if (descripcionHidden) {
-                descripcionHidden.value = html;
+                descripcionHidden.value = quillDescripcion.root.innerHTML;
             }
-            
-            // Actualizar contador
+
             if (descripcionCounter) {
-                descripcionCounter.textContent = `${longitud} / 500`;
-                
-                if (longitud > 500) {
+                descripcionCounter.textContent = `${longitud} / ${LIMITE}`;
+
+                if (longitud >= LIMITE) {
                     descripcionCounter.style.color = '#e74c3c';
                     descripcionCounter.style.fontWeight = 'bold';
                     if (descripcionError) descripcionError.classList.remove('hidden');
-                } else if (longitud >= 490) {
-                    descripcionCounter.style.color = '#f39c12';
-                    if (descripcionError) descripcionError.classList.add('hidden');
                 } else {
                     descripcionCounter.style.color = '#6c757d';
+                    descripcionCounter.style.fontWeight = 'normal';
                     if (descripcionError) descripcionError.classList.add('hidden');
                 }
             }
         }
 
-        // Escuchar cambios en Quill
-        quillDescripcion.on('text-change', function() {
+        quillDescripcion.on('text-change', function(delta, oldDelta, source) {
+            const texto = getTextoPuro();
+            if (texto.length > LIMITE) {
+                // Revertir el último cambio que excedió el límite
+                quillDescripcion.history.undo();
+                return;
+            }
             actualizarDescripcion();
         });
 
-        // Inicializar contador
         actualizarDescripcion();
 
-        // 🔥 IMPORTANTE: Al enviar el formulario, asegurar que el hidden input esté actualizado
         const form = document.getElementById('academicForm');
         if (form) {
             form.addEventListener('submit', function() {
-                if (quillDescripcion) {
-                    const html = quillDescripcion.root.innerHTML;
-                    if (descripcionHidden) {
-                        descripcionHidden.value = html;
-                        console.log('Enviando descripción, longitud:', html.length);
-                    }
+                if (descripcionHidden) {
+                    descripcionHidden.value = quillDescripcion.root.innerHTML;
                 }
             });
         }
+
+        // Exponer para resetForm
+        window.quillDescripcion = quillDescripcion;
     } else {
         console.warn('⚠️ Editor Quill no encontrado o Quill no está cargado');
-    }
-    
-    // ==========================================
-    // CONTADOR DE DESCRIPCIÓN (solo por si hay textarea)
-    // ==========================================
-    const textareaDescripcion = document.getElementById('descripcion');
-    const contadorDescripcion = document.getElementById('descripcionCounter');
-    
-    if (textareaDescripcion && contadorDescripcion) {
-        console.log('✓ Contador de descripción encontrado');
-        
-        function actualizarContadorDescripcion() {
-            const longitud = textareaDescripcion.value.length;
-            contadorDescripcion.textContent = longitud + ' / 500';
-            
-            if (longitud >= 500) {
-                contadorDescripcion.style.color = 'red';
-                contadorDescripcion.style.fontWeight = 'bold';
-            } else if (longitud >= 490) {
-                contadorDescripcion.style.color = 'orange';
-                contadorDescripcion.style.fontWeight = 'normal';
-            } else {
-                contadorDescripcion.style.color = '#6c757d';
-                contadorDescripcion.style.fontWeight = 'normal';
-            }
-        }
-        
-        textareaDescripcion.addEventListener('input', actualizarContadorDescripcion);
-        actualizarContadorDescripcion();
     }
     
     // ==========================================
@@ -144,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const fechaFin = document.getElementById('fechaFin');
         if (fechaFin) fechaFin.disabled = false;
         
-        // Resetear Quill si existe
         if (window.quillDescripcion) {
             window.quillDescripcion.root.innerHTML = '';
             const descripcionHidden = document.getElementById('descripcionHidden');
@@ -153,15 +123,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (descripcionCounter) {
                 descripcionCounter.textContent = '0 / 500';
                 descripcionCounter.style.color = '#6c757d';
+                descripcionCounter.style.fontWeight = 'normal';
             }
-        }
-        
-        if (textareaDescripcion && contadorDescripcion) {
-            contadorDescripcion.textContent = '0 / 500';
-            contadorDescripcion.style.color = '#6c757d';
+            const descripcionError = document.getElementById('descripcionError');
+            if (descripcionError) descripcionError.classList.add('hidden');
         }
 
-        // Resetear campo "Otro"
         const otroContainer = document.getElementById('otroTipoFormacionContainer');
         const otroInput = document.getElementById('otroTipoFormacion');
         if (otroContainer) otroContainer.style.display = 'none';
@@ -170,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
             otroInput.removeAttribute('required');
         }
         
-        // Resetear dropdown
         const label = document.getElementById('tipoFormacionLabel');
         const hidden = document.getElementById('tipoFormacionHidden');
         if (label) {
@@ -204,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.form-input, .form-textarea').forEach(el => el.classList.remove('error'));
             
-            // Validar Institución
             const institucion = document.getElementById('institucion').value.trim();
             if (!institucion) {
                 const errorEl = document.getElementById('institucionError');
@@ -213,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
-            // Validar Título Obtenido
             const tituloObtenido = document.getElementById('tituloObtenido').value.trim();
             if (!tituloObtenido) {
                 const errorEl = document.getElementById('tituloObtenidoError');
@@ -222,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
-            // Validar Tipo de Formación
             const tipoFormacion = document.getElementById('tipoFormacionHidden').value;
             if (!tipoFormacion) {
                 const errorEl = document.getElementById('tipoFormacionError');
@@ -230,11 +193,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
-            // Validar "Otro" si se seleccionó
             if (tipoFormacion === 'Otro') {
                 const otroInput = document.getElementById('otroTipoFormacion');
                 const otroError = document.getElementById('otroTipoFormacionError');
-                
                 if (!otroInput || !otroInput.value.trim()) {
                     isValid = false;
                     if (otroError) {
@@ -245,7 +206,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // Validar Fecha Inicio
             const fechaInicio = document.getElementById('fechaInicio').value;
             if (!fechaInicio) {
                 const errorEl = document.getElementById('fechaInicioError');
@@ -254,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValid = false;
             }
             
-            // Validar fechas
             const estudioActual = document.getElementById('estudioActual').checked;
             const fechaFin = document.getElementById('fechaFin').value;
             const fechaFinError = document.getElementById('fechaFinError');
@@ -279,14 +238,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (!isValid) {
                 e.preventDefault();
-                console.log('Formulario tiene errores');
-            } else {
-                console.log('Formulario válido, enviando...');
             }
         });
     }
     
-    // Inicializar toggle si "Estudio actual" está marcado
     const estudioActualCheck = document.getElementById('estudioActual');
     if (estudioActualCheck && estudioActualCheck.checked) {
         window.toggleFechaFin(estudioActualCheck);
@@ -319,14 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
             menu.style.display = 'none';
         }
 
-        toggleBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            dropdown.classList.contains('open') ? cerrarDrop() : abrirDrop();
-        });
-
-        // Función para manejar la selección incluyendo "Otro"
         function handleDropdownSelection(li, valor, texto) {
-            // Actualizar label y hidden
             label.textContent = texto || valor || '— Seleccionar tipo —';
             if (valor) {
                 label.classList.remove('muted');
@@ -335,13 +283,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             hidden.value = valor || '';
             
-            // Marcar como seleccionado (solo si hay li)
             if (li) {
                 menu.querySelectorAll('li').forEach(l => l.classList.remove('selected'));
                 li.classList.add('selected');
             }
             
-            // Manejar "Otro"
             if (valor === 'Otro') {
                 if (otroContainer) otroContainer.style.display = 'block';
                 if (otroInput) {
@@ -362,7 +308,11 @@ document.addEventListener('DOMContentLoaded', function() {
             cerrarDrop();
         }
 
-        // Agregar event listeners a cada item del dropdown
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdown.classList.contains('open') ? cerrarDrop() : abrirDrop();
+        });
+
         menu.querySelectorAll('li:not(.dropdown-group-title)').forEach(function(li) {
             li.addEventListener('click', function() {
                 const valor = this.dataset.value || '';
@@ -371,14 +321,12 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Cerrar dropdown al hacer clic fuera
         document.addEventListener('click', function(e) {
             if (!dropdown.contains(e.target)) cerrarDrop();
         });
 
         cerrarDrop();
         
-        // Si hay un valor guardado (para edición), restaurarlo
         const valorGuardado = hidden.value;
         if (valorGuardado) {
             const opcionesPredefinidas = [
@@ -388,11 +336,9 @@ document.addEventListener('DOMContentLoaded', function() {
             ];
             
             if (!opcionesPredefinidas.includes(valorGuardado)) {
-                // Es un valor personalizado
                 handleDropdownSelection(null, 'Otro', 'Otro');
                 if (otroInput) otroInput.value = valorGuardado;
             } else {
-                // Es una opción predefinida, buscar y seleccionar
                 const itemToSelect = Array.from(menu.querySelectorAll('li[data-value]')).find(
                     li => li.dataset.value === valorGuardado
                 );
