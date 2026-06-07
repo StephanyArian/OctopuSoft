@@ -1185,9 +1185,9 @@ $folderColors = [
                             <i class="fas fa-map-marker-alt" style="color:#0abf9e;font-size:10px;"></i> {{ $exp->ubicacion }}
                         </div>
                         @endif
-                        @if(!empty($aca->descripcion))
+                        @if(!empty($exp->descripcion))
                         <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-                            {{ strip_tags($aca->descripcion) }}
+                            {{ strip_tags($exp->descripcion) }}
                         </div>
                         @endif
                         <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
