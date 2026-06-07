@@ -127,11 +127,23 @@ class PreviewController extends Controller
                 ];
             })->values();
         
-        // ==========================================
-        // INFORMACIÓN ACADÉMICA (SIN MODIFICAR - STRING JSON)
-        // ⭐ ESTA ES LA VERSIÓN CORRECTA PARA PREVIEW (EDICIÓN) ⭐
+       // ==========================================
+        // INFORMACIÓN ACADÉMICA (CON EVIDENCIAS PROCESADAS - IGUAL QUE PÚBLICO)
         // ==========================================
         $academicas = $user->experiences->where('type', 'education')->map(function($edu) {
+            // Procesar evidence_url - convertir string JSON a ARRAY
+            $evidenceUrl = $edu->evidence_url;
+            if (is_string($evidenceUrl) && !empty($evidenceUrl)) {
+                $decoded = json_decode($evidenceUrl, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    $evidenceUrl = $decoded;
+                } else {
+                    $evidenceUrl = [$evidenceUrl];
+                }
+            } elseif (empty($evidenceUrl)) {
+                $evidenceUrl = null;
+            }
+            
             return (object) [
                 'institucion' => $edu->institution,
                 'titulo' => $edu->title,
@@ -140,7 +152,7 @@ class PreviewController extends Controller
                 'fecha_fin' => $edu->end_date,
                 'estudio_actual' => $edu->is_current,
                 'descripcion' => $edu->description,
-                'evidence_url' => $edu->evidence_url,  // ⭐ SIN MODIFICAR (string JSON)
+                'evidence_url' => $evidenceUrl,  // ✅ Ahora es ARRAY
             ];
         });
         

@@ -192,44 +192,7 @@
         }
         .card .description.expanded { display: block; }
 
-        /* ============================================
-           MODAL DETALLE EXPERIENCIA / ACADÉMICA
-           (idéntico al público)
-           ============================================ */
-        #modal-detalle-exp,
-        #modal-detalle-aca {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.65); z-index: 11000;
-            align-items: center; justify-content: center;
-            backdrop-filter: blur(2px);
-        }
-        .modal-detalle-content {
-            background: #fff; border-radius: 16px;
-            max-width: 620px; width: 92%; max-height: 88vh;
-            overflow-y: auto; position: relative;
-            animation: modalFadeIn 0.2s ease;
-        }
-        .modal-detalle-header {
-            padding: 20px 24px 16px; border-bottom: 1px solid #e2e8f0;
-            display: flex; justify-content: space-between; align-items: flex-start;
-            position: sticky; top: 0; background: white; z-index: 5;
-        }
-        .modal-detalle-header h3 { margin: 0 0 4px; font-size: 1.1rem; font-weight: 700; color: #0f172a; }
-        .modal-detalle-header .modal-det-subtitle { font-size: 0.78rem; color: #0abf9e; font-weight: 600; }
-        .modal-detalle-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
-        .modal-det-date {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: #f1f5f9; color: #64748b; font-size: 11px;
-            font-weight: 600; padding: 4px 12px; border-radius: 20px; width: fit-content;
-        }
-        .modal-det-desc { color: #475569; font-size: 13px; line-height: 1.7; }
-        .modal-det-desc .ql-snow  { border: none !important; }
-        .modal-det-desc .ql-editor { padding: 0 !important; min-height: 0 !important; }
-        .modal-det-certs {
-            display: flex; flex-wrap: wrap; gap: 8px;
-            padding-top: 10px; border-top: 1px solid #f0f0f0;
-        }
-
+     
         /* ============================================
            MODAL PROYECTO DETALLE — idéntico al público
            ============================================ */
@@ -389,6 +352,8 @@
             transform: translateY(0) scale(1);
             pointer-events: all;
         }
+
+        
     </style>
 </head>
 <body>
@@ -538,38 +503,39 @@
     <div class="section" id="section-experiencias">
         <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
         <div class="cards-grid" id="experiencias-grid">
-            @forelse($experienciasRecientes as $exp)
-            <div class="card" onclick="abrirDetalleExp({{ $loop->index }})">
-                <h3>{{ $exp->empresa }}</h3>
-                @if(!empty($exp->ubicacion))<div class="subtitle">{{ $exp->ubicacion }}</div>@endif
-                @if(str_contains($exp->cargo, ' / '))
-                    <ul class="roles-list">
-                        @foreach(explode(' / ', $exp->cargo) as $rol)<li>{{ $rol }}</li>@endforeach
-                    </ul>
-                @else
-                    <div class="role-single">{{ $exp->cargo }}</div>
-                @endif
-                <div class="date">
-                    {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d F Y') }}
-                    @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d F Y') }}
-                    @elseif($exp->trabajo_actual) — Actualidad
-                    @endif
-                </div>
-                @if(!empty($exp->descripcion))
-                <div class="description-wrapper">
-                    <div class="description collapsed" id="desc-exp-{{ $loop->index }}">
-                        <div class="ql-snow"><div class="ql-editor">{!! strip_tags($exp->descripcion, $allowedHtmlTags) !!}</div></div>
-                    </div>
-                    @if(mb_strlen(trim(strip_tags($exp->descripcion))) > 150)
-                        <button class="ver-mas-btn" onclick="event.stopPropagation(); toggleDesc('desc-exp-{{ $loop->index }}', this)">Ver más</button>
-                    @endif
-                </div>
+    @foreach($experienciasRecientes as $i => $exp)
+        <div class="card" onclick="abrirDetalleExp({{ $i }})">
+            <h3>{{ $exp->empresa }}</h3>
+            @if(!empty($exp->ubicacion))<div class="subtitle">{{ $exp->ubicacion }}</div>@endif
+            @if(str_contains($exp->cargo, ' / '))
+                <ul class="roles-list">
+                    @foreach(explode(' / ', $exp->cargo) as $rol)<li>{{ $rol }}</li>@endforeach
+                </ul>
+            @else
+                <div class="role-single">{{ $exp->cargo }}</div>
+            @endif
+            <div class="date">
+                {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d F Y') }}
+                @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d F Y') }}
+                @elseif($exp->trabajo_actual) — Actualidad
                 @endif
             </div>
-            @empty
-            <div class="empty-message-preview"><i class="fas fa-info-circle"></i> No hay experiencias laborales registradas.</div>
-            @endforelse
+            @if(!empty($exp->descripcion))
+            <div class="description-wrapper">
+                <div class="description collapsed" id="desc-exp-{{ $i }}">
+                    <div class="ql-snow"><div class="ql-editor">{!! strip_tags($exp->descripcion, $allowedHtmlTags) !!}</div></div>
+                </div>
+                @if(mb_strlen(trim(strip_tags($exp->descripcion))) > 150)
+                    <button class="ver-mas-btn" onclick="event.stopPropagation(); toggleDesc('desc-exp-{{ $i }}', this)">Ver más</button>
+                @endif
+            </div>
+            @endif
+            <div style="font-size:11px;color:#0abf9e;margin-top:10px;display:flex;align-items:center;gap:4px;font-weight:600;">
+                <i class="fas fa-expand-alt" style="font-size:9px;"></i> Clic para ver detalle completo
+            </div>
         </div>
+        @endforeach
+    </div>
 
         @if($experienciasRestantes->count() > 0)
             <div class="btn-ver-todos">
@@ -603,45 +569,40 @@
     <div class="section" id="section-academicas">
         <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
         <div class="cards-grid" id="academicas-grid">
-            @forelse($academicasRecientes as $aca)
-            <div class="card" onclick="abrirDetalleAca({{ $loop->index }})">
-                <h3>{{ $aca->institucion }}</h3>
-                <div class="subtitle">{{ $aca->titulo }}</div>
-                @if(!empty($aca->specialty))<div class="specialty-badge"><i class="fas fa-tag"></i> {{ $aca->specialty }}</div>@endif
-                <div class="date">
-                    {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
-                    @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
-                    @elseif($aca->estudio_actual) — Actualidad
-                    @endif
-                </div>
-                @if(!empty($aca->descripcion))
-                <div class="description-wrapper">
-                    <div class="description collapsed" id="desc-aca-{{ $loop->index }}">
-                        <div class="ql-snow"><div class="ql-editor">{!! strip_tags($aca->descripcion, $allowedHtmlTags) !!}</div></div>
-                    </div>
-                    @if(mb_strlen(trim(strip_tags($aca->descripcion))) > 150)
-                        <button class="ver-mas-btn" onclick="event.stopPropagation(); toggleDesc('desc-aca-{{ $loop->index }}', this)">Ver más</button>
-                    @endif
-                </div>
-                @endif
-                {{-- Indicador de evidencias disponibles --}}
-                @php
-                    $hasEvAca = false;
-                    if (isset($aca->evidence_url) && $aca->evidence_url) {
-                        $evArr = is_array($aca->evidence_url) ? $aca->evidence_url : (json_decode($aca->evidence_url, true) ?? []);
-                        $hasEvAca = !empty($evArr);
-                    }
-                @endphp
-                @if($hasEvAca)
-                    <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;">
-                        <i class="fas fa-certificate" style="font-size:10px;"></i> Tiene certificado — clic para ver
-                    </div>
+    @foreach($academicasRecientes as $i => $aca)
+        <div class="card" onclick="event.stopPropagation(); abrirDetalleAca({{ $i }})">
+            <h3>{{ $aca->institucion }}</h3>
+            <div class="subtitle">{{ $aca->titulo }}</div>
+            @if(!empty($aca->specialty))<div class="specialty-badge"><i class="fas fa-tag"></i> {{ $aca->specialty }}</div>@endif
+            <div class="date">
+                {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('F Y') }}
+                @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('F Y') }}
+                @elseif($aca->estudio_actual) — Actualidad
                 @endif
             </div>
-            @empty
-            <div class="empty-message-preview"><i class="fas fa-info-circle"></i> No hay información académica registrada.</div>
-            @endforelse
+            @if(!empty($aca->descripcion))
+            <div class="description-wrapper">
+                <div class="description collapsed" id="desc-aca-{{ $i }}">
+                    <div class="ql-snow"><div class="ql-editor">{!! strip_tags($aca->descripcion, $allowedHtmlTags) !!}</div></div>
+                </div>
+                @if(mb_strlen(trim(strip_tags($aca->descripcion))) > 150)
+                    <button class="ver-mas-btn" onclick="event.stopPropagation(); toggleDesc('desc-aca-{{ $i }}', this)">Ver más</button>
+                @endif
+            </div>
+            @endif
+            @php
+                $hasEvAca = false;
+                if (isset($aca->evidence_url) && $aca->evidence_url) {
+                    $evArr = is_array($aca->evidence_url) ? $aca->evidence_url : (json_decode($aca->evidence_url, true) ?? []);
+                    $hasEvAca = !empty($evArr);
+                }
+            @endphp
+            <div style="font-size:11px;color:#0abf9e;margin-top:10px;display:flex;align-items:center;gap:4px;font-weight:600;">
+                <i class="fas fa-expand-alt" style="font-size:9px;"></i> Clic para ver detalle completo{{ $hasEvAca ? ' + certificado' : '' }}
+            </div>
         </div>
+        @endforeach
+    </div>
 
         @if($academicasRestantes->count() > 0)
             <div class="btn-ver-todos">
@@ -965,30 +926,30 @@
     ) !!};
 
     window.previewAcademicasData = {!! json_encode(
-        $academicas->map(function($aca) use ($allowedHtmlTags) {
-            $evidencias = [];
-            if (isset($aca->evidence_url) && $aca->evidence_url) {
-                $evidencias = is_array($aca->evidence_url)
-                    ? $aca->evidence_url
-                    : (json_decode($aca->evidence_url, true) ?? []);
-            }
-            return [
-                'institucion'    => $aca->institucion,
-                'titulo'         => $aca->titulo,
-                'specialty'      => $aca->specialty ?? null,
-                'fecha_inicio'   => \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y'),
-                'fecha_fin'      => $aca->fecha_fin ? \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') : null,
-                'estudio_actual' => $aca->estudio_actual ?? false,
-                'descripcion'    => strip_tags($aca->descripcion ?? '', $allowedHtmlTags),
-                'evidencias'     => array_map(function($e) {
-                    return [
-                        'url'    => asset('storage/' . $e),
-                        'ext'    => pathinfo($e, PATHINFO_EXTENSION),
-                        'nombre' => basename($e),
-                    ];
-                }, $evidencias),
-            ];
-        })->values()
+    $academicas->map(function($aca) use ($allowedHtmlTags) {
+        $evidencias = [];
+        if (isset($aca->evidence_url) && $aca->evidence_url) {
+            $evidencias = is_array($aca->evidence_url)
+                ? $aca->evidence_url
+                : (json_decode($aca->evidence_url, true) ?? []);
+        }
+        return [
+            'institucion'    => $aca->institucion,
+            'titulo'         => $aca->titulo,
+            'specialty'      => $aca->specialty ?? null,
+            'fecha_inicio'   => \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y'),
+            'fecha_fin'      => $aca->fecha_fin ? \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') : null,
+            'estudio_actual' => $aca->estudio_actual ?? false,
+            'descripcion'    => strip_tags($aca->descripcion ?? '', $allowedHtmlTags),
+            'evidencias'     => array_map(function($e) {
+                return [
+                    'url'    => asset('storage/' . $e),
+                    'ext'    => pathinfo($e, PATHINFO_EXTENSION),
+                    'nombre' => basename($e),
+                ];
+            }, $evidencias),
+        ];
+    })->values()
     ) !!};
 
     window.previewProjectsById = {!! json_encode(
@@ -1012,86 +973,167 @@
     {{-- ==================== MODALES "VER TODOS" ==================== --}}
 
     {{-- Modal todos los proyectos --}}
-    @if($proyectos->count() > 0)
-    <div id="modal-todos-proyectos" class="modal-todos-proyectos">
-        <div class="modal-todos-content">
-            <div class="modal-todos-header">
-                <h2><i class="fas fa-project-diagram"></i> Todos los proyectos ({{ $proyectos->count() }})</h2>
-                <button class="close-todos-modal" onclick="cerrarModalTodosProyectos()">✕</button>
-            </div>
-            <div class="todos-proyectos-grid">
-                @foreach($proyectos as $proyecto)
-                    @php
-                        $estadoClass = $proyecto->estado=='Completado' ? 'estado-completado' : ($proyecto->estado=='En curso' ? 'estado-curso' : 'estado-default');
-                        $modalPayload = ['nombre'=>$proyecto->nombre,'descripcion'=>strip_tags($proyecto->descripcion??'',$allowedHtmlTags),'fecha_inicio'=>optional($proyecto->fecha_inicio)->format('d/m/Y'),'fecha_fin'=>optional($proyecto->fecha_fin)->format('d/m/Y'),'estado'=>$proyecto->estado,'rol'=>$proyecto->rol,'cliente'=>$proyecto->cliente,'tecnologias'=>$proyecto->tecnologias,'evidencias'=>$proyecto->evidencias];
-                    @endphp
-                    <div class="proyecto-card-modal" onclick='cerrarModalTodosProyectos(); abrirModal(@json($modalPayload));'>
-                        <h4>{{ $proyecto->nombre }}</h4>
-                        <div class="proyecto-fecha"><i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }} @if($proyecto->fecha_fin) → {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif</div>
-                        @if(!empty($proyecto->rol)||!empty($proyecto->cliente))
-                        <div style="font-size:0.75rem;color:#475569;margin:6px 0;">
-                            @if(!empty($proyecto->rol))Rol: {{ $proyecto->rol }}@endif
-                            @if(!empty($proyecto->rol)&&!empty($proyecto->cliente)) | @endif
-                            @if(!empty($proyecto->cliente))Cliente: {{ $proyecto->cliente }}@endif
-                        </div>
-                        @endif
-                        <span class="estado-badge {{ $estadoClass }}">{{ $proyecto->estado ?? 'En progreso' }}</span>
-                        @if(!empty($proyecto->tecnologias))
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-                                @foreach(array_slice($proyecto->tecnologias,0,3) as $tec)<span style="background:#eef2ff;padding:3px 10px;border-radius:20px;font-size:0.7rem;color:#0abf9e;">{{ $tec }}</span>@endforeach
-                                @if(count($proyecto->tecnologias)>3)<span style="background:#eef2ff;padding:3px 10px;border-radius:20px;font-size:0.7rem;color:#0abf9e;">+{{ count($proyecto->tecnologias)-3 }}</span>@endif
-                            </div>
+@if($proyectos->count() > 0)
+@php
+$folderColors = [
+    ['bg'=>'#0abf9e','tab'=>'#07866e','light'=>'#f0fdf9'],
+    ['bg'=>'#6366f1','tab'=>'#4f46e5','light'=>'#eef2ff'],
+    ['bg'=>'#f59e0b','tab'=>'#d97706','light'=>'#fffbeb'],
+    ['bg'=>'#ec4899','tab'=>'#db2777','light'=>'#fdf2f8'],
+    ['bg'=>'#14b8a6','tab'=>'#0d9488','light'=>'#f0fdfa'],
+    ['bg'=>'#8b5cf6','tab'=>'#7c3aed','light'=>'#f5f3ff'],
+    ['bg'=>'#f97316','tab'=>'#ea580c','light'=>'#fff7ed'],
+    ['bg'=>'#3b82f6','tab'=>'#2563eb','light'=>'#eff6ff'],
+];
+@endphp
+<div id="modal-todos-proyectos" class="modal-todos-proyectos">
+    <div class="modal-todos-content" style="max-width:1000px;">
+        <div class="modal-todos-header">
+            <h2><i class="fas fa-folder-open"></i> Todos los proyectos <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $proyectos->count() }}</span></h2>
+            <button class="close-todos-modal" onclick="cerrarModalTodosProyectos()">✕</button>
+        </div>
+        <div style="padding:0 24px 16px;">
+            <input type="text" id="search-proyectos-prev" placeholder="🔍 Buscar por nombre, tecnología o estado..." oninput="filtrarProyectosPreview(this.value)" style="width:100%;padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:40px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;">
+        </div>
+        <div style="padding:0 24px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;" id="folder-grid-preview">
+            @foreach($proyectos as $idx => $proyecto)
+            @php
+                $color = $folderColors[$idx % count($folderColors)];
+                $estadoStyle = $proyecto->estado=='Completado' ? 'background:#d1fae5;color:#065f46;' : ($proyecto->estado=='En curso' ? 'background:#fef3c7;color:#92400e;' : 'background:#f1f5f9;color:#64748b;');
+                $modalPayload = ['nombre'=>$proyecto->nombre,'descripcion'=>strip_tags($proyecto->descripcion??'',$allowedHtmlTags),'fecha_inicio'=>optional($proyecto->fecha_inicio)->format('d/m/Y'),'fecha_fin'=>optional($proyecto->fecha_fin)->format('d/m/Y'),'estado'=>$proyecto->estado,'rol'=>$proyecto->rol,'cliente'=>$proyecto->cliente,'tecnologias'=>$proyecto->tecnologias,'evidencias'=>$proyecto->evidencias];
+                $techs = $proyecto->tecnologias ?? [];
+                $descCorta = strip_tags($proyecto->descripcion ?? '');
+            @endphp
+            <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.25s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+                 data-nombre="{{ strtolower($proyecto->nombre) }}"
+                 data-techs="{{ strtolower(implode(' ', $techs)) }}"
+                 data-estado="{{ strtolower($proyecto->estado ?? '') }}"
+                 onclick='cerrarModalTodosProyectos(); abrirModal(@json($modalPayload));'
+                 onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 16px 32px -8px rgba(10,191,158,0.2)';this.style.borderColor='#0abf9e';"
+                 onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';this.style.borderColor='#e2e8f0';">
+                {{-- Top coloreado --}}
+                <div style="height:80px;background:{{ $color['bg'] }};position:relative;display:flex;align-items:flex-end;padding:0 18px 14px;">
+                    <div style="position:absolute;top:0;left:18px;width:60px;height:20px;border-radius:8px 8px 0 0;background:{{ $color['tab'] }};"></div>
+                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+                    <span style="margin-left:auto;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;{{ $estadoStyle }}">
+                        {{ $proyecto->estado ?? 'En progreso' }}
+                    </span>
+                </div>
+                {{-- Body --}}
+                <div style="padding:16px 18px 12px;">
+                    <h4 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#0f172a;">{{ $proyecto->nombre }}</h4>
+                    <div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <i class="fas fa-calendar-alt" style="color:#0abf9e;font-size:10px;"></i>
+                        {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
+                        @if($proyecto->fecha_fin) — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif
+                    </div>
+                    @if(!empty($descCorta))
+                    <div style="font-size:12px;color:#64748b;line-height:1.55;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $descCorta }}</div>
+                    @endif
+                    @if(!empty($techs))
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                        @foreach(array_slice($techs,0,3) as $tec)
+                            <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;">{{ $tec }}</span>
+                        @endforeach
+                        @if(count($techs)>3)
+                            <span style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;">+{{ count($techs)-3 }}</span>
                         @endif
                     </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-    @endif
-
-    {{-- Modal todas las experiencias --}}
-    <div id="modal-todos-experiencias" class="modal-todos-proyectos">
-        <div class="modal-todos-content">
-            <div class="modal-todos-header">
-                <h2><i class="fas fa-briefcase"></i> Todas las experiencias ({{ $experiencias->count() }})</h2>
-                <button class="close-todos-modal" onclick="cerrarModalExperiencias()">✕</button>
-            </div>
-            <div class="todos-proyectos-grid">
-                @foreach($experiencias as $i => $exp)
-                    <div class="proyecto-card-modal" onclick="cerrarModalExperiencias(); abrirDetalleExp({{ $i }})">
-                        <h4>{{ $exp->empresa }}</h4>
-                        <div class="proyecto-fecha"><i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('d/m/Y') }} @if($exp->fecha_fin) → {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('d/m/Y') }} @elseif($exp->trabajo_actual) → Actualidad @endif</div>
-                        <div style="font-size:0.75rem;color:#475569;margin-top:6px;">{{ $exp->cargo }} @if(!empty($exp->ubicacion)) | {{ $exp->ubicacion }} @endif</div>
-                        @if(!empty($exp->descripcion))<div style="font-size:11px;color:#94a3b8;margin-top:6px;display:flex;align-items:center;gap:4px;"><i class="fas fa-chevron-right" style="font-size:9px;color:#0abf9e;"></i> Ver detalle</div>@endif
+                    @endif
+                </div>
+                {{-- Footer --}}
+                <div style="padding:12px 18px;border-top:1px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between;background:#fafbfc;">
+                    <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;">
+                        @if(!empty($proyecto->rol))
+                            <i class="fas fa-user-check" style="color:#0abf9e;font-size:10px;"></i> {{ $proyecto->rol }}
+                        @elseif(!empty($proyecto->cliente))
+                            <i class="fas fa-building" style="color:#0abf9e;font-size:10px;"></i> {{ $proyecto->cliente }}
+                        @else
+                            <i class="fas fa-folder" style="color:#0abf9e;font-size:10px;"></i> Ver detalle
+                        @endif
                     </div>
-                @endforeach
+                    <div style="width:28px;height:28px;border-radius:50%;background:#f0fdf9;border:1px solid #d1fae5;display:flex;align-items:center;justify-content:center;color:#0abf9e;font-size:11px;transition:all 0.2s;">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
             </div>
+            @endforeach
+        </div>
+        <div id="no-results-preview" style="display:none;text-align:center;padding:40px;color:#94a3b8;font-size:14px;">
+            <i class="fas fa-search" style="font-size:32px;margin-bottom:10px;display:block;"></i>
+            No se encontraron proyectos con ese criterio.
         </div>
     </div>
+</div>
+@endif
 
     {{-- Modal todas las académicas --}}
-    <div id="modal-todos-academicas" class="modal-todos-proyectos">
-        <div class="modal-todos-content">
-            <div class="modal-todos-header">
-                <h2><i class="fas fa-graduation-cap"></i> Toda la formación académica ({{ $academicas->count() }})</h2>
-                <button class="close-todos-modal" onclick="cerrarModalAcademicas()">✕</button>
-            </div>
-            <div class="todos-proyectos-grid">
-                @foreach($academicas as $i => $aca)
-                    @php
-                        $hasEvMod = false;
-                        if(isset($aca->evidence_url)&&$aca->evidence_url){$evA=is_array($aca->evidence_url)?$aca->evidence_url:(json_decode($aca->evidence_url,true)??[]);$hasEvMod=!empty($evA);}
-                    @endphp
-                    <div class="proyecto-card-modal" onclick="cerrarModalAcademicas(); abrirDetalleAca({{ $i }})">
-                        <h4>{{ $aca->institucion }}</h4>
-                        <div class="proyecto-fecha"><i class="far fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y') }} @if($aca->fecha_fin) → {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') }} @elseif($aca->estudio_actual??false) → Actualidad @endif</div>
-                        <div style="font-size:0.75rem;color:#475569;margin-top:6px;">{{ $aca->titulo }} @if(!empty($aca->specialty??'')) | {{ $aca->specialty }} @endif</div>
-                        @if(!empty($aca->descripcion)||$hasEvMod)<div style="font-size:11px;color:#94a3b8;margin-top:6px;display:flex;align-items:center;gap:4px;"><i class="fas fa-chevron-right" style="font-size:9px;color:#0abf9e;"></i> Ver detalle{{ $hasEvMod?' + certificado':'' }}</div>@endif
+    {{-- Modal todas las académicas --}}
+{{-- Modal todas las académicas --}}
+<div id="modal-todos-academicas" class="modal-todos-proyectos">
+    <div class="modal-todos-content" style="max-width:700px;">
+        <div class="modal-todos-header">
+            <h2>
+                <i class="fas fa-graduation-cap"></i> Formación académica
+                <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $academicas->count() }}</span>
+            </h2>
+            <button class="close-todos-modal" onclick="cerrarModalAcademicas()">✕</button>
+        </div>
+        <div style="padding:32px 28px;">
+            <div style="position:relative;padding-left:48px;">
+                <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0abf9e 0%,#e2e8f0 100%);"></div>
+                @foreach($academicas->values() as $i => $aca)
+                @php
+                    $hasEv = false;
+                    if (isset($aca->evidence_url) && $aca->evidence_url) {
+                        $evArr = is_array($aca->evidence_url) ? $aca->evidence_url : json_decode($aca->evidence_url, true);
+                        if (!is_array($evArr)) { $evArr = []; }
+                        $hasEv = !empty($evArr);
+                    }
+                @endphp
+                <div style="position:relative;margin-bottom:24px;">
+                    <div style="position:absolute;left:-39px;top:18px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0abf9e;display:flex;align-items:center;justify-content:center;z-index:2;">
+                        <div style="width:8px;height:8px;border-radius:50%;background:#0abf9e;"></div>
                     </div>
+                    <div onclick="cerrarModalAcademicas(); abrirDetalleAca({{ $i }});"
+     style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px 20px;cursor:pointer;transition:all 0.22s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+     onmouseover="this.style.borderColor='#0abf9e';this.style.transform='translateX(4px)';this.style.boxShadow='0 8px 24px -6px rgba(10,191,158,0.2)';"
+     onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+                            <div>
+                                <div style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:3px;">{{ $aca->institucion }}</div>
+                                <div style="font-size:12px;color:#0abf9e;font-weight:600;">{{ $aca->titulo }}</div>
+                            </div>
+                            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;background:#f8fafc;padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                                <i class="fas fa-calendar-alt"></i>
+                                {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('M Y') }}
+                                @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('M Y') }}
+                                @elseif($aca->estudio_actual??false) — Actualidad @endif
+                            </div>
+                        </div>
+                        @if(!empty($aca->specialty??''))
+                        <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+                            <i class="fas fa-tag" style="color:#0abf9e;font-size:10px;"></i> {{ $aca->specialty }}
+                        </div>
+                        @endif
+                        @if(!empty($aca->descripcion))
+                        <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                            {{ strip_tags($aca->descripcion) }}
+                        </div>
+                        @endif
+                        <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
+                            <i class="fas fa-mouse-pointer" style="font-size:9px;"></i>
+                            Clic para ver detalle completo{{ $hasEv ? ' + certificado' : '' }}
+                        </div>
+                    </div>
+                </div>
                 @endforeach
             </div>
         </div>
     </div>
+</div>
 
     {{-- Modal habilidades técnicas --}}
     @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0 || ($habilidadesTecnicasBackend ?? collect())->count() > 0)
@@ -1211,47 +1253,69 @@
     @endif
 
     {{-- ==================== MODAL DETALLE EXPERIENCIA ==================== --}}
-    <div id="modal-detalle-exp">
-        <div class="modal-detalle-content">
-            <div class="modal-detalle-header">
-                <div>
-                    <h3 id="det-exp-empresa"></h3>
-                    <div class="modal-det-subtitle" id="det-exp-cargo"></div>
+    <div id="modal-detalle-exp" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:12000;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
+            <div style="background:#fff;border-radius:20px;max-width:640px;width:92%;max-height:88vh;overflow-y:auto;animation:modalFadeIn 0.2s ease;">
+                {{-- Hero --}}
+                <div style="padding:24px 28px 20px;border-bottom:1px solid #e2e8f0;position:relative;">
+                    <button onclick="cerrarDetalleExp()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;transition:color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">✕</button>
+                    <div style="display:inline-flex;align-items:center;gap:6px;background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:10px;">
+                        <i class="fas fa-briefcase"></i> Experiencia laboral
+                    </div>
+                    <h3 id="det-exp-empresa" style="margin:0 0 4px;font-size:1.2rem;font-weight:700;color:#0f172a;"></h3>
+                    <div id="det-exp-cargo" style="font-size:14px;color:#0abf9e;font-weight:600;margin-bottom:12px;"></div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+                        <div id="det-exp-fecha-pill" style="display:inline-flex;align-items:center;gap:5px;background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;">
+                            <i class="fas fa-calendar-alt" style="color:#0abf9e;font-size:10px;"></i>
+                            <span id="det-exp-fecha-txt"></span>
+                        </div>
+                        <div id="det-exp-ubicacion-pill" style="display:none;align-items:center;gap:5px;background:#f8fafc;border:1px solid #e2e8f0;color:#64748b;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;">
+                            <i class="fas fa-map-marker-alt" style="color:#0abf9e;font-size:10px;"></i>
+                            <span id="det-exp-ubicacion-txt"></span>
+                        </div>
+                    </div>
                 </div>
-                <button onclick="cerrarDetalleExp()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;transition:color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">✕</button>
-            </div>
-            <div class="modal-detalle-body">
-                <div id="det-exp-fecha" class="modal-det-date"></div>
-                <div id="det-exp-ubicacion" style="font-size:12px;color:#64748b;"></div>
-                <div class="modal-det-desc ql-snow">
-                    <div class="ql-editor" id="det-exp-desc-inner" style="padding:0;min-height:0;"></div>
+                {{-- Body --}}
+                <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
+                    <div>
+                        <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                            <i class="fas fa-align-left" style="color:#0abf9e;"></i> Descripción
+                        </div>
+                        <div class="ql-snow" style="border:none;">
+                            <div class="ql-editor" id="det-exp-desc-inner" style="padding:0;min-height:0;font-size:13px;color:#475569;line-height:1.75;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- ==================== MODAL DETALLE ACADÉMICA ==================== --}}
-    <div id="modal-detalle-aca">
-        <div class="modal-detalle-content">
-            <div class="modal-detalle-header">
-                <div>
-                    <h3 id="det-aca-inst"></h3>
-                    <div class="modal-det-subtitle" id="det-aca-titulo"></div>
+    
+   {{-- ==================== MODAL DETALLE ACADÉMICA ==================== --}}
+        <div id="modal-detalle-aca" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;align-items:center;justify-content:center;">
+            <div style="background:#fff;border-radius:20px;max-width:640px;width:90%;max-height:85vh;overflow-y:auto;margin:auto;position:relative;">
+                <div style="padding:24px 28px 20px;border-bottom:1px solid #e2e8f0;position:relative;">
+                    <button onclick="cerrarDetalleAca()" style="position:absolute;top:15px;right:20px;background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+                    <div style="background:#f0fdf9;color:#0abf9e;display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;margin-bottom:10px;">
+                        <i class="fas fa-graduation-cap"></i> Formación académica
+                    </div>
+                    <h3 id="det-aca-inst" style="margin:0;font-size:1.2rem;"></h3>
+                    <div id="det-aca-titulo" style="color:#0abf9e;font-weight:600;margin:5px 0;"></div>
+                    <div style="margin-top:10px;">
+                        <span style="display:inline-flex;align-items:center;gap:5px;background:#f8fafc;padding:4px 12px;border-radius:20px;font-size:11px;">
+                            <i class="fas fa-calendar-alt"></i> <span id="det-aca-fecha-txt"></span>
+                        </span>
+                        <span id="det-aca-specialty-pill" style="display:none;margin-left:8px;display:inline-flex;align-items:center;gap:5px;background:#f8fafc;padding:4px 12px;border-radius:20px;font-size:11px;">
+                            <i class="fas fa-tag"></i> <span id="det-aca-specialty-txt"></span>
+                        </span>
+                    </div>
                 </div>
-                <button onclick="cerrarDetalleAca()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;transition:color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">✕</button>
-            </div>
-            <div class="modal-detalle-body">
-                <div id="det-aca-fecha" class="modal-det-date"></div>
-                <div id="det-aca-specialty" style="font-size:12px;color:#64748b;"></div>
-                <div class="modal-det-desc ql-snow">
-                    <div class="ql-editor" id="det-aca-desc" style="padding:0;min-height:0;"></div>
+                <div style="padding:24px 28px;">
+                    <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:8px;">Descripción</div>
+                    <div id="det-aca-desc" style="font-size:13px;line-height:1.6;color:#475569;"></div>
+                    <div id="det-aca-certs" style="margin-top:20px;display:none;"></div>
                 </div>
-                {{-- ✅ EVIDENCIAS/CERTIFICADOS en modal académica --}}
-                <div id="det-aca-certs" class="modal-det-certs" style="display:none;"></div>
             </div>
         </div>
-    </div>
-
     {{-- ==================== MODAL COMPARTIR ==================== --}}
     <div id="modal-compartir" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
         <div style="background:#fff;border-radius:12px;width:450px;max-width:90%;position:relative;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,0.1);">
@@ -1398,37 +1462,46 @@ function abrirDetalleExp(i) {
     var d = window.previewExperienciasData[i];
     if (!d) return;
     document.getElementById('det-exp-empresa').textContent = d.empresa;
-    document.getElementById('det-exp-cargo').textContent   = d.cargo;
+    document.getElementById('det-exp-cargo').textContent = d.cargo;
     var fecha = d.fecha_inicio;
-    if (d.fecha_fin)      fecha += ' — ' + d.fecha_fin;
+    if (d.fecha_fin) fecha += ' — ' + d.fecha_fin;
     else if (d.trabajo_actual) fecha += ' — Actualidad';
-    document.getElementById('det-exp-fecha').innerHTML = '<i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>' + fecha;
-    var ubicEl = document.getElementById('det-exp-ubicacion');
-    ubicEl.textContent = d.ubicacion ? '📍 ' + d.ubicacion : '';
-    document.getElementById('det-exp-desc-inner').innerHTML = d.descripcion || '<span style="color:#94a3b8;font-style:italic;">Sin descripción disponible.</span>';
+    document.getElementById('det-exp-fecha-txt').textContent = fecha;
+    var ubicPill = document.getElementById('det-exp-ubicacion-pill');
+    if (d.ubicacion) {
+        document.getElementById('det-exp-ubicacion-txt').textContent = d.ubicacion;
+        ubicPill.style.display = 'inline-flex';
+    } else {
+        ubicPill.style.display = 'none';
+    }
+    document.getElementById('det-exp-desc-inner').innerHTML = d.descripcion || '<em style="color:#94a3b8;">Sin descripción disponible.</em>';
     document.getElementById('modal-detalle-exp').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
-function cerrarDetalleExp() { document.getElementById('modal-detalle-exp').style.display = 'none'; document.body.style.overflow = ''; }
-document.getElementById('modal-detalle-exp').addEventListener('click', function(e) { if (e.target === this) cerrarDetalleExp(); });
-
+function cerrarDetalleExp() {
+    document.getElementById('modal-detalle-exp').style.display = 'none';
+    document.body.style.overflow = '';
+}
 // ============================================================
 // MODAL DETALLE ACADÉMICA
 // ============================================================
 function abrirDetalleAca(i) {
     var d = window.previewAcademicasData[i];
     if (!d) return;
-    document.getElementById('det-aca-inst').textContent   = d.institucion;
+    document.getElementById('det-aca-inst').textContent = d.institucion;
     document.getElementById('det-aca-titulo').textContent = d.titulo;
     var fecha = d.fecha_inicio;
-    if (d.fecha_fin)       fecha += ' — ' + d.fecha_fin;
+    if (d.fecha_fin) fecha += ' — ' + d.fecha_fin;
     else if (d.estudio_actual) fecha += ' — Actualidad';
-    document.getElementById('det-aca-fecha').innerHTML = '<i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>' + fecha;
-    var spEl = document.getElementById('det-aca-specialty');
-    spEl.textContent = d.specialty ? '🏷️ ' + d.specialty : '';
-    document.getElementById('det-aca-desc').innerHTML = d.descripcion || '<span style="color:#94a3b8;font-style:italic;">Sin descripción disponible.</span>';
-
-    // ✅ Certificados
+    document.getElementById('det-aca-fecha-txt').textContent = fecha;
+    var spPill = document.getElementById('det-aca-specialty-pill');
+    if (d.specialty) {
+        document.getElementById('det-aca-specialty-txt').textContent = d.specialty;
+        spPill.style.display = 'inline-flex';
+    } else {
+        spPill.style.display = 'none';
+    }
+    document.getElementById('det-aca-desc').innerHTML = d.descripcion || '<em style="color:#94a3b8;">Sin descripción disponible.</em>';
     var certsDiv = document.getElementById('det-aca-certs');
     certsDiv.innerHTML = '';
     if (d.evidencias && d.evidencias.length) {
@@ -1437,18 +1510,19 @@ function abrirDetalleAca(i) {
             if (ev.ext === 'pdf') {
                 certsDiv.innerHTML += '<a href="' + ev.url + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#0abf9e;font-size:12px;font-weight:600;text-decoration:none;padding:6px 14px;border-radius:20px;background:#f0fdf9;border:1px solid #d1fae5;" onmouseover="this.style.background=\'#d1fae5\'" onmouseout="this.style.background=\'#f0fdf9\'"><i class="fas fa-file-pdf"></i> Ver PDF</a>';
             } else {
-                certsDiv.innerHTML += '<a href="javascript:void(0)" onclick="abrirLightbox(\'' + ev.url + '\')" style="display:inline-flex;align-items:center;gap:6px;color:#0abf9e;font-size:12px;font-weight:600;text-decoration:none;padding:6px 14px;border-radius:20px;background:#f0fdf9;border:1px solid #d1fae5;" onmouseover="this.style.background=\'#d1fae5\'" onmouseout="this.style.background=\'#f0fdf9\'"><i class="fas fa-certificate"></i> Ver certificado</a>';
+               certsDiv.innerHTML += '<button onclick="document.getElementById(\'modal-detalle-aca\').style.display=\'none\'; abrirLightbox(\'' + ev.url + '\')" style="display:inline-flex;align-items:center;gap:6px;color:#0abf9e;font-size:12px;font-weight:600;cursor:pointer;padding:6px 14px;border-radius:20px;background:#f0fdf9;border:1px solid #d1fae5;font-family:inherit;" onmouseover="this.style.background=\'#d1fae5\'" onmouseout="this.style.background=\'#f0fdf9\'"><i class="fas fa-certificate"></i> Ver certificado</button>';
             }
         });
     } else {
         certsDiv.style.display = 'none';
     }
-
     document.getElementById('modal-detalle-aca').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
-function cerrarDetalleAca() { document.getElementById('modal-detalle-aca').style.display = 'none'; document.body.style.overflow = ''; }
-document.getElementById('modal-detalle-aca').addEventListener('click', function(e) { if (e.target === this) cerrarDetalleAca(); });
+function cerrarDetalleAca() {
+    document.getElementById('modal-detalle-aca').style.display = 'none';
+    document.body.style.overflow = '';
+}
 
 // ============================================================
 // MODAL PROYECTO (con evidencias + ojito, igual al público)
@@ -1731,6 +1805,19 @@ document.getElementById('formPublicar').addEventListener('submit', function(e) {
     });
 });
 
+function filtrarProyectosPreview(q) {
+    q = q.toLowerCase().trim();
+    var cards = document.querySelectorAll('#folder-grid-preview [data-nombre]');
+    var visible = 0;
+    cards.forEach(function(card) {
+        var match = !q || card.dataset.nombre.includes(q) || card.dataset.techs.includes(q) || card.dataset.estado.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    var noRes = document.getElementById('no-results-preview');
+    if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+}
+
 // ============================================================
 // VIBE SELECTOR
 // ============================================================
@@ -1784,6 +1871,18 @@ function saveVibeTheme() {
         Swal.fire({ icon:'error', title:'Error', text:'No se pudo conectar.' });
     });
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var cards = document.querySelectorAll('#academicas-grid .card');
+    cards.forEach(function(card, idx) {
+        card.onclick = function(e) {
+            e.stopPropagation();
+            abrirDetalleAca(idx);
+        };
+    });
+});
 </script>
 
 </body>
