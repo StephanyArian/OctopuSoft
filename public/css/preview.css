@@ -186,115 +186,47 @@ body {
 @media (max-width: 768px) {
     .profile-header {
         flex-direction: column;
-        align-items: center;
-        padding: 50px 20px 24px;
     }
-
-    /* Avatar circular centrado arriba */
     .profile-avatar-side {
-        width: 120px;
-        height: 120px;
-        min-height: unset;
+        width: 100%;
+        min-height: 260px;
+        height: 260px;
         clip-path: none;
         -webkit-clip-path: none;
         overflow: hidden;
-        display: flex;
-        border-radius: 50%;
-        border: 3px solid var(--teal);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        flex-shrink: 0;
-        margin-bottom: 14px;
-        align-self: center;
+        display: block;
         order: -1;
     }
     .profile-avatar-side img {
         width: 100%;
-        height: 100%;
+        height: 260px;
         object-fit: cover;
-        object-position: center 15%;
+        object-position: center 20%;
         display: block;
         position: relative;
         top: auto;
         left: auto;
     }
-    .profile-avatar-side .avatar-placeholder {
-        font-size: 40px;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Info centrada */
-    .profile-info {
-        padding: 0;
-        align-items: center;
-        text-align: center;
-        width: 100%;
-        order: 0;
-    }
-    .profile-header h1 {
-        font-size: 20px;
-        text-align: center;
-        letter-spacing: 1px;
-        margin-bottom: 2px;
-    }
-    .profile-header .title {
-        font-size: 12px;
-        text-align: center;
-        margin-bottom: 14px;
-    }
-
-    /* Contactos en fila horizontal centrada con icono encima */
-    .profile-contact-list {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 16px;
-        margin-bottom: 14px;
-    }
-    .profile-contact-list .contact-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        font-size: 11px;
-        color: rgba(255,255,255,0.7);
-    }
-    .profile-contact-list .contact-row i {
-        font-size: 16px;
-        width: auto;
-    }
-
-    /* Línea divisora teal */
-    .profile-contact-list::after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 1px;
-        background: rgba(10,191,158,0.3);
-        margin-top: 4px;
-    }
-
-    /* Iconos sociales centrados */
     .profile-social-icons {
         position: static;
-        justify-content: center;
+        justify-content: flex-start;
         padding: 0;
         background: none;
-        gap: 12px;
-        margin-top: 0;
-        right: auto;
-        top: auto;
+        gap: 8px;
+        margin-top: 10px;
     }
-    .profile-social-icons a {
-        width: 36px;
-        height: 36px;
-        background: rgba(255,255,255,0.12);
-        border: 1px solid rgba(255,255,255,0.2);
+    .profile-info {
+        padding: 20px;
     }
-
+    .profile-header h1 {
+        font-size: 22px;
+    }
+    .profile-header .title {
+        font-size: 13px;
+    }
+    .profile-contact-list .contact-row {
+        font-size: 12px;
+    }
     .profile-header::after {
         right: 0;
     }
