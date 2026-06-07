@@ -84,22 +84,29 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="position: relative;">
+                                    <div class="form-group location-autocomplete-wrap" style="position: relative;">
                                         <label class="form-label">Ubicación</label>
-                                        <input class="form-input" type="text" id="location" name="location" placeholder="Ej. Cochabamba, Bolivia" value="{{ old('location', $user->city . ($user->country ? ', ' . $user->country : '')) }}" maxlength="30" autocomplete="off">
-                                        <div id="locationSuggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #edf0f4; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; max-height: 200px; overflow-y: auto;"></div>
+                                        @php
+                                            $savedLocation = old('location');
+                                            if ($savedLocation === null) {
+                                                $locParts = array_filter([trim($user->city ?? ''), trim($user->country ?? '')]);
+                                                $savedLocation = implode(', ', $locParts);
+                                            }
+                                        @endphp
+                                        <input class="form-input geo-autocomplete" type="text" id="location" name="location" placeholder="Ej. Cochabamba, Bolivia" value="{{ $savedLocation }}" maxlength="30" autocomplete="off">
+                                        <ul id="locationSuggestions" class="geo-dropdown hidden"></ul>
                                         <div id="locationError" class="error-message hidden">Debes seleccionar una ubicación real de la lista de sugerencias.</div>
-                                        <span class="text-xs text-gray-400 mt-1">Escribe tu ciudad y país y selecciónala de la lista.</span>
+                                        <span class="text-xs text-gray-400 mt-1">Escribe ciudad o país y selecciónalo de la lista.</span>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Biografía profesional</label>
-                                        <div class="textarea-wrapper" style="position: relative;">
-                                            <div id="quillEditor" style="height:250px;background:white;">{!! old('bio', $user->biography) !!}</div>
-                                            <textarea id="bio" name="bio" style="display:none;">{{ old('bio', $user->biography) }}</textarea>
-                                            <span class="word-count" id="contadorBio" style="display:block; text-align:left; font-size:12px; color:#94a3b8; margin-top:4px;">0/500 caracteres</span>
+                                        <div class="textarea-wrapper quill-editor-wrap" style="position: relative;">
+                                            <div id="quillEditor" style="height:250px;background:white;"></div>
+                                            <textarea id="bio" name="bio" style="display:none;">{!! old('bio', $user->biography) !!}</textarea>
+                                            <span class="word-count char-counter" id="contadorBio" style="display:block; text-align:left; font-size:12px; color:#94a3b8; margin-top:4px;">0/500 caracteres</span>
                                         </div>
-                                        <div id="bioError" class="error-message hidden">La biografía no puede exceder los 500 caracteres</div>
-                                        <span class="text-xs text-gray-400 mt-1">Máximo 500 caracteres</span>
+                                        <div id="bioError" class="error-message hidden">La biografía no puede exceder los 500 caracteres (sin contar espacios)</div>
+                                        <span class="text-xs text-gray-400 mt-1">Máximo 500 caracteres sin contar espacios</span>
                                     </div>
                                 </div>
                                 

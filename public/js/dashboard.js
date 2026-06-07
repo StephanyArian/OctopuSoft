@@ -36,11 +36,28 @@ function openPhotoPreview(src) {
     }
 }
 
+// ── BIO: conteo sin espacios (igual que el servidor) ────────
+const BIO_LIMITE = 500;
+
+function bioTextoSinEspacios(texto) {
+    if (!texto) return '';
+    let text = texto;
+    if (text.length > 0 && text.charCodeAt(text.length - 1) === 10) {
+        text = text.slice(0, -1);
+    }
+    return text.replace(/[\s\u00a0\u1680\u2000-\u200b\u202f\u205f\u3000\ufeff]/g, '');
+}
+
+function bioConteoDesdeHtml(html) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html || '';
+    return bioTextoSinEspacios(tempDiv.textContent || tempDiv.innerText || '');
+}
+
 // ── VALIDACIÓN DEL FORMULARIO ───────────────────────────────
 document.getElementById('profileForm')?.addEventListener('submit', function (e) {
     let isValid = true;
 
-    // Nombre
     const name = document.getElementById('name').value.trim();
     const nameError = document.getElementById('nameError');
     const nameRegex = /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/;
@@ -61,7 +78,6 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
         nameError.classList.add('hidden');
     }
 
-    // Título profesional
     const title = document.getElementById('title').value.trim();
     let titleError = document.getElementById('titleError');
     if (!titleError) {
@@ -84,7 +100,6 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
         titleError.classList.add('hidden');
     }
 
-    // Ubicación (Autocomplete y Validación Real)
     const locationInput = document.getElementById('location');
     const location = locationInput ? locationInput.value.trim() : '';
     const locationError = document.getElementById('locationError');
@@ -102,24 +117,14 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
         locationError.classList.add('hidden');
     }
 
-    // Biografía (500 caracteres - CORREGIDO)
-    const bio = document.getElementById('bio').value;
+    const inputBio = document.getElementById('bio');
     const bioError = document.getElementById('bioError');
-    
-    // Crear un elemento temporal para parsear el HTML y obtener el texto plano de forma segura
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = bio;
-    let text = tempDiv.textContent || tempDiv.innerText || '';
-    
-    // Quitar el salto de línea final
-    if (text.length > 0 && text.charCodeAt(text.length - 1) === 10) {
-        text = text.slice(0, -1);
+    if (window.quillBio) {
+        inputBio.value = window.quillBio.root.innerHTML;
     }
-    
-    // Quitar todos los espacios para el conteo
-    const cleanText = text.replace(/\s/g, '');
-    
-    if (cleanText.length > 500) {
+    const cleanText = bioConteoDesdeHtml(inputBio ? inputBio.value : '');
+
+    if (cleanText.length > BIO_LIMITE) {
         bioError.classList.remove('hidden');
         bioError.textContent = 'La biografía no puede exceder los 500 caracteres (sin contar espacios)';
         isValid = false;
@@ -127,7 +132,6 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
         bioError.classList.add('hidden');
     }
 
-    // Foto
     const photo = document.getElementById('photoInput').files[0];
     const photoError = document.getElementById('photoError');
     if (photo) {
@@ -148,103 +152,90 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    // ── AUTOCOMPLETADO DE UBICACIÓN ──────────────────────────────
+    // ── AUTOCOMPLETADO DE UBICACIÓN (Nominatim) ────────────────
+    const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
     const locationInput = document.getElementById('location');
-    const suggestionsDiv = document.getElementById('locationSuggestions');
+    const suggestionsList = document.getElementById('locationSuggestions');
     const locationError = document.getElementById('locationError');
-    
-    if (locationInput && suggestionsDiv) {
-        // Inicializar dataset
-        locationInput.dataset.isValidLocation = locationInput.value.trim() !== '' ? 'true' : 'false';
-        let debounceTimeout;
+    let locationDebounce = null;
 
-        locationInput.addEventListener('input', function() {
-            locationInput.dataset.isValidLocation = 'false';
-            const query = this.value.trim();
-            
-            clearTimeout(debounceTimeout);
-            if (query.length < 3) {
-                suggestionsDiv.innerHTML = '';
-                suggestionsDiv.style.display = 'none';
+    function formatLocationLabel(item) {
+        const a = item.address || {};
+        const partes = [];
+        if (a.city || a.town || a.village || a.municipality) {
+            partes.push(a.city || a.town || a.village || a.municipality);
+        }
+        if (a.state || a.region) partes.push(a.state || a.region);
+        if (a.country) partes.push(a.country);
+        if (partes.length) return partes.join(', ');
+        return item.display_name.split(',').slice(0, 3).join(',').trim();
+    }
+
+    function truncateLocation(label) {
+        return label.length > 30 ? label.substring(0, 30) : label;
+    }
+
+    if (locationInput && suggestionsList) {
+        locationInput.dataset.isValidLocation = locationInput.value.trim() !== '' ? 'true' : 'false';
+
+        function showLocationSuggestions(items) {
+            suggestionsList.innerHTML = '';
+            if (!items.length) {
+                suggestionsList.classList.add('hidden');
                 return;
             }
-            
-            debounceTimeout = setTimeout(() => {
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5`, {
-                    headers: {
-                        'User-Agent': 'OctopuSoft-Portfolio-App'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    suggestionsDiv.innerHTML = '';
-                    if (data && data.length > 0) {
-                        suggestionsDiv.style.display = 'block';
-                        data.forEach(item => {
-                            const address = item.address;
-                            const city = address.city || address.town || address.village || address.suburb || address.municipality || '';
-                            const state = address.state || address.region || '';
-                            const country = address.country || '';
-                            
-                            let displayText = '';
-                            if (city) displayText += city;
-                            if (state) displayText += (displayText ? ', ' : '') + state;
-                            if (country) displayText += (displayText ? ', ' : '') + country;
-                            
-                            if (!displayText) {
-                                displayText = item.display_name;
-                            }
-                            
-                            // Limitar tamaño a un máximo de 30 caracteres
-                            if (displayText.length > 30) {
-                                displayText = '';
-                                if (city) displayText += city;
-                                if (country) displayText += (displayText ? ', ' : '') + country;
-                                if (displayText.length > 30) {
-                                    displayText = displayText.substring(0, 30);
-                                }
-                            }
-                            
-                            const div = document.createElement('div');
-                            div.className = 'suggestion-item';
-                            div.style.cssText = 'padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #334155; transition: background 0.2s; text-align: left;';
-                            div.textContent = displayText;
-                            
-                            div.addEventListener('mouseover', function() {
-                                this.style.backgroundColor = '#f1f5f9';
-                            });
-                            div.addEventListener('mouseout', function() {
-                                this.style.backgroundColor = 'white';
-                            });
-                            
-                            div.addEventListener('click', function() {
-                                locationInput.value = displayText;
-                                locationInput.dataset.isValidLocation = 'true';
-                                suggestionsDiv.innerHTML = '';
-                                suggestionsDiv.style.display = 'none';
-                                if (locationError) locationError.classList.add('hidden');
-                            });
-                            suggestionsDiv.appendChild(div);
-                        });
-                    } else {
-                        suggestionsDiv.style.display = 'none';
-                    }
-                })
-                .catch(err => {
-                    console.error('Error fetching locations:', err);
+            items.forEach(function (item) {
+                const label = truncateLocation(formatLocationLabel(item));
+                const li = document.createElement('li');
+                li.textContent = label;
+                li.addEventListener('mousedown', function (e) {
+                    e.preventDefault();
+                    locationInput.value = label;
+                    locationInput.dataset.isValidLocation = 'true';
+                    suggestionsList.classList.add('hidden');
+                    suggestionsList.innerHTML = '';
+                    if (locationError) locationError.classList.add('hidden');
                 });
-            }, 400);
-        });
-        
-        // Cerrar sugerencias al hacer clic fuera
-        document.addEventListener('click', function(e) {
-            if (!locationInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
-                suggestionsDiv.innerHTML = '';
-                suggestionsDiv.style.display = 'none';
+                suggestionsList.appendChild(li);
+            });
+            suggestionsList.classList.remove('hidden');
+        }
+
+        locationInput.addEventListener('input', function () {
+            locationInput.dataset.isValidLocation = 'false';
+            const query = this.value.trim();
+            clearTimeout(locationDebounce);
+
+            if (query.length < 2) {
+                suggestionsList.classList.add('hidden');
+                suggestionsList.innerHTML = '';
+                return;
             }
+
+            locationDebounce = setTimeout(function () {
+                fetch(
+                    NOMINATIM + '?q=' + encodeURIComponent(query) + '&format=json&addressdetails=1&limit=6&accept-language=es',
+                    { headers: { 'Accept-Language': 'es' } }
+                )
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) { showLocationSuggestions(data || []); })
+                    .catch(function () { suggestionsList.classList.add('hidden'); });
+            }, 350);
+        });
+
+        locationInput.addEventListener('blur', function () {
+            setTimeout(function () { suggestionsList.classList.add('hidden'); }, 150);
+            if (locationInput.value.trim() && locationInput.dataset.isValidLocation !== 'true' && locationError) {
+                locationError.classList.remove('hidden');
+            }
+        });
+
+        locationInput.addEventListener('focus', function () {
+            if (locationError) locationError.classList.add('hidden');
         });
     }
 
+    // ── EDITOR QUILL — BIOGRAFÍA ───────────────────────────────
     if (typeof Quill === 'undefined') return;
     const qc = document.getElementById('quillEditor');
     if (!qc) return;
@@ -270,41 +261,41 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    window.quillBio = quill;
+
     const inputBio = document.getElementById('bio');
     const contadorBio = document.getElementById('contadorBio');
-    let lastValidHtml = quill.root.innerHTML;
 
-    function getCharacterCount() {
-        // Obtener texto plano y eliminar el salto de línea final de Quill
-        let text = quill.getText();
-        // Quitar el carácter de nueva línea al final si existe
-        if (text.length > 0 && text.charCodeAt(text.length - 1) === 10) {
-            text = text.slice(0, -1);
-        }
-        // Quitar todos los espacios para el conteo
-        return text.replace(/\s/g, '').length;
+    if (inputBio && inputBio.value.trim()) {
+        quill.root.innerHTML = inputBio.value;
     }
 
-    function actualizarContador() {
-        const len = getCharacterCount();
+    function getBioCharCount() {
+        return bioTextoSinEspacios(quill.getText()).length;
+    }
+
+    function actualizarContadorBio() {
+        const len = getBioCharCount();
         if (contadorBio) {
             contadorBio.textContent = len + '/500 caracteres';
-            contadorBio.style.color = len > 500 ? '#ef4444' : '#94a3b8';
+            contadorBio.style.color = len > BIO_LIMITE ? '#ef4444' : '#94a3b8';
+            contadorBio.style.fontWeight = len > BIO_LIMITE ? 'bold' : 'normal';
+        }
+        if (inputBio) {
+            inputBio.value = quill.root.innerHTML;
         }
     }
 
-    quill.on('text-change', function () {
-        const len = getCharacterCount();
-        if (len > 500) {
-            // Revertir al último HTML válido
-            quill.root.innerHTML = lastValidHtml;
-            actualizarContador();
-        } else {
-            lastValidHtml = quill.root.innerHTML;
-            if (inputBio) inputBio.value = quill.root.innerHTML;
-            actualizarContador();
+    quill.on('text-change', function (delta, oldDelta, source) {
+        if (source !== 'user') return;
+
+        const len = getBioCharCount();
+        if (len > BIO_LIMITE) {
+            quill.history.undo();
+            return;
         }
+        actualizarContadorBio();
     });
 
-    actualizarContador();
+    actualizarContadorBio();
 });

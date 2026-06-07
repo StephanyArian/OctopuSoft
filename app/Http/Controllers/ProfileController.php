@@ -61,11 +61,10 @@ class ProfileController extends Controller
                 'nullable',
                 'string',
                 function ($attribute, $value, $fail) {
-                    // Decodificar entidades HTML y quitar etiquetas HTML para obtener texto plano
                     $plainText = html_entity_decode(strip_tags($value), ENT_QUOTES, 'UTF-8');
-                    // Quitar todos los espacios (incluyendo espacios de varios bytes/Unicode)
-                    $cleanText = preg_replace('/\s+/u', '', $plainText);
-                    
+                    $plainText = rtrim($plainText, "\n\r");
+                    $cleanText = preg_replace('/[\s\x{00A0}\x{1680}\x{2000}-\x{200B}\x{202F}\x{205F}\x{3000}\x{FEFF}]/u', '', $plainText);
+
                     if (mb_strlen($cleanText, 'UTF-8') > 500) {
                         $fail('La biografía no puede exceder los 500 caracteres (sin contar espacios).');
                     }
