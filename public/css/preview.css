@@ -54,7 +54,7 @@ body {
 
 .profile-info {
     flex: 1;
-    padding: 15px 30px 15px 40px;
+   padding: 65px 30px 15px 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
