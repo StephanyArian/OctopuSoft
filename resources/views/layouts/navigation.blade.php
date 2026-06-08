@@ -18,19 +18,19 @@
             {{-- DERECHA: casita + avatar + hamburger --}}
             <div style="display:flex; align-items:center; gap:12px;">
 
-                {{-- CASITA --}}
-                <a href="{{ url('/') }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
-                    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 28px rgba(0,255,136,0.3);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
-                            <path fill="#2d0a1e" d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
-                            <path fill="#2d0a1e" d="M13 7.293l-5-5-5 5V14a1 1 0 0 0 1 1h3v-3h2v3h3a1 1 0 0 0 1-1z"/>
-                        </svg>
-                    </div>
-                    <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Inicio</span>
-                </a>
+          {{-- CASITA --}}
+<a href="{{ url('/') }}" style="display:flex;flex-direction:column;align-items:center;text-decoration:none;position:relative;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 28px rgba(0,255,136,0.3);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16">
+            <path fill="#2d0a1e" d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+            <path fill="#2d0a1e" d="M13 7.293l-5-5-5 5V14a1 1 0 0 0 1 1h3v-3h2v3h3a1 1 0 0 0 1-1z"/>
+        </svg>
+    </div>
+    <span style="position:absolute;bottom:-14px;font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Inicio</span>
+</a>
 
                 {{-- AVATAR + DROPDOWN --}}
-                <div id="userDropdown" style="position:relative; display:flex; align-items:center;">
+                <div id="userDropdown" style="position:relative; display:flex; align-items:center;margin-top:2px;">
                     <button onclick="toggleUserMenu()" style="background:transparent;border:none;padding:0;cursor:pointer;display:flex;align-items:center;gap:6px;">
                         <div style="position:relative;">
                             @if(Auth::user()->photo_base64)
