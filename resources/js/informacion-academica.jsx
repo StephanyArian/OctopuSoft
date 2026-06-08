@@ -231,16 +231,21 @@ function DescripcionColapsable({ html, limite = 150 }) {
 // EDITOR DE EVIDENCIAS
 // ==========================================
 function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
-    // Evidencias ya guardadas en el servidor (con path real como id)
     const [evidencias, setEvidencias] = useState(
         evidenciasIniciales.map(ev => ({ ...ev, marked: false }))
     );
-    // Archivos nuevos pendientes de subir
     const [archivos, setArchivos] = useState([]);
-    // Paths marcados para eliminar (se envían como campo hidden)
     const [aEliminar, setAEliminar] = useState([]);
     const [errores, setErrores] = useState([]);
     const inputRef = useRef(null);
+
+    // ✅ SOLUCIÓN: sincronizar el input file con los archivos del estado
+    useEffect(() => {
+        if (!inputRef.current) return;
+        const dataTransfer = new DataTransfer();
+        archivos.forEach(a => dataTransfer.items.add(a.file));
+        inputRef.current.files = dataTransfer.files;
+    }, [archivos]);
 
     function validarArchivo(file) {
         if (!ALLOWED_TYPES.includes(file.type))
@@ -261,14 +266,13 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
         });
         setErrores(errs);
         setArchivos(prev => [...prev, ...validos]);
-        e.target.value = '';
+        // ⚠️ NO limpiar e.target.value aquí — el useEffect se encarga
     }
 
     function quitarPendiente(idx) {
         setArchivos(prev => prev.filter((_, i) => i !== idx));
     }
 
-    // Marcar evidencia guardada para eliminar (se envía al servidor al hacer submit)
     function marcarEliminar(path) {
         setEvidencias(prev => prev.filter(ev => ev.path !== path));
         setAEliminar(prev => [...prev, path]);
@@ -278,12 +282,10 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
         <div style={{ marginBottom: '12px' }}>
             <label className="form-label">Evidencias (JPG, PNG, PDF — máx. {MAX_SIZE_MB} MB c/u)</label>
 
-            {/* Campo oculto con los paths a eliminar */}
             {aEliminar.length > 0 && (
                 <input type="hidden" name="evidencias_eliminar" value={aEliminar.join(',')} />
             )}
 
-            {/* Evidencias guardadas */}
             {evidencias.length > 0 && (
                 <div className="evidencias-grid">
                     {evidencias.map(ev => (
@@ -309,7 +311,6 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                 </div>
             )}
 
-            {/* Archivos nuevos pendientes */}
             {archivos.length > 0 && (
                 <div className="evidencias-grid">
                     {archivos.map((a, i) => (
@@ -341,12 +342,20 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                 </ul>
             )}
 
+            {/* ✅ Sin onChange — el input solo se usa como destino del DataTransfer */}
             <input ref={inputRef} type="file" name="evidencias[]" multiple
                 accept=".jpg,.jpeg,.png,.pdf"
-                onChange={agregarArchivos}
                 style={{ display: 'none' }} />
             <button type="button" className="btn-sm"
-                onClick={() => inputRef.current?.click()}
+                onClick={() => {
+                    // Input temporal para seleccionar, sin afectar el principal
+                    const tmp = document.createElement('input');
+                    tmp.type = 'file';
+                    tmp.multiple = true;
+                    tmp.accept = '.jpg,.jpeg,.png,.pdf';
+                    tmp.onchange = agregarArchivos;
+                    tmp.click();
+                }}
                 style={{ marginTop: 4 }}>
                 + Agregar archivo
             </button>
