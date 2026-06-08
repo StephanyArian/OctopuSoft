@@ -5,22 +5,52 @@ function previewPhoto(event) {
 
     const reader = new FileReader();
     reader.onload = function (e) {
-        const preview = document.getElementById('photoPreview');
-        const photoLink = document.getElementById('photoLink');
-        const photoIcon = document.getElementById('photoIcon');
+        const preview    = document.getElementById('photoPreview');
+        const photoLink  = document.getElementById('photoLink');
+        const photoIcon  = document.getElementById('photoIcon');
         const photoLabel = document.getElementById('photoLabel');
+        const btnEliminar = document.getElementById('btnEliminarFoto');
 
-        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
-        if (photoLink) { photoLink.dataset.src = e.target.result; photoLink.style.display = 'block'; }
-        if (photoIcon) photoIcon.style.display = 'none';
+        if (preview)  { preview.src = e.target.result; preview.style.display = 'block'; }
+        if (photoLink){ photoLink.dataset.src = e.target.result; photoLink.style.display = 'block'; }
+        if (photoIcon)  photoIcon.style.display = 'none';
         if (photoLabel) photoLabel.style.display = 'none';
+
+        // Mostrar botón eliminar; marcarlo como "solo preview" si no hay foto guardada en BD
+        if (btnEliminar) {
+            btnEliminar.style.display = 'flex';
+            if (btnEliminar.dataset.hasPhoto !== 'true') {
+                btnEliminar.setAttribute('data-preview-only', 'true');
+            }
+        }
     };
     reader.readAsDataURL(file);
 }
 
-function openDeleteModal() {
+// Manejar el botón eliminar: si solo hay preview (no foto en BD), descarta la selección
+window.openDeleteModal = function() {
+    const btnEliminar = document.getElementById('btnEliminarFoto');
+    if (btnEliminar && btnEliminar.getAttribute('data-preview-only') === 'true') {
+        // Descartar preview sin foto en BD
+        const photoInput = document.getElementById('photoInput');
+        if (photoInput) photoInput.value = '';
+
+        const preview    = document.getElementById('photoPreview');
+        const photoLink  = document.getElementById('photoLink');
+        const photoIcon  = document.getElementById('photoIcon');
+        const photoLabel = document.getElementById('photoLabel');
+
+        if (preview)  { preview.src = '#'; preview.style.display = 'none'; }
+        if (photoLink){ photoLink.style.display = 'none'; }
+        if (photoIcon)  photoIcon.style.display = '';
+        if (photoLabel) photoLabel.style.display = '';
+        btnEliminar.style.display = 'none';
+        btnEliminar.removeAttribute('data-preview-only');
+        return;
+    }
+    // Hay foto guardada en BD → abrir modal de confirmación
     document.getElementById('delete-modal')?.classList.add('active');
-}
+};
 
 function closeDeleteModal() {
     document.getElementById('delete-modal')?.classList.remove('active');

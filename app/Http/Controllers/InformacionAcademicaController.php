@@ -111,8 +111,8 @@ class InformacionAcademicaController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'institucion' => 'required|string|max:60|regex:/^(?!.*[^aeiouáéíóúAEIOUÁÉÍÓÚ]{6,})[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/u',
-            'titulo_obtenido' => 'required|string|max:30|regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/',
+            'institucion' => 'required|string|max:60',
+            'titulo_obtenido' => 'required|string|max:30',
             'especialidad' => 'nullable|string|max:50', 
             'tipo_formacion' => 'required|string|max:50',
             'otro_tipo_formacion' => 'required_if:tipo_formacion,Otro|string|max:50|nullable', // NUEVA VALIDACIÓN

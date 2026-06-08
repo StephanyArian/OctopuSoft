@@ -231,11 +231,16 @@ function DescripcionColapsable({ html, limite = 150 }) {
 // EDITOR DE EVIDENCIAS
 // ==========================================
 function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
-    const [evidencias, setEvidencias] = useState(evidenciasIniciales);
+    // Evidencias ya guardadas en el servidor (con path real como id)
+    const [evidencias, setEvidencias] = useState(
+        evidenciasIniciales.map(ev => ({ ...ev, marked: false }))
+    );
+    // Archivos nuevos pendientes de subir
     const [archivos, setArchivos] = useState([]);
+    // Paths marcados para eliminar (se envían como campo hidden)
+    const [aEliminar, setAEliminar] = useState([]);
     const [errores, setErrores] = useState([]);
     const inputRef = useRef(null);
-    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     function validarArchivo(file) {
         if (!ALLOWED_TYPES.includes(file.type))
@@ -263,22 +268,26 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
         setArchivos(prev => prev.filter((_, i) => i !== idx));
     }
 
-    async function eliminarEvidencia(evidenciaId) {
-        const res = await fetch(`/evidencias/${evidenciaId}`, {
-            method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
-        });
-        if (res.ok) setEvidencias(prev => prev.filter(e => e.id !== evidenciaId));
+    // Marcar evidencia guardada para eliminar (se envía al servidor al hacer submit)
+    function marcarEliminar(path) {
+        setEvidencias(prev => prev.filter(ev => ev.path !== path));
+        setAEliminar(prev => [...prev, path]);
     }
 
     return (
         <div style={{ marginBottom: '12px' }}>
             <label className="form-label">Evidencias (JPG, PNG, PDF — máx. {MAX_SIZE_MB} MB c/u)</label>
 
+            {/* Campo oculto con los paths a eliminar */}
+            {aEliminar.length > 0 && (
+                <input type="hidden" name="evidencias_eliminar" value={aEliminar.join(',')} />
+            )}
+
+            {/* Evidencias guardadas */}
             {evidencias.length > 0 && (
                 <div className="evidencias-grid">
                     {evidencias.map(ev => (
-                        <div key={ev.id} style={{ position: 'relative', display: 'inline-block' }}>
+                        <div key={ev.path} style={{ position: 'relative', display: 'inline-block' }}>
                             {ev.mime_type?.startsWith('image/') ? (
                                 <img src={ev.url} alt="evidencia"
                                     style={{ width: 70, height: 70, objectFit: 'cover', borderRadius: 8, border: '1px solid #ddd' }} />
@@ -288,7 +297,7 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                                 </a>
                             )}
                             <button type="button"
-                                onClick={() => eliminarEvidencia(ev.id)}
+                                onClick={() => marcarEliminar(ev.path)}
                                 style={{
                                     position: 'absolute', top: -6, right: -6,
                                     background: '#e53e3e', color: '#fff', border: 'none',
@@ -300,6 +309,7 @@ function EvidenciasEditor({ formacionId, evidenciasIniciales = [] }) {
                 </div>
             )}
 
+            {/* Archivos nuevos pendientes */}
             {archivos.length > 0 && (
                 <div className="evidencias-grid">
                     {archivos.map((a, i) => (
@@ -615,8 +625,8 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
                                     formacionId={f.id}
                                     evidenciasIniciales={
                                         f.evidence_url
-                                            ? JSON.parse(f.evidence_url).map((path, i) => ({
-                                                id: i,
+                                            ? JSON.parse(f.evidence_url).map((path) => ({
+                                                path: path,
                                                 url: `/storage/${path}`,
                                                 mime_type: path.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
                                                 nombre: path.split('/').pop(),

@@ -101,7 +101,7 @@
                                                             Categoría <span style="font-weight:400;color:#aaa;">(opcional)</span>
                                                         </label>
                                                         <select name="category" class="form-input">
-                                                            <option value="">Sin categoría</option>
+                                                            <option value="">— Seleccionar —</option>
                                                             <option value="frontend" {{ old('category', $editSkill->category) === 'frontend' ? 'selected' : '' }}>Frontend</option>
                                                             <option value="backend"  {{ old('category', $editSkill->category) === 'backend'  ? 'selected' : '' }}>Backend</option>
                                                         </select>
@@ -180,7 +180,7 @@
                                                                 Categoría <span style="font-weight:400;color:#aaa;">(opcional)</span>
                                                             </label>
                                                             <select name="category" class="form-input">
-                                                                <option value="">Sin categoría</option>
+                                                                <option value="">— Seleccionar —</option>
                                                                 <option value="frontend" {{ old('category') === 'frontend' ? 'selected' : '' }}>Frontend</option>
                                                                 <option value="backend"  {{ old('category') === 'backend'  ? 'selected' : '' }}>Backend</option>
                                                             </select>
