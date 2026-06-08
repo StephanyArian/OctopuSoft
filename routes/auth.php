@@ -32,6 +32,14 @@ Route::middleware('guest')->group(function () {
 
 });
 
+Route::middleware('auth')->post('register/cancel', function () {
+    $user = auth()->user();
+    if ($user && is_null($user->email_verified_at)) {
+        auth()->logout();
+        $user->delete();
+    }
+    return redirect(route('home'));
+})->name('register.cancel');
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');

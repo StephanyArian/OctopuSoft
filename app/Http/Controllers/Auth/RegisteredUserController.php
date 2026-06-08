@@ -40,6 +40,10 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+return redirect(route('verification.notice'))->withHeaders([
+    'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+    'Pragma' => 'no-cache',
+    'Expires' => 'Sat, 01 Jan 2000 00:00:00 GMT',
+]);
     }
 }

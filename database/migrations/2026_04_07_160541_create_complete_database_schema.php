@@ -33,30 +33,28 @@ return new class extends Migration
         // =====================================================
         // 3. USERS
         // =====================================================
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('profession_id')->nullable()->constrained('professions')->nullOnDelete();
-            $table->string('first_name', 100);
-            $table->string('last_name', 100);
-            $table->string('email', 150)->unique();
-            $table->string('password', 255);
-            $table->text('biography')->nullable();
-            $table->string('photo_url', 500)->nullable();
-            $table->string('phone', 30)->nullable();
-            $table->string('country', 100)->nullable();
-            $table->string('city', 100)->nullable();
-            $table->string('website', 255)->nullable();
-            $table->boolean('email_verified')->default(false);
-            $table->boolean('is_active')->default(true);
-            $table->timestamp('registered_at')->useCurrent();
-            $table->rememberToken();
-            $table->timestamps();
+Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('profession_id')->nullable()->constrained('professions')->nullOnDelete();
+    $table->string('first_name', 100);
+    $table->string('last_name', 100);
+    $table->string('email', 150)->unique();
+    $table->string('password', 255);
+    $table->text('biography')->nullable();
+    $table->string('photo_url', 500)->nullable();
+    $table->string('phone', 30)->nullable();
+    $table->string('country', 100)->nullable();
+    $table->string('city', 100)->nullable();
+    $table->string('website', 255)->nullable();
+    $table->boolean('is_active')->default(true);
+    $table->timestamp('registered_at')->useCurrent();
+    $table->rememberToken();
+    $table->timestamps();
 
-            $table->index('profession_id');
-            $table->index('is_active');
-            $table->index('email');
-        });
-
+    $table->index('profession_id');
+    $table->index('is_active');
+    $table->index('email');
+});
         // =====================================================
         // 4. SESSIONS
         // =====================================================

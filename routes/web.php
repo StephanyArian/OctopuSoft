@@ -33,7 +33,7 @@ Route::get('/dashboard', function () {
         ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
         ->header('Pragma', 'no-cache')
         ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 Route::get('/reset-password/{token}', function ($token) {
     return view('auth.reset-password', [
@@ -57,9 +57,7 @@ Route::get('/portafolios', [App\Http\Controllers\PreviewController::class, 'expl
 // ============================================
 // RUTAS PROTEGIDAS (requieren autenticación)
 // ============================================
-Route::middleware('auth')->group(function () {
-
-    // PERFIL
+Route::middleware('auth')->group(function () {    // PERFIL
     Route::get('/profile',   [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
