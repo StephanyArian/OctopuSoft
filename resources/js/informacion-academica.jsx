@@ -375,9 +375,6 @@ function HistorialAcademico({ formaciones: initialFormaciones }) {
 
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-    // ==========================================
-    // INICIALIZAR QUILL EN MODO EDICIÓN
-    // ==========================================
     useEffect(() => {
         if (editando && typeof window !== 'undefined' && window.Quill) {
             if (quillInstances.current[editando]) {

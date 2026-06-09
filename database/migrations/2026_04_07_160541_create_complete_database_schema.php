@@ -47,8 +47,10 @@ return new class extends Migration
             $table->string('city', 100)->nullable();
             $table->string('website', 255)->nullable();
             $table->boolean('email_verified')->default(false);
+            $table->timestamp('email_verified_at')->nullable(); 
             $table->boolean('is_active')->default(true);
             $table->timestamp('registered_at')->useCurrent();
+
             $table->rememberToken();
             $table->timestamps();
 
