@@ -127,10 +127,13 @@ class ProfileController extends Controller
         $user->first_name = $fullName[0];
         $user->last_name = $fullName[1] ?? $fullName[0];
     
-        $user->email = $request->email;
+        // Si el email cambió, marcar como no verificado
+        if ($user->email !== $request->email) {
+            $user->email = $request->email;
+            $user->email_verified = false;
+        }
 
         $user->save();
-
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

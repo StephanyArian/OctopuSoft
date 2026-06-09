@@ -77,6 +77,8 @@ class ProyectoController extends Controller
             $proyecto->load('technologies', 'evidencias');
 
             return response()->json($this->formato($proyecto), 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e; // Dejar que Laravel maneje la ValidationException correctamente
         } catch (\Exception $e) {
             Log::error('Error al crear proyecto: ' . $e->getMessage());
             return response()->json(['error' => 'Error al crear proyecto: ' . $e->getMessage()], 500);
@@ -119,6 +121,8 @@ class ProyectoController extends Controller
             $proyecto->load('technologies', 'evidencias');
 
             return response()->json($this->formato($proyecto));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             Log::error('Error al actualizar proyecto: ' . $e->getMessage());
             return response()->json(['error' => 'Error al actualizar proyecto'], 500);

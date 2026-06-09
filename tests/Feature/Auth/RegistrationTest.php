@@ -18,11 +18,14 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        // El registro requiere first_name, last_name separados
+        // y contraseña fuerte (mayúscula, minúscula, número, especial)
         $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'first_name'            => 'Test',
+            'last_name'             => 'User',
+            'email'                 => 'test@example.com',
+            'password'              => 'Password123!',
+            'password_confirmation' => 'Password123!',
         ]);
 
         $this->assertAuthenticated();

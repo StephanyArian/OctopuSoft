@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -33,9 +34,42 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified' => 'boolean',
         'password' => 'hashed',
     ];
+
+    /**
+     * Determina si el email del usuario está verificado.
+     * Usa la columna booleana `email_verified` en vez de `email_verified_at`.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        return (bool) $this->email_verified;
+    }
+
+    /**
+     * Marca el email como verificado.
+     */
+    public function markEmailAsVerified(): bool
+    {
+        return $this->forceFill(['email_verified' => true])->save();
+    }
+
+    /**
+     * Devuelve la dirección de email para verificación.
+     */
+    public function getEmailForVerification(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Envía la notificación de verificación de email.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail());
+    }
 
     public function getAuthPassword(): string
     {
