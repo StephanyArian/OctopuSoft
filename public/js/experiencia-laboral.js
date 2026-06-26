@@ -4,7 +4,6 @@
 
 const MAX_CARGOS = 5;
 
-/* Lista maestra de opciones (debe coincidir con el blade) */
 const CARGO_OPTIONS = [
     'Frontend Developer',
     'Backend Developer',
@@ -27,14 +26,12 @@ const CARGO_OPTIONS = [
     'Systems Analyst',
 ];
 
-/* ── SVG del ícono de basurero ── */
 const TRASH_ICON = `
 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
     <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
     <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
 </svg>`;
 
-/* ── Generador de HTML para un dropdown de cargo ── */
 function crearDropdownHTML(index) {
     const opts = CARGO_OPTIONS.map(o =>
         `<li data-value="${o}">${o}</li>`
@@ -59,12 +56,10 @@ function crearDropdownHTML(index) {
         </div>`;
 }
 
-/* ── Abrir / cerrar un dropdown ── */
 window.toggleDropdown = function (btn) {
     const wrapper = btn.closest('.custom-dropdown');
     const isOpen  = wrapper.classList.contains('open');
 
-    // Cerrar todos los demás
     document.querySelectorAll('.custom-dropdown.open').forEach(d => {
         if (d !== wrapper) cerrarDropdown(d);
     });
@@ -79,7 +74,6 @@ window.toggleDropdown = function (btn) {
 function abrirDropdown(wrapper) {
     wrapper.classList.add('open');
     wrapper.querySelector('.dropdown-arrow').textContent = '▼';
-    // Adjuntar listeners a los <li> solo cuando se abre
     wrapper.querySelectorAll('.custom-dropdown-menu li').forEach(li => {
         li.onclick = () => seleccionarOpcion(li);
     });
@@ -96,7 +90,6 @@ function seleccionarOpcion(li) {
     const label   = wrapper.querySelector('.dropdown-label');
     const hidden  = wrapper.querySelector('input[type=hidden]');
 
-    // Actualizar label
     if (valor === '') {
         label.textContent = '— Seleccionar cargo —';
         label.classList.add('muted');
@@ -105,25 +98,20 @@ function seleccionarOpcion(li) {
         label.classList.remove('muted');
     }
 
-    // Marcar seleccionada
     wrapper.querySelectorAll('.custom-dropdown-menu li').forEach(l => l.classList.remove('selected'));
     li.classList.add('selected');
-
-    // Guardar en el hidden
     hidden.value = valor;
 
     cerrarDropdown(wrapper);
     ocultarCargosError();
 }
 
-/* Cerrar dropdowns al hacer clic fuera */
 document.addEventListener('click', function (e) {
     if (!e.target.closest('.custom-dropdown')) {
         document.querySelectorAll('.custom-dropdown.open').forEach(cerrarDropdown);
     }
 });
 
-/* ── Gestión de la lista de cargos ── */
 function getCargosItems() {
     return document.querySelectorAll('#cargos-list .cargo-item');
 }
@@ -153,7 +141,6 @@ window.removeCargo = function (btn) {
         mostrarCargosError('Debe haber al menos un cargo registrado.');
         return;
     }
-    // Cerrar dropdown si está abierto
     const wrapper = btn.closest('.cargo-item').querySelector('.custom-dropdown');
     if (wrapper) cerrarDropdown(wrapper);
 
@@ -162,7 +149,6 @@ window.removeCargo = function (btn) {
     actualizarBotonesRemover();
 };
 
-/* ── Mensajes de error de cargos ── */
 function mostrarCargosError(msg) {
     const el = document.getElementById('cargosError');
     el.textContent = msg;
@@ -172,7 +158,6 @@ function ocultarCargosError() {
     document.getElementById('cargosError').classList.add('hidden');
 }
 
-/* ── Validación de cargos al enviar ── */
 function validarCargos() {
     const hiddens = document.querySelectorAll('#cargos-list input[type=hidden][name="cargos[]"]');
     const valores = [];
@@ -193,31 +178,48 @@ function validarCargos() {
     return true;
 }
 
-/* ── Sync date picker → hidden inputs para el controller ── */
+/* ── Sync date picker → hidden inputs ── */
+/* FIX 1: Validar que val sea una fecha completa (YYYY-MM-DD, 10 chars) antes de sincronizar */
 window.syncFechaInicio = function (val) {
     const fullEl = document.getElementById('fechaInicioFull');
-    if (!val) {
-        ['fechaInicioDia','fechaInicioMes','fechaInicioAnio'].forEach(id => document.getElementById(id).value = '');
+
+    // Si val está vacío o incompleto (el usuario está escribiendo), limpiar hiddens y salir
+    if (!val || val.length < 10 || val.includes('_')) {
+        ['fechaInicioDia','fechaInicioMes','fechaInicioAnio'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
         if (fullEl) fullEl.value = '';
         return;
     }
+
     const [anio, mes, dia] = val.split('-');
-    if (parseInt(anio) < 1950) { document.getElementById('fechaInicioPicker').value = '1950-01-01'; return; }
+    if (parseInt(anio) < 1950) {
+        document.getElementById('fechaInicioPicker').value = '1950-01-01';
+        return;
+    }
+
     document.getElementById('fechaInicioDia').value  = dia;
     document.getElementById('fechaInicioMes').value  = mes;
     document.getElementById('fechaInicioAnio').value = anio;
     if (fullEl) fullEl.value = val;
+
     const finPicker = document.getElementById('fechaFinPicker');
     if (finPicker) finPicker.min = val;
 };
 
+/* FIX 1: Mismo fix para syncFechaFin */
 window.syncFechaFin = function (val) {
     const fullEl = document.getElementById('fechaFinFull');
-    if (!val) {
-        ['fechaFinDia','fechaFinMes','fechaFinAnio'].forEach(id => document.getElementById(id).value = '');
+
+    // Si val está vacío o incompleto, limpiar hiddens y salir
+    if (!val || val.length < 10 || val.includes('_')) {
+        ['fechaFinDia','fechaFinMes','fechaFinAnio'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
         if (fullEl) fullEl.value = '';
         return;
     }
+
     const [anio, mes, dia] = val.split('-');
     document.getElementById('fechaFinDia').value  = dia;
     document.getElementById('fechaFinMes').value  = mes;
@@ -227,10 +229,10 @@ window.syncFechaFin = function (val) {
 
 /* ── Toggle trabajo actual ── */
 window.toggleFechaFin = function (checkbox) {
-    const group     = document.getElementById('fechaFinGroup');
-    const picker    = document.getElementById('fechaFinPicker');
-    const required  = document.getElementById('fechaFinRequired');
-    const hiddens   = ['fechaFinDia','fechaFinMes','fechaFinAnio'];
+    const group    = document.getElementById('fechaFinGroup');
+    const picker   = document.getElementById('fechaFinPicker');
+    const required = document.getElementById('fechaFinRequired');
+    const hiddens  = ['fechaFinDia','fechaFinMes','fechaFinAnio'];
 
     if (checkbox.checked) {
         picker.disabled = true;
@@ -255,6 +257,10 @@ window.updateCounter = function(inputId, counterId) {
 /* ── Reset completo del formulario ── */
 window.resetForm = function () {
     document.getElementById('experienciaForm').reset();
+
+    // Limpiar todos los mensajes de error visibles
+    document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+
     document.getElementById('fechaFinGroup').style.opacity = '1';
     const finPicker = document.getElementById('fechaFinPicker');
     if (finPicker) { finPicker.disabled = false; finPicker.value = ''; }
@@ -264,26 +270,34 @@ window.resetForm = function () {
         const el = document.getElementById(id);
         if (el) { el.disabled = false; el.value = ''; }
     });
-    // Reset counters
-    ['empresaCount','locationCount','descripcionCount'].forEach(id => {
+    const fullIni = document.getElementById('fechaInicioFull');
+    if (fullIni) fullIni.value = '';
+    const fullFin = document.getElementById('fechaFinFull');
+    if (fullFin) fullFin.value = '';
+
+    ['empresaCount','locationCount'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.textContent = '0';
     });
+    const descCount = document.getElementById('descripcionCount');
+    if (descCount) descCount.textContent = '0 / 500 caracteres';
 
-    // Restaurar lista a un solo dropdown vacío
     const list = document.getElementById('cargos-list');
     list.innerHTML = '';
     const div = document.createElement('div');
     div.innerHTML = crearDropdownHTML(0);
     list.appendChild(div.firstElementChild);
-    // El primero no se puede eliminar
     list.querySelector('.btn-remove-cargo').disabled = true;
 
     ocultarCargosError();
     actualizarBotonesRemover();
 };
 
-/* ── Validación global al submit ── */
+/* ══════════════════════════════════════════════════════════
+   VALIDACIÓN GLOBAL AL SUBMIT
+   FIX: stopImmediatePropagation si hay errores para que
+   ningún otro listener pueda enviar el form igualmente.
+   ══════════════════════════════════════════════════════════ */
 document.getElementById('experienciaForm').addEventListener('submit', function (e) {
     let isValid = true;
 
@@ -305,7 +319,7 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
         fechaInicioError.classList.remove('hidden'); isValid = false;
     } else { fechaInicioError.classList.add('hidden'); }
 
-    // Fecha fin — obligatoria si no es trabajo actual
+    // Fecha fin
     const finDia        = document.getElementById('fechaFinDia').value;
     const finMes        = document.getElementById('fechaFinMes').value;
     const finAnio       = document.getElementById('fechaFinAnio').value;
@@ -324,17 +338,20 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
         } else { fechaFinError.classList.add('hidden'); }
     } else { fechaFinError.classList.add('hidden'); }
 
-    if (!isValid) e.preventDefault();
-});
+    if (!isValid) {
+        e.preventDefault();
+        e.stopImmediatePropagation(); /* FIX: bloquea todos los demás listeners de submit */
+    }
+
+}, false); /* false = burbuja, corre DESPUÉS del capture de Quill */
 
 /* ══════════════════════════════════════════════════════════
    GEO-AUTOCOMPLETE — formulario de alta (Blade)
-   Fuente: OpenStreetMap Nominatim (sin API key)
    ══════════════════════════════════════════════════════════ */
 (function () {
     const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
     let debounceTimer = null;
-    let locationValid = false;   // ← bandera: el valor fue elegido de la lista
+    let locationValid = false;
 
     function buildQuery(q) {
         return `${NOMINATIM}?q=${encodeURIComponent(q)}&format=json&addressdetails=1&limit=6&accept-language=es`;
@@ -351,14 +368,13 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
     }
 
     window.addEventListener('DOMContentLoaded', function () {
-        const input   = document.getElementById('location');
-        const list    = document.getElementById('geo-suggestions');
-        const errEl   = document.getElementById('locationError');
-        const hidden  = document.querySelector('input[name="location"]'); // mismo input
+        const input  = document.getElementById('location');
+        const list   = document.getElementById('geo-suggestions');
+        const errEl  = document.getElementById('locationError');
 
         if (!input || !list) return;
 
-        /* Si ya venía con valor (old()), asumirlo como válido */
+        /* FIX 2: Si ya hay un valor al cargar (old() en blade), marcarlo como válido */
         if (input.value.trim()) locationValid = true;
 
         function showSuggestions(items) {
@@ -370,7 +386,7 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
                 li.textContent = label;
                 li.dataset.value = label;
                 li.addEventListener('mousedown', function (e) {
-                    e.preventDefault();  // evitar blur antes de click
+                    e.preventDefault();
                     input.value = label;
                     document.getElementById('locationCount').textContent = label.length;
                     locationValid = true;
@@ -384,15 +400,13 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
         }
 
         input.addEventListener('input', function () {
-            locationValid = false;  // el usuario escribió manualmente → inválido hasta elegir
+            locationValid = false;
             const q = input.value.trim();
             clearTimeout(debounceTimer);
             if (q.length < 3) { list.classList.add('hidden'); return; }
             debounceTimer = setTimeout(async () => {
                 try {
-                    const res  = await fetch(buildQuery(q), {
-                        headers: { 'Accept-Language': 'es' }
-                    });
+                    const res  = await fetch(buildQuery(q), { headers: { 'Accept-Language': 'es' } });
                     const data = await res.json();
                     showSuggestions(data);
                 } catch (_) { /* silencioso */ }
@@ -401,7 +415,6 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
 
         input.addEventListener('blur', function () {
             setTimeout(() => list.classList.add('hidden'), 150);
-            /* Si el campo tiene texto pero no fue elegido de la lista → error */
             if (input.value.trim() && !locationValid) {
                 errEl.classList.remove('hidden');
             }
@@ -411,7 +424,8 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
             errEl.classList.add('hidden');
         });
 
-        /* Bloquear submit si la ubicación no es válida */
+        /* FIX 2: capture=true para correr ANTES del listener de validación general.
+           Si hay texto sin seleccionar de la lista, bloquear el submit completamente. */
         const form = document.getElementById('experienciaForm');
         form.addEventListener('submit', function (e) {
             if (input.value.trim() && !locationValid) {
@@ -419,40 +433,55 @@ document.getElementById('experienciaForm').addEventListener('submit', function (
                 e.preventDefault();
                 e.stopImmediatePropagation();
             }
-        }, false);   // false = fase de burbuja, DESPUÉS del listener de validación general
+        }, true); /* capture=true: corre ANTES del listener de validación general */
     });
 })();
+
 /* ── Init ── */
 window.addEventListener('DOMContentLoaded', function () {
     const cb = document.getElementById('trabajoActual');
     if (cb && cb.checked) toggleFechaFin(cb);
     actualizarBotonesRemover();
 
-    // También actualizar el ícono del primer btn-remove-cargo que viene del blade
     document.querySelectorAll('#cargos-list .btn-remove-cargo').forEach(btn => {
         if (btn.textContent.trim() === '×') btn.innerHTML = TRASH_ICON;
     });
 
-    ['empresa','location','descripcion'].forEach(name => {
+    ['empresa', 'location', 'descripcion'].forEach(name => {
         const el  = document.querySelector(`[name="${name}"]`);
-        const map = { empresa:'empresaCount', location:'locationCount', descripcion:'descripcionCount' };
+        const map = { empresa: 'empresaCount', location: 'locationCount', descripcion: 'descripcionCount' };
         if (el && map[name]) {
             const cnt = document.getElementById(map[name]);
             if (cnt) cnt.textContent = el.value.length;
         }
     });
-    const iniAnio = document.getElementById('fechaInicioAnio')?.value;
-    const iniMes  = document.getElementById('fechaInicioMes')?.value;
-    const iniDia  = document.getElementById('fechaInicioDia')?.value;
-    if (iniAnio && iniMes && iniDia) {
-        const p = document.getElementById('fechaInicioPicker');
-        if (p) p.value = `${iniAnio}-${iniMes}-${iniDia}`;
+
+    /* ── FIX: sincronizar hidden inputs al cargar si el picker ya tiene valor ── */
+    const iniPicker = document.getElementById('fechaInicioPicker');
+    if (iniPicker && iniPicker.value) {
+        syncFechaInicio(iniPicker.value);
+    } else {
+        const iniAnio = document.getElementById('fechaInicioAnio')?.value;
+        const iniMes  = document.getElementById('fechaInicioMes')?.value;
+        const iniDia  = document.getElementById('fechaInicioDia')?.value;
+        if (iniAnio && iniMes && iniDia) {
+            const val = `${iniAnio}-${iniMes}-${iniDia}`;
+            if (iniPicker) iniPicker.value = val;
+            syncFechaInicio(val);
+        }
     }
-    const finAnio = document.getElementById('fechaFinAnio')?.value;
-    const finMes  = document.getElementById('fechaFinMes')?.value;
-    const finDia  = document.getElementById('fechaFinDia')?.value;
-    if (finAnio && finMes && finDia) {
-        const p = document.getElementById('fechaFinPicker');
-        if (p) p.value = `${finAnio}-${finMes}-${finDia}`;
+
+    const finPicker = document.getElementById('fechaFinPicker');
+    if (finPicker && finPicker.value) {
+        syncFechaFin(finPicker.value);
+    } else {
+        const finAnio = document.getElementById('fechaFinAnio')?.value;
+        const finMes  = document.getElementById('fechaFinMes')?.value;
+        const finDia  = document.getElementById('fechaFinDia')?.value;
+        if (finAnio && finMes && finDia) {
+            const val = `${finAnio}-${finMes}-${finDia}`;
+            if (finPicker) finPicker.value = val;
+            syncFechaFin(val);
+        }
     }
 });

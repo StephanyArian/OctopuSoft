@@ -623,7 +623,7 @@ function FormEdicionGrupo({ grupo, token, onGuardado, onCancelar }) {
                     {/* Error si escribió sin seleccionar */}
                     {geo.showError && (
                         <div className="error-message">
-                            Selecciona una ubicación válida de la lista de sugerencias.
+                            Por favor, selecciona una ubicación de la lista de sugerencias al escribir.
                         </div>
                     )}
                 </div>
