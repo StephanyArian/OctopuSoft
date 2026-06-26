@@ -54,6 +54,9 @@ Route::get('/portafolio/{slug}', [PreviewController::class, 'publicShow']) // ü
 Route::get('/portafolios', [App\Http\Controllers\PreviewController::class, 'explore'])
     ->name('portafolio.explore');
 
+Route::get('/portafolios/comparar', [App\Http\Controllers\PreviewController::class, 'compare'])
+    ->name('portafolio.compare');
+
 // ============================================
 // RUTAS PROTEGIDAS (requieren autenticaci√≥n)
 // ============================================

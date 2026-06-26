@@ -27,12 +27,14 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
     const skillCheckboxes = document.querySelectorAll('input[name="skills[]"]');
     const experienceRadios = document.querySelectorAll('input[name="min_experience"]');
     const languageRadios = document.querySelectorAll('input[name="language"]');
+    const companyRadios = document.querySelectorAll('input[name="company"]');
     const sortRadios = document.querySelectorAll('input[name="sort"]');
 
     const categoryText = document.getElementById('categoryDropdownText');
     const skillsText = document.getElementById('skillsDropdownText');
     const experienceText = document.getElementById('experienceDropdownText');
     const languageText = document.getElementById('languageDropdownText');
+    const companyText = document.getElementById('companyDropdownText');
     const sortText = document.getElementById('sortDropdownText');
     const clearSkillsOption = document.getElementById('clearSkillsOption');
 
@@ -73,6 +75,10 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
             languageText.textContent = getCheckedLabel(languageRadios, 'Idiomas');
         }
 
+        if (companyText) {
+            companyText.textContent = getCheckedLabel(companyRadios, 'Empresa');
+        }
+
         if (sortText) {
             sortText.textContent = getCheckedLabel(sortRadios, 'Más recientes');
         }
@@ -108,11 +114,13 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
                 .slice(0, 50)
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
+                .trim()
             : '';
 
         const category = getCheckedValue(categoryRadios);
         const minExperience = getCheckedValue(experienceRadios);
         const language = getCheckedValue(languageRadios);
+        const company = getCheckedValue(companyRadios);
         const sort = getCheckedValue(sortRadios, 'desc');
         const selectedSkills = getSelectedSkills();
 
@@ -128,10 +136,15 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
         });
 
         if (minExperience) params.append('min_experience', minExperience);
+        if (company) params.append('company', company);
         if (language) params.append('language', language);
         if (sort) params.append('sort', sort);
 
-        return `${window.location.pathname}?${params.toString()}`;
+        const queryString = params.toString();
+        
+        return queryString
+        ? `${window.location.pathname}?${queryString}`
+        : window.location.pathname;
     }
 
     function fetchFilteredPortfolios() {
@@ -163,6 +176,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
 
                 if (portfoliosGrid && data.html !== undefined) {
                     portfoliosGrid.innerHTML = data.html;
+                    syncCompareButtons();
                 }
 
                 if (totalResults) {
@@ -243,6 +257,14 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
         });
     });
 
+    companyRadios.forEach(radio => {
+     radio.addEventListener('change', () => {
+        updateDropdownTexts();
+        closeAllDropdowns();
+        fetchFilteredPortfolios();
+      });
+    });
+
     sortRadios.forEach(radio => {
         radio.addEventListener('change', () => {
             updateDropdownTexts();
@@ -297,6 +319,10 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
             });
 
             languageRadios.forEach(radio => {
+                radio.checked = radio.value === '';
+            });
+
+            companyRadios.forEach(radio => {
                 radio.checked = radio.value === '';
             });
 
@@ -438,6 +464,114 @@ if (mobileFilterToggle && filterContainer) {
         mobileFilterToggle.classList.toggle('active');
     });
 }
+
+// ── Comparar perfiles ──
+const selectedCompare = new Map();
+
+const compareBar = document.getElementById('compareBar');
+const compareCount = document.getElementById('compareCount');
+const compareNames = document.getElementById('compareNames');
+const btnClearCompare = document.getElementById('btnClearCompare');
+const btnGoCompare = document.getElementById('btnGoCompare');
+
+function updateCompareBar() {
+    if (!compareBar || !compareCount || !compareNames) return;
+
+    const total = selectedCompare.size;
+
+    compareCount.textContent = `${total} perfil${total === 1 ? '' : 'es'} seleccionado${total === 1 ? '' : 's'}`;
+    compareNames.textContent = Array.from(selectedCompare.values()).join(' | ');
+
+    compareBar.hidden = total === 0;
+
+    if (btnGoCompare) {
+        btnGoCompare.disabled = total < 2;
+    }
+}
+
+function syncCompareButtons() {
+    document.querySelectorAll('.js-compare-toggle').forEach(button => {
+        const id = button.dataset.portfolioId;
+
+        if (selectedCompare.has(id)) {
+            button.classList.add('selected');
+            button.innerHTML = '<i class="fas fa-check"></i> Seleccionado';
+        } else {
+            button.classList.remove('selected');
+            button.innerHTML = '<i class="fas fa-scale-balanced"></i> Comparar';
+        }
+    });
+}
+
+document.addEventListener('click', e => {
+    const button = e.target.closest('.js-compare-toggle');
+
+    if (!button) return;
+
+    e.preventDefault();
+
+    const id = button.dataset.portfolioId;
+    const name = button.dataset.portfolioName;
+
+    if (selectedCompare.has(id)) {
+        selectedCompare.delete(id);
+    } else {
+        if (selectedCompare.size >= 3) {
+            alert('Puedes comparar máximo 3 perfiles a la vez.');
+            return;
+        }
+
+        selectedCompare.set(id, name);
+    }
+
+    syncCompareButtons();
+    updateCompareBar();
+});
+
+if (btnClearCompare) {
+    btnClearCompare.addEventListener('click', e => {
+        e.preventDefault();
+
+        selectedCompare.clear();
+        syncCompareButtons();
+        updateCompareBar();
+    });
+}
+
+if (btnGoCompare) {
+    btnGoCompare.addEventListener('click', e => {
+        e.preventDefault();
+
+        if (selectedCompare.size < 2) {
+            alert('Selecciona al menos 2 perfiles para comparar.');
+            return;
+        }
+
+        const compareUrl = new URL(btnGoCompare.dataset.compareUrl, window.location.origin);
+
+        selectedCompare.forEach((name, id) => {
+            compareUrl.searchParams.append('ids[]', id);
+        });
+
+        const currentParams = new URLSearchParams(window.location.search);
+
+        ['search', 'category', 'company', 'language', 'min_experience', 'sort'].forEach(key => {
+            if (currentParams.has(key)) {
+                compareUrl.searchParams.set(key, currentParams.get(key));
+            }
+        });
+
+        currentParams.getAll('skills[]').forEach(skill => {
+            compareUrl.searchParams.append('skills[]', skill);
+        });
+
+        window.location.href = compareUrl.toString();
+    });
+}
+
+syncCompareButtons();
+updateCompareBar();
+
     updateDropdownTexts();
 });
 
