@@ -436,7 +436,47 @@
 </head>
 <body>
 
+@if($errors->has('publish'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Portafolio incompleto',
+                html: `
+                    <p style="margin-bottom:12px;">
+                        {{ $errors->first('publish') }}
+                    </p>
 
+                    @if(session('publish_missing'))
+                        <div style="text-align:left;">
+                            <strong>Debes completar:</strong>
+                            <ul style="margin-top:8px;">
+                                @foreach(session('publish_missing') as $campo)
+                                    <li>{{ $campo }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                `,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#0abf9e'
+            });
+        });
+    </script>
+@endif
+
+@if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: 'Correcto',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#0abf9e'
+            });
+        });
+    </script>
+@endif
 
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';

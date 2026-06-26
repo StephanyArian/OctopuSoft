@@ -121,7 +121,7 @@ return new class extends Migration
             $table->string('slug', 120)->unique();
             $table->string('title', 255);
             $table->text('description')->nullable();
-            $table->boolean('is_public')->default(true);
+            $table->boolean('is_public')->default(false);
             $table->boolean('show_email')->default(false);
             $table->boolean('show_phone')->default(false);
             $table->timestamps();

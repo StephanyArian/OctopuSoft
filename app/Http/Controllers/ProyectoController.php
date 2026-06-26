@@ -20,7 +20,7 @@ class ProyectoController extends Controller
             [
                 'slug'      => 'portfolio-' . Auth::id(),
                 'title'     => 'Mi Portafolio',
-                'is_public' => true,
+                'is_public' => false,
                 'show_email'=> false,
                 'show_phone'=> false,
             ]

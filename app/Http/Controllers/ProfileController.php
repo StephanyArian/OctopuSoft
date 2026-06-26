@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -171,30 +172,118 @@ class ProfileController extends Controller
         return redirect()->route('dashboard')->with('success', 'Foto eliminada exitosamente');
     }
 
-    public function publish(Request $request): RedirectResponse
+    private function obtenerCamposBasicosFaltantes($user): array
+{
+    $user->loadMissing([
+        'profession',
+        'skills',
+        'experiences',
+        'professionalNetworks.platform',
+        'location',
+        'portfolio.projects'
+    ]);
+
+    $faltantes = [];
+
+    $nombreCompleto = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+
+    if ($nombreCompleto === '' || mb_strlen($nombreCompleto) < 5) {
+        $faltantes[] = 'Nombre completo';
+    }
+
+    if (!$user->profession) {
+        $faltantes[] = 'Título profesional o profesión';
+    }
+
+    $biografiaTexto = trim(preg_replace(
+        '/\s+/',
+        ' ',
+        strip_tags(html_entity_decode($user->biography ?? '', ENT_QUOTES, 'UTF-8'))
+    ));
+
+    if ($biografiaTexto === '' || mb_strlen($biografiaTexto) < 40) {
+        $faltantes[] = 'Biografía profesional de al menos 40 caracteres';
+    }
+
+    $tieneUbicacion = trim(($user->city ?? '') . ' ' . ($user->country ?? '')) !== ''
+        || ($user->location && !empty($user->location->address));
+
+    if (!$tieneUbicacion) {
+        $faltantes[] = 'Ubicación';
+    }
+
+    $tieneFormacion = $user->experiences
+        ->where('type', 'education')
+        ->where('is_visible', true)
+        ->count() > 0;
+
+    $tieneExperiencia = $user->experiences
+        ->where('type', 'work')
+        ->where('is_visible', true)
+        ->count() > 0;
+
+    if (!$tieneFormacion && !$tieneExperiencia) {
+        $faltantes[] = 'Al menos una formación académica o experiencia laboral';
+    }
+
+    $tieneHabilidadTecnica = $user->skills
+        ->where('type', 'technical')
+        ->where('is_visible', true)
+        ->count() > 0;
+
+    if (!$tieneHabilidadTecnica) {
+        $faltantes[] = 'Al menos una habilidad técnica visible';
+    }
+
+    $tieneContactoVisible = $user->professionalNetworks
+        ->where('is_visible', true)
+        ->count() > 0;
+
+    if (!$tieneContactoVisible) {
+        $faltantes[] = 'Al menos una red o medio de contacto visible';
+    }
+
+    return $faltantes;
+}
+
+public function publish(Request $request): RedirectResponse
 {
     $user = $request->user();
-    
-    // Verificar si el usuario tiene un portafolio
-    if ($user->portfolio) {
-        $user->portfolio->update(['is_public' => true]);
-        
+
+    $faltantes = $this->obtenerCamposBasicosFaltantes($user);
+
+    if (!empty($faltantes)) {
         return redirect()
             ->route('preview')
-            ->with('success', '✅ ¡Perfil publicado exitosamente! Ahora es visible para todos.');
+            ->withErrors([
+                'publish' => 'No puedes publicar el portafolio todavía. Debes completar la información básica requerida.'
+            ])
+            ->with('publish_missing', $faltantes);
     }
-    
-    // Si no tiene portafolio, crear uno
-    $portfolio = $user->portfolio()->create([
-        'slug' => \Illuminate\Support\Str::slug($user->first_name . '-' . $user->last_name . '-' . $user->id),
-        'title' => 'Portafolio de ' . $user->first_name . ' ' . $user->last_name,
+
+    $portfolio = $user->portfolio()->firstOrCreate(
+        [
+            'user_id' => $user->id,
+        ],
+        [
+            'slug' => Str::slug(($user->first_name ?? 'usuario') . '-' . ($user->last_name ?? '') . '-' . $user->id),
+            'title' => 'Portafolio de ' . trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
+            'description' => $user->biography ?? '',
+            'is_public' => false,
+            'show_email' => false,
+            'show_phone' => false,
+        ]
+    );
+
+    $portfolio->update([
+        'title' => 'Portafolio de ' . trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')),
         'description' => $user->biography ?? '',
-        'is_public' => true
+        'is_public' => true,
     ]);
-    
+
     return redirect()
         ->route('preview')
-        ->with('success', '✅ ¡Perfil publicado exitosamente!');
+        ->with('success', '✅ ¡Perfil publicado exitosamente! Ahora es visible para todos.');
 }
 
     public function updateTheme(Request $request)
