@@ -497,10 +497,10 @@
 @endphp
 
 {{-- Botón Volver flotante --}}
-<button class="btn-volver-flotante" onclick="window.location.href='{{ url()->previous() }}'">
+<a href="{{ route('dashboard') }}" class="btn-volver-flotante">
     <i class="fas fa-arrow-left"></i>
     <span>Volver</span>
-</button>
+</a>
 
 {{-- FAB flotante abajo-izquierda --}}
 <div class="fab-container" id="fabContainer">
