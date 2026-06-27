@@ -117,16 +117,12 @@
         Configuración
     </a>
 
-    <a href="{{ route('cerrar.sesion') }}"
-    style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#e53e3e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box, linear-gradient(135deg,#f87171,#dc2626) border-box;box-shadow:0 2px 8px rgba(229,62,62,0.15);"
-    onmouseover="this.style.boxShadow='0 4px 16px rgba(229,62,62,0.3)'"
-    onmouseout="this.style.boxShadow='0 2px 8px rgba(229,62,62,0.15)'">
-        <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#f87171,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <i class="bi bi-box-arrow-right" style="color:white;"></i>
-        </div>
-        Cerrar sesión
-    </a>
-
+<button type="button" onclick="openLogoutModal()" style="display:flex;align-items:center;gap:12px;padding:10px 12px;text-decoration:none;color:#e53e3e;font-size:14px;font-weight:500;border-radius:10px;border:1.5px solid transparent;background:linear-gradient(white,white) padding-box,linear-gradient(135deg,#f87171,#dc2626) border-box;box-shadow:0 2px 8px rgba(229,62,62,0.15);width:100%;text-align:left;cursor:pointer;">
+    <div style="width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#f87171,#dc2626);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="bi bi-box-arrow-right" style="color:white;"></i>
+    </div>
+    Cerrar sesión
+</button>
 </div>
 
                         </div>
@@ -363,5 +359,7 @@
             }
         });
     </script>
+
+    @include('auth.Cierresesion')
 </body>
 </html>

@@ -78,7 +78,7 @@ class RedContactoController extends Controller
                 'linkedin.regex' => 'El enlace debe ser de LinkedIn válido',
                 'github.regex' => 'El enlace debe ser de GitHub válido',
 
-             'whatsapp.regex' => 'Solo se permiten números de Bolivia: 8 dígitos que empiecen con 6 o 7 (ej: 71234567)',
+             'whatsapp.regex' => 'Solo se permiten números de Bolivia: 8 dígitos que empiecen con 6 o 7 (ej: 71234567)', 
 
                 'email_contacto.email' => 'Debe ser un correo válido',
                 'email_contacto.regex' => 'Solo se permiten correos @gmail.com',

@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 
     @stack('styles')
+    
 </head>
 <body>
 
@@ -39,6 +40,6 @@
 
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     @stack('scripts')
-
+     @include('auth.Cierresesion')
 </body>
 </html>
