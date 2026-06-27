@@ -2,6 +2,20 @@
     @php
         $cardTheme = $portfolio->color_theme ?? 'default';
         $cardThemeClass = $cardTheme !== 'default' ? 'card-theme-' . $cardTheme : '';
+
+        $completedSections = collect([
+            filled($portfolio->user->photo_base64),
+            filled($portfolio->user->biography),
+            filled($portfolio->user->profession_id),
+            $portfolio->user->skills->where('type', 'technical')->where('is_visible', true)->count() > 0,
+            $portfolio->projects->where('is_visible', true)->count() > 0,
+            $portfolio->user->professionalNetworks->where('is_visible', true)->count() > 0,
+            $portfolio->user->experiences->where('type', 'work')->where('is_visible', true)->count() > 0,
+            $portfolio->user->experiences->where('type', 'education')->where('is_visible', true)->count() > 0,
+            $portfolio->user->skills->where('type', 'language')->where('is_visible', true)->count() > 0,
+        ])->filter()->count();
+
+        $portfolioStars = max(1, min(5, (int) ceil(($completedSections / 9) * 5)));
     @endphp
     <div class="portfolio-card {{ $cardThemeClass }}">
         {{-- Foto o color + iniciales --}}
@@ -54,21 +68,24 @@
                 @endforeach
             </div>
 
-            {{-- Botón ver portafolio --}}
-            <div class="card-footer-row">
-                <a href="{{ route('portafolio.public', $portfolio->slug) }}" class="card-link">
-                    Ver portafolio <i class="fas fa-arrow-right"></i>
-                </a>
-                <button
-                type="button"
-                class="card-compare-btn js-compare-toggle"
-                data-portfolio-id="{{ $portfolio->id }}"
-                data-portfolio-name="{{ $portfolio->user->first_name }} {{ $portfolio->user->last_name }}"
-                >
-                <i class="fas fa-scale-balanced"></i>
-                Comparar
-              </button>
-            </div>
+            {{-- Estrellas + botón ver portafolio --}}
+<div class="card-footer-row">
+    <div class="portfolio-rating" title="Portafolio {{ $completedSections }}/9 secciones completas">
+        <span class="rating-stars">
+            @for($i = 1; $i <= 5; $i++)
+                <i class="{{ $i <= $portfolioStars ? 'fas' : 'far' }} fa-star"></i>
+            @endfor
+        </span>
+
+        <span class="rating-text">
+            {{ $portfolioStars }}/5 completo
+        </span>
+    </div>
+
+    <a href="{{ route('portafolio.public', $portfolio->slug) }}" class="card-link">
+        Ver portafolio <i class="fas fa-arrow-right"></i>
+    </a>
+</div>
         </div>
     </div>
 @empty

@@ -10,11 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
-        /* ============================================
-           ESTILOS ADICIONALES EXCLUSIVOS PARA PREVIEW
-           ============================================ */
-
         .empty-message-preview {
             text-align: center;
             padding: 40px;
@@ -27,7 +24,6 @@
         }
         .empty-message-preview i { color: #0abf9e; margin-right: 8px; }
 
-        /* Botón Volver */
         .btn-volver-flotante {
             position: fixed;
             top: 20px;
@@ -61,7 +57,6 @@
         .theme-sakura .btn-volver-flotante { background: #ec4899; }
         .theme-sakura .btn-volver-flotante:hover { background: #db2777; }
 
-        /* FAB */
         .fab-container {
             position: fixed;
             bottom: 30px;
@@ -105,7 +100,6 @@
         }
         .fab-button:hover { background: #07866e; transform: translateY(-2px); }
 
-        /* Barra publicar */
         .preview-bottom-bar {
             background: white; border-top: 1px solid #e2e8f0;
             padding: 16px 24px; display: flex;
@@ -126,9 +120,6 @@
             .fab-container { bottom: 20px; left: 20px; }
         }
 
-        /* ============================================
-           MODAL "VER TODOS" — igual al público
-           ============================================ */
         .btn-ver-todos {
             display: flex; justify-content: center; margin-top: 30px;
         }
@@ -185,17 +176,12 @@
         .estado-curso      { background: #fef3c7; color: #92400e; }
         .estado-default    { background: #f1f5f9; color: #64748b; }
 
-        /* Descripción colapsada */
         .card .description.collapsed {
             display: -webkit-box; -webkit-line-clamp: 3;
             -webkit-box-orient: vertical; overflow: hidden;
         }
         .card .description.expanded { display: block; }
 
-     
-        /* ============================================
-           MODAL PROYECTO DETALLE — idéntico al público
-           ============================================ */
         #modal-proyecto {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.5); z-index: 9999;
@@ -222,19 +208,14 @@
             text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px;
         }
 
-        /* Idioma barra */
         .idioma-barra-wrap { height: 8px; background: #edf0f4; border-radius: 10px; overflow: hidden; margin-top: 10px; }
         .idioma-barra-fill-custom { height: 100%; border-radius: 10px; transition: width 0.8s ease; }
 
         @media (max-width: 768px) {
             .todos-proyectos-grid { grid-template-columns: 1fr; padding: 16px; }
-            
-            .top-actions-bar {
-                padding: 10px 20px !important;
-            }
+            .top-actions-bar { padding: 10px 20px !important; }
         }
 
-        /* ===== BARRA DE ACCIONES SUPERIOR ===== */
         .top-actions-bar {
             display: flex;
             justify-content: space-between;
@@ -273,7 +254,6 @@
             color: #0abf9e;
         }
         
-        /* Theme overrides for hover state of Volver button */
         .theme-sunset.top-actions-bar .btn-volver-flotante:hover { background: #fff7ed; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
         .theme-sunset.top-actions-bar .btn-volver-flotante:hover i { color: #f97316; }
         
@@ -322,7 +302,6 @@
             transform: translateY(-1px);
         }
         
-        /* Theme overrides for hover state of fab-button */
         .theme-sunset.top-actions-bar .fab-button:hover { background: #fff7ed; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
         .theme-emerald.top-actions-bar .fab-button:hover { background: #ecfdf5; color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
         .theme-midnight.top-actions-bar .fab-button:hover { background: #fdf4ff; color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
@@ -352,93 +331,88 @@
             transform: translateY(0) scale(1);
             pointer-events: all;
         }
-    /* ===== RESTAURAR FLOTANTES ===== */
-.btn-volver-flotante {
-    position: fixed !important;
-    top: 20px !important;
-    left: 20px !important;
-    z-index: 1100 !important;
-    background: var(--burg-mid, #4a1030) !important;
-    border: none !important;
-    color: white !important;
-    padding: 10px 20px !important;
-    border-radius: 40px !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
-    transition: all 0.2s !important;
-    font-family: inherit !important;
-    text-decoration: none !important;
-}
-.btn-volver-flotante:hover {
-    transform: translateY(-2px) !important;
-    background: var(--burg-deep, #2d0a1e) !important;
-}
-.theme-sunset .btn-volver-flotante  { background: #f97316 !important; }
-.theme-sunset .btn-volver-flotante:hover  { background: #ea580c !important; }
-.theme-emerald .btn-volver-flotante { background: #10b981 !important; }
-.theme-emerald .btn-volver-flotante:hover { background: #047857 !important; }
-.theme-midnight .btn-volver-flotante { background: #a855f7 !important; }
-.theme-midnight .btn-volver-flotante:hover { background: #7e22ce !important; }
-.theme-ocean .btn-volver-flotante  { background: #00b4d8 !important; }
-.theme-ocean .btn-volver-flotante:hover  { background: #0077b6 !important; }
-.theme-sakura .btn-volver-flotante { background: #ec4899 !important; }
-.theme-sakura .btn-volver-flotante:hover { background: #db2777 !important; }
+        
+    .btn-volver-flotante {
+        position: fixed !important;
+        top: 20px !important;
+        left: 20px !important;
+        z-index: 1100 !important;
+        background: var(--burg-mid, #4a1030) !important;
+        border: none !important;
+        color: white !important;
+        padding: 10px 20px !important;
+        border-radius: 40px !important;
+        cursor: pointer !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+        transition: all 0.2s !important;
+        font-family: inherit !important;
+        text-decoration: none !important;
+    }
+    .btn-volver-flotante:hover {
+        transform: translateY(-2px) !important;
+        background: var(--burg-deep, #2d0a1e) !important;
+    }
+    .theme-sunset .btn-volver-flotante  { background: #f97316 !important; }
+    .theme-sunset .btn-volver-flotante:hover  { background: #ea580c !important; }
+    .theme-emerald .btn-volver-flotante { background: #10b981 !important; }
+    .theme-emerald .btn-volver-flotante:hover { background: #047857 !important; }
+    .theme-midnight .btn-volver-flotante { background: #a855f7 !important; }
+    .theme-midnight .btn-volver-flotante:hover { background: #7e22ce !important; }
+    .theme-ocean .btn-volver-flotante  { background: #00b4d8 !important; }
+    .theme-ocean .btn-volver-flotante:hover  { background: #0077b6 !important; }
+    .theme-sakura .btn-volver-flotante { background: #ec4899 !important; }
+    .theme-sakura .btn-volver-flotante:hover { background: #db2777 !important; }
 
-.fab-container {
-    position: fixed !important;
-    bottom: 30px !important;
-    left: 30px !important;
-    top: auto !important;
-    right: auto !important;
-    z-index: 1100 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-}
-.fab-menu {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    margin-bottom: 10px !important;
-}
-.fab-button {
-    background: #0abf9e !important;
-    color: white !important;
-    border: none !important;
-    padding: 12px 22px !important;
-    border-radius: 40px !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    box-shadow: 0 4px 16px rgba(10,191,158,0.45) !important;
-    transition: all 0.2s !important;
-    font-family: inherit !important;
-}
-.fab-button:hover { background: #07866e !important; transform: translateY(-2px) !important; }
+    .fab-container {
+        position: fixed !important;
+        bottom: 30px !important;
+        left: 30px !important;
+        top: auto !important;
+        right: auto !important;
+        z-index: 1100 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    .fab-menu {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        margin-bottom: 10px !important;
+    }
+    .fab-button {
+        background: #0abf9e !important;
+        color: white !important;
+        border: none !important;
+        padding: 12px 22px !important;
+        border-radius: 40px !important;
+        cursor: pointer !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        box-shadow: 0 4px 16px rgba(10,191,158,0.45) !important;
+        transition: all 0.2s !important;
+        font-family: inherit !important;
+    }
+    .fab-button:hover { background: #07866e !important; transform: translateY(-2px) !important; }
 
-/* Quitar top-actions-bar si quedó vacío */
-.top-actions-bar { display: none !important; }
+    .top-actions-bar { display: none !important; }
 
-@media (max-width: 768px) {
-    .btn-volver-flotante { top: 12px !important; left: 12px !important; padding: 8px 16px !important; font-size: 12px !important; }
-    .fab-container { bottom: 20px !important; left: 20px !important; }
-}
+    @media (max-width: 768px) {
+        .btn-volver-flotante { top: 12px !important; left: 12px !important; padding: 8px 16px !important; font-size: 12px !important; }
+        .fab-container { bottom: 20px !important; left: 20px !important; }
+    }
         
     </style>
 </head>
 <body>
-
-{{-- ============================================
-    MENSAJES DE PUBLICACIÓN (MEJORADOS)
-    ============================================ --}}
 
 @if($errors->has('publish'))
 <div style="position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:99999;width:90%;max-width:500px;">
@@ -556,17 +530,13 @@
     $claseTema  = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
 
-{{-- Botón Volver flotante --}}
 <a href="{{ route('dashboard') }}" class="btn-volver-flotante">
     <i class="fas fa-arrow-left"></i>
     <span>Volver</span>
 </a>
 
-
-{{-- FAB flotante abajo-izquierda --}}
 <div class="fab-container" id="fabContainer">
     <div class="fab-menu" id="fabMenu">
-        {{-- ✅ BOTÓN DE DESCARGA CONDICIONADO --}}
         @if($tieneContenido ?? false)
             <button class="fab-item" onclick="descargarPDF()">
                 <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
@@ -575,13 +545,10 @@
                 <i class="fas fa-image"></i><span>Descargar imagen</span>
             </button>
         @else
-            {{-- Botones deshabilitados con tooltip --}}
-            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" 
-                    onclick="mostrarAlertaIncompleto()">
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" onclick="mostrarAlertaIncompleto()">
                 <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
             </button>
-            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" 
-                    onclick="mostrarAlertaIncompleto()">
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" onclick="mostrarAlertaIncompleto()">
                 <i class="fas fa-image"></i><span>Descargar imagen</span>
             </button>
         @endif
@@ -598,7 +565,6 @@
 
 <div class="preview-container {{ $claseTema }}" id="previewContainer">
 
-    {{-- ==================== CABECERA ==================== --}}
     <div class="profile-header">
         <div class="profile-info">
             <h1>{{ $user->first_name ?? 'Usuario' }} {{ $user->last_name ?? '' }}</h1>
@@ -656,7 +622,6 @@
         </div>
     </div>
 
-    {{-- ==================== EXPERIENCIA LABORAL ==================== --}}
     <div class="section" id="section-experiencias">
         <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
         <div class="cards-grid" id="experiencias-grid">
@@ -722,7 +687,6 @@
         </div>
     </div>
 
-    {{-- ==================== INFORMACIÓN ACADÉMICA ==================== --}}
     <div class="section" id="section-academicas">
         <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
         <div class="cards-grid" id="academicas-grid">
@@ -790,7 +754,6 @@
         </div>
     </div>
 
-    {{-- ==================== HABILIDADES TÉCNICAS ==================== --}}
     @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0 || ($habilidadesTecnicasBackend ?? collect())->count() > 0)
     <div class="section" id="section-tecnicas">
         <h2><i class="fas fa-code"></i> Habilidades técnicas</h2>
@@ -866,7 +829,6 @@
     </div>
     @endif
 
-    {{-- ==================== HABILIDADES BLANDAS ==================== --}}
     @if($habilidadesBlandas->count() > 0)
     <div class="section" id="section-blandas">
         <h2><i class="fas fa-heart"></i> Habilidades blandas</h2>
@@ -892,7 +854,6 @@
     </div>
     @endif
 
-    {{-- ==================== IDIOMAS ==================== --}}
     @if($idiomas->count() > 0)
     <div class="section" id="section-idiomas">
         <h2><i class="fas fa-language"></i> Idiomas</h2>
@@ -917,7 +878,6 @@
                             <span class="idioma-preview-nivel">{{ $idioma->nivel_label }} — {{ $idioma->nivel_nombre }}</span>
                         </div>
                     </div>
-                    {{-- ✅ CERTIFICADO EN IDIOMAS (igual que en público) --}}
                     @if(!empty($idioma->certificado))
                     <a href="javascript:void(0)" onclick="abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')" class="idioma-cert-link">
                         <i class="fas fa-certificate"></i> Cert.
@@ -975,7 +935,6 @@
     </div>
     @endif
 
-    {{-- ==================== PROYECTOS ==================== --}}
     @if($proyectos->count() > 0)
     <div class="section" id="section-proyectos">
         <h2><i class="fas fa-project-diagram"></i> Proyectos</h2>
@@ -1066,288 +1025,279 @@
     </div>
     @endif
 
-    {{-- ==================== DATOS JS ==================== --}}
-    <script>
-    window.previewExperienciasData = {!! json_encode(
-        $experiencias->map(function($exp) use ($allowedHtmlTags) {
-            return [
-                'empresa'        => $exp->empresa,
-                'cargo'          => $exp->cargo,
-                'ubicacion'      => $exp->ubicacion,
-                'fecha_inicio'   => \Carbon\Carbon::parse($exp->fecha_inicio)->format('d/m/Y'),
-                'fecha_fin'      => $exp->fecha_fin ? \Carbon\Carbon::parse($exp->fecha_fin)->format('d/m/Y') : null,
-                'trabajo_actual' => $exp->trabajo_actual ?? false,
-                'descripcion'    => strip_tags($exp->descripcion ?? '', $allowedHtmlTags),
-            ];
-        })->values()
-    ) !!};
+    {{-- ==================== MODAL COMPARTIR (CON COPIA DE QR) ==================== --}}
+    <div id="modal-compartir" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+        <div style="background:#fff;border-radius:16px;width:520px;max-width:92%;padding:28px 30px;box-shadow:0 20px 60px rgba(0,0,0,0.2);position:relative;">
 
-    window.previewAcademicasData = {!! json_encode(
-    $academicas->map(function($aca) use ($allowedHtmlTags) {
-        $evidencias = [];
-        if (isset($aca->evidence_url) && $aca->evidence_url) {
-            $evidencias = is_array($aca->evidence_url)
-                ? $aca->evidence_url
-                : (json_decode($aca->evidence_url, true) ?? []);
-        }
-        return [
-            'institucion'    => $aca->institucion,
-            'titulo'         => $aca->titulo,
-            'specialty'      => $aca->specialty ?? null,
-            'fecha_inicio'   => \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y'),
-            'fecha_fin'      => $aca->fecha_fin ? \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') : null,
-            'estudio_actual' => $aca->estudio_actual ?? false,
-            'descripcion'    => strip_tags($aca->descripcion ?? '', $allowedHtmlTags),
-            'evidencias'     => array_map(function($e) {
-                return [
-                    'url'    => asset('storage/' . $e),
-                    'ext'    => pathinfo($e, PATHINFO_EXTENSION),
-                    'nombre' => basename($e),
-                ];
-            }, $evidencias),
-        ];
-    })->values()
-    ) !!};
+            <button onclick="cerrarModalCompartir()" 
+                    style="position:absolute;top:14px;right:18px;background:#f1f5f9;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;color:#64748b;transition:all 0.2s;display:flex;align-items:center;justify-content:center;"
+                    onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444';" 
+                    onmouseout="this.style.background='#f1f5f9';this.style.color='#64748b';">
+                ✕
+            </button>
 
-    window.previewProjectsById = {!! json_encode(
-        collect($proyectos)->keyBy('id')->map(function($p) use ($allowedHtmlTags) {
-            return [
-                'id'           => $p->id,
-                'nombre'       => $p->nombre,
-                'descripcion'  => strip_tags($p->descripcion ?? '', $allowedHtmlTags),
-                'fecha_inicio' => optional($p->fecha_inicio)->format('d/m/Y'),
-                'fecha_fin'    => optional($p->fecha_fin)->format('d/m/Y'),
-                'estado'       => $p->estado,
-                'rol'          => $p->rol,
-                'cliente'      => $p->cliente,
-                'tecnologias'  => $p->tecnologias,
-                'evidencias'   => $p->evidencias,
-            ];
-        })
-    ) !!};
-    </script>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;">
+                <div style="width:38px;height:38px;border-radius:50%;background:#f0fdf9;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-share-alt" style="color:#0abf9e;font-size:16px;"></i>
+                </div>
+                <h2 style="margin:0;font-size:18px;font-weight:700;color:#0f172a;">Compartir portafolio</h2>
+            </div>
+
+            <div style="display:flex;gap:20px;align-items:stretch;">
+
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+                    <label style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px;">
+                        <i class="fas fa-link" style="color:#0abf9e;margin-right:6px;"></i> Enlace público
+                    </label>
+                    <div style="display:flex;border:2px solid #e2e8f0;border-radius:10px;padding:3px;background:#fafbfc;align-items:center;transition:border-color 0.2s;flex:1;" 
+                         onmouseover="this.style.borderColor='#0abf9e';" 
+                         onmouseout="this.style.borderColor='#e2e8f0';">
+                        <input type="text" id="share-link-input" readonly 
+                               value="{{ $user->portfolio ? url('/portafolio/'.$user->portfolio->slug) : '' }}" 
+                               style="flex:1;border:none;background:transparent;padding:8px 10px;outline:none;color:#1e293b;font-size:13px;font-family:monospace;min-width:0;">
+                        <button onclick="copiarLinkPortafolio()" id="btn-copiar-link" 
+                                style="background:#0abf9e;border:none;border-radius:6px;padding:7px 16px;cursor:pointer;font-weight:600;font-size:12px;color:white;transition:all 0.2s;white-space:nowrap;"
+                                onmouseover="this.style.background='#07866e';" 
+                                onmouseout="this.style.background='#0abf9e';">
+                            <i class="fas fa-copy"></i> <span id="btn-copiar-texto">Copiar</span>
+                        </button>
+                    </div>
+                    <p style="font-size:11px;color:#94a3b8;margin-top:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="fas fa-info-circle" style="color:#0abf9e;font-size:12px;"></i>
+                        Comparte este enlace con quien quieras
+                    </p>
+                </div>
+
+                <div style="flex-shrink:0;text-align:center;background:#fafbfc;border-radius:12px;padding:12px;border:1px solid #eef2f6;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:120px;">
+                    <div id="qrCodeContainer" style="width:100px;height:100px;display:flex;align-items:center;justify-content:center;"></div>
+                    <button onclick="copiarQR()" 
+                            style="margin-top:8px;background:#f0fdf9;border:1px solid #0abf9e;border-radius:20px;padding:4px 14px;cursor:pointer;font-size:10px;font-weight:600;color:#0abf9e;transition:all 0.2s;display:flex;align-items:center;gap:4px;font-family:inherit;"
+                            onmouseover="this.style.background='#0abf9e';this.style.color='white';" 
+                            onmouseout="this.style.background='#f0fdf9';this.style.color='#0abf9e';">
+                        <i class="fas fa-copy" style="font-size:10px;"></i> Copiar QR
+                    </button>
+                    <span style="font-size:9px;color:#94a3b8;display:block;margin-top:4px;">Escanea o copia</span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 
     {{-- ==================== MODALES "VER TODOS" ==================== --}}
-
-    {{-- Modal todos los proyectos --}}
-@if($proyectos->count() > 0)
-@php
-$folderColors = [
-    ['bg'=>'#0abf9e','tab'=>'#07866e','light'=>'#f0fdf9'],
-    ['bg'=>'#6366f1','tab'=>'#4f46e5','light'=>'#eef2ff'],
-    ['bg'=>'#f59e0b','tab'=>'#d97706','light'=>'#fffbeb'],
-    ['bg'=>'#ec4899','tab'=>'#db2777','light'=>'#fdf2f8'],
-    ['bg'=>'#14b8a6','tab'=>'#0d9488','light'=>'#f0fdfa'],
-    ['bg'=>'#8b5cf6','tab'=>'#7c3aed','light'=>'#f5f3ff'],
-    ['bg'=>'#f97316','tab'=>'#ea580c','light'=>'#fff7ed'],
-    ['bg'=>'#3b82f6','tab'=>'#2563eb','light'=>'#eff6ff'],
-];
-@endphp
-<div id="modal-todos-proyectos" class="modal-todos-proyectos">
-    <div class="modal-todos-content" style="max-width:1000px;">
-        <div class="modal-todos-header">
-            <h2><i class="fas fa-folder-open"></i> Todos los proyectos <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $proyectos->count() }}</span></h2>
-            <button class="close-todos-modal" onclick="cerrarModalTodosProyectos()">✕</button>
-        </div>
-        <div style="padding:0 24px 16px;">
-            <input type="text" id="search-proyectos-prev" placeholder="🔍 Buscar por nombre, tecnología o estado..." oninput="filtrarProyectosPreview(this.value)" style="width:100%;padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:40px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;">
-        </div>
-        <div style="padding:0 24px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;" id="folder-grid-preview">
-            @foreach($proyectos as $idx => $proyecto)
-            @php
-                $color = $folderColors[$idx % count($folderColors)];
-                $estadoStyle = $proyecto->estado=='Completado' ? 'background:#d1fae5;color:#065f46;' : ($proyecto->estado=='En curso' ? 'background:#fef3c7;color:#92400e;' : 'background:#f1f5f9;color:#64748b;');
-                $modalPayload = ['nombre'=>$proyecto->nombre,'descripcion'=>strip_tags($proyecto->descripcion??'',$allowedHtmlTags),'fecha_inicio'=>optional($proyecto->fecha_inicio)->format('d/m/Y'),'fecha_fin'=>optional($proyecto->fecha_fin)->format('d/m/Y'),'estado'=>$proyecto->estado,'rol'=>$proyecto->rol,'cliente'=>$proyecto->cliente,'tecnologias'=>$proyecto->tecnologias,'evidencias'=>$proyecto->evidencias];
-                $techs = $proyecto->tecnologias ?? [];
-                $descCorta = strip_tags($proyecto->descripcion ?? '');
-            @endphp
-            <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.25s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
-                 data-nombre="{{ strtolower($proyecto->nombre) }}"
-                 data-techs="{{ strtolower(implode(' ', $techs)) }}"
-                 data-estado="{{ strtolower($proyecto->estado ?? '') }}"
-                 onclick='cerrarModalTodosProyectos(); abrirModal(@json($modalPayload));'
-                 onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 16px 32px -8px rgba(10,191,158,0.2)';this.style.borderColor='#0abf9e';"
-                 onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';this.style.borderColor='#e2e8f0';">
-                {{-- Top coloreado --}}
-                <div style="height:80px;background:{{ $color['bg'] }};position:relative;display:flex;align-items:flex-end;padding:0 18px 14px;">
-                    <div style="position:absolute;top:0;left:18px;width:60px;height:20px;border-radius:8px 8px 0 0;background:{{ $color['tab'] }};"></div>
-                    <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;">
-                        <i class="fas fa-code-branch"></i>
-                    </div>
-                    <span style="margin-left:auto;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;{{ $estadoStyle }}">
-                        {{ $proyecto->estado ?? 'En progreso' }}
-                    </span>
-                </div>
-                {{-- Body --}}
-                <div style="padding:16px 18px 12px;">
-                    <h4 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#0f172a;">{{ $proyecto->nombre }}</h4>
-                    <div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                        <i class="fas fa-calendar-alt" style="color:#0abf9e;font-size:10px;"></i>
-                        {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
-                        @if($proyecto->fecha_fin) — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif
-                    </div>
-                    @if(!empty($descCorta))
-                    <div style="font-size:12px;color:#64748b;line-height:1.55;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $descCorta }}</div>
-                    @endif
-                    @if(!empty($techs))
-                    <div style="display:flex;flex-wrap:wrap;gap:5px;">
-                        @foreach(array_slice($techs,0,3) as $tec)
-                            <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;">{{ $tec }}</span>
-                        @endforeach
-                        @if(count($techs)>3)
-                            <span style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;">+{{ count($techs)-3 }}</span>
-                        @endif
-                    </div>
-                    @endif
-                </div>
-                {{-- Footer --}}
-                <div style="padding:12px 18px;border-top:1px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between;background:#fafbfc;">
-                    <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;">
-                        @if(!empty($proyecto->rol))
-                            <i class="fas fa-user-check" style="color:#0abf9e;font-size:10px;"></i> {{ $proyecto->rol }}
-                        @elseif(!empty($proyecto->cliente))
-                            <i class="fas fa-building" style="color:#0abf9e;font-size:10px;"></i> {{ $proyecto->cliente }}
-                        @else
-                            <i class="fas fa-folder" style="color:#0abf9e;font-size:10px;"></i> Ver detalle
-                        @endif
-                    </div>
-                    <div style="width:28px;height:28px;border-radius:50%;background:#f0fdf9;border:1px solid #d1fae5;display:flex;align-items:center;justify-content:center;color:#0abf9e;font-size:11px;transition:all 0.2s;">
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                </div>
+    @if($proyectos->count() > 0)
+    @php
+    $folderColors = [
+        ['bg'=>'#0abf9e','tab'=>'#07866e','light'=>'#f0fdf9'],
+        ['bg'=>'#6366f1','tab'=>'#4f46e5','light'=>'#eef2ff'],
+        ['bg'=>'#f59e0b','tab'=>'#d97706','light'=>'#fffbeb'],
+        ['bg'=>'#ec4899','tab'=>'#db2777','light'=>'#fdf2f8'],
+        ['bg'=>'#14b8a6','tab'=>'#0d9488','light'=>'#f0fdfa'],
+        ['bg'=>'#8b5cf6','tab'=>'#7c3aed','light'=>'#f5f3ff'],
+        ['bg'=>'#f97316','tab'=>'#ea580c','light'=>'#fff7ed'],
+        ['bg'=>'#3b82f6','tab'=>'#2563eb','light'=>'#eff6ff'],
+    ];
+    @endphp
+    <div id="modal-todos-proyectos" class="modal-todos-proyectos">
+        <div class="modal-todos-content" style="max-width:1000px;">
+            <div class="modal-todos-header">
+                <h2><i class="fas fa-folder-open"></i> Todos los proyectos <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $proyectos->count() }}</span></h2>
+                <button class="close-todos-modal" onclick="cerrarModalTodosProyectos()">✕</button>
             </div>
-            @endforeach
-        </div>
-        <div id="no-results-preview" style="display:none;text-align:center;padding:40px;color:#94a3b8;font-size:14px;">
-            <i class="fas fa-search" style="font-size:32px;margin-bottom:10px;display:block;"></i>
-            No se encontraron proyectos con ese criterio.
-        </div>
-    </div>
-</div>
-@endif
-
-{{-- Modal todas las experiencias --}}
-@if($experiencias->count() > 0)
-<div id="modal-todos-experiencias" class="modal-todos-proyectos">
-    <div class="modal-todos-content" style="max-width:700px;">
-        <div class="modal-todos-header">
-            <h2>
-                <i class="fas fa-briefcase"></i> Experiencia laboral
-                <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $experiencias->count() }}</span>
-            </h2>
-            <button class="close-todos-modal" onclick="cerrarModalExperiencias()">✕</button>
-        </div>
-        <div style="padding:32px 28px;">
-            <div style="position:relative;padding-left:48px;">
-                <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0abf9e 0%,#e2e8f0 100%);"></div>
-                @foreach($experiencias->values() as $i => $exp)
-                <div style="position:relative;margin-bottom:24px;">
-                    <div style="position:absolute;left:-39px;top:18px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0abf9e;display:flex;align-items:center;justify-content:center;z-index:2;">
-                        <div style="width:8px;height:8px;border-radius:50%;background:#0abf9e;"></div>
-                    </div>
-                    <div onclick="cerrarModalExperiencias(); abrirDetalleExp({{ $i }});"
-                         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px 20px;cursor:pointer;transition:all 0.22s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
-                         onmouseover="this.style.borderColor='#0abf9e';this.style.transform='translateX(4px)';this.style.boxShadow='0 8px 24px -6px rgba(10,191,158,0.2)';"
-                         onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';">
-                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
-                            <div>
-                                <div style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:3px;">{{ $exp->empresa }}</div>
-                                <div style="font-size:12px;color:#0abf9e;font-weight:600;">{{ $exp->cargo }}</div>
-                            </div>
-                            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;background:#f8fafc;padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                                <i class="fas fa-calendar-alt"></i>
-                                {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('M Y') }}
-                                @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('M Y') }}
-                                @elseif($exp->trabajo_actual ?? false) — Actualidad @endif
-                            </div>
-                        </div>
-                        @if(!empty($exp->ubicacion))
-                        <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
-                            <i class="fas fa-map-marker-alt" style="color:#0abf9e;font-size:10px;"></i> {{ $exp->ubicacion }}
-                        </div>
-                        @endif
-                        @if(!empty($exp->descripcion))
-                        <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-                            {{ strip_tags($exp->descripcion) }}
-                        </div>
-                        @endif
-                        <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
-                            <i class="fas fa-mouse-pointer" style="font-size:9px;"></i>
-                            Clic para ver detalle completo
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <div style="padding:0 24px 16px;">
+                <input type="text" id="search-proyectos-prev" placeholder="🔍 Buscar por nombre, tecnología o estado..." oninput="filtrarProyectosPreview(this.value)" style="width:100%;padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:40px;font-size:13px;outline:none;font-family:inherit;box-sizing:border-box;">
             </div>
-        </div>
-    </div>
-</div>
-@endif
-{{-- Modal todas las académicas --}}
-<div id="modal-todos-academicas" class="modal-todos-proyectos">
-    <div class="modal-todos-content" style="max-width:700px;">
-        <div class="modal-todos-header">
-            <h2>
-                <i class="fas fa-graduation-cap"></i> Formación académica
-                <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $academicas->count() }}</span>
-            </h2>
-            <button class="close-todos-modal" onclick="cerrarModalAcademicas()">✕</button>
-        </div>
-        <div style="padding:32px 28px;">
-            <div style="position:relative;padding-left:48px;">
-                <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0abf9e 0%,#e2e8f0 100%);"></div>
-                @foreach($academicas->values() as $i => $aca)
+            <div style="padding:0 24px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;" id="folder-grid-preview">
+                @foreach($proyectos as $idx => $proyecto)
                 @php
-                    $hasEv = false;
-                    if (isset($aca->evidence_url) && $aca->evidence_url) {
-                        $evArr = is_array($aca->evidence_url) ? $aca->evidence_url : json_decode($aca->evidence_url, true);
-                        if (!is_array($evArr)) { $evArr = []; }
-                        $hasEv = !empty($evArr);
-                    }
+                    $color = $folderColors[$idx % count($folderColors)];
+                    $estadoStyle = $proyecto->estado=='Completado' ? 'background:#d1fae5;color:#065f46;' : ($proyecto->estado=='En curso' ? 'background:#fef3c7;color:#92400e;' : 'background:#f1f5f9;color:#64748b;');
+                    $modalPayload = ['nombre'=>$proyecto->nombre,'descripcion'=>strip_tags($proyecto->descripcion??'',$allowedHtmlTags),'fecha_inicio'=>optional($proyecto->fecha_inicio)->format('d/m/Y'),'fecha_fin'=>optional($proyecto->fecha_fin)->format('d/m/Y'),'estado'=>$proyecto->estado,'rol'=>$proyecto->rol,'cliente'=>$proyecto->cliente,'tecnologias'=>$proyecto->tecnologias,'evidencias'=>$proyecto->evidencias];
+                    $techs = $proyecto->tecnologias ?? [];
+                    $descCorta = strip_tags($proyecto->descripcion ?? '');
                 @endphp
-                <div style="position:relative;margin-bottom:24px;">
-                    <div style="position:absolute;left:-39px;top:18px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0abf9e;display:flex;align-items:center;justify-content:center;z-index:2;">
-                        <div style="width:8px;height:8px;border-radius:50%;background:#0abf9e;"></div>
+                <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:18px;overflow:hidden;cursor:pointer;transition:all 0.25s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+                     data-nombre="{{ strtolower($proyecto->nombre) }}"
+                     data-techs="{{ strtolower(implode(' ', $techs)) }}"
+                     data-estado="{{ strtolower($proyecto->estado ?? '') }}"
+                     onclick='cerrarModalTodosProyectos(); abrirModal(@json($modalPayload));'
+                     onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 16px 32px -8px rgba(10,191,158,0.2)';this.style.borderColor='#0abf9e';"
+                     onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';this.style.borderColor='#e2e8f0';">
+                    <div style="height:80px;background:{{ $color['bg'] }};position:relative;display:flex;align-items:flex-end;padding:0 18px 14px;">
+                        <div style="position:absolute;top:0;left:18px;width:60px;height:20px;border-radius:8px 8px 0 0;background:{{ $color['tab'] }};"></div>
+                        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;">
+                            <i class="fas fa-code-branch"></i>
+                        </div>
+                        <span style="margin-left:auto;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;{{ $estadoStyle }}">
+                            {{ $proyecto->estado ?? 'En progreso' }}
+                        </span>
                     </div>
-                    <div onclick="cerrarModalAcademicas(); abrirDetalleAca({{ $i }});"
-     style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px 20px;cursor:pointer;transition:all 0.22s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
-     onmouseover="this.style.borderColor='#0abf9e';this.style.transform='translateX(4px)';this.style.boxShadow='0 8px 24px -6px rgba(10,191,158,0.2)';"
-     onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';">
-                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
-                            <div>
-                                <div style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:3px;">{{ $aca->institucion }}</div>
-                                <div style="font-size:12px;color:#0abf9e;font-weight:600;">{{ $aca->titulo }}</div>
-                            </div>
-                            <div style="font-size:11px;color:#94a3b8;white-space:nowrap;background:#f8fafc;padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                                <i class="fas fa-calendar-alt"></i>
-                                {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('M Y') }}
-                                @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('M Y') }}
-                                @elseif($aca->estudio_actual??false) — Actualidad @endif
-                            </div>
+                    <div style="padding:16px 18px 12px;">
+                        <h4 style="margin:0 0 6px;font-size:0.95rem;font-weight:700;color:#0f172a;">{{ $proyecto->nombre }}</h4>
+                        <div style="font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                            <i class="fas fa-calendar-alt" style="color:#0abf9e;font-size:10px;"></i>
+                            {{ \Carbon\Carbon::parse($proyecto->fecha_inicio)->format('d/m/Y') }}
+                            @if($proyecto->fecha_fin) — {{ \Carbon\Carbon::parse($proyecto->fecha_fin)->format('d/m/Y') }} @endif
                         </div>
-                        @if(!empty($aca->specialty??''))
-                        <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
-                            <i class="fas fa-tag" style="color:#0abf9e;font-size:10px;"></i> {{ $aca->specialty }}
+                        @if(!empty($descCorta))
+                        <div style="font-size:12px;color:#64748b;line-height:1.55;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ $descCorta }}</div>
+                        @endif
+                        @if(!empty($techs))
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+                            @foreach(array_slice($techs,0,3) as $tec)
+                                <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;">{{ $tec }}</span>
+                            @endforeach
+                            @if(count($techs)>3)
+                                <span style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;">+{{ count($techs)-3 }}</span>
+                            @endif
                         </div>
                         @endif
-                        @if(!empty($aca->descripcion))
-                        <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-                            {{ strip_tags($aca->descripcion) }}
+                    </div>
+                    <div style="padding:12px 18px;border-top:1px solid #f0f4f8;display:flex;align-items:center;justify-content:space-between;background:#fafbfc;">
+                        <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;">
+                            @if(!empty($proyecto->rol))
+                                <i class="fas fa-user-check" style="color:#0abf9e;font-size:10px;"></i> {{ $proyecto->rol }}
+                            @elseif(!empty($proyecto->cliente))
+                                <i class="fas fa-building" style="color:#0abf9e;font-size:10px;"></i> {{ $proyecto->cliente }}
+                            @else
+                                <i class="fas fa-folder" style="color:#0abf9e;font-size:10px;"></i> Ver detalle
+                            @endif
                         </div>
-                        @endif
-                        <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
-                            <i class="fas fa-mouse-pointer" style="font-size:9px;"></i>
-                            Clic para ver detalle completo{{ $hasEv ? ' + certificado' : '' }}
+                        <div style="width:28px;height:28px;border-radius:50%;background:#f0fdf9;border:1px solid #d1fae5;display:flex;align-items:center;justify-content:center;color:#0abf9e;font-size:11px;transition:all 0.2s;">
+                            <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
                 </div>
                 @endforeach
             </div>
+            <div id="no-results-preview" style="display:none;text-align:center;padding:40px;color:#94a3b8;font-size:14px;">
+                <i class="fas fa-search" style="font-size:32px;margin-bottom:10px;display:block;"></i>
+                No se encontraron proyectos con ese criterio.
+            </div>
         </div>
     </div>
-</div>
+    @endif
 
-    {{-- Modal habilidades técnicas --}}
+    @if($experiencias->count() > 0)
+    <div id="modal-todos-experiencias" class="modal-todos-proyectos">
+        <div class="modal-todos-content" style="max-width:700px;">
+            <div class="modal-todos-header">
+                <h2>
+                    <i class="fas fa-briefcase"></i> Experiencia laboral
+                    <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $experiencias->count() }}</span>
+                </h2>
+                <button class="close-todos-modal" onclick="cerrarModalExperiencias()">✕</button>
+            </div>
+            <div style="padding:32px 28px;">
+                <div style="position:relative;padding-left:48px;">
+                    <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0abf9e 0%,#e2e8f0 100%);"></div>
+                    @foreach($experiencias->values() as $i => $exp)
+                    <div style="position:relative;margin-bottom:24px;">
+                        <div style="position:absolute;left:-39px;top:18px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0abf9e;display:flex;align-items:center;justify-content:center;z-index:2;">
+                            <div style="width:8px;height:8px;border-radius:50%;background:#0abf9e;"></div>
+                        </div>
+                        <div onclick="cerrarModalExperiencias(); abrirDetalleExp({{ $i }});"
+                             style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px 20px;cursor:pointer;transition:all 0.22s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+                             onmouseover="this.style.borderColor='#0abf9e';this.style.transform='translateX(4px)';this.style.boxShadow='0 8px 24px -6px rgba(10,191,158,0.2)';"
+                             onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+                                <div>
+                                    <div style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:3px;">{{ $exp->empresa }}</div>
+                                    <div style="font-size:12px;color:#0abf9e;font-weight:600;">{{ $exp->cargo }}</div>
+                                </div>
+                                <div style="font-size:11px;color:#94a3b8;white-space:nowrap;background:#f8fafc;padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ \Carbon\Carbon::parse($exp->fecha_inicio)->format('M Y') }}
+                                    @if($exp->fecha_fin) — {{ \Carbon\Carbon::parse($exp->fecha_fin)->format('M Y') }}
+                                    @elseif($exp->trabajo_actual ?? false) — Actualidad @endif
+                                </div>
+                            </div>
+                            @if(!empty($exp->ubicacion))
+                            <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+                                <i class="fas fa-map-marker-alt" style="color:#0abf9e;font-size:10px;"></i> {{ $exp->ubicacion }}
+                            </div>
+                            @endif
+                            @if(!empty($exp->descripcion))
+                            <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                                {{ strip_tags($exp->descripcion) }}
+                            </div>
+                            @endif
+                            <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
+                                <i class="fas fa-mouse-pointer" style="font-size:9px;"></i>
+                                Clic para ver detalle completo
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <div id="modal-todos-academicas" class="modal-todos-proyectos">
+        <div class="modal-todos-content" style="max-width:700px;">
+            <div class="modal-todos-header">
+                <h2>
+                    <i class="fas fa-graduation-cap"></i> Formación académica
+                    <span style="background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;margin-left:8px;">{{ $academicas->count() }}</span>
+                </h2>
+                <button class="close-todos-modal" onclick="cerrarModalAcademicas()">✕</button>
+            </div>
+            <div style="padding:32px 28px;">
+                <div style="position:relative;padding-left:48px;">
+                    <div style="position:absolute;left:18px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#0abf9e 0%,#e2e8f0 100%);"></div>
+                    @foreach($academicas->values() as $i => $aca)
+                    @php
+                        $hasEv = false;
+                        if (isset($aca->evidence_url) && $aca->evidence_url) {
+                            $evArr = is_array($aca->evidence_url) ? $aca->evidence_url : json_decode($aca->evidence_url, true);
+                            if (!is_array($evArr)) { $evArr = []; }
+                            $hasEv = !empty($evArr);
+                        }
+                    @endphp
+                    <div style="position:relative;margin-bottom:24px;">
+                        <div style="position:absolute;left:-39px;top:18px;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0abf9e;display:flex;align-items:center;justify-content:center;z-index:2;">
+                            <div style="width:8px;height:8px;border-radius:50%;background:#0abf9e;"></div>
+                        </div>
+                        <div onclick="cerrarModalAcademicas(); abrirDetalleAca({{ $i }});"
+         style="background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:18px 20px;cursor:pointer;transition:all 0.22s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+         onmouseover="this.style.borderColor='#0abf9e';this.style.transform='translateX(4px)';this.style.boxShadow='0 8px 24px -6px rgba(10,191,158,0.2)';"
+         onmouseout="this.style.borderColor='#e2e8f0';this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)';">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+                                <div>
+                                    <div style="font-size:0.95rem;font-weight:700;color:#0f172a;margin-bottom:3px;">{{ $aca->institucion }}</div>
+                                    <div style="font-size:12px;color:#0abf9e;font-weight:600;">{{ $aca->titulo }}</div>
+                                </div>
+                                <div style="font-size:11px;color:#94a3b8;white-space:nowrap;background:#f8fafc;padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ \Carbon\Carbon::parse($aca->fecha_inicio)->format('M Y') }}
+                                    @if($aca->fecha_fin) — {{ \Carbon\Carbon::parse($aca->fecha_fin)->format('M Y') }}
+                                    @elseif($aca->estudio_actual??false) — Actualidad @endif
+                                </div>
+                            </div>
+                            @if(!empty($aca->specialty??''))
+                            <div style="font-size:11px;color:#64748b;display:flex;align-items:center;gap:5px;margin-bottom:8px;">
+                                <i class="fas fa-tag" style="color:#0abf9e;font-size:10px;"></i> {{ $aca->specialty }}
+                            </div>
+                            @endif
+                            @if(!empty($aca->descripcion))
+                            <div style="font-size:12px;color:#64748b;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
+                                {{ strip_tags($aca->descripcion) }}
+                            </div>
+                            @endif
+                            <div style="font-size:11px;color:#0abf9e;margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:600;">
+                                <i class="fas fa-mouse-pointer" style="font-size:9px;"></i>
+                                Clic para ver detalle completo{{ $hasEv ? ' + certificado' : '' }}
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
     @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0 || ($habilidadesTecnicasBackend ?? collect())->count() > 0)
     <div id="modal-todos-tecnicas" class="modal-todos-proyectos">
         <div class="modal-todos-content">
@@ -1403,7 +1353,6 @@ $folderColors = [
     </div>
     @endif
 
-    {{-- Modal habilidades blandas --}}
     @if($habilidadesBlandas->count() > 0)
     <div id="modal-todos-blandas" class="modal-todos-proyectos">
         <div class="modal-todos-content">
@@ -1420,7 +1369,6 @@ $folderColors = [
     </div>
     @endif
 
-    {{-- Modal todos los idiomas --}}
     @if($idiomas->count() > 0)
     <div id="modal-todos-idiomas" class="modal-todos-proyectos">
         <div class="modal-todos-content">
@@ -1448,7 +1396,6 @@ $folderColors = [
                             <div style="width:{{ $idioma->porcentaje }}%;height:100%;background:{{ $colorBarra }};border-radius:10px;transition:width 0.8s ease;"></div>
                         </div>
                     </div>
-                    {{-- ✅ CERTIFICADO en modal idiomas --}}
                     @if(!empty($idioma->certificado))
                         <a href="javascript:void(0)"
                            onclick="event.stopPropagation(); abrirLightbox('{{ asset('storage/' . $idioma->certificado) }}')"
@@ -1467,7 +1414,6 @@ $folderColors = [
     {{-- ==================== MODAL DETALLE EXPERIENCIA ==================== --}}
     <div id="modal-detalle-exp" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:12000;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
             <div style="background:#fff;border-radius:20px;max-width:640px;width:92%;max-height:88vh;overflow-y:auto;animation:modalFadeIn 0.2s ease;">
-                {{-- Hero --}}
                 <div style="padding:24px 28px 20px;border-bottom:1px solid #e2e8f0;position:relative;">
                     <button onclick="cerrarDetalleExp()" style="position:absolute;top:20px;right:20px;background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;transition:color 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">✕</button>
                     <div style="display:inline-flex;align-items:center;gap:6px;background:#f0fdf9;color:#0abf9e;border:1px solid #d1fae5;font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;margin-bottom:10px;">
@@ -1486,7 +1432,6 @@ $folderColors = [
                         </div>
                     </div>
                 </div>
-                {{-- Body --}}
                 <div style="padding:24px 28px;display:flex;flex-direction:column;gap:20px;">
                     <div>
                         <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
@@ -1501,9 +1446,7 @@ $folderColors = [
         </div>
 
     {{-- ==================== MODAL DETALLE ACADÉMICA ==================== --}}
-    
-   {{-- ==================== MODAL DETALLE ACADÉMICA ==================== --}}
-        <div id="modal-detalle-aca" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;align-items:center;justify-content:center;">
+    <div id="modal-detalle-aca" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;align-items:center;justify-content:center;">
             <div style="background:#fff;border-radius:20px;max-width:640px;width:90%;max-height:85vh;overflow-y:auto;margin:auto;position:relative;">
                 <div style="padding:24px 28px 20px;border-bottom:1px solid #e2e8f0;position:relative;">
                     <button onclick="cerrarDetalleAca()" style="position:absolute;top:15px;right:20px;background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
@@ -1528,39 +1471,8 @@ $folderColors = [
                 </div>
             </div>
         </div>
-    {{-- ==================== MODAL COMPARTIR ==================== --}}
-    <div id="modal-compartir" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
-        <div style="background:#fff;border-radius:12px;width:450px;max-width:90%;position:relative;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                <h2 style="margin:0;font-size:20px;font-weight:600;color:#333;">Compartir</h2>
-                <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
-            </div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:24px;text-align:center;">
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('whatsapp')">
-                    <div style="width:55px;height:55px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fab fa-whatsapp"></i></div>
-                    <span style="font-size:12px;font-weight:500;">WhatsApp</span>
-                </a>
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('facebook')">
-                    <div style="width:55px;height:55px;border-radius:50%;background:#1877F2;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fab fa-facebook-f"></i></div>
-                    <span style="font-size:12px;font-weight:500;">Facebook</span>
-                </a>
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('twitter')">
-                    <div style="width:55px;height:55px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fab fa-x-twitter"></i></div>
-                    <span style="font-size:12px;font-weight:500;">X</span>
-                </a>
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('email')">
-                    <div style="width:55px;height:55px;border-radius:50%;background:#7f8c8d;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fas fa-envelope"></i></div>
-                    <span style="font-size:12px;font-weight:500;">Correo</span>
-                </a>
-            </div>
-            <div style="display:flex;border:1px solid #e0e0e0;border-radius:8px;padding:6px;background:#f9f9f9;align-items:center;">
-                <input type="text" id="share-link-input" readonly value="{{ $user->portfolio ? url('/portafolio/'.$user->portfolio->slug) : '' }}" style="flex:1;border:none;background:transparent;padding:8px 12px;outline:none;color:#555;font-size:14px;text-overflow:ellipsis;">
-                <button onclick="copiarLinkPortafolio()" id="btn-copiar-link" style="background:white;border:1px solid #e0e0e0;border-radius:20px;padding:6px 18px;cursor:pointer;font-weight:600;font-size:14px;color:#333;">Copiar</button>
-            </div>
-        </div>
-    </div>
 
-    {{-- ==================== MODAL PROYECTO DETALLE (igual al público) ==================== --}}
+    {{-- ==================== MODAL PROYECTO DETALLE ==================== --}}
     <div id="modal-proyecto">
         <div class="modal-proyecto-inner">
             <div class="modal-proyecto-head">
@@ -1582,7 +1494,6 @@ $folderColors = [
                     <div class="modal-proyecto-section-label">Stack Tecnológico</div>
                     <div id="modal-tecnologias" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
                 </div>
-                {{-- ✅ EVIDENCIAS con ojito (igual al público) --}}
                 <div id="modal-evidencias" style="display:none;">
                     <div class="modal-proyecto-section-label" style="padding-top:16px;border-top:1px solid #f0f0f0;">
                         Evidencias <span id="modal-ev-count" style="color:#1abc9c;"></span>
@@ -1596,7 +1507,6 @@ $folderColors = [
 {{-- ==================== BARRA PUBLICAR ==================== --}}
 <div class="preview-bottom-bar" id="previewBottomBar">
     @php
-        // Verificar si hay contenido mínimo para mostrar estado visual
         $tieneExperiencia = $experiencias->count() > 0;
         $tieneAcademica = $academicas->count() > 0;
         $tieneProyecto = $proyectos->count() > 0;
@@ -1606,7 +1516,6 @@ $folderColors = [
         $tieneBiografia = !empty($user->biography);
         $tieneProfesion = !empty($user->profession_id);
         
-        // Contar secciones completas
         $seccionesCompletas = 0;
         if ($tieneExperiencia) $seccionesCompletas++;
         if ($tieneAcademica) $seccionesCompletas++;
@@ -1617,12 +1526,10 @@ $folderColors = [
         if ($tieneBiografia) $seccionesCompletas++;
         if ($tieneProfesion) $seccionesCompletas++;
         
-        // Total de items
         $totalItems = $experiencias->count() + $academicas->count() + $proyectos->count() 
                     + $habilidadesTecnicasFrontend->count() + $habilidadesTecnicasBackend->count() 
                     + $idiomas->count() + $habilidadesBlandas->count();
         
-        // ✅ MISMA REGLA QUE EL CONTROLLER
         $puedePublicar = $seccionesCompletas >= 2 && $totalItems >= 2;
     @endphp
 
@@ -1646,8 +1553,6 @@ $folderColors = [
         @endif
     </form>
 </div>
-
-    
 
 </div><!-- fin .preview-container -->
 
@@ -1783,7 +1688,7 @@ function cerrarDetalleAca() {
 }
 
 // ============================================================
-// MODAL PROYECTO (con evidencias + ojito, igual al público)
+// MODAL PROYECTO
 // ============================================================
 function previewEscapeHtml(s) {
     if (s == null) return '';
@@ -1793,7 +1698,6 @@ function previewEscapeHtml(s) {
 function abrirModal(data) {
     document.getElementById('modal-nombre').textContent = data.nombre;
 
-    // Badges
     var badgesDiv = document.getElementById('modal-badges');
     badgesDiv.innerHTML = '';
     var badge = function(t, bg, c) {
@@ -1810,16 +1714,13 @@ function abrirModal(data) {
     if (data.rol)    badgesDiv.innerHTML += badgeIcon('fas fa-user-check', previewEscapeHtml(data.rol),    '#ede9fe','#5b21b6');
     if (data.cliente) badgesDiv.innerHTML += badgeIcon('fas fa-building',  previewEscapeHtml(data.cliente),'#f1f5f9','#475569');
 
-    // Fechas
     var fechasDiv = document.getElementById('modal-fechas');
     fechasDiv.innerHTML = '';
     if (data.fecha_inicio) fechasDiv.innerHTML += '<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Inicio: <strong>'+previewEscapeHtml(data.fecha_inicio)+'</strong></span>';
     if (data.fecha_fin)    fechasDiv.innerHTML += '<span><i class="far fa-calendar-alt" style="color:#94a3b8;margin-right:4px;"></i>Fin: <strong>'+previewEscapeHtml(data.fecha_fin)+'</strong></span>';
 
-    // Descripción
     document.getElementById('modal-descripcion').innerHTML = data.descripcion || '';
 
-    // Tecnologías
     var tecDiv     = document.getElementById('modal-tecnologias');
     var tecSection = document.getElementById('modal-tec-section');
     tecDiv.innerHTML = '';
@@ -1828,7 +1729,6 @@ function abrirModal(data) {
         data.tecnologias.forEach(function(t) { tecDiv.innerHTML += '<span class="tec-badge">'+previewEscapeHtml(t)+'</span>'; });
     } else { tecSection.style.display = 'none'; }
 
-    // ✅ Evidencias con ojito (igual al público)
     var evDiv = document.getElementById('modal-evidencias-lista');
     var evSec = document.getElementById('modal-evidencias');
     evDiv.innerHTML = '';
@@ -1898,8 +1798,17 @@ function abrirModalBlandas()         { var el=document.getElementById('modal-tod
 function cerrarModalBlandas()        { var el=document.getElementById('modal-todos-blandas');     if(el){el.style.display='none';document.body.style.overflow='';} }
 function abrirModalIdiomas()         { var el=document.getElementById('modal-todos-idiomas');     if(el){el.style.display='flex';document.body.style.overflow='hidden';} }
 function cerrarModalIdiomas()        { var el=document.getElementById('modal-todos-idiomas');     if(el){el.style.display='none';document.body.style.overflow='';} }
-function abrirModalCompartir()       { document.getElementById('modal-compartir').style.display='flex'; }
-function cerrarModalCompartir()      { document.getElementById('modal-compartir').style.display='none'; document.getElementById('btn-copiar-link').textContent='Copiar'; }
+function abrirModalCompartir()       { 
+    document.getElementById('modal-compartir').style.display='flex';
+    document.body.style.overflow='hidden';
+    generarQR();
+}
+function cerrarModalCompartir()      { 
+    document.getElementById('modal-compartir').style.display='none'; 
+    document.body.style.overflow='';
+    var btnTexto = document.getElementById('btn-copiar-texto');
+    if (btnTexto) btnTexto.textContent = 'Copiar';
+}
 
 // Cerrar al clic fuera
 ['modal-todos-proyectos','modal-todos-experiencias','modal-todos-academicas','modal-todos-tecnicas','modal-todos-blandas','modal-todos-idiomas','modal-proyecto','modal-compartir','modal-detalle-exp','modal-detalle-aca'].forEach(function(id) {
@@ -1907,18 +1816,138 @@ function cerrarModalCompartir()      { document.getElementById('modal-compartir'
     if (el) el.addEventListener('click', function(e) { if (e.target === this) { this.style.display='none'; document.body.style.overflow=''; } });
 });
 
+// ============================================================
+// COPIAR ENLACE + QR
+// ============================================================
 function copiarLinkPortafolio() {
-    var i=document.getElementById('share-link-input'); i.select();
-    navigator.clipboard.writeText(i.value).then(function(){
-        var btn=document.getElementById('btn-copiar-link'); btn.textContent='¡Copiado!';
-        setTimeout(function(){ btn.textContent='Copiar'; },2000);
-    });
+    var input = document.getElementById('share-link-input');
+    if (!input) return;
+    
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    var link = input.value;
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function() {
+            var texto = document.getElementById('btn-copiar-texto');
+            var btn = document.getElementById('btn-copiar-link');
+            if (texto) texto.textContent = '¡Copiado!';
+            if (btn) btn.style.background = '#10b981';
+            
+            setTimeout(function() {
+                if (texto) texto.textContent = 'Copiar';
+                if (btn) btn.style.background = '#0abf9e';
+            }, 2000);
+        });
+    } else {
+        document.execCommand('copy');
+        Swal.fire({
+            icon: 'success',
+            title: 'Enlace copiado',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
 }
-function shareTo(platform) {
-    var link = encodeURIComponent(document.getElementById('share-link-input').value);
-    var text = encodeURIComponent('¡Mira mi portafolio profesional!');
-    var urls = { whatsapp:'https://api.whatsapp.com/send?text='+text+' '+link, facebook:'https://www.facebook.com/sharer/sharer.php?u='+link, twitter:'https://twitter.com/intent/tweet?text='+text+'&url='+link, email:'mailto:?subject='+text+'&body='+link };
-    if (urls[platform]) window.open(urls[platform],'_blank','width=600,height=400');
+
+function generarQR() {
+    var container = document.getElementById('qrCodeContainer');
+    var input = document.getElementById('share-link-input');
+    
+    if (!container || !input) return;
+    
+    var link = input.value;
+    if (!link) return;
+    
+    container.innerHTML = '';
+    
+    if (typeof QRCode !== 'undefined') {
+        try {
+            new QRCode(container, {
+                text: link,
+                width: 100,
+                height: 100,
+                colorDark: '#0f172a',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } catch (e) {
+            container.innerHTML = '<span style="font-size:10px;color:#94a3b8;">QR no disponible</span>';
+        }
+    } else {
+        container.innerHTML = '<span style="font-size:10px;color:#94a3b8;">Cargando QR...</span>';
+    }
+}
+
+function copiarQR() {
+    var canvas = document.querySelector('#qrCodeContainer canvas');
+    if (!canvas) {
+        Swal.fire({
+            icon: 'info',
+            title: 'QR no disponible',
+            text: 'Primero genera el código QR.',
+            confirmButtonColor: '#0abf9e'
+        });
+        return;
+    }
+
+    canvas.toBlob(function(blob) {
+        if (!blob) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo copiar el QR.',
+                confirmButtonColor: '#0abf9e'
+            });
+            return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.write) {
+            var item = new ClipboardItem({
+                'image/png': blob
+            });
+            navigator.clipboard.write([item]).then(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: '✅ QR copiado',
+                    text: 'El código QR se ha copiado como imagen.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }).catch(function() {
+                descargarQR();
+            });
+        } else {
+            descargarQR();
+        }
+    }, 'image/png');
+}
+
+function descargarQR() {
+    var canvas = document.querySelector('#qrCodeContainer canvas');
+    if (!canvas) return;
+
+    var link = document.createElement('a');
+    link.download = 'codigo-qr-portafolio.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    Swal.fire({
+        icon: 'success',
+        title: '✅ QR descargado',
+        text: 'El código QR se ha descargado como imagen.',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
 }
 
 // ============================================================
@@ -1928,17 +1957,14 @@ function crearCopiaCompleta() {
     var original = document.getElementById('previewContainer');
     var clone = original.cloneNode(true);
 
-    // 1. Expandir descripciones colapsadas
     clone.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed').forEach(function(el) {
         el.classList.remove('collapsed'); el.classList.add('expanded');
         el.style.maxHeight = 'none'; el.style.overflow = 'visible';
     });
 
-    // 2. Quitar botones "Ver más" y "Ver todos"
     clone.querySelectorAll('.ver-mas-btn').forEach(function(btn) { btn.remove(); });
     clone.querySelectorAll('.btn-ver-todos').forEach(function(btn) { btn.style.display = 'none'; });
 
-    // 3. Reemplazar grids visibles con la versión completa (todas las entradas)
     [
         ['#experiencias-completas', '#experiencias-grid',   '.cards-grid'],
         ['#academicas-completas',   '#academicas-grid',     '.cards-grid'],
@@ -1957,11 +1983,8 @@ function crearCopiaCompleta() {
     var tecSource = document.getElementById('tecnicas-completas');
     if (tecSource) { var tecTarget = clone.querySelector('#tecnicas-grid'); if (tecTarget) tecTarget.innerHTML = tecSource.innerHTML; }
 
-    // 4. Quitar certificados/lightbox (no se pueden capturar bien)
     clone.querySelectorAll('.idioma-cert-link,.btn-certificado,a[onclick*="abrirLightbox"]').forEach(function(el) { el.remove(); });
 
-    // 5. Eliminar secciones enteras que solo tienen mensaje vacío (sin datos reales)
-    //    Una sección se considera vacía si tras el reemplazo no tiene ninguna tarjeta/skill/idioma
     var seccionesARevisar = [
         { id: 'section-experiencias', selector: '.card:not(.empty-message-preview)' },
         { id: 'section-academicas',   selector: '.card:not(.empty-message-preview)' },
@@ -1973,7 +1996,6 @@ function crearCopiaCompleta() {
     seccionesARevisar.forEach(function(s) {
         var sec = clone.querySelector('#' + s.id);
         if (!sec) return;
-        // Si la sección solo tiene el mensaje vacío o no tiene ítems reales → eliminarla
         var tieneContenido = sec.querySelectorAll(s.selector).length > 0;
         var tieneVacio     = sec.querySelector('.empty-message-preview') !== null;
         if (!tieneContenido || tieneVacio) {
@@ -1981,10 +2003,8 @@ function crearCopiaCompleta() {
         }
     });
 
-    // 6. Quitar también cualquier .empty-message-preview suelto que haya quedado
     clone.querySelectorAll('.empty-message-preview').forEach(function(el) { el.remove(); });
 
-    // 7. Ocultar elementos exclusivos de la vista previa
     var fabClone    = clone.querySelector('#fabContainer');       if (fabClone)    fabClone.style.display    = 'none';
     var barClone    = clone.querySelector('#previewBottomBar');   if (barClone)    barClone.style.display    = 'none';
     var volverClone = clone.querySelector('.btn-volver-flotante');if (volverClone) volverClone.style.display = 'none';
@@ -2129,77 +2149,28 @@ function saveVibeTheme() {
         Swal.fire({ icon:'error', title:'Error', text:'No se pudo conectar.' });
     });
 }
-</script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var cards = document.querySelectorAll('#academicas-grid .card');
-    cards.forEach(function(card, idx) {
-        card.onclick = function(e) {
-            e.stopPropagation();
-            abrirDetalleAca(idx);
-        };
-    });
-});
-</script>
-<script>
 // ============================================================
-// PUBLICAR - CON VALIDACIÓN ADICIONAL
+// INICIALIZACIÓN
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    const formPublicar = document.getElementById('formPublicar');
-    const btnPublicar = document.getElementById('btnPublicar');
-    
-    if (formPublicar) {
-        formPublicar.addEventListener('submit', function(e) {
-            // Si el botón está deshabilitado, prevenir el envío
-            if (btnPublicar && btnPublicar.disabled) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Portafolio incompleto',
-                    text: 'Completa tu perfil (experiencia, formación o proyectos) antes de publicar.',
-                    confirmButtonColor: '#0abf9e'
-                });
-                return false;
-            }
-            
-            // Si está habilitado, mostrar confirmación
-            e.preventDefault();
-            Swal.fire({
-                title: '¿Publicar portafolio?',
-                text: 'Tu perfil será visible para todos los usuarios.',
-                showCancelButton: true,
-                confirmButtonColor: '#0abf9e',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Publicar',
-                cancelButtonText: 'Cancelar'
-            }).then(function(result) {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Publicando...',
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    });
-                    formPublicar.submit();
-                }
-            });
-        });
+    var shareInput = document.getElementById('share-link-input');
+    if (shareInput) {
+        var link = "{{ $user->portfolio ? url('/portafolio/'.$user->portfolio->slug) : '' }}";
+        if (link) {
+            shareInput.value = link;
+        }
     }
 });
-
-// ============================================================
-// ALERTA DE PORTAFOLIO INCOMPLETO PARA DESCARGAS
-// ============================================================
 
 function mostrarAlertaIncompleto() {
     document.getElementById('fabMenu').classList.remove('open');
     
-    const seccionesCompletas = @json($seccionesCompletas ?? 0);
-    const estadoSecciones = @json($estadoSecciones ?? []);
+    var seccionesCompletas = @json($seccionesCompletas ?? 0);
+    var estadoSecciones = @json($estadoSecciones ?? []);
     
-    const completas = Object.values(estadoSecciones).filter(s => s.completo);
-    const faltantes = Object.values(estadoSecciones).filter(s => !s.completo);
+    var completas = Object.values(estadoSecciones).filter(function(s) { return s.completo; });
+    var faltantes = Object.values(estadoSecciones).filter(function(s) { return !s.completo; });
     
     Swal.fire({
         icon: 'warning',
@@ -2220,12 +2191,12 @@ function mostrarAlertaIncompleto() {
                         Secciones pendientes:
                     </p>
                     <ul style="margin: 0 0 16px 0; padding: 0; list-style: none;">
-                        ${faltantes.map(item => 
-                            `<li style="font-size: 14px; color: #64748b; padding: 6px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px;">
+                        ${faltantes.map(function(item) {
+                            return `<li style="font-size: 14px; color: #64748b; padding: 6px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px;">
                                 <span style="color: #94a3b8;">○</span>
                                 ${item.icono} ${item.nombre}
-                            </li>`
-                        ).join('')}
+                            </li>`;
+                        }).join('')}
                     </ul>
                 ` : ''}
                 
@@ -2243,8 +2214,6 @@ function mostrarAlertaIncompleto() {
     });
 }
 </script>
-
-
 
 </body>
 </html>

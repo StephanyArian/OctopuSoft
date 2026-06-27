@@ -80,7 +80,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
         }
 
         if (sortText) {
-            sortText.textContent = getCheckedLabel(sortRadios, 'Más recientes');
+            sortText.textContent = getCheckedLabel(sortRadios, 'Más completos');
         }
 
         if (skillsText) {
@@ -121,7 +121,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
         const minExperience = getCheckedValue(experienceRadios);
         const language = getCheckedValue(languageRadios);
         const company = getCheckedValue(companyRadios);
-        const sort = getCheckedValue(sortRadios, 'desc');
+        const sort = getCheckedValue(sortRadios, 'complete');
         const selectedSkills = getSelectedSkills();
 
         const params = new URLSearchParams();
@@ -147,21 +147,25 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
         : window.location.pathname;
     }
 
-    function fetchFilteredPortfolios() {
-        const newUrl = buildFilterUrl();
+function fetchFilteredPortfolios() {
+    const pageUrl = buildFilterUrl();
 
-        window.history.replaceState({}, '', newUrl);
+    window.history.replaceState({}, '', pageUrl);
 
-        if (portfoliosGrid) {
-            portfoliosGrid.style.opacity = '0.6';
-        }
+    const ajaxUrl = new URL(pageUrl, window.location.origin);
+    ajaxUrl.searchParams.set('_ajax', '1');
 
-        fetch(newUrl, {
-    headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'application/json'
+    if (portfoliosGrid) {
+        portfoliosGrid.style.opacity = '0.6';
     }
-})
+
+    fetch(ajaxUrl.toString(), {
+        cache: 'no-store',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error en la respuesta del servidor');
@@ -327,7 +331,7 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
             });
 
             sortRadios.forEach(radio => {
-                radio.checked = radio.value === 'desc';
+                radio.checked = radio.value === 'complete';
             });
 
             skillCheckboxes.forEach(checkbox => {
