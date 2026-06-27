@@ -15,20 +15,23 @@ class PasswordUpdateTest extends TestCase
     {
         $user = User::factory()->create();
 
+        // La nueva contraseña debe cumplir: mayúscula, minúscula, número y carácter especial
+        $newPassword = 'NewPassword1!';
+
         $response = $this
             ->actingAs($user)
             ->from('/profile')
             ->put('/password', [
-                'current_password' => 'password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'current_password'      => 'password',
+                'password'              => $newPassword,
+                'password_confirmation' => $newPassword,
             ]);
 
         $response
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
+        $this->assertTrue(Hash::check($newPassword, $user->refresh()->password));
     }
 
     public function test_correct_password_must_be_provided_to_update_password(): void
@@ -39,9 +42,9 @@ class PasswordUpdateTest extends TestCase
             ->actingAs($user)
             ->from('/profile')
             ->put('/password', [
-                'current_password' => 'wrong-password',
-                'password' => 'new-password',
-                'password_confirmation' => 'new-password',
+                'current_password'      => 'wrong-password',
+                'password'              => 'NewPassword1!',
+                'password_confirmation' => 'NewPassword1!',
             ]);
 
         $response

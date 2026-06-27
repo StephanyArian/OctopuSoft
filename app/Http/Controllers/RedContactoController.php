@@ -55,11 +55,10 @@ class RedContactoController extends Controller
                     'max:255',
                     'regex:/^https?:\/\/(www\.)?github\.com\/.+$/'
                 ],
-
-                'whatsapp' => [
-                    'nullable',
-                    'regex:/^\+?[0-9]{8,15}$/'
-                ],
+'whatsapp' => [
+    'nullable',
+    'regex:/^[67][0-9]{7}$/'
+],
 
                 'email_contacto' => [
                     'nullable',
@@ -79,7 +78,7 @@ class RedContactoController extends Controller
                 'linkedin.regex' => 'El enlace debe ser de LinkedIn válido',
                 'github.regex' => 'El enlace debe ser de GitHub válido',
 
-                'whatsapp.regex' => 'El número debe tener solo números (8 a 15 dígitos, sin letras)',
+             'whatsapp.regex' => 'Solo se permiten números de Bolivia: 8 dígitos que empiecen con 6 o 7 (ej: 71234567)',
 
                 'email_contacto.email' => 'Debe ser un correo válido',
                 'email_contacto.regex' => 'Solo se permiten correos @gmail.com',

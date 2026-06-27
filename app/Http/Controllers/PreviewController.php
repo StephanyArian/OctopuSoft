@@ -14,12 +14,148 @@ use Carbon\Carbon;
 class PreviewController extends Controller
 {
     /**
+     * ==========================================
+     * NUEVO: Verificar si el portafolio tiene contenido suficiente
+     * ==========================================
+     */
+    private function portafolioTieneContenido($user)
+    {
+        // Contar items en cada sección
+        $contenido = [
+            'experiencias' => $user->experiences->where('type', 'work')->where('is_visible', true)->count(),
+            'academicas'   => $user->experiences->where('type', 'education')->where('is_visible', true)->count(),
+            'proyectos'    => $user->portfolio ? $user->portfolio->projects->where('is_visible', true)->count() : 0,
+            'habilidades_tecnicas' => $user->skills->where('type', 'technical')->where('is_visible', true)->count(),
+            'habilidades_blandas'  => $user->skills->where('type', 'soft')->where('is_visible', true)->count(),
+            'idiomas'      => $user->skills->where('type', 'language')->where('is_visible', true)->count(),
+            'biografia'    => !empty($user->biography),
+            'profesion'    => !empty($user->profession_id),
+        ];
+
+        // Contar secciones completas
+        $seccionesCompletas = 0;
+        foreach ($contenido as $key => $value) {
+            if (in_array($key, ['biografia', 'profesion'])) {
+                if ($value) $seccionesCompletas++;
+            } else {
+                if ($value > 0) $seccionesCompletas++;
+            }
+        }
+
+        // Total de items (excluyendo biografía y profesión)
+        $totalItems = $contenido['experiencias'] + $contenido['academicas'] + 
+                      $contenido['proyectos'] + $contenido['habilidades_tecnicas'] + 
+                      $contenido['habilidades_blandas'] + $contenido['idiomas'];
+
+        // 🔥 REGLA NUEVA: mínimo 2 secciones completas Y al menos 2 items totales
+        return $seccionesCompletas >= 2 && $totalItems >= 2;
+    }
+
+    /**
+     * ==========================================
+     * NUEVO: Obtener campos faltantes para mostrar al usuario
+     * ==========================================
+     */
+    private function obtenerCamposFaltantes($user)
+    {
+        $faltantes = [];
+        
+        if ($user->experiences->where('type', 'work')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar al menos una experiencia laboral';
+        }
+        if ($user->experiences->where('type', 'education')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar al menos una formación académica';
+        }
+        if ($user->portfolio && $user->portfolio->projects->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar al menos un proyecto';
+        }
+        if ($user->skills->where('type', 'technical')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar habilidades técnicas';
+        }
+        if ($user->skills->where('type', 'soft')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar habilidades blandas';
+        }
+        if ($user->skills->where('type', 'language')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar idiomas';
+        }
+        if (empty($user->biography)) {
+            $faltantes[] = 'Completar tu biografía';
+        }
+        if (empty($user->profession_id)) {
+            $faltantes[] = 'Seleccionar tu profesión';
+        }
+
+        return $faltantes;
+    }
+
+    /**
+     * ==========================================
+     * NUEVO: PUBLICAR PORTAFOLIO
+     * ==========================================
+     */
+    public function publicar(Request $request)
+    {
+        $user = Auth::user();
+        
+        // 🔍 Verificar si hay contenido
+        if (!$this->portafolioTieneContenido($user)) {
+            $faltantes = $this->obtenerCamposFaltantes($user);
+            
+            // Guardar en sesión para mostrar en la vista
+            session()->flash('publish_error', true);
+            session()->flash('publish_missing', $faltantes);
+            
+            return redirect()->back()->withErrors([
+                'publish' => 'Tu portafolio está incompleto. Completa la información faltante antes de publicar.'
+            ]);
+        }
+
+        // ✅ Si tiene contenido, publicar
+        try {
+            $portfolio = $user->portfolio;
+            if ($portfolio) {
+                $portfolio->is_public = true;
+               //$portfolio->published_at = now();
+                $portfolio->save();
+            }
+
+            session()->flash('success', '¡Tu portafolio ha sido publicado exitosamente!');
+            
+            return redirect()->back()->with('success', '¡Portafolio publicado!');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors([
+                'publish' => 'Ocurrió un error al publicar: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * ==========================================
+     * NUEVO: CAMBIAR TEMA (Vibe)
+     * ==========================================
+     */
+    public function updateTheme(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->portfolio) {
+            $user->portfolio->color_theme = $request->theme;
+            $user->portfolio->save();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'Portafolio no encontrado']);
+    }
+
+    /**
      * Vista previa del portafolio para el usuario logueado (con edición)
      */
     public function preview()
     {
         // Obtener usuario logueado
         $user = Auth::user();
+
+         $tieneContenido = $this->portafolioTieneContenido($user);
+        $camposFaltantes = $this->obtenerCamposFaltantes($user);
         
         // Cargar relaciones SEGÚN TU ESTRUCTURA DE BD
         $user->load([
@@ -30,6 +166,8 @@ class PreviewController extends Controller
             'professionalNetworks.platform',
             'location'
         ]);
+
+      
         
         // ==========================================
         // HABILIDADES TÉCNICAS (type = 'technical')
@@ -247,7 +385,10 @@ class PreviewController extends Controller
             'experiencias',
             'academicas',
             'proyectos',
-            'redes'
+            'redes',
+            'tieneContenido',        //  NUEVO
+            'camposFaltantes'        // NUEVO
+
         ));
     }
 
@@ -536,128 +677,214 @@ class PreviewController extends Controller
         });
 
         // ==========================================
+// EMPRESAS / INSTITUCIONES
+// ==========================================
+$companies = collect([
+    'SEGIP',
+    'UMSS',
+    'JalaSoft',
+    'Digital Harboard',
+    'Apple',
+    'Microsoft',
+    'Banco Unión',
+    'Google Bolivia',
+    'ABC',
+    'SIN',
+    'Gobernación',
+    'Alcaldía',
+    'YPFB',
+    'ENTEL',
+    'Tigo',
+    'Viva',
+    'Banco Nacional de Bolivia',
+    'Banco Mercantil Santa Cruz',
+    'Banco Bisa',
+    'Caja Nacional de Salud',
+    'Aduana Nacional',
+    'Impuestos Nacionales',
+    'SENASAG',
+    'ENDE',
+    'BoA',
+    'COTEL',
+    'EMAPA',
+    'Farmacorp',
+    'Hipermaxi',
+    'Univalle',
+    'UPB',
+    'Universidad Católica Boliviana',
+])->map(function ($name) {
+    return (object) [
+        'name' => $name,
+    ];
+});
+
+        // ==========================================
         // QUERY PRINCIPAL
         // ==========================================
-        $query = Portfolio::where('is_public', true)
-            ->with(['user.profession', 'user.skills', 'projects.technologies']);
+$query = Portfolio::where('is_public', true)
+    ->with([
+        'user.profession',
+        'user.skills',
+        'user.experiences',
+        'user.location',
+        'projects.technologies'
+    ]);
 
-        // BÚSQUEDA POR TEXTO
-        if ($request->filled('search')) {
-            $search = trim($request->input('search'));
-            $searchNormalized = strtolower(str_replace(
-                ['á','é','í','ó','ú','Á','É','Í','Ó','Ú'],
-                ['a','e','i','o','u','a','e','i','o','u'],
-                $search
-            ));
+$normalizeText = function ($text) {
+    $text = trim($text ?? '');
 
-            $terms = [$searchNormalized];
+    $text = str_replace(
+        ['á','é','í','ó','ú','Á','É','Í','Ó','Ú','ñ','Ñ'],
+        ['a','e','i','o','u','a','e','i','o','u','n','n'],
+        $text
+    );
 
-            $synonyms = [
-                'ingenieria' => ['ing', 'engineering'],
-                'ing' => ['ingenieria', 'engineering'],
-                'sistemas' => ['systems', 'system'],
-                'systems' => ['sistemas'],
-                'desarrollador' => ['developer', 'dev'],
-                'desarrollo' => ['development', 'developer', 'dev'],
-                'developer' => ['desarrollador', 'desarrollo', 'dev'],
-                'development' => ['desarrollo', 'developer', 'dev'],
-                'dev' => ['developer', 'development', 'desarrollador'],
-                'frontend' => ['front end', 'front-end'],
-                'backend' => ['back end', 'back-end'],
-                'fullstack' => ['full stack', 'full-stack'],
-                'full stack' => ['fullstack', 'full-stack'],
-                'diseñador' => ['designer', 'ui ux', 'ui/ux'],
-                'designer' => ['diseñador', 'ui ux', 'ui/ux'],
-                'administrador' => ['admin', 'administrator'],
-                'administrator' => ['administrador', 'admin'],
-                'seguridad' => ['security'],
-                'security' => ['seguridad'],
-                'datos' => ['data'],
-                'data' => ['datos'],
-            ];
+    return strtolower($text);
+};
 
-            foreach ($synonyms as $word => $equivalents) {
-                if (str_contains($searchNormalized, $word)) {
-                    foreach ($equivalents as $equivalent) {
-                        $terms[] = str_replace($word, $equivalent, $searchNormalized);
-                        $terms[] = $equivalent;
-                    }
-                }
+$normalizeColumn = function ($column) {
+    return "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($column,
+        'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'),'ñ','n'))";
+};
+
+$expandSearchTerms = function ($text) use ($normalizeText) {
+    $search = $normalizeText($text);
+
+    $terms = collect([$search]);
+
+    $synonyms = [
+        'desarrollador' => ['developer', 'develop', 'development', 'dev'],
+        'desarrolladora' => ['developer', 'develop', 'development', 'dev'],
+        'desarrollo' => ['developer', 'develop', 'development', 'dev'],
+        'developer' => ['desarrollador', 'desarrolladora', 'desarrollo', 'dev'],
+        'develop' => ['developer', 'desarrollador', 'desarrolladora', 'desarrollo'],
+        'development' => ['desarrollo', 'developer', 'desarrollador'],
+
+        'frontend' => ['front end', 'front-end'],
+        'front end' => ['frontend', 'front-end'],
+        'backend' => ['back end', 'back-end'],
+        'back end' => ['backend', 'back-end'],
+
+        'full stack' => ['fullstack', 'full-stack'],
+        'fullstack' => ['full stack', 'full-stack'],
+        'full-stack' => ['full stack', 'fullstack'],
+
+        'ingeniero' => ['engineer'],
+        'ingeniera' => ['engineer'],
+        'engineer' => ['ingeniero', 'ingeniera'],
+
+        'sistemas' => ['systems'],
+        'systems' => ['sistemas'],
+
+        'diseñador' => ['designer'],
+        'diseñadora' => ['designer'],
+        'designer' => ['diseñador', 'diseñadora'],
+
+        'datos' => ['data'],
+        'data' => ['datos'],
+    ];
+
+    foreach ($synonyms as $word => $equivalents) {
+        if (str_contains($search, $word)) {
+            foreach ($equivalents as $equivalent) {
+                $terms->push(str_replace($word, $equivalent, $search));
+                $terms->push($equivalent);
             }
+        }
+    }
 
-            $terms = array_unique(array_filter($terms));
+    return $terms
+        ->map(fn ($term) => trim($term))
+        ->filter()
+        ->unique()
+        ->values();
+};
 
-            $normalizeColumn = function ($column) {
-                return "LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE($column,
-                    'á','a'),'é','e'),'í','i'),'ó','o'),'ú','u'))";
-            };
+// BÚSQUEDA POR TEXTO GENERAL
+if ($request->filled('search')) {
+    $terms = $expandSearchTerms($request->input('search'));
 
-            $query->where(function ($q) use ($terms, $normalizeColumn) {
-                foreach ($terms as $term) {
-                    $like = "%{$term}%";
+    $query->where(function ($q) use ($terms, $normalizeColumn) {
+        foreach ($terms as $term) {
+            $like = "%{$term}%";
 
-                    $q->orWhereHas('user', function ($u) use ($like, $normalizeColumn) {
-                        $u->whereRaw($normalizeColumn('first_name') . " LIKE ?", [$like])
-                          ->orWhereRaw($normalizeColumn('last_name') . " LIKE ?", [$like])
-                          ->orWhereRaw($normalizeColumn("CONCAT(first_name, ' ', last_name)") . " LIKE ?", [$like])
-                          ->orWhereRaw($normalizeColumn('biography') . " LIKE ?", [$like])
-                          ->orWhereRaw($normalizeColumn('city') . " LIKE ?", [$like])
-                          ->orWhereRaw($normalizeColumn('country') . " LIKE ?", [$like]);
-                    })
-                    ->orWhereHas('user.location', function ($location) use ($like, $normalizeColumn) {
-                        $location->whereRaw($normalizeColumn('address') . " LIKE ?", [$like]);
-                    })
-                    ->orWhereHas('user.profession', function ($p) use ($like, $normalizeColumn) {
-                        $p->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
-                    })
-                    ->orWhereHas('user.skills', function ($s) use ($like, $normalizeColumn) {
-                        $s->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
-                    })
-                    ->orWhereHas('user.experiences', function ($e) use ($like, $normalizeColumn) {
-                        $e->where('is_visible', true)
-                          ->where(function ($exp) use ($like, $normalizeColumn) {
-                              $exp->whereRaw($normalizeColumn('title') . " LIKE ?", [$like])
-                                  ->orWhereRaw($normalizeColumn('institution') . " LIKE ?", [$like])
-                                  ->orWhereRaw($normalizeColumn('specialty') . " LIKE ?", [$like])
-                                  ->orWhereRaw($normalizeColumn('description') . " LIKE ?", [$like]);
-                          });
-                    })
-                    ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
-                        $p->where('is_visible', true)
-                          ->where(function ($projectQuery) use ($like, $normalizeColumn) {
-                              $projectQuery->whereRaw($normalizeColumn('name') . " LIKE ?", [$like])
-                                  ->orWhereRaw($normalizeColumn('description') . " LIKE ?", [$like])
-                                  ->orWhereRaw($normalizeColumn('role') . " LIKE ?", [$like])
-                                  ->orWhereRaw($normalizeColumn('company') . " LIKE ?", [$like]);
-                          });
-                    })
-                    ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
-                        $p->where('is_visible', true)
-                          ->whereHas('technologies', function ($t) use ($like, $normalizeColumn) {
-                              $t->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
-                          });
-                    });
-                }
+            $q->orWhereHas('user', function ($u) use ($like, $normalizeColumn) {
+                $u->whereRaw($normalizeColumn('first_name') . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn('last_name') . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn("CONCAT(first_name, ' ', last_name)") . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn('biography') . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn('city') . " LIKE ?", [$like])
+                  ->orWhereRaw($normalizeColumn('country') . " LIKE ?", [$like]);
+            })
+            ->orWhereHas('user.location', function ($location) use ($like, $normalizeColumn) {
+                $location->whereRaw($normalizeColumn('address') . " LIKE ?", [$like]);
+            })
+            ->orWhereHas('user.profession', function ($p) use ($like, $normalizeColumn) {
+                $p->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
+            })
+            ->orWhereHas('user.skills', function ($s) use ($like, $normalizeColumn) {
+                $s->where('is_visible', true)
+                  ->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
+            })
+            ->orWhereHas('user.experiences', function ($e) use ($like, $normalizeColumn) {
+                $e->where('is_visible', true)
+                  ->where(function ($exp) use ($like, $normalizeColumn) {
+                      $exp->whereRaw($normalizeColumn('title') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('institution') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('specialty') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('description') . " LIKE ?", [$like]);
+                  });
+            })
+            ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
+                $p->where('is_visible', true)
+                  ->where(function ($projectQuery) use ($like, $normalizeColumn) {
+                      $projectQuery->whereRaw($normalizeColumn('name') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('description') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('role') . " LIKE ?", [$like])
+                          ->orWhereRaw($normalizeColumn('company') . " LIKE ?", [$like]);
+                  });
+            })
+            ->orWhereHas('projects.technologies', function ($t) use ($like, $normalizeColumn) {
+                $t->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
             });
         }
+    });
+}
 
-        // FILTRO POR CATEGORÍA (PROFESIÓN)
-        if ($request->filled('category')) {
-            $category = trim($request->category);
-            $query->where(function ($q) use ($category) {
-                $q->whereHas('user.profession', function ($p) use ($category) {
-                    $p->where('name', 'LIKE', "%{$category}%");
-                })
-                ->orWhereHas('user.experiences', function ($e) use ($category) {
-                    $e->where('type', 'work')
-                      ->where('title', 'LIKE', "%{$category}%");
-                })
-                ->orWhereHas('projects', function ($p) use ($category) {
-                    $p->where('is_visible', true)
-                      ->where('role', 'LIKE', "%{$category}%");
-                });
+// FILTRO POR EMPRESA / INSTITUCIÓN LABORAL
+if ($request->filled('company')) {
+    $company = $normalizeText($request->input('company'));
+
+    $query->whereHas('user.experiences', function ($e) use ($company, $normalizeColumn) {
+        $e->where('type', 'work')
+          ->where('is_visible', true)
+          ->whereRaw($normalizeColumn('institution') . " LIKE ?", ["%{$company}%"]);
+    });
+}
+
+// FILTRO POR CATEGORÍA / PROFESIÓN
+if ($request->filled('category')) {
+    $categoryTerms = $expandSearchTerms($request->input('category'));
+
+    $query->where(function ($q) use ($categoryTerms, $normalizeColumn) {
+        foreach ($categoryTerms as $category) {
+            $like = "%{$category}%";
+
+            $q->orWhereHas('user.profession', function ($p) use ($like, $normalizeColumn) {
+                $p->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
+            })
+            ->orWhereHas('user.experiences', function ($e) use ($like, $normalizeColumn) {
+                $e->where('type', 'work')
+                  ->where('is_visible', true)
+                  ->whereRaw($normalizeColumn('title') . " LIKE ?", [$like]);
+            })
+            ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
+                $p->where('is_visible', true)
+                  ->whereRaw($normalizeColumn('role') . " LIKE ?", [$like]);
             });
         }
+    });
+}
 
         // FILTRO POR SKILLS (TECNOLOGÍAS)
         if ($request->filled('skills')) {
@@ -691,12 +918,39 @@ if ($request->filled('min_experience')) {
 
 // FILTRO POR IDIOMA
 if ($request->filled('language')) {
-    $language = trim($request->input('language'));
+    $language = $normalizeText($request->input('language'));
 
-    $query->whereHas('user.skills', function ($s) use ($language) {
+    $languageMap = [
+        'ingles' => ['ingles', 'english'],
+        'english' => ['ingles', 'english'],
+
+        'espanol' => ['espanol', 'spanish', 'castellano'],
+        'spanish' => ['espanol', 'spanish', 'castellano'],
+        'castellano' => ['espanol', 'spanish', 'castellano'],
+
+        'portugues' => ['portugues', 'portuguese'],
+        'portuguese' => ['portugues', 'portuguese'],
+
+        'frances' => ['frances', 'french'],
+        'french' => ['frances', 'french'],
+
+        'aleman' => ['aleman', 'german'],
+        'german' => ['aleman', 'german'],
+
+        'italiano' => ['italiano', 'italian'],
+        'italian' => ['italiano', 'italian'],
+    ];
+
+    $languageTerms = $languageMap[$language] ?? [$language];
+
+    $query->whereHas('user.skills', function ($s) use ($languageTerms, $normalizeColumn) {
         $s->where('type', 'language')
           ->where('is_visible', true)
-          ->where('name', $language);
+          ->where(function ($langQuery) use ($languageTerms, $normalizeColumn) {
+              foreach ($languageTerms as $term) {
+                  $langQuery->orWhereRaw($normalizeColumn('name') . " LIKE ?", ["%{$term}%"]);
+              }
+          });
     });
 }
 
@@ -859,7 +1113,6 @@ switch ($sort) {
 }
 
 // PAGINACIÓN
-// PAGINACIÓN
 $query->with([
     'user.experiences' => function ($experienceQuery) {
         $experienceQuery
@@ -906,8 +1159,247 @@ if ($request->ajax() && $request->wantsJson()) {
 }
 
 // RESPUESTA NORMAL: cuando entras o vuelves desde un portafolio
-return view('portafolio.explore', compact('portfolios', 'categories', 'skills'));
+return view('portafolio.explore', compact('portfolios', 'categories', 'skills', 'companies'));
     }
+
+    public function compare(Request $request)
+{
+    $ids = $request->input('ids', []);
+
+    if (is_string($ids)) {
+        $ids = explode(',', $ids);
+    }
+
+    $ids = collect($ids)
+        ->map(fn ($id) => (int) $id)
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->take(3)
+        ->values();
+
+    if ($ids->count() < 2) {
+        return redirect()
+            ->route('portafolio.explore')
+            ->withErrors([
+                'compare' => 'Selecciona al menos dos perfiles para comparar.'
+            ]);
+    }
+
+    $portfolios = Portfolio::where('is_public', true)
+        ->whereIn('id', $ids)
+        ->with([
+            'user.profession',
+            'user.skills',
+            'user.experiences',
+            'user.location',
+            'user.professionalNetworks',
+            'projects.technologies',
+        ])
+        ->get()
+        ->sortBy(fn ($portfolio) => $ids->search($portfolio->id))
+        ->values();
+
+    if ($portfolios->count() < 2) {
+        return redirect()
+            ->route('portafolio.explore')
+            ->withErrors([
+                'compare' => 'No se encontraron suficientes perfiles públicos para comparar.'
+            ]);
+    }
+
+    $scores = [];
+
+    foreach ($portfolios as $portfolio) {
+        $scores[$portfolio->id] = $this->calcularPuntajeComparacion($portfolio, $request);
+    }
+
+    $bestPortfolioId = collect($scores)
+        ->sortByDesc('score')
+        ->keys()
+        ->first();
+
+    return view('portafolio.comparar', compact('portfolios', 'scores', 'bestPortfolioId'));
+}
+
+private function normalizarTextoComparacion(?string $texto): string
+{
+    $texto = trim($texto ?? '');
+
+    $texto = str_replace(
+        ['á','é','í','ó','ú','Á','É','Í','Ó','Ú','ñ','Ñ'],
+        ['a','e','i','o','u','a','e','i','o','u','n','n'],
+        $texto
+    );
+
+    return strtolower($texto);
+}
+
+private function calcularPuntajeComparacion($portfolio, Request $request): array
+{
+    $user = $portfolio->user;
+
+    $score = 0;
+    $reasons = [];
+
+    $experiencias = collect($user->experiences)
+        ->where('type', 'work')
+        ->filter(fn ($experience) => (bool) $experience->is_visible);
+
+    $formaciones = collect($user->experiences)
+        ->where('type', 'education')
+        ->filter(fn ($experience) => (bool) $experience->is_visible);
+
+    $habilidadesTecnicas = collect($user->skills)
+        ->where('type', 'technical')
+        ->filter(fn ($skill) => (bool) $skill->is_visible);
+
+    $idiomas = collect($user->skills)
+        ->where('type', 'language')
+        ->filter(fn ($skill) => (bool) $skill->is_visible);
+
+    $proyectos = collect($portfolio->projects)
+        ->filter(fn ($project) => (bool) $project->is_visible);
+
+    $redesProfesionales = collect($user->professionalNetworks)
+        ->filter(fn ($network) => (bool) $network->is_visible);
+
+    $aniosExperiencia = $this->calculateRealExperienceYears($experiencias);
+
+    if ($user->profession) {
+        $score += 10;
+        $reasons[] = 'Tiene profesión definida';
+    }
+
+    $biografia = trim(strip_tags($user->biography ?? ''));
+
+    if ($biografia !== '' && mb_strlen($biografia) >= 40) {
+        $score += 10;
+        $reasons[] = 'Tiene biografía profesional completa';
+    }
+
+    $tieneUbicacion = !empty($user->city)
+        || !empty($user->country)
+        || !empty(optional($user->location)->address);
+
+    if ($tieneUbicacion) {
+        $score += 10;
+        $reasons[] = 'Tiene ubicación registrada';
+    }
+
+    if ($experiencias->count() > 0) {
+        $score += 20;
+        $reasons[] = 'Tiene experiencia laboral registrada';
+    }
+
+    if ($formaciones->count() > 0) {
+        $score += 10;
+        $reasons[] = 'Tiene formación académica registrada';
+    }
+
+    if ($habilidadesTecnicas->count() > 0) {
+        $score += 15;
+        $reasons[] = 'Tiene habilidades técnicas visibles';
+    }
+
+    if ($idiomas->count() > 0) {
+        $score += 10;
+        $reasons[] = 'Tiene idiomas registrados';
+    }
+
+    if ($proyectos->count() > 0) {
+        $score += 15;
+        $reasons[] = 'Tiene proyectos visibles';
+    }
+
+    if ($redesProfesionales->count() > 0) {
+        $score += 10;
+        $reasons[] = 'Tiene redes profesionales visibles';
+    }
+
+    if ($request->filled('company')) {
+        $company = $this->normalizarTextoComparacion($request->input('company'));
+
+        $matchesCompany = $experiencias->contains(function ($experience) use ($company) {
+            return str_contains(
+                $this->normalizarTextoComparacion($experience->institution),
+                $company
+            );
+        }) || $proyectos->contains(function ($project) use ($company) {
+            return str_contains(
+                $this->normalizarTextoComparacion($project->company),
+                $company
+            );
+        });
+
+        if ($matchesCompany) {
+            $score += 20;
+            $reasons[] = 'Coincide con la empresa o institución filtrada';
+        }
+    }
+
+    if ($request->filled('language')) {
+        $language = $this->normalizarTextoComparacion($request->input('language'));
+
+        $matchesLanguage = $idiomas->contains(function ($skill) use ($language) {
+            return str_contains(
+                $this->normalizarTextoComparacion($skill->name),
+                $language
+            );
+        });
+
+        if ($matchesLanguage) {
+            $score += 15;
+            $reasons[] = 'Coincide con el idioma filtrado';
+        }
+    }
+
+    if ($request->filled('category')) {
+        $category = $this->normalizarTextoComparacion($request->input('category'));
+        $profession = $this->normalizarTextoComparacion(optional($user->profession)->name);
+
+        if ($profession !== '' && str_contains($profession, $category)) {
+            $score += 15;
+            $reasons[] = 'Coincide con la profesión filtrada';
+        }
+    }
+
+    if ($request->filled('min_experience')) {
+        $minExperience = (int) $request->input('min_experience');
+
+        if ($aniosExperiencia >= $minExperience) {
+            $score += 15;
+            $reasons[] = "Cumple con {$minExperience} o más años de experiencia";
+        }
+    }
+
+    $selectedSkills = collect($request->input('skills', []))
+        ->map(fn ($skill) => $this->normalizarTextoComparacion($skill))
+        ->filter()
+        ->values();
+
+    if ($selectedSkills->count() > 0) {
+        $userSkills = $habilidadesTecnicas
+            ->pluck('name')
+            ->map(fn ($skill) => $this->normalizarTextoComparacion($skill));
+
+        $matches = $selectedSkills->filter(function ($skill) use ($userSkills) {
+            return $userSkills->contains(function ($userSkill) use ($skill) {
+                return str_contains($userSkill, $skill) || str_contains($skill, $userSkill);
+            });
+        });
+
+        if ($matches->count() > 0) {
+            $score += min($matches->count() * 5, 15);
+            $reasons[] = 'Coincide con habilidades técnicas filtradas';
+        }
+    }
+
+    return [
+        'score' => min($score, 100),
+        'years' => $aniosExperiencia,
+        'reasons' => $reasons,
+    ];
+}
 
     private function calculateRealExperienceYears($experiences): int
     {

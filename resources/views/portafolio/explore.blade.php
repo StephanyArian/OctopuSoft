@@ -178,6 +178,38 @@
     </div>
 </div>
 
+{{-- Empresa --}}
+<div class="custom-dropdown" id="companyDropdown">
+    <button type="button" class="custom-dropdown-btn" id="companyDropdownBtn">
+        <span id="companyDropdownText">Empresa</span>
+        <i class="fas fa-chevron-down"></i>
+    </button>
+
+    <div class="custom-dropdown-menu" id="companyDropdownMenu">
+        <label class="custom-option">
+            <input
+                type="radio"
+                name="company"
+                value=""
+                {{ request('company') ? '' : 'checked' }}
+            >
+            <span>Empresa</span>
+        </label>
+
+        @foreach($companies as $company)
+            <label class="custom-option">
+                <input
+                    type="radio"
+                    name="company"
+                    value="{{ $company->name }}"
+                    {{ request('company') == $company->name ? 'checked' : '' }}
+                >
+                <span>{{ $company->name }}</span>
+            </label>
+        @endforeach
+    </div>
+</div>
+
 {{-- Idiomas --}}
 <div class="custom-dropdown" id="languageDropdown">
     <button type="button" class="custom-dropdown-btn" id="languageDropdownBtn">
@@ -369,7 +401,7 @@
         <div class="empty-state">
             <i class="fas fa-folder-open"></i>
 
-            @if(request()->hasAny(['search', 'category', 'skills', 'min_experience', 'language', 'sort']))
+            @if(request()->hasAny(['search', 'category', 'skills', 'min_experience', 'company', 'language', 'sort']))
                 <h3>No se encontraron resultados</h3>
                 <p>Intenta cambiar los criterios o filtros de búsqueda.</p>
             @else
@@ -382,7 +414,29 @@
     @endif
 </div>
 
-        </div>
+<div id="compareBar" class="compare-bar" hidden>
+    <div>
+        <strong id="compareCount">0 perfiles seleccionados</strong>
+        <span id="compareNames"></span>
+    </div>
+
+    <div class="compare-actions">
+        <button type="button" id="btnClearCompare" class="btn-clear-compare">
+            Limpiar
+        </button>
+
+        <button
+            type="button"
+            id="btnGoCompare"
+            class="btn-go-compare"
+            data-compare-url="{{ route('portafolio.compare') }}"
+        >
+            Comparar perfiles
+        </button>
+    </div>
+</div>
+
+</div>
     </div>
 
     {{-- FOOTER --}}

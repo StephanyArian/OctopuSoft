@@ -59,6 +59,15 @@
                 <a href="{{ route('portafolio.public', $portfolio->slug) }}" class="card-link">
                     Ver portafolio <i class="fas fa-arrow-right"></i>
                 </a>
+                <button
+                type="button"
+                class="card-compare-btn js-compare-toggle"
+                data-portfolio-id="{{ $portfolio->id }}"
+                data-portfolio-name="{{ $portfolio->user->first_name }} {{ $portfolio->user->last_name }}"
+                >
+                <i class="fas fa-scale-balanced"></i>
+                Comparar
+              </button>
             </div>
         </div>
     </div>

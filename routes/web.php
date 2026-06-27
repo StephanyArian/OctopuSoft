@@ -12,7 +12,7 @@ use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\EvidenciaController;
 use App\Models\Portfolio;
 use App\Http\Controllers\IdiomasController;
-
+use App\Http\Controllers\PreviewController;
 
 // ============================================
 // RUTA PRINCIPAL (HOME) - CON PORTAFOLIOS
@@ -48,11 +48,14 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])
 // ============================================
 // RUTAS PÚBLICAS - PORTAFOLIO (HU-16)
 // ============================================
-Route::get('/portafolio/{slug}', [App\Http\Controllers\PreviewController::class, 'publicShow'])
+Route::get('/portafolio/{slug}', [PreviewController::class, 'publicShow']) // 👈 USA PreviewController
     ->name('portafolio.public');
 
 Route::get('/portafolios', [App\Http\Controllers\PreviewController::class, 'explore'])
     ->name('portafolio.explore');
+
+Route::get('/portafolios/comparar', [App\Http\Controllers\PreviewController::class, 'compare'])
+    ->name('portafolio.compare');
 
 // ============================================
 // RUTAS PROTEGIDAS (requieren autenticación)
@@ -131,8 +134,13 @@ Route::middleware('auth')->group(function () {    // PERFIL
     ->middleware(['auth'])
     ->name('preview');
 
-    Route::post('/perfil/publicar', [ProfileController::class, 'publish'])->name('perfil.publicar');
-    Route::post('/portfolio/theme', [ProfileController::class, 'updateTheme'])->name('portfolio.theme.update');
+   //  PUBLICAR PORTAFOLIO (usando PreviewController)
+    Route::post('/perfil/publicar', [PreviewController::class, 'publicar'])
+        ->name('perfil.publicar');
+
+    //  CAMBIAR TEMA (vibe)
+    Route::post('/portfolio/theme', [PreviewController::class, 'updateTheme'])
+        ->name('portfolio.theme.update');
 
     // IDIOMAS
     Route::get('/idiomas-info',         [IdiomasController::class, 'index'])->name('idiomas.index');

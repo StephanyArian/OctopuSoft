@@ -436,7 +436,67 @@
 </head>
 <body>
 
+{{-- ============================================
+    MENSAJES DE PUBLICACIÓN (MEJORADOS)
+    ============================================ --}}
 
+@if($errors->has('publish'))
+<div style="position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:99999;width:90%;max-width:500px;">
+    <div style="background:#fff3cd;border:2px solid #ffc107;border-radius:16px;padding:20px 24px;box-shadow:0 12px 40px rgba(0,0,0,0.15);animation:slideDown 0.3s ease;">
+        <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="background:#ffc107;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-exclamation-triangle" style="color:#856404;font-size:20px;"></i>
+            </div>
+            <div>
+                <h4 style="margin:0 0 8px;font-size:16px;color:#856404;font-weight:700;">Portafolio incompleto</h4>
+                <p style="margin:0 0 12px;font-size:14px;color:#856404;">
+                    {{ $errors->first('publish') }}
+                </p>
+
+                @if(session('publish_missing'))
+                    <div style="background:#fff;border-radius:10px;padding:12px 16px;border:1px solid #ffc107;">
+                        <strong style="font-size:12px;color:#856404;display:block;margin-bottom:8px;">
+                            📋 Debes completar:
+                        </strong>
+                        <ul style="margin:0;padding-left:20px;list-style:disc;">
+                            @foreach(session('publish_missing') as $campo)
+                                <li style="font-size:13px;color:#856404;margin-bottom:4px;">{{ $campo }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <button onclick="this.closest('div[style*=\"position:fixed\"]').remove()" 
+                        style="margin-top:12px;background:rgba(255,193,7,0.3);border:1px solid #ffc107;color:#856404;padding:6px 18px;border-radius:30px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
+                    <i class="fas fa-times"></i> Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+</style>
+@endif
+
+@if(session('success'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        Swal.fire({
+            icon: 'success',
+            title: '✅ ¡Publicado!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#0abf9e',
+            timer: 3000,
+            timerProgressBar: true
+        });
+    });
+</script>
+@endif
 
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -497,18 +557,39 @@
 @endphp
 
 {{-- Botón Volver flotante --}}
-<button class="btn-volver-flotante" onclick="window.location.href='{{ url()->previous() }}'">
+<a href="{{ route('dashboard') }}" class="btn-volver-flotante">
     <i class="fas fa-arrow-left"></i>
     <span>Volver</span>
-</button>
+</a>
+
 
 {{-- FAB flotante abajo-izquierda --}}
 <div class="fab-container" id="fabContainer">
     <div class="fab-menu" id="fabMenu">
-        <button class="fab-item" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
-        <button class="fab-item" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
+        {{-- ✅ BOTÓN DE DESCARGA CONDICIONADO --}}
+        @if($tieneContenido ?? false)
+            <button class="fab-item" onclick="descargarPDF()">
+                <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
+            </button>
+            <button class="fab-item" onclick="descargarImagen()">
+                <i class="fas fa-image"></i><span>Descargar imagen</span>
+            </button>
+        @else
+            {{-- Botones deshabilitados con tooltip --}}
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" 
+                    onclick="mostrarAlertaIncompleto()">
+                <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
+            </button>
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" 
+                    onclick="mostrarAlertaIncompleto()">
+                <i class="fas fa-image"></i><span>Descargar imagen</span>
+            </button>
+        @endif
+        
         <div class="fab-divider"></div>
-        <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');"><i class="fas fa-palette"></i><span>Elegir Vibe</span></button>
+        <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');">
+            <i class="fas fa-palette"></i><span>Elegir Vibe</span>
+        </button>
     </div>
     <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
         <i class="fas fa-ellipsis-h" id="fabIcon"></i><span class="fab-label">Más opciones</span>
@@ -1512,15 +1593,61 @@ $folderColors = [
         </div>
     </div>
 
+{{-- ==================== BARRA PUBLICAR ==================== --}}
+<div class="preview-bottom-bar" id="previewBottomBar">
+    @php
+        // Verificar si hay contenido mínimo para mostrar estado visual
+        $tieneExperiencia = $experiencias->count() > 0;
+        $tieneAcademica = $academicas->count() > 0;
+        $tieneProyecto = $proyectos->count() > 0;
+        $tieneHabilidadTecnica = $habilidadesTecnicasFrontend->count() > 0 || $habilidadesTecnicasBackend->count() > 0;
+        $tieneIdioma = $idiomas->count() > 0;
+        $tieneBlanda = $habilidadesBlandas->count() > 0;
+        $tieneBiografia = !empty($user->biography);
+        $tieneProfesion = !empty($user->profession_id);
+        
+        // Contar secciones completas
+        $seccionesCompletas = 0;
+        if ($tieneExperiencia) $seccionesCompletas++;
+        if ($tieneAcademica) $seccionesCompletas++;
+        if ($tieneProyecto) $seccionesCompletas++;
+        if ($tieneHabilidadTecnica) $seccionesCompletas++;
+        if ($tieneIdioma) $seccionesCompletas++;
+        if ($tieneBlanda) $seccionesCompletas++;
+        if ($tieneBiografia) $seccionesCompletas++;
+        if ($tieneProfesion) $seccionesCompletas++;
+        
+        // Total de items
+        $totalItems = $experiencias->count() + $academicas->count() + $proyectos->count() 
+                    + $habilidadesTecnicasFrontend->count() + $habilidadesTecnicasBackend->count() 
+                    + $idiomas->count() + $habilidadesBlandas->count();
+        
+        // ✅ MISMA REGLA QUE EL CONTROLLER
+        $puedePublicar = $seccionesCompletas >= 2 && $totalItems >= 2;
+    @endphp
 
+    <form action="{{ route('perfil.publicar') }}" method="POST" style="margin:0;" id="formPublicar">
+        @csrf
+        <button type="submit" 
+                class="btn-publicar-main" 
+                id="btnPublicar"
+                @if(!$puedePublicar) 
+                    disabled 
+                    style="opacity:0.5;cursor:not-allowed;background:#94a3b8;"
+                @endif>
+            <i class="fas fa-globe"></i> 
+            {{ $puedePublicar ? 'Publicar perfil' : 'Completa tu perfil para publicar' }}
+        </button>
+        @if(!$puedePublicar)
+            <div style="font-size:12px;color:#94a3b8;margin-top:8px;text-align:center;width:100%;">
+                <i class="fas fa-info-circle"></i> 
+                Necesitas al menos 2 secciones completas y 2 items en total para publicar
+            </div>
+        @endif
+    </form>
+</div>
 
-    {{-- ==================== BARRA PUBLICAR ==================== --}}
-    <div class="preview-bottom-bar" id="previewBottomBar">
-        <form action="{{ route('perfil.publicar') }}" method="POST" style="margin:0;" id="formPublicar">
-            @csrf
-            <button type="submit" class="btn-publicar-main"><i class="fas fa-globe"></i> Publicar perfil</button>
-        </form>
-    </div>
+    
 
 </div><!-- fin .preview-container -->
 
@@ -2015,6 +2142,109 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script>
+// ============================================================
+// PUBLICAR - CON VALIDACIÓN ADICIONAL
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const formPublicar = document.getElementById('formPublicar');
+    const btnPublicar = document.getElementById('btnPublicar');
+    
+    if (formPublicar) {
+        formPublicar.addEventListener('submit', function(e) {
+            // Si el botón está deshabilitado, prevenir el envío
+            if (btnPublicar && btnPublicar.disabled) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Portafolio incompleto',
+                    text: 'Completa tu perfil (experiencia, formación o proyectos) antes de publicar.',
+                    confirmButtonColor: '#0abf9e'
+                });
+                return false;
+            }
+            
+            // Si está habilitado, mostrar confirmación
+            e.preventDefault();
+            Swal.fire({
+                title: '¿Publicar portafolio?',
+                text: 'Tu perfil será visible para todos los usuarios.',
+                showCancelButton: true,
+                confirmButtonColor: '#0abf9e',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Publicar',
+                cancelButtonText: 'Cancelar'
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Publicando...',
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    });
+                    formPublicar.submit();
+                }
+            });
+        });
+    }
+});
+
+// ============================================================
+// ALERTA DE PORTAFOLIO INCOMPLETO PARA DESCARGAS
+// ============================================================
+
+function mostrarAlertaIncompleto() {
+    document.getElementById('fabMenu').classList.remove('open');
+    
+    const seccionesCompletas = @json($seccionesCompletas ?? 0);
+    const estadoSecciones = @json($estadoSecciones ?? []);
+    
+    const completas = Object.values(estadoSecciones).filter(s => s.completo);
+    const faltantes = Object.values(estadoSecciones).filter(s => !s.completo);
+    
+    Swal.fire({
+        icon: 'warning',
+        title: '⚠️ Portafolio incompleto',
+        html: `
+            <div style="text-align: left;">
+                <div style="background: #f0fdf4; border-left: 4px solid #0abf9e; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+                    <p style="margin: 0; font-size: 14px; color: #065f46;">
+                        <strong>Requisito:</strong> Mínimo 2 secciones completas
+                    </p>
+                    <p style="margin: 4px 0 0; font-size: 13px; color: #047857;">
+                        Completadas: ${seccionesCompletas} de 2
+                    </p>
+                </div>
+                
+                ${faltantes.length > 0 ? `
+                    <p style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">
+                        Secciones pendientes:
+                    </p>
+                    <ul style="margin: 0 0 16px 0; padding: 0; list-style: none;">
+                        ${faltantes.map(item => 
+                            `<li style="font-size: 14px; color: #64748b; padding: 6px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px;">
+                                <span style="color: #94a3b8;">○</span>
+                                ${item.icono} ${item.nombre}
+                            </li>`
+                        ).join('')}
+                    </ul>
+                ` : ''}
+                
+                <div style="background: #f8fafc; border-radius: 6px; padding: 10px 14px; text-align: center;">
+                    <span style="font-size: 13px; color: #64748b;">
+                        💡 Complete las secciones pendientes para habilitar la descarga
+                    </span>
+                </div>
+            </div>
+        `,
+        confirmButtonColor: '#0abf9e',
+        confirmButtonText: 'Entendido',
+        showCancelButton: false,
+        width: 480,
+    });
+}
+</script>
+
+
 
 </body>
 </html>

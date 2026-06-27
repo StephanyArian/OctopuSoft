@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Exponer para resetForm
+        
         window.quillDescripcion = quillDescripcion;
     } else {
         console.warn('⚠️ Editor Quill no encontrado o Quill no está cargado');

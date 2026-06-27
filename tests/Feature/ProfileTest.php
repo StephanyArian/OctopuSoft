@@ -38,9 +38,12 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
+        // El modelo usa first_name/last_name en lugar de name
+        $this->assertSame('Test', $user->first_name);
+        $this->assertSame('User', $user->last_name);
         $this->assertSame('test@example.com', $user->email);
-        $this->assertNull($user->email_verified_at);
+        // Al cambiar el email queda sin verificar (email_verified = false)
+        $this->assertFalse((bool) $user->email_verified);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void
@@ -58,7 +61,8 @@ class ProfileTest extends TestCase
             ->assertSessionHasNoErrors()
             ->assertRedirect('/profile');
 
-        $this->assertNotNull($user->refresh()->email_verified_at);
+        // El email no cambió, así que la verificación se mantiene
+        $this->assertTrue($user->refresh()->hasVerifiedEmail());
     }
 
     public function test_user_can_delete_their_account(): void
