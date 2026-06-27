@@ -10,7 +10,7 @@ use App\Notifications\VerificacionCorreo;
 use App\Notifications\ResetPasswordPersonalizado;
 
 
-class User extends Authenticatable{
+class User extends Authenticatable implements MustVerifyEmail {
     use HasFactory, Notifiable;
 
     protected $table = 'users';
@@ -56,10 +56,6 @@ class User extends Authenticatable{
         return $this->belongsTo(Profession::class);
     }
 
-    /**
-     * Mutadores para limitar automáticamente los campos a sus longitudes máximas
-     * Esto sirve como capa adicional de seguridad en el modelo
-     */
     public function setFirstNameAttribute($value)
     {
         $this->attributes['first_name'] = $value ? substr($value, 0, 30) : null;
