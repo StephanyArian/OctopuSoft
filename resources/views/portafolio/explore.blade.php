@@ -309,7 +309,7 @@
 {{-- Ordenamiento --}}
 <div class="custom-dropdown" id="sortDropdown">
     <button type="button" class="custom-dropdown-btn" id="sortDropdownBtn">
-        <span id="sortDropdownText">Más recientes</span>
+        <span id="sortDropdownText">Más completos</span>
         <i class="fas fa-chevron-down"></i>
     </button>
 
@@ -319,7 +319,7 @@
                 type="radio"
                 name="sort"
                 value="desc"
-                {{ request('sort', 'desc') == 'desc' ? 'checked' : '' }}
+                {{ request('sort') == 'desc' ? 'checked' : '' }}
             >
             <span>Más recientes</span>
         </label>
@@ -339,7 +339,7 @@
                 type="radio"
                 name="sort"
                 value="complete"
-                {{ request('sort') == 'complete' ? 'checked' : '' }}
+                {{ request('sort', 'complete') == 'complete' ? 'checked' : '' }}
             >
             <span>Más completos</span>
         </label>
@@ -412,28 +412,6 @@
     @else
         @include('partials.portfolio_cards')
     @endif
-</div>
-
-<div id="compareBar" class="compare-bar" hidden>
-    <div>
-        <strong id="compareCount">0 perfiles seleccionados</strong>
-        <span id="compareNames"></span>
-    </div>
-
-    <div class="compare-actions">
-        <button type="button" id="btnClearCompare" class="btn-clear-compare">
-            Limpiar
-        </button>
-
-        <button
-            type="button"
-            id="btnGoCompare"
-            class="btn-go-compare"
-            data-compare-url="{{ route('portafolio.compare') }}"
-        >
-            Comparar perfiles
-        </button>
-    </div>
 </div>
 
 </div>

@@ -727,6 +727,7 @@ $query = Portfolio::where('is_public', true)
         'user.skills',
         'user.experiences',
         'user.location',
+        'user.professionalNetworks',
         'projects.technologies'
     ]);
 
@@ -955,7 +956,7 @@ if ($request->filled('language')) {
 }
 
 // ORDENAMIENTO
-$sort = $request->input('sort', 'desc');
+$sort = $request->input('sort', 'complete');
 
 switch ($sort) {
     case 'asc':
@@ -1148,14 +1149,20 @@ if ($minExperience !== null) {
     $portfolios = $query->paginate(12)->appends($request->query());
 }
 // RESPUESTA AJAX: solo cuando el filtro JS pide JSON explícitamente
-if ($request->ajax() && $request->wantsJson()) {
+if (
+    $request->ajax() &&
+    $request->wantsJson() &&
+    $request->query('_ajax') === '1'
+) {
     return response()->json([
         'html' => view('partials.portfolio_cards', [
             'portfolios' => $portfolios,
             'ajax' => true
         ])->render(),
         'count' => $portfolios->total()
-    ]);
+    ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+      ->header('Pragma', 'no-cache')
+      ->header('Vary', 'Accept, X-Requested-With');
 }
 
 // RESPUESTA NORMAL: cuando entras o vuelves desde un portafolio
