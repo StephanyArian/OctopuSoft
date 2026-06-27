@@ -1409,3 +1409,20 @@ body {
 .theme-sakura .btn-ver-todos button:hover { background: #db2777; }
 .theme-sakura .profile-contact-list .contact-row i { color: #ec4899; }
 .theme-sakura .profile-social-icons a:hover { background: #ec4899; border-color: #ec4899; }
+/* ============================================
+   ESTILOS PARA BOTÓN PUBLICAR DESHABILITADO
+   ============================================ */
+
+.btn-publicar-main:disabled {
+    background: #94a3b8 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    opacity: 0.6;
+    transform: none !important;
+}
+
+.btn-publicar-main:disabled:hover {
+    background: #94a3b8 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}

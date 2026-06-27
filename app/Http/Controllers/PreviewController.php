@@ -14,6 +14,139 @@ use Carbon\Carbon;
 class PreviewController extends Controller
 {
     /**
+     * ==========================================
+     * NUEVO: Verificar si el portafolio tiene contenido suficiente
+     * ==========================================
+     */
+    private function portafolioTieneContenido($user)
+    {
+        // Contar items en cada sección
+        $contenido = [
+            'experiencias' => $user->experiences->where('type', 'work')->where('is_visible', true)->count(),
+            'academicas'   => $user->experiences->where('type', 'education')->where('is_visible', true)->count(),
+            'proyectos'    => $user->portfolio ? $user->portfolio->projects->where('is_visible', true)->count() : 0,
+            'habilidades_tecnicas' => $user->skills->where('type', 'technical')->where('is_visible', true)->count(),
+            'habilidades_blandas'  => $user->skills->where('type', 'soft')->where('is_visible', true)->count(),
+            'idiomas'      => $user->skills->where('type', 'language')->where('is_visible', true)->count(),
+            'biografia'    => !empty($user->biography),
+            'profesion'    => !empty($user->profession_id),
+        ];
+
+        // Contar secciones completas
+        $seccionesCompletas = 0;
+        foreach ($contenido as $key => $value) {
+            if (in_array($key, ['biografia', 'profesion'])) {
+                if ($value) $seccionesCompletas++;
+            } else {
+                if ($value > 0) $seccionesCompletas++;
+            }
+        }
+
+        // Total de items (excluyendo biografía y profesión)
+        $totalItems = $contenido['experiencias'] + $contenido['academicas'] + 
+                      $contenido['proyectos'] + $contenido['habilidades_tecnicas'] + 
+                      $contenido['habilidades_blandas'] + $contenido['idiomas'];
+
+        // 🔥 REGLA NUEVA: mínimo 2 secciones completas Y al menos 2 items totales
+        return $seccionesCompletas >= 2 && $totalItems >= 2;
+    }
+
+    /**
+     * ==========================================
+     * NUEVO: Obtener campos faltantes para mostrar al usuario
+     * ==========================================
+     */
+    private function obtenerCamposFaltantes($user)
+    {
+        $faltantes = [];
+        
+        if ($user->experiences->where('type', 'work')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar al menos una experiencia laboral';
+        }
+        if ($user->experiences->where('type', 'education')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar al menos una formación académica';
+        }
+        if ($user->portfolio && $user->portfolio->projects->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar al menos un proyecto';
+        }
+        if ($user->skills->where('type', 'technical')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar habilidades técnicas';
+        }
+        if ($user->skills->where('type', 'soft')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar habilidades blandas';
+        }
+        if ($user->skills->where('type', 'language')->where('is_visible', true)->count() === 0) {
+            $faltantes[] = 'Agregar idiomas';
+        }
+        if (empty($user->biography)) {
+            $faltantes[] = 'Completar tu biografía';
+        }
+        if (empty($user->profession_id)) {
+            $faltantes[] = 'Seleccionar tu profesión';
+        }
+
+        return $faltantes;
+    }
+
+    /**
+     * ==========================================
+     * NUEVO: PUBLICAR PORTAFOLIO
+     * ==========================================
+     */
+    public function publicar(Request $request)
+    {
+        $user = Auth::user();
+        
+        // 🔍 Verificar si hay contenido
+        if (!$this->portafolioTieneContenido($user)) {
+            $faltantes = $this->obtenerCamposFaltantes($user);
+            
+            // Guardar en sesión para mostrar en la vista
+            session()->flash('publish_error', true);
+            session()->flash('publish_missing', $faltantes);
+            
+            return redirect()->back()->withErrors([
+                'publish' => 'Tu portafolio está incompleto. Completa la información faltante antes de publicar.'
+            ]);
+        }
+
+        // ✅ Si tiene contenido, publicar
+        try {
+            $portfolio = $user->portfolio;
+            if ($portfolio) {
+                $portfolio->is_public = true;
+               //$portfolio->published_at = now();
+                $portfolio->save();
+            }
+
+            session()->flash('success', '¡Tu portafolio ha sido publicado exitosamente!');
+            
+            return redirect()->back()->with('success', '¡Portafolio publicado!');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors([
+                'publish' => 'Ocurrió un error al publicar: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * ==========================================
+     * NUEVO: CAMBIAR TEMA (Vibe)
+     * ==========================================
+     */
+    public function updateTheme(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->portfolio) {
+            $user->portfolio->color_theme = $request->theme;
+            $user->portfolio->save();
+            return response()->json(['success' => true]);
+        }
+        return response()->json(['success' => false, 'message' => 'Portafolio no encontrado']);
+    }
+
+    /**
      * Vista previa del portafolio para el usuario logueado (con edición)
      */
     public function preview()
@@ -30,6 +163,8 @@ class PreviewController extends Controller
             'professionalNetworks.platform',
             'location'
         ]);
+
+      
         
         // ==========================================
         // HABILIDADES TÉCNICAS (type = 'technical')
