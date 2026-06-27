@@ -562,13 +562,34 @@
     <span>Volver</span>
 </a>
 
+
 {{-- FAB flotante abajo-izquierda --}}
 <div class="fab-container" id="fabContainer">
     <div class="fab-menu" id="fabMenu">
-        <button class="fab-item" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
-        <button class="fab-item" onclick="descargarImagen()"><i class="fas fa-image"></i><span>Descargar imagen</span></button>
+        {{-- ✅ BOTÓN DE DESCARGA CONDICIONADO --}}
+        @if($tieneContenido ?? false)
+            <button class="fab-item" onclick="descargarPDF()">
+                <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
+            </button>
+            <button class="fab-item" onclick="descargarImagen()">
+                <i class="fas fa-image"></i><span>Descargar imagen</span>
+            </button>
+        @else
+            {{-- Botones deshabilitados con tooltip --}}
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" 
+                    onclick="mostrarAlertaIncompleto()">
+                <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
+            </button>
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" 
+                    onclick="mostrarAlertaIncompleto()">
+                <i class="fas fa-image"></i><span>Descargar imagen</span>
+            </button>
+        @endif
+        
         <div class="fab-divider"></div>
-        <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');"><i class="fas fa-palette"></i><span>Elegir Vibe</span></button>
+        <button class="fab-item" onclick="toggleVibeSidebar(true); document.getElementById('fabMenu').classList.remove('open');">
+            <i class="fas fa-palette"></i><span>Elegir Vibe</span>
+        </button>
     </div>
     <button class="fab-button" id="fabButton" onclick="toggleFabMenu()">
         <i class="fas fa-ellipsis-h" id="fabIcon"></i><span class="fab-label">Más opciones</span>
@@ -2166,6 +2187,61 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ============================================================
+// ALERTA DE PORTAFOLIO INCOMPLETO PARA DESCARGAS
+// ============================================================
+
+function mostrarAlertaIncompleto() {
+    document.getElementById('fabMenu').classList.remove('open');
+    
+    const seccionesCompletas = @json($seccionesCompletas ?? 0);
+    const estadoSecciones = @json($estadoSecciones ?? []);
+    
+    const completas = Object.values(estadoSecciones).filter(s => s.completo);
+    const faltantes = Object.values(estadoSecciones).filter(s => !s.completo);
+    
+    Swal.fire({
+        icon: 'warning',
+        title: '⚠️ Portafolio incompleto',
+        html: `
+            <div style="text-align: left;">
+                <div style="background: #f0fdf4; border-left: 4px solid #0abf9e; padding: 12px 16px; border-radius: 4px; margin-bottom: 16px;">
+                    <p style="margin: 0; font-size: 14px; color: #065f46;">
+                        <strong>Requisito:</strong> Mínimo 2 secciones completas
+                    </p>
+                    <p style="margin: 4px 0 0; font-size: 13px; color: #047857;">
+                        Completadas: ${seccionesCompletas} de 2
+                    </p>
+                </div>
+                
+                ${faltantes.length > 0 ? `
+                    <p style="font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px;">
+                        Secciones pendientes:
+                    </p>
+                    <ul style="margin: 0 0 16px 0; padding: 0; list-style: none;">
+                        ${faltantes.map(item => 
+                            `<li style="font-size: 14px; color: #64748b; padding: 6px 0; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; gap: 10px;">
+                                <span style="color: #94a3b8;">○</span>
+                                ${item.icono} ${item.nombre}
+                            </li>`
+                        ).join('')}
+                    </ul>
+                ` : ''}
+                
+                <div style="background: #f8fafc; border-radius: 6px; padding: 10px 14px; text-align: center;">
+                    <span style="font-size: 13px; color: #64748b;">
+                        💡 Complete las secciones pendientes para habilitar la descarga
+                    </span>
+                </div>
+            </div>
+        `,
+        confirmButtonColor: '#0abf9e',
+        confirmButtonText: 'Entendido',
+        showCancelButton: false,
+        width: 480,
+    });
+}
 </script>
 
 

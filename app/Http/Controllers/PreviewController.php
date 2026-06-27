@@ -153,6 +153,9 @@ class PreviewController extends Controller
     {
         // Obtener usuario logueado
         $user = Auth::user();
+
+         $tieneContenido = $this->portafolioTieneContenido($user);
+        $camposFaltantes = $this->obtenerCamposFaltantes($user);
         
         // Cargar relaciones SEGÚN TU ESTRUCTURA DE BD
         $user->load([
@@ -382,7 +385,10 @@ class PreviewController extends Controller
             'experiencias',
             'academicas',
             'proyectos',
-            'redes'
+            'redes',
+            'tieneContenido',        //  NUEVO
+            'camposFaltantes'        // NUEVO
+
         ));
     }
 
