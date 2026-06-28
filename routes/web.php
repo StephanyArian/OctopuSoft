@@ -54,7 +54,7 @@ Route::get('/portafolio/{slug}', [PreviewController::class, 'publicShow']) // ðŸ
 Route::get('/portafolios', [App\Http\Controllers\PreviewController::class, 'explore'])
     ->name('portafolio.explore');
 
-Route::get('/portafolios/comparar', [App\Http\Controllers\PreviewController::class, 'compare'])
+Route::redirect('/portafolios/comparar', '/portafolios')
     ->name('portafolio.compare');
 
 // ============================================
