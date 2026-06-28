@@ -745,42 +745,81 @@ private function portafolioTieneContenido($user)
             ];
         });
 
-        // ==========================================
+// ==========================================
 // EMPRESAS / INSTITUCIONES
 // ==========================================
 $companies = collect([
-    'SEGIP',
-    'UMSS',
+    // Empresas tecnológicas y software
     'JalaSoft',
-    'Digital Harboard',
-    'Apple',
+    'AssureSoft',
+    'Mojix',
+    'Truextend',
+    'Digital Harbor',
+    'Ultracasas',
+    'TuGerente',
+    'Síntesis',
+    'GeoPagos',
+    'Tigo Business',
     'Microsoft',
-    'Banco Unión',
-    'Google Bolivia',
-    'ABC',
-    'SIN',
-    'Gobernación',
-    'Alcaldía',
-    'YPFB',
+    'Google',
+    'Apple',
+    'Amazon Web Services',
+    'IBM',
+
+    // Telecomunicaciones
     'ENTEL',
     'Tigo',
     'Viva',
+    'AXS Bolivia',
+    'COTEL',
+    'Comteco',
+
+    // Bancos y entidades financieras
+    'Banco Unión',
     'Banco Nacional de Bolivia',
     'Banco Mercantil Santa Cruz',
     'Banco Bisa',
-    'Caja Nacional de Salud',
+    'Banco Económico',
+    'Banco Ganadero',
+    'BancoSol',
+    'FIE',
+    'Prodem',
+    'BCP Bolivia',
+
+    // Instituciones públicas
+    'SEGIP',
+    'SIN',
     'Aduana Nacional',
-    'Impuestos Nacionales',
-    'SENASAG',
+    'Gobernación',
+    'Alcaldía',
+    'YPFB',
     'ENDE',
+    'SENASAG',
+    'ABC',
     'BoA',
-    'COTEL',
-    'EMAPA',
+    'Caja Nacional de Salud',
+    'Impuestos Nacionales',
+
+    // Universidades e instituciones académicas
+    'UMSS',
+    'Universidad Mayor de San Simón',
+    'Universidad Católica Boliviana',
+    'UPB',
+    'Univalle',
+    'Universidad Privada Domingo Savio',
+    'Universidad Franz Tamayo',
+    'Universidad Técnica de Oruro',
+    'Universidad Gabriel René Moreno',
+
+    // Empresas comerciales y servicios
     'Farmacorp',
     'Hipermaxi',
-    'Univalle',
-    'UPB',
-    'Universidad Católica Boliviana',
+    'EMAPA',
+    'Soboce',
+    'Coca Cola Bolivia',
+    'Pil Andina',
+    'Sofía',
+    'PedidosYa Bolivia',
 ])->map(function ($name) {
     return (object) [
         'name' => $name,
@@ -863,8 +902,184 @@ $expandSearchTerms = function ($text) use ($normalizeText) {
         }
     }
 
+    // Si la búsqueda contiene un rol específico, no permitir términos demasiado generales.
+// Ejemplo: "full stack development" no debe convertirse en solo "developer".
+$hasFullStack = str_contains($search, 'full stack')
+    || str_contains($search, 'fullstack')
+    || str_contains($search, 'full-stack');
+
+$hasFrontend = str_contains($search, 'frontend')
+    || str_contains($search, 'front end')
+    || str_contains($search, 'front-end');
+
+$hasBackend = str_contains($search, 'backend')
+    || str_contains($search, 'back end')
+    || str_contains($search, 'back-end');
+
+if ($hasFullStack) {
+    $terms = $terms->merge([
+        'full stack',
+        'fullstack',
+        'full-stack',
+        'full stack developer',
+        'fullstack developer',
+        'full-stack developer',
+        'desarrollador full stack',
+        'desarrolladora full stack',
+        'desarrollo full stack',
+    ]);
+}
+
+if ($hasFrontend) {
+    $terms = $terms->merge([
+        'frontend',
+        'front end',
+        'front-end',
+        'frontend developer',
+        'front end developer',
+        'front-end developer',
+        'desarrollador frontend',
+        'desarrolladora frontend',
+        'desarrollo frontend',
+    ]);
+}
+
+if ($hasBackend) {
+    $terms = $terms->merge([
+        'backend',
+        'back end',
+        'back-end',
+        'backend developer',
+        'back end developer',
+        'back-end developer',
+        'desarrollador backend',
+        'desarrolladora backend',
+        'desarrollo backend',
+    ]);
+}
+
+if ($hasFullStack || $hasFrontend || $hasBackend) {
+    $blockedGenericTerms = [
+        'developer',
+        'develop',
+        'development',
+        'dev',
+        'desarrollador',
+        'desarrolladora',
+        'desarrollo',
+    ];
+
+    $terms = $terms->reject(function ($term) use ($blockedGenericTerms) {
+        return in_array($term, $blockedGenericTerms, true);
+    });
+}
+
     return $terms
         ->map(fn ($term) => trim($term))
+        ->filter()
+        ->unique()
+        ->values();
+};
+
+$expandCompanyTerms = function ($text) use ($normalizeText) {
+    $company = $normalizeText($text);
+
+    $aliases = [
+        'google bolivia' => [
+            'google',
+            'google bolivia',
+        ],
+        'google' => [
+            'google',
+            'google bolivia',
+        ],
+
+        'umss' => [
+            'umss',
+            'universidad mayor de san simon',
+            'universidad mayor de san simón',
+        ],
+        'universidad mayor de san simon' => [
+            'umss',
+            'universidad mayor de san simon',
+            'universidad mayor de san simón',
+        ],
+        'universidad mayor de san simón' => [
+            'umss',
+            'universidad mayor de san simon',
+            'universidad mayor de san simón',
+        ],
+
+        'ucb' => [
+            'ucb',
+            'universidad catolica boliviana',
+            'universidad católica boliviana',
+        ],
+        'universidad catolica boliviana' => [
+            'ucb',
+            'universidad catolica boliviana',
+            'universidad católica boliviana',
+        ],
+        'universidad católica boliviana' => [
+            'ucb',
+            'universidad catolica boliviana',
+            'universidad católica boliviana',
+        ],
+
+        'upb' => [
+            'upb',
+            'universidad privada boliviana',
+        ],
+        'universidad privada boliviana' => [
+            'upb',
+            'universidad privada boliviana',
+        ],
+
+        'banco union' => [
+            'banco union',
+            'banco unión',
+        ],
+        'banco unión' => [
+            'banco union',
+            'banco unión',
+        ],
+
+        'banco nacional de bolivia' => [
+            'banco nacional de bolivia',
+            'bnb',
+        ],
+        'bnb' => [
+            'banco nacional de bolivia',
+            'bnb',
+        ],
+
+        'banco mercantil santa cruz' => [
+            'banco mercantil santa cruz',
+            'banco mercantil',
+            'mercantil santa cruz',
+            'bmsc',
+        ],
+        'bmsc' => [
+            'banco mercantil santa cruz',
+            'banco mercantil',
+            'mercantil santa cruz',
+            'bmsc',
+        ],
+
+        'jalasoft' => [
+            'jalasoft',
+            'jala soft',
+            'jala',
+        ],
+        'jala soft' => [
+            'jalasoft',
+            'jala soft',
+            'jala',
+        ],
+    ];
+
+    return collect($aliases[$company] ?? [$company])
+        ->map(fn ($term) => $normalizeText($term))
         ->filter()
         ->unique()
         ->values();
@@ -873,6 +1088,11 @@ $expandSearchTerms = function ($text) use ($normalizeText) {
 // BÚSQUEDA POR TEXTO GENERAL
 if ($request->filled('search')) {
     $terms = $expandSearchTerms($request->input('search'));
+    
+    $terms = $terms
+        ->merge($expandCompanyTerms($request->input('search')))
+        ->unique()
+        ->values();
 
     $query->where(function ($q) use ($terms, $normalizeColumn) {
         foreach ($terms as $term) {
@@ -923,22 +1143,134 @@ if ($request->filled('search')) {
 
 // FILTRO POR EMPRESA / INSTITUCIÓN LABORAL
 if ($request->filled('company')) {
-    $company = $normalizeText($request->input('company'));
+    $companyTerms = $expandCompanyTerms($request->input('company'));
 
-    $query->whereHas('user.experiences', function ($e) use ($company, $normalizeColumn) {
-        $e->where('type', 'work')
-          ->where('is_visible', true)
-          ->whereRaw($normalizeColumn('institution') . " LIKE ?", ["%{$company}%"]);
+    $query->where(function ($companyQuery) use ($companyTerms, $normalizeColumn) {
+        foreach ($companyTerms as $companyTerm) {
+            $like = "%{$companyTerm}%";
+
+            $companyQuery
+                ->orWhereHas('user.experiences', function ($e) use ($like, $normalizeColumn) {
+                    $e->where('type', 'work')
+                      ->where('is_visible', true)
+                      ->where(function ($exp) use ($like, $normalizeColumn) {
+                          $exp->whereRaw($normalizeColumn('institution') . " LIKE ?", [$like])
+                              ->orWhereRaw($normalizeColumn('location') . " LIKE ?", [$like]);
+                      });
+                })
+                ->orWhereHas('projects', function ($p) use ($like, $normalizeColumn) {
+                    $p->where('is_visible', true)
+                      ->whereRaw($normalizeColumn('company') . " LIKE ?", [$like]);
+                });
+        }
     });
 }
 
 // FILTRO POR CATEGORÍA / PROFESIÓN
 if ($request->filled('category')) {
-    $categoryTerms = $expandSearchTerms($request->input('category'));
+    $category = $normalizeText($request->input('category'));
+
+    $categoryMap = [
+        'frontend developer' => [
+            'frontend',
+            'front end',
+            'front-end',
+            'frontend developer',
+            'front end developer',
+            'front-end developer',
+            'desarrollador frontend',
+            'desarrolladora frontend',
+        ],
+
+        'backend developer' => [
+            'backend',
+            'back end',
+            'back-end',
+            'backend developer',
+            'back end developer',
+            'back-end developer',
+            'desarrollador backend',
+            'desarrolladora backend',
+        ],
+
+        'full stack developer' => [
+            'full stack',
+            'fullstack',
+            'full-stack',
+            'full stack developer',
+            'fullstack developer',
+            'full-stack developer',
+            'desarrollador full stack',
+            'desarrolladora full stack',
+        ],
+
+        'mobile developer' => [
+            'mobile',
+            'movil',
+            'móvil',
+            'android',
+            'ios',
+            'mobile developer',
+            'desarrollador mobile',
+            'desarrollador movil',
+            'desarrolladora mobile',
+        ],
+
+        'ui/ux designer' => [
+            'ui/ux',
+            'ux/ui',
+            'ui ux',
+            'ux',
+            'interfaz',
+            'experiencia de usuario',
+            'designer',
+            'diseñador ui',
+            'diseñadora ui',
+            'diseñador ux',
+            'diseñadora ux',
+        ],
+
+        'qa tester' => [
+            'qa',
+            'tester',
+            'testing',
+            'quality assurance',
+            'control de calidad',
+            'aseguramiento de calidad',
+        ],
+
+        'devops engineer' => [
+            'devops',
+            'devops engineer',
+            'ingeniero devops',
+            'ingeniera devops',
+        ],
+
+        'data analyst' => [
+            'data analyst',
+            'analista de datos',
+            'datos',
+            'data',
+        ],
+
+        'ai engineer' => [
+            'ai engineer',
+            'ia engineer',
+            'inteligencia artificial',
+            'machine learning',
+            'artificial intelligence',
+        ],
+    ];
+
+    $categoryTerms = collect($categoryMap[$category] ?? [$category])
+        ->map(fn ($term) => $normalizeText($term))
+        ->filter()
+        ->unique()
+        ->values();
 
     $query->where(function ($q) use ($categoryTerms, $normalizeColumn) {
-        foreach ($categoryTerms as $category) {
-            $like = "%{$category}%";
+        foreach ($categoryTerms as $categoryTerm) {
+            $like = "%{$categoryTerm}%";
 
             $q->orWhereHas('user.profession', function ($p) use ($like, $normalizeColumn) {
                 $p->whereRaw($normalizeColumn('name') . " LIKE ?", [$like]);
@@ -1032,108 +1364,409 @@ switch ($sort) {
         $query->orderBy('portfolios.created_at', 'asc');
         break;
 
-    case 'complete':
-        $query
-            ->addSelect([
-                'visible_projects_count' => DB::table('projects')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('projects.portfolio_id', 'portfolios.id')
-                    ->where('projects.is_visible', true),
+case 'complete':
+    /*
+    |--------------------------------------------------------------------------
+    | Puntaje de completitud
+    |--------------------------------------------------------------------------
+    | Mide qué tan completo está el portafolio.
+    | Ya no solo pregunta si existe una sección, también toma en cuenta
+    | cuánta información tiene en habilidades, proyectos, experiencias, etc.
+    */
+    $completenessScore = "
+        (
+            CASE WHEN EXISTS (
+                SELECT 1 FROM users u
+                WHERE u.id = portfolios.user_id
+                AND u.photo_base64 IS NOT NULL
+                AND u.photo_base64 != ''
+            ) THEN 8 ELSE 0 END
 
-                'technical_skills_count' => DB::table('skills')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('skills.user_id', 'portfolios.user_id')
-                    ->where('skills.type', 'technical')
-                    ->where('skills.is_visible', true),
+            +
 
-                'languages_count' => DB::table('skills')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('skills.user_id', 'portfolios.user_id')
-                    ->where('skills.type', 'language')
-                    ->where('skills.is_visible', true),
+            CASE WHEN EXISTS (
+                SELECT 1 FROM users u
+                WHERE u.id = portfolios.user_id
+                AND u.biography IS NOT NULL
+                AND u.biography != ''
+            ) THEN 12 ELSE 0 END
 
-                'experiences_count' => DB::table('experiences')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('experiences.user_id', 'portfolios.user_id')
-                    ->where('experiences.type', 'work')
-                    ->where('experiences.is_visible', true),
+            +
 
-                'education_count' => DB::table('experiences')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('experiences.user_id', 'portfolios.user_id')
-                    ->where('experiences.type', 'education')
-                    ->where('experiences.is_visible', true),
+            CASE WHEN EXISTS (
+                SELECT 1 FROM users u
+                WHERE u.id = portfolios.user_id
+                AND u.profession_id IS NOT NULL
+            ) THEN 10 ELSE 0 END
 
-                'networks_count' => DB::table('professional_networks')
-                    ->selectRaw('COUNT(*)')
-                    ->whereColumn('professional_networks.user_id', 'portfolios.user_id')
-                    ->where('professional_networks.is_visible', true),
-            ])
-            ->orderByDesc(DB::raw("
-                (
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM users
-                        WHERE users.id = portfolios.user_id
-                        AND users.photo_base64 IS NOT NULL
-                        AND users.photo_base64 != ''
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM users
-                        WHERE users.id = portfolios.user_id
-                        AND users.biography IS NOT NULL
-                        AND users.biography != ''
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM users
-                        WHERE users.id = portfolios.user_id
-                        AND users.profession_id IS NOT NULL
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM skills
-                        WHERE skills.user_id = portfolios.user_id
-                        AND skills.type = 'technical'
-                        AND skills.is_visible = 1
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM projects
-                        WHERE projects.portfolio_id = portfolios.id
-                        AND projects.is_visible = 1
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM professional_networks
-                        WHERE professional_networks.user_id = portfolios.user_id
-                        AND professional_networks.is_visible = 1
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM experiences
-                        WHERE experiences.user_id = portfolios.user_id
-                        AND experiences.type = 'work'
-                        AND experiences.is_visible = 1
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM experiences
-                        WHERE experiences.user_id = portfolios.user_id
-                        AND experiences.type = 'education'
-                        AND experiences.is_visible = 1
-                    ) THEN 1 ELSE 0 END
-                    +
-                    CASE WHEN EXISTS (
-                        SELECT 1 FROM skills
-                        WHERE skills.user_id = portfolios.user_id
-                        AND skills.type = 'language'
-                        AND skills.is_visible = 1
-                    ) THEN 1 ELSE 0 END
+            +
+
+            LEAST((
+                SELECT COUNT(*)
+                FROM skills s
+                WHERE s.user_id = portfolios.user_id
+                AND s.type = 'technical'
+                AND s.is_visible = 1
+            ), 5) * 4
+
+            +
+
+            LEAST((
+                SELECT COUNT(*)
+                FROM projects p
+                WHERE p.portfolio_id = portfolios.id
+                AND p.is_visible = 1
+            ), 4) * 5
+
+            +
+
+            LEAST((
+                SELECT COUNT(*)
+                FROM experiences e
+                WHERE e.user_id = portfolios.user_id
+                AND e.type = 'work'
+                AND e.is_visible = 1
+            ), 3) * 4
+
+            +
+
+            LEAST((
+                SELECT COUNT(*)
+                FROM experiences e
+                WHERE e.user_id = portfolios.user_id
+                AND e.type = 'education'
+                AND e.is_visible = 1
+            ), 2) * 4
+
+            +
+
+            LEAST((
+                SELECT COUNT(*)
+                FROM skills s
+                WHERE s.user_id = portfolios.user_id
+                AND s.type = 'language'
+                AND s.is_visible = 1
+            ), 3) * 2
+
+            +
+
+            LEAST((
+                SELECT COUNT(*)
+                FROM professional_networks pn
+                WHERE pn.user_id = portfolios.user_id
+                AND pn.is_visible = 1
+            ), 2) * 2
+        )
+    ";
+
+    /*
+    |--------------------------------------------------------------------------
+    | Puntaje de compatibilidad
+    |--------------------------------------------------------------------------
+    | Mide qué tanto coincide el portafolio con búsqueda y filtros.
+    | No reemplaza los filtros. Solo ordena mejor los resultados encontrados.
+    */
+    $compatibilityParts = ['0'];
+    $compatibilityBindings = [];
+
+    $addExistsScore = function ($sql, $score, $bindings = []) use (&$compatibilityParts, &$compatibilityBindings) {
+        $compatibilityParts[] = "CASE WHEN EXISTS ($sql) THEN {$score} ELSE 0 END";
+
+        foreach ($bindings as $binding) {
+            $compatibilityBindings[] = $binding;
+        }
+    };
+
+    $addCountScore = function ($sql, $limit, $weight, $bindings = []) use (&$compatibilityParts, &$compatibilityBindings) {
+        $compatibilityParts[] = "(LEAST(($sql), {$limit}) * {$weight})";
+
+        foreach ($bindings as $binding) {
+            $compatibilityBindings[] = $binding;
+        }
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coincidencia con búsqueda general
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('search')) {
+        $searchTerms = $expandSearchTerms($request->input('search'));
+
+        foreach ($searchTerms as $term) {
+            $like = "%{$term}%";
+
+            // Coincidencia con profesión principal
+            $addExistsScore("
+                SELECT 1
+                FROM users u
+                INNER JOIN professions pr ON pr.id = u.profession_id
+                WHERE u.id = portfolios.user_id
+                AND " . $normalizeColumn('pr.name') . " LIKE ?
+            ", 24, [$like]);
+
+            // Coincidencia con habilidades técnicas visibles
+            $addCountScore("
+                SELECT COUNT(*)
+                FROM skills s
+                WHERE s.user_id = portfolios.user_id
+                AND s.type = 'technical'
+                AND s.is_visible = 1
+                AND " . $normalizeColumn('s.name') . " LIKE ?
+            ", 5, 5, [$like]);
+
+            // Coincidencia con proyectos y tecnologías usadas
+            $addCountScore("
+                SELECT COUNT(DISTINCT p.id)
+                FROM projects p
+                LEFT JOIN project_technology pt ON pt.project_id = p.id
+                LEFT JOIN technologies t ON t.id = pt.technology_id
+                WHERE p.portfolio_id = portfolios.id
+                AND p.is_visible = 1
+                AND (
+                    " . $normalizeColumn('p.name') . " LIKE ?
+                    OR " . $normalizeColumn('p.description') . " LIKE ?
+                    OR " . $normalizeColumn('p.role') . " LIKE ?
+                    OR " . $normalizeColumn('p.company') . " LIKE ?
+                    OR " . $normalizeColumn('t.name') . " LIKE ?
                 )
-            "))
-            ->orderBy('portfolios.created_at', 'desc');
-        break;
+            ", 4, 4, [$like, $like, $like, $like, $like]);
+
+            // Coincidencia con experiencia laboral o académica
+            $addCountScore("
+                SELECT COUNT(*)
+                FROM experiences e
+                WHERE e.user_id = portfolios.user_id
+                AND e.is_visible = 1
+                AND (
+                    " . $normalizeColumn('e.title') . " LIKE ?
+                    OR " . $normalizeColumn('e.institution') . " LIKE ?
+                    OR " . $normalizeColumn('e.specialty') . " LIKE ?
+                    OR " . $normalizeColumn('e.description') . " LIKE ?
+                )
+            ", 3, 4, [$like, $like, $like, $like]);
+
+            // Coincidencia con nombre, biografía, ciudad, país o ubicación
+            $addExistsScore("
+                SELECT 1
+                FROM users u
+                LEFT JOIN user_locations ul ON ul.user_id = u.id
+                WHERE u.id = portfolios.user_id
+                AND (
+                    " . $normalizeColumn('u.first_name') . " LIKE ?
+                    OR " . $normalizeColumn('u.last_name') . " LIKE ?
+                    OR " . $normalizeColumn("CONCAT(u.first_name, ' ', u.last_name)") . " LIKE ?
+                    OR " . $normalizeColumn('u.biography') . " LIKE ?
+                    OR " . $normalizeColumn('u.city') . " LIKE ?
+                    OR " . $normalizeColumn('u.country') . " LIKE ?
+                    OR " . $normalizeColumn('ul.address') . " LIKE ?
+                )
+            ", 8, [$like, $like, $like, $like, $like, $like, $like]);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coincidencia con categoría / rol
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('category')) {
+        $categoryTerms = $expandSearchTerms($request->input('category'));
+
+        foreach ($categoryTerms as $categoryTerm) {
+            $like = "%{$categoryTerm}%";
+
+            // Coincidencia fuerte con profesión
+            $addExistsScore("
+                SELECT 1
+                FROM users u
+                LEFT JOIN professions pr ON pr.id = u.profession_id
+                WHERE u.id = portfolios.user_id
+                AND " . $normalizeColumn('pr.name') . " LIKE ?
+            ", 30, [$like]);
+
+            // Coincidencia con cargo laboral
+            $addCountScore("
+                SELECT COUNT(*)
+                FROM experiences e
+                WHERE e.user_id = portfolios.user_id
+                AND e.type = 'work'
+                AND e.is_visible = 1
+                AND " . $normalizeColumn('e.title') . " LIKE ?
+            ", 3, 6, [$like]);
+
+            // Coincidencia con rol en proyectos
+            $addCountScore("
+                SELECT COUNT(*)
+                FROM projects p
+                WHERE p.portfolio_id = portfolios.id
+                AND p.is_visible = 1
+                AND " . $normalizeColumn('p.role') . " LIKE ?
+            ", 3, 6, [$like]);
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coincidencia con empresa / institución
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('company')) {
+    $companyTerms = $expandCompanyTerms($request->input('company'));
+
+    $experienceConditions = [];
+    $experienceBindings = [];
+
+    $projectConditions = [];
+    $projectBindings = [];
+
+    foreach ($companyTerms as $companyTerm) {
+        $like = "%{$companyTerm}%";
+
+        $experienceConditions[] = "(
+            " . $normalizeColumn('e.institution') . " LIKE ?
+            OR " . $normalizeColumn('e.location') . " LIKE ?
+        )";
+
+        $experienceBindings[] = $like;
+        $experienceBindings[] = $like;
+
+        $projectConditions[] = $normalizeColumn('p.company') . " LIKE ?";
+        $projectBindings[] = $like;
+    }
+
+    // Empresa laboral: cuenta como coincidencia una sola vez, no por cantidad de registros.
+    $addExistsScore("
+        SELECT 1
+        FROM experiences e
+        WHERE e.user_id = portfolios.user_id
+        AND e.type = 'work'
+        AND e.is_visible = 1
+        AND (" . implode(' OR ', $experienceConditions) . ")
+    ", 25, $experienceBindings);
+
+    // Empresa/cliente en proyectos: también cuenta una sola vez.
+    $addExistsScore("
+        SELECT 1
+        FROM projects p
+        WHERE p.portfolio_id = portfolios.id
+        AND p.is_visible = 1
+        AND (" . implode(' OR ', $projectConditions) . ")
+    ", 10, $projectBindings);
+}
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coincidencia con idioma
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('language')) {
+        $language = $normalizeText($request->input('language'));
+
+        $languageMap = [
+            'ingles' => ['ingles', 'english'],
+            'english' => ['ingles', 'english'],
+
+            'espanol' => ['espanol', 'spanish', 'castellano'],
+            'spanish' => ['espanol', 'spanish', 'castellano'],
+            'castellano' => ['espanol', 'spanish', 'castellano'],
+
+            'portugues' => ['portugues', 'portuguese'],
+            'portuguese' => ['portugues', 'portuguese'],
+
+            'frances' => ['frances', 'french'],
+            'french' => ['frances', 'french'],
+
+            'aleman' => ['aleman', 'german'],
+            'german' => ['aleman', 'german'],
+
+            'italiano' => ['italiano', 'italian'],
+            'italian' => ['italiano', 'italian'],
+        ];
+
+        $languageTerms = $languageMap[$language] ?? [$language];
+
+        $languageConditions = [];
+        $languageBindings = [];
+
+        foreach ($languageTerms as $term) {
+            $languageConditions[] = $normalizeColumn('s.name') . " LIKE ?";
+            $languageBindings[] = "%{$term}%";
+        }
+
+        $addExistsScore("
+            SELECT 1
+            FROM skills s
+            WHERE s.user_id = portfolios.user_id
+            AND s.type = 'language'
+            AND s.is_visible = 1
+            AND (" . implode(' OR ', $languageConditions) . ")
+        ", 25, $languageBindings);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Coincidencia con tecnologías seleccionadas
+    |--------------------------------------------------------------------------
+    */
+    if ($request->filled('skills')) {
+        $skillsArray = array_filter((array) $request->input('skills'));
+
+        foreach ($skillsArray as $skillName) {
+            $skill = $normalizeText($skillName);
+            $like = "%{$skill}%";
+
+            $compatibilityParts[] = "
+                CASE WHEN (
+                    EXISTS (
+                        SELECT 1
+                        FROM skills s
+                        WHERE s.user_id = portfolios.user_id
+                        AND s.type = 'technical'
+                        AND s.is_visible = 1
+                        AND " . $normalizeColumn('s.name') . " LIKE ?
+                    )
+                    OR EXISTS (
+                        SELECT 1
+                        FROM projects p
+                        INNER JOIN project_technology pt ON pt.project_id = p.id
+                        INNER JOIN technologies t ON t.id = pt.technology_id
+                        WHERE p.portfolio_id = portfolios.id
+                        AND p.is_visible = 1
+                        AND " . $normalizeColumn('t.name') . " LIKE ?
+                    )
+                ) THEN 16 ELSE 0 END
+            ";
+
+            $compatibilityBindings[] = $like;
+            $compatibilityBindings[] = $like;
+        }
+    }
+
+    $compatibilityScore = implode(' + ', $compatibilityParts);
+
+    $query
+        ->addSelect([
+            'visible_projects_count' => DB::table('projects')
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('projects.portfolio_id', 'portfolios.id')
+                ->where('projects.is_visible', true),
+
+            'technical_skills_count' => DB::table('skills')
+                ->selectRaw('COUNT(*)')
+                ->whereColumn('skills.user_id', 'portfolios.user_id')
+                ->where('skills.type', 'technical')
+                ->where('skills.is_visible', true),
+        ])
+        ->selectRaw("$completenessScore AS completeness_score")
+        ->selectRaw("($compatibilityScore) AS compatibility_score", $compatibilityBindings)
+        ->orderByDesc('compatibility_score')
+        ->orderByDesc('completeness_score')
+        ->orderByDesc('visible_projects_count')
+        ->orderByDesc('technical_skills_count')
+        ->orderBy('portfolios.created_at', 'desc');
+
+    break;
 
     case 'projects':
         $query
