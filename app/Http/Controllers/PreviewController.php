@@ -13,80 +13,147 @@ use Carbon\Carbon;
 
 class PreviewController extends Controller
 {
-    /**
-     * ==========================================
-     * NUEVO: Verificar si el portafolio tiene contenido suficiente
-     * ==========================================
-     */
-    private function portafolioTieneContenido($user)
-    {
-        // Contar items en cada sección
-        $contenido = [
-            'experiencias' => $user->experiences->where('type', 'work')->where('is_visible', true)->count(),
-            'academicas'   => $user->experiences->where('type', 'education')->where('is_visible', true)->count(),
-            'proyectos'    => $user->portfolio ? $user->portfolio->projects->where('is_visible', true)->count() : 0,
-            'habilidades_tecnicas' => $user->skills->where('type', 'technical')->where('is_visible', true)->count(),
-            'habilidades_blandas'  => $user->skills->where('type', 'soft')->where('is_visible', true)->count(),
-            'idiomas'      => $user->skills->where('type', 'language')->where('is_visible', true)->count(),
-            'biografia'    => !empty($user->biography),
-            'profesion'    => !empty($user->profession_id),
-        ];
-
-        // Contar secciones completas
-        $seccionesCompletas = 0;
-        foreach ($contenido as $key => $value) {
-            if (in_array($key, ['biografia', 'profesion'])) {
-                if ($value) $seccionesCompletas++;
-            } else {
-                if ($value > 0) $seccionesCompletas++;
-            }
-        }
-
-        // Total de items (excluyendo biografía y profesión)
-        $totalItems = $contenido['experiencias'] + $contenido['academicas'] + 
-                      $contenido['proyectos'] + $contenido['habilidades_tecnicas'] + 
-                      $contenido['habilidades_blandas'] + $contenido['idiomas'];
-
-        // 🔥 REGLA NUEVA: mínimo 2 secciones completas Y al menos 2 items totales
-        return $seccionesCompletas >= 2 && $totalItems >= 2;
-    }
+    
+ 
+ // VERIFICAR SI EL PORTAFOLIO TIENE CONTENIDO SUFICIENTE
+ //REGLA: Necesita 3 de 5 secciones principales
+ 
+ 
+private function portafolioTieneContenido($user)
+{
+    $userId = $user->id;
+    
+    // ==========================================
+    // 5 SECCIONES PRINCIPALES (CONSULTA DIRECTA A BD)
+    // ==========================================
+    
+    // 1. Experiencia Laboral
+    $tieneExperiencia = DB::table('experiences')
+        ->where('user_id', $userId)
+        ->where('type', 'work')
+        ->where('is_visible', true)
+        ->exists();
+    
+    // 2. Habilidad Técnica (cualquier categoría)
+    $tieneHabilidadTecnica = DB::table('skills')
+        ->where('user_id', $userId)
+        ->where('type', 'technical')
+        ->where('is_visible', true)
+        ->exists();
+    
+    // 3. Proyecto
+    $tieneProyecto = DB::table('projects')
+        ->join('portfolios', 'projects.portfolio_id', '=', 'portfolios.id')
+        ->where('portfolios.user_id', $userId)
+        ->where('projects.is_visible', true)
+        ->exists();
+    
+    // 4. Biografía
+    $tieneBiografia = DB::table('users')
+        ->where('id', $userId)
+        ->whereNotNull('biography')
+        ->where('biography', '!=', '')
+        ->exists();
+    
+    // 5. Formación Académica
+    $tieneAcademica = DB::table('experiences')
+        ->where('user_id', $userId)
+        ->where('type', 'education')
+        ->where('is_visible', true)
+        ->exists();
+    
+    // ==========================================
+    // CONTAR SECCIONES COMPLETAS
+    // ==========================================
+    $seccionesCompletas = 0;
+    if ($tieneExperiencia) $seccionesCompletas++;
+    if ($tieneHabilidadTecnica) $seccionesCompletas++;
+    if ($tieneProyecto) $seccionesCompletas++;
+    if ($tieneBiografia) $seccionesCompletas++;
+    if ($tieneAcademica) $seccionesCompletas++;
+    
+    // 🔥 REGLA: Necesita 3 de 5 secciones
+    return $seccionesCompletas >= 3;
+}
 
     /**
      * ==========================================
      * NUEVO: Obtener campos faltantes para mostrar al usuario
      * ==========================================
      */
-    private function obtenerCamposFaltantes($user)
-    {
-        $faltantes = [];
-        
-        if ($user->experiences->where('type', 'work')->where('is_visible', true)->count() === 0) {
-            $faltantes[] = 'Agregar al menos una experiencia laboral';
-        }
-        if ($user->experiences->where('type', 'education')->where('is_visible', true)->count() === 0) {
-            $faltantes[] = 'Agregar al menos una formación académica';
-        }
-        if ($user->portfolio && $user->portfolio->projects->where('is_visible', true)->count() === 0) {
-            $faltantes[] = 'Agregar al menos un proyecto';
-        }
-        if ($user->skills->where('type', 'technical')->where('is_visible', true)->count() === 0) {
-            $faltantes[] = 'Agregar habilidades técnicas';
-        }
-        if ($user->skills->where('type', 'soft')->where('is_visible', true)->count() === 0) {
-            $faltantes[] = 'Agregar habilidades blandas';
-        }
-        if ($user->skills->where('type', 'language')->where('is_visible', true)->count() === 0) {
-            $faltantes[] = 'Agregar idiomas';
-        }
-        if (empty($user->biography)) {
-            $faltantes[] = 'Completar tu biografía';
-        }
-        if (empty($user->profession_id)) {
-            $faltantes[] = 'Seleccionar tu profesión';
-        }
-
-        return $faltantes;
+        private function obtenerCamposFaltantes($user)
+{
+    $userId = $user->id;
+    $faltantes = [];
+    $completas = 0;
+    
+    $tieneExperiencia = DB::table('experiences')
+        ->where('user_id', $userId)
+        ->where('type', 'work')
+        ->where('is_visible', true)
+        ->exists();
+    
+    if ($tieneExperiencia) {
+        $completas++;
+    } else {
+        $faltantes[] = '⭐ Agregar al menos una experiencia laboral';
     }
+    
+    $tieneHabilidadTecnica = DB::table('skills')
+        ->where('user_id', $userId)
+        ->where('type', 'technical')
+        ->where('is_visible', true)
+        ->exists();
+    
+    if ($tieneHabilidadTecnica) {
+        $completas++;
+    } else {
+        $faltantes[] = '⭐ Agregar al menos una habilidad técnica';
+    }
+    
+    $tieneProyecto = DB::table('projects')
+        ->join('portfolios', 'projects.portfolio_id', '=', 'portfolios.id')
+        ->where('portfolios.user_id', $userId)
+        ->where('projects.is_visible', true)
+        ->exists();
+    
+    if ($tieneProyecto) {
+        $completas++;
+    } else {
+        $faltantes[] = 'Agregar al menos un proyecto';
+    }
+    
+    $tieneBiografia = DB::table('users')
+        ->where('id', $userId)
+        ->whereNotNull('biography')
+        ->where('biography', '!=', '')
+        ->exists();
+    
+    if ($tieneBiografia) {
+        $completas++;
+    } else {
+        $faltantes[] = 'Completar tu biografía';
+    }
+    
+    $tieneAcademica = DB::table('experiences')
+        ->where('user_id', $userId)
+        ->where('type', 'education')
+        ->where('is_visible', true)
+        ->exists();
+    
+    if ($tieneAcademica) {
+        $completas++;
+    } else {
+        $faltantes[] = 'Agregar formación académica (recomendado)';
+    }
+    
+    $necesita = 3 - $completas;
+    if ($necesita > 0) {
+        $faltantes[] = "📊 Necesitas {$necesita} sección(es) más para publicar (tienes {$completas} de 3)";
+    }
+    
+    return $faltantes;
+}
 
     /**
      * ==========================================
@@ -154,6 +221,8 @@ class PreviewController extends Controller
         // Obtener usuario logueado
         $user = Auth::user();
 
+
+        $this->verificarYDespublicarSiEsNecesario($user);
          $tieneContenido = $this->portafolioTieneContenido($user);
         $camposFaltantes = $this->obtenerCamposFaltantes($user);
         
@@ -1241,5 +1310,29 @@ return view('portafolio.explore', compact('portfolios', 'categories', 'skills', 
         }
 
         return (int) floor($totalDays / 365);
+    }
+
+    /**
+     * ==========================================
+     * VERIFICAR SI EL PORTAFOLIO DEBE DESPUBLICARSE
+     * ==========================================
+     */
+    private function verificarYDespublicarSiEsNecesario($user)
+    {
+        // Si no está publicado, no hacer nada
+        if (!$user->portfolio || !$user->portfolio->is_public) {
+            return;
+        }
+        
+        // Verificar si aún cumple con los requisitos
+        if (!$this->portafolioTieneContenido($user)) {
+            // Despublicar automáticamente
+            $user->portfolio->is_public = false;
+           // $user->portfolio->published_at = null;
+            $user->portfolio->save();
+            
+            // Guardar en sesión para mostrar mensaje
+            session()->flash('auto_unpublished', true);
+        }
     }
 }

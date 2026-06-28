@@ -449,6 +449,29 @@
     </div>
 </div>
 
+{{-- Mensaje de despublicación automática --}}
+@if(session('auto_unpublished'))
+<div style="position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:99999;width:90%;max-width:500px;">
+    <div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:16px;padding:20px 24px;box-shadow:0 12px 40px rgba(0,0,0,0.15);animation:slideDown 0.3s ease;">
+        <div style="display:flex;align-items:flex-start;gap:14px;">
+            <div style="background:#f59e0b;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-eye-slash" style="color:#fff;font-size:20px;"></i>
+            </div>
+            <div>
+                <h4 style="margin:0 0 8px;font-size:16px;color:#92400e;font-weight:700;">Portafolio despublicado</h4>
+                <p style="margin:0;font-size:14px;color:#78350f;">
+                    Tu portafolio ha sido despublicado automáticamente porque ya no cumple con los requisitos mínimos (3 de 5 secciones).
+                </p>
+                <button onclick="this.closest('div[style*=\"position:fixed\"]').remove()" 
+                        style="margin-top:12px;background:rgba(245,158,11,0.2);border:1px solid #f59e0b;color:#92400e;padding:6px 18px;border-radius:30px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">
+                    <i class="fas fa-times"></i> Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 <style>
     @keyframes slideDown {
         from { opacity: 0; transform: translateX(-50%) translateY(-30px); }
@@ -1507,31 +1530,34 @@
 {{-- ==================== BARRA PUBLICAR ==================== --}}
 <div class="preview-bottom-bar" id="previewBottomBar">
     @php
-        $tieneExperiencia = $experiencias->count() > 0;
-        $tieneAcademica = $academicas->count() > 0;
-        $tieneProyecto = $proyectos->count() > 0;
-        $tieneHabilidadTecnica = $habilidadesTecnicasFrontend->count() > 0 || $habilidadesTecnicasBackend->count() > 0;
-        $tieneIdioma = $idiomas->count() > 0;
-        $tieneBlanda = $habilidadesBlandas->count() > 0;
-        $tieneBiografia = !empty($user->biography);
-        $tieneProfesion = !empty($user->profession_id);
-        
-        $seccionesCompletas = 0;
-        if ($tieneExperiencia) $seccionesCompletas++;
-        if ($tieneAcademica) $seccionesCompletas++;
-        if ($tieneProyecto) $seccionesCompletas++;
-        if ($tieneHabilidadTecnica) $seccionesCompletas++;
-        if ($tieneIdioma) $seccionesCompletas++;
-        if ($tieneBlanda) $seccionesCompletas++;
-        if ($tieneBiografia) $seccionesCompletas++;
-        if ($tieneProfesion) $seccionesCompletas++;
-        
-        $totalItems = $experiencias->count() + $academicas->count() + $proyectos->count() 
-                    + $habilidadesTecnicasFrontend->count() + $habilidadesTecnicasBackend->count() 
-                    + $idiomas->count() + $habilidadesBlandas->count();
-        
-        $puedePublicar = $seccionesCompletas >= 2 && $totalItems >= 2;
-    @endphp
+    // ==========================================
+    // CALCULAR SI PUEDE PUBLICAR (3 de 5 secciones)
+    // ==========================================
+    $tieneExperiencia = $experiencias->count() > 0;
+    $tieneAcademica = $academicas->count() > 0;
+    $tieneProyecto = $proyectos->count() > 0;
+    
+    // ✅ CONTAR TODAS LAS TÉCNICAS (sin importar categoría)
+    $totalTecnicas = $habilidadesTecnicasFrontend->count() + $habilidadesTecnicasBackend->count();
+    $tieneHabilidadTecnica = $totalTecnicas > 0;
+    
+    $tieneBiografia = !empty($user->biography);
+    
+    // CONTAR SECCIONES (SOLO 5 PRINCIPALES)
+    $seccionesCompletas = 0;
+    if ($tieneExperiencia) $seccionesCompletas++;
+    if ($tieneHabilidadTecnica) $seccionesCompletas++;
+    if ($tieneProyecto) $seccionesCompletas++;
+    if ($tieneBiografia) $seccionesCompletas++;
+    if ($tieneAcademica) $seccionesCompletas++;
+    
+    // 🔥 REGLA: 3 de 5 secciones
+    $puedePublicar = $seccionesCompletas >= 3;
+    
+    // Para mostrar en el mensaje (opcional)
+    $totalItems = $experiencias->count() + $academicas->count() + $proyectos->count() 
+                + $totalTecnicas + $idiomas->count() + $habilidadesBlandas->count();
+@endphp
 
     <form action="{{ route('perfil.publicar') }}" method="POST" style="margin:0;" id="formPublicar">
         @csrf
@@ -1545,12 +1571,45 @@
             <i class="fas fa-globe"></i> 
             {{ $puedePublicar ? 'Publicar perfil' : 'Completa tu perfil para publicar' }}
         </button>
-        @if(!$puedePublicar)
-            <div style="font-size:12px;color:#94a3b8;margin-top:8px;text-align:center;width:100%;">
-                <i class="fas fa-info-circle"></i> 
-                Necesitas al menos 2 secciones completas y 2 items en total para publicar
+     @if(!$puedePublicar)
+    <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:22px 24px;margin-top:16px;width:100%;max-width:480px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="background:#fff1e0;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <i class="fas fa-clipboard-list" style="color:#f97316;font-size:14px;"></i>
             </div>
-        @endif
+            <div style="flex:1;">
+                <div style="font-size:14px;font-weight:700;color:#1e293b;">Completa tu perfil para publicar</div>
+                <div style="font-size:11.5px;color:#94a3b8;margin-top:1px;">Necesitas 3 de 5 secciones</div>
+            </div>
+            <div style="font-size:18px;font-weight:800;color:#0abf9e;">
+                {{ $seccionesCompletas }}<span style="font-size:12px;color:#cbd5e1;">/3</span>
+            </div>
+        </div>
+
+        <div style="height:7px;background:#f1f5f9;border-radius:10px;overflow:hidden;margin-bottom:18px;">
+            <div style="height:100%;width:{{ min(100, ($seccionesCompletas/3)*100) }}%;background:linear-gradient(90deg,#0abf9e,#07866e);border-radius:10px;transition:width 0.6s ease;"></div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">
+            Te falta completar
+        </div>
+
+        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;">
+            @foreach($camposFaltantes as $campo)
+                @if(!str_starts_with($campo, '📊'))
+                    @php $textoLimpio = trim(str_replace('⭐', '', $campo)); @endphp
+                    <li style="font-size:13px;color:#475569;display:flex;align-items:center;gap:10px;">
+                        <span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #fdba74;background:#fff7ed;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+                            <span style="width:6px;height:6px;border-radius:50%;background:#f97316;"></span>
+                        </span>
+                        {{ $textoLimpio }}
+                    </li>
+                @endif
+            @endforeach
+        </ul>
+    </div>
+@endif
     </form>
 </div>
 
