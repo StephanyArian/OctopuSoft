@@ -69,14 +69,6 @@ Route::middleware('auth')->group(function () {    // PERFIL
 
     Route::post('/logout-others', [SessionController::class, 'logoutOtherDevices'])->name('logout.others');
 
-    Route::get('/cerrar-sesion', function () {
-        return response()
-            ->view('auth.cerrar-sesion')
-            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-            ->header('Pragma', 'no-cache')
-            ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
-    })->name('cerrar.sesion');
-
     // INFORMACIÓN ACADÉMICA
     Route::get('/informacion-academica',         [InformacionAcademicaController::class, 'index'])->name('informacion.academica');
     Route::post('/informacion-academica',        [InformacionAcademicaController::class, 'store'])->name('informacion.academica.store');

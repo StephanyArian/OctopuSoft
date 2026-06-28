@@ -30,15 +30,13 @@
     <div class="ve-bg">
         <div class="ve-card">
 
-         <form method="POST" action="{{ route('register.cancel') }}">
-    @csrf
-    <button type="submit" class="ve-back" style="background:none;border:none;cursor:pointer;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        Volver
-    </button>
-</form>
+            <a href="{{ route('home') }}" class="ve-back">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+                Volver
+            </a>
+
             <div class="ve-steps">
                 <span class="ve-step-dot done"></span>
                 <span class="ve-step-line done"></span>

@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
         /* ===== BOTONES FLOTANTES ===== */
         .btn-volver-flotante {
@@ -21,10 +22,10 @@
             transition: all 0.2s; font-family: inherit; text-decoration: none;
         }
         .btn-volver-flotante:hover { transform: translateY(-2px); background: #07866e; }
-        .fab-container-top { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; align-items: flex-end; gap: 0; }
-        .fab-button-top { background: #fff; color: #4a1030; border: 2px solid #4a1030; padding: 10px 18px; border-radius: 40px; cursor: pointer; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 9px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); transition: all 0.25s ease; font-family: inherit; letter-spacing: 0.3px; position: relative; z-index: 1; }
-        .fab-button-top:hover { background: #4a1030; color: white; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
-        .fab-menu-top { position: absolute; top: calc(100% + 10px); right: 0; background: #fff; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); border: 1px solid #edf0f4; min-width: 200px; overflow: hidden; opacity: 0; transform: translateY(-10px) scale(0.97); pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; }
+        .fab-container-top { position: fixed; bottom: 30px; left: 30px; z-index: 1100; display: flex; flex-direction: column; align-items: flex-start; gap: 0; }
+        .fab-button-top { background: #fff; color: #4a1030; border: 2px solid #4a1030; padding: 12px 22px; border-radius: 40px; cursor: pointer; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transition: all 0.2s; font-family: inherit; }
+        .fab-button-top:hover { background: #4a1030; color: white; transform: translateY(-2px); }
+        .fab-menu-top { position: relative; margin-bottom: 10px; background: #fff; border-radius: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.18); border: 1px solid #edf0f4; min-width: 200px; overflow: hidden; opacity: 0; transform: translateY(10px) scale(0.97); pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; }
         .fab-menu-top.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
         .fab-item-top { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 18px; background: none; border: none; font-family: inherit; font-size: 13px; font-weight: 600; color: #2d0a1e; cursor: pointer; transition: background 0.15s, color 0.15s; text-decoration: none; }
         .fab-item-top:hover { background: #f5f6f8; color: #07866e; }
@@ -179,7 +180,7 @@
         }
         .cert-btn:hover { background: #d1fae5; transform: translateY(-1px); }
 
-        /* ===== MODAL IDIOMAS - ESTILOS MEJORADOS ===== */
+        /* ===== MODAL IDIOMAS ===== */
         .idiomas-modal-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -258,16 +259,245 @@
 
         @media (max-width: 768px) {
             .btn-volver-flotante { top: 10px; left: 10px; padding: 8px 16px; font-size: 12px; }
-            .fab-container-top { top: 10px; right: 10px; }
+            .fab-container-top { bottom: 20px; left: 20px; }
             .fab-button-top { padding: 8px 14px; font-size: 12px; }
             .projects-folder-grid { grid-template-columns: 1fr; }
             .timeline-container { padding: 20px 16px; }
             .detail-modal-hero, .detail-modal-body { padding: 18px; }
             .modal-header { padding: 16px 18px; }
             .idiomas-modal-grid { grid-template-columns: 1fr; padding: 16px; }
-            
-            .top-actions-bar {
-                padding: 10px 20px !important;
+            .top-actions-bar { padding: 10px 20px !important; }
+        }
+
+        /* ===== MODAL COMPARTIR CON QR ===== */
+        #modal-compartir {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        #modal-compartir .modal-share-content {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 520px;
+            max-width: 92%;
+            padding: 28px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            position: relative;
+            animation: mFadeIn 0.25s ease;
+        }
+        #modal-compartir .modal-close-btn {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #modal-compartir .modal-close-btn:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+        #modal-compartir .share-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+        #modal-compartir .share-header-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(10, 191, 158, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #modal-compartir .share-header-icon i {
+            color: #0abf9e;
+            font-size: 16px;
+        }
+        #modal-compartir .share-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        #modal-compartir .share-body {
+            display: flex;
+            gap: 20px;
+            align-items: stretch;
+        }
+        #modal-compartir .share-link-section {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        #modal-compartir .share-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        #modal-compartir .share-label i {
+            color: #0abf9e;
+            margin-right: 6px;
+        }
+        #modal-compartir .share-input-wrapper {
+            display: flex;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 3px;
+            background: #fafbfc;
+            align-items: center;
+            transition: border-color 0.2s;
+            flex: 1;
+        }
+        #modal-compartir .share-input-wrapper:focus-within {
+            border-color: #0abf9e;
+        }
+        #modal-compartir .share-input-wrapper input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px 10px;
+            outline: none;
+            color: #1e293b;
+            font-size: 13px;
+            font-family: monospace;
+            min-width: 0;
+        }
+        #modal-compartir .btn-copy-link {
+            background: #0abf9e;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            color: white;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #modal-compartir .btn-copy-link:hover {
+            background: #07866e;
+        }
+        #modal-compartir .btn-copy-link.copied {
+            background: #10b981;
+        }
+        #modal-compartir .share-hint {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #modal-compartir .share-hint i {
+            color: #0abf9e;
+            font-size: 12px;
+        }
+        #modal-compartir .share-qr-section {
+            flex-shrink: 0;
+            text-align: center;
+            background: #fafbfc;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #eef2f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+        #modal-compartir .qr-container {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #modal-compartir .qr-container canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #modal-compartir .qr-container .qr-placeholder {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        #modal-compartir .qr-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+        }
+        #modal-compartir .qr-actions button {
+            background: rgba(10, 191, 158, 0.06);
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: inherit;
+        }
+        #modal-compartir .qr-actions button:hover {
+            border-color: #0abf9e;
+            color: #0abf9e;
+            background: rgba(10, 191, 158, 0.08);
+        }
+        #modal-compartir .qr-actions button.copied {
+            border-color: #10b981;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+        }
+        #modal-compartir .qr-label {
+            font-size: 9px;
+            color: #94a3b8;
+            display: block;
+            margin-top: 4px;
+        }
+        @media (max-width: 640px) {
+            #modal-compartir .share-body {
+                flex-direction: column;
+                align-items: center;
+            }
+            #modal-compartir .share-qr-section {
+                width: 100%;
+                min-width: unset;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+                padding: 16px;
+            }
+            #modal-compartir .qr-container {
+                width: 80px;
+                height: 80px;
             }
         }
 
@@ -309,20 +539,14 @@
         .top-actions-bar .btn-volver-flotante:hover svg {
             stroke: #0abf9e;
         }
-        
-        /* Theme overrides for hover state of Volver button */
         .theme-sunset.top-actions-bar .btn-volver-flotante:hover { background: #fff7ed; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
         .theme-sunset.top-actions-bar .btn-volver-flotante:hover svg { stroke: #f97316; }
-        
         .theme-emerald.top-actions-bar .btn-volver-flotante:hover { background: #ecfdf5; color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
         .theme-emerald.top-actions-bar .btn-volver-flotante:hover svg { stroke: #10b981; }
-        
         .theme-midnight.top-actions-bar .btn-volver-flotante:hover { background: #fdf4ff; color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
         .theme-midnight.top-actions-bar .btn-volver-flotante:hover svg { stroke: #a855f7; }
-        
         .theme-ocean.top-actions-bar .btn-volver-flotante:hover { background: #f0fdfa; color: #00b4d8; border-color: rgba(0, 180, 216, 0.3); }
         .theme-ocean.top-actions-bar .btn-volver-flotante:hover svg { stroke: #00b4d8; }
-        
         .theme-sakura.top-actions-bar .btn-volver-flotante:hover { background: #fdf2f8; color: #ec4899; border-color: rgba(236, 72, 153, 0.3); }
         .theme-sakura.top-actions-bar .btn-volver-flotante:hover svg { stroke: #ec4899; }
 
@@ -355,7 +579,6 @@
             border-color: rgba(10, 191, 158, 0.3);
             transform: translateY(-1px);
         }
-        
         .theme-sunset.top-actions-bar .fab-button-top:hover { background: #fff7ed; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
         .theme-emerald.top-actions-bar .fab-button-top:hover { background: #ecfdf5; color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
         .theme-midnight.top-actions-bar .fab-button-top:hover { background: #fdf4ff; color: #a855f7; border-color: rgba(168, 85, 247, 0.3); }
@@ -385,84 +608,10 @@
             transform: translateY(0) scale(1);
             pointer-events: all;
         }
-        /* ===== RESTAURAR FLOTANTES PÚBLICO ===== */
-.btn-volver-flotante {
-    position: fixed !important;
-    top: 20px !important;
-    left: 20px !important;
-    z-index: 1100 !important;
-    background: #0abf9e !important;
-    border: none !important;
-    color: white !important;
-    padding: 10px 20px !important;
-    border-radius: 40px !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
-    transition: all 0.2s !important;
-    font-family: inherit !important;
-    text-decoration: none !important;
-}
-.btn-volver-flotante:hover { transform: translateY(-2px) !important; background: #07866e !important; }
-
-.fab-container-top {
-    position: fixed !important;
-    bottom: 30px !important;
-    left: 30px !important;
-    top: auto !important;
-    right: auto !important;
-    z-index: 1100 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-}
-.fab-menu-top {
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    margin-bottom: 10px !important;
-    transform: none !important;
-}
-.fab-menu-top.open {
-    opacity: 1 !important;
-    transform: none !important;
-    pointer-events: all !important;
-}
-.fab-button-top {
-    background: #fff !important;
-    color: #4a1030 !important;
-    border: 2px solid #4a1030 !important;
-    padding: 12px 22px !important;
-    border-radius: 40px !important;
-    cursor: pointer !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
-    transition: all 0.2s !important;
-    font-family: inherit !important;
-}
-.fab-button-top:hover { background: #4a1030 !important; color: white !important; transform: translateY(-2px) !important; }
-
-/* Quitar barra sticky */
-.top-actions-bar { display: none !important; }
-
-@media (max-width: 768px) {
-    .btn-volver-flotante { top: 12px !important; left: 12px !important; padding: 8px 16px !important; font-size: 12px !important; }
-    .fab-container-top { bottom: 20px !important; left: 20px !important; }
-}
+        .top-actions-bar { display: none !important; }
     </style>
 </head>
 <body>
-
-
 
 @php
     $allowedHtmlTags = '<p><br><strong><b><em><i><u><s><strike><del><sup><sub><ul><ol><li><a><span><h1><h2><h3><blockquote><pre><div>';
@@ -501,14 +650,13 @@
     $claseTema = $temaActual !== 'default' ? 'theme-' . $temaActual : '';
 @endphp
 
-<!-- Barra de acciones superior (Volver y Más opciones) -->
-{{-- Botón Volver flotante --}}
+<!-- Botón Volver flotante -->
 <button class="btn-volver-flotante" onclick="window.history.back()">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
     <span>Volver</span>
 </button>
 
-{{-- FAB flotante abajo-izquierda --}}
+<!-- FAB flotante abajo-izquierda -->
 <div class="fab-container-top" id="fabContainerTop">
     <div class="fab-menu-top" id="fabMenuTop">
         <button class="fab-item-top" onclick="descargarPDF()"><i class="fas fa-file-pdf"></i><span>Descargar PDF</span></button>
@@ -1254,7 +1402,7 @@
     </div>
     @endif
 
-    <!-- ==================== MODAL IDIOMAS - CON BOTÓN VER CERTIFICADO BIEN ALINEADO ==================== -->
+    <!-- ==================== MODAL IDIOMAS ==================== -->
     @if($idiomas->count() > 0)
     <div id="modal-todos-idiomas" class="modal-overlay">
         <div class="modal-box">
@@ -1304,23 +1452,57 @@
     </div>
     @endif
 
-    <!-- ==================== MODAL COMPARTIR ==================== -->
-    <div id="modal-compartir" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(2px);">
-        <div style="background:#fff;border-radius:12px;width:450px;max-width:90%;position:relative;padding:24px;box-shadow:0 10px 25px rgba(0,0,0,0.1);">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-                <h2 style="margin:0;font-size:20px;font-weight:600;color:#333;">Compartir</h2>
-                <button onclick="cerrarModalCompartir()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;">✕</button>
+    <!-- ==================== MODAL COMPARTIR CON QR ==================== -->
+    <div id="modal-compartir">
+        <div class="modal-share-content">
+            
+            <button class="modal-close-btn" onclick="cerrarModalCompartir()">✕</button>
+
+            <div class="share-header">
+                <div class="share-header-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h2>Compartir portafolio</h2>
             </div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:24px;text-align:center;">
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('whatsapp')"><div style="width:55px;height:55px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fab fa-whatsapp"></i></div><span style="font-size:12px;font-weight:500;">WhatsApp</span></a>
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('facebook')"><div style="width:55px;height:55px;border-radius:50%;background:#1877F2;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fab fa-facebook-f"></i></div><span style="font-size:12px;font-weight:500;">Facebook</span></a>
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('twitter')"><div style="width:55px;height:55px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fab fa-x-twitter"></i></div><span style="font-size:12px;font-weight:500;">X</span></a>
-                <a href="javascript:void(0)" style="text-decoration:none;color:#333;" onclick="shareTo('email')"><div style="width:55px;height:55px;border-radius:50%;background:#7f8c8d;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;color:white;font-size:26px;"><i class="fas fa-envelope"></i></div><span style="font-size:12px;font-weight:500;">Correo</span></a>
+
+            <div class="share-body">
+
+                <!-- Enlace -->
+                <div class="share-link-section">
+                    <label class="share-label">
+                        <i class="fas fa-link"></i> Enlace público
+                    </label>
+                    <div class="share-input-wrapper">
+                        <input type="text" id="share-link-input" readonly 
+                               value="{{ $user->portfolio ? url('/portafolio/' . $user->portfolio->slug) : '' }}">
+                        <button class="btn-copy-link" id="btn-copiar-link" onclick="copiarLinkPortafolio()">
+                            <i class="fas fa-copy"></i> <span id="btn-copiar-texto">Copiar</span>
+                        </button>
+                    </div>
+                    <p class="share-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Comparte este enlace con quien quieras
+                    </p>
+                </div>
+
+                <!-- QR -->
+                <div class="share-qr-section">
+                    <div class="qr-container" id="qrCodeContainer">
+                        <span class="qr-placeholder">Cargando QR...</span>
+                    </div>
+                    <div class="qr-actions">
+                        <button onclick="copiarQR()" id="btn-copiar-qr">
+                            <i class="fas fa-copy"></i> Copiar
+                        </button>
+                        <button onclick="descargarQR()" id="btn-descargar-qr">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                    <span class="qr-label">Escanea o descarga</span>
+                </div>
+
             </div>
-            <div style="display:flex;border:1px solid #e0e0e0;border-radius:8px;padding:6px;background:#f9f9f9;align-items:center;">
-                <input type="text" id="share-link-input" readonly value="{{ $user->portfolio ? url('/portafolio/' . $user->portfolio->slug) : '' }}" style="flex:1;border:none;background:transparent;padding:8px 12px;outline:none;color:#555;font-size:14px;text-overflow:ellipsis;">
-                <button onclick="copiarLinkPortafolio()" id="btn-copiar-link" style="background:white;border:1px solid #e0e0e0;border-radius:20px;padding:6px 18px;cursor:pointer;font-weight:600;font-size:14px;color:#333;">Copiar</button>
-            </div>
+
         </div>
     </div>
 
@@ -1574,9 +1756,6 @@ function abrirModalBlandas() { var el=document.getElementById('modal-todos-bland
 function cerrarModalBlandas() { var el=document.getElementById('modal-todos-blandas'); if(el){el.style.display='none';document.body.style.overflow='';} }
 function abrirModalIdiomas() { var el=document.getElementById('modal-todos-idiomas'); if(el){el.style.display='flex';document.body.style.overflow='hidden';} }
 function cerrarModalIdiomas() { var el=document.getElementById('modal-todos-idiomas'); if(el){el.style.display='none';document.body.style.overflow='';} }
-function abrirModalCompartir() { document.getElementById('modal-compartir').style.display='flex'; }
-function cerrarModalCompartir() { document.getElementById('modal-compartir').style.display='none'; document.getElementById('btn-copiar-link').textContent='Copiar'; }
-document.getElementById('modal-compartir').addEventListener('click', function(e) { if(e.target===this)cerrarModalCompartir(); });
 
 // Cerrar overlays al clic en fondo
 ['modal-todos-proyectos','modal-todos-experiencias','modal-todos-academicas','modal-todos-tecnicas','modal-todos-blandas','modal-todos-idiomas'].forEach(function(id) {
@@ -1584,15 +1763,212 @@ document.getElementById('modal-compartir').addEventListener('click', function(e)
     if(el) el.addEventListener('click', function(e){ if(e.target===this){this.style.display='none';document.body.style.overflow='';} });
 });
 
-function copiarLinkPortafolio() {
-    var input=document.getElementById('share-link-input'); input.select(); input.setSelectionRange(0,99999);
-    navigator.clipboard.writeText(input.value).then(function(){ var btn=document.getElementById('btn-copiar-link'); btn.textContent='¡Copiado!'; setTimeout(function(){btn.textContent='Copiar';},2000); });
+// ============================================================
+// MODAL COMPARTIR CON QR
+// ============================================================
+function abrirModalCompartir() { 
+    var modal = document.getElementById('modal-compartir');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    setTimeout(function() {
+        generarQR();
+    }, 200);
 }
-function shareTo(platform) {
-    var link=encodeURIComponent(document.getElementById('share-link-input').value);
-    var text=encodeURIComponent('¡Mira mi portafolio profesional en DevFolio!');
-    var urls={whatsapp:'https://api.whatsapp.com/send?text='+text+' '+link,facebook:'https://www.facebook.com/sharer/sharer.php?u='+link,twitter:'https://twitter.com/intent/tweet?text='+text+'&url='+link,email:'mailto:?subject='+text+'&body=Puedes ver mi portafolio aquí: '+link};
-    if(urls[platform])window.open(urls[platform],'_blank','width=600,height=400');
+
+function cerrarModalCompartir() { 
+    var modal = document.getElementById('modal-compartir');
+    modal.style.display = 'none'; 
+    document.body.style.overflow = '';
+    
+    var container = document.getElementById('qrCodeContainer');
+    if (container) {
+        container.innerHTML = '<span class="qr-placeholder">Cargando QR...</span>';
+    }
+    
+    var btnTexto = document.getElementById('btn-copiar-texto');
+    if (btnTexto) btnTexto.textContent = 'Copiar';
+    
+    var btnQR = document.getElementById('btn-copiar-qr');
+    if (btnQR) {
+        btnQR.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+        btnQR.className = '';
+    }
+}
+
+document.getElementById('modal-compartir')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalCompartir();
+    }
+});
+
+// ============================================================
+// COPIAR ENLACE
+// ============================================================
+function copiarLinkPortafolio() {
+    var input = document.getElementById('share-link-input');
+    if (!input) return;
+    
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    var link = input.value;
+    var btn = document.getElementById('btn-copiar-link');
+    var texto = document.getElementById('btn-copiar-texto');
+    
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function() {
+            if (texto) texto.textContent = '¡Copiado!';
+            if (btn) {
+                btn.classList.add('copied');
+                btn.style.background = '#10b981';
+            }
+            
+            setTimeout(function() {
+                if (texto) texto.textContent = 'Copiar';
+                if (btn) {
+                    btn.classList.remove('copied');
+                    btn.style.background = '';
+                }
+            }, 2000);
+        });
+    } else {
+        document.execCommand('copy');
+        if (texto) texto.textContent = '¡Copiado!';
+        if (btn) btn.classList.add('copied');
+        
+        setTimeout(function() {
+            if (texto) texto.textContent = 'Copiar';
+            if (btn) btn.classList.remove('copied');
+        }, 2000);
+    }
+}
+
+// ============================================================
+// QR
+// ============================================================
+function generarQR() {
+    var container = document.getElementById('qrCodeContainer');
+    var input = document.getElementById('share-link-input');
+    
+    if (!container || !input) return;
+    
+    var link = input.value.trim();
+    if (!link) {
+        container.innerHTML = '<span class="qr-placeholder">Sin enlace disponible</span>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    if (typeof QRCode !== 'undefined') {
+        try {
+            new QRCode(container, {
+                text: link,
+                width: 100,
+                height: 100,
+                colorDark: '#0f172a',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } catch (e) {
+            container.innerHTML = '<span class="qr-placeholder" style="color:#ef4444;">Error al generar QR</span>';
+        }
+    } else {
+        container.innerHTML = '<span class="qr-placeholder">Cargando QR...</span>';
+    }
+}
+
+// ============================================================
+// COPIAR QR
+// ============================================================
+function copiarQR() {
+    var canvas = document.querySelector('#qrCodeContainer canvas');
+    if (!canvas) {
+        Swal.fire({
+            icon: 'info',
+            title: 'QR no disponible',
+            text: 'Primero genera el código QR.',
+            confirmButtonColor: '#0abf9e'
+        });
+        return;
+    }
+
+    var btn = document.getElementById('btn-copiar-qr');
+    if (btn) {
+        btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+            btn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+            btn.classList.remove('copied');
+        }, 2500);
+    }
+
+    canvas.toBlob(function(blob) {
+        if (!blob) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No se pudo copiar el QR.',
+                confirmButtonColor: '#0abf9e'
+            });
+            return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.write) {
+            var item = new ClipboardItem({
+                'image/png': blob
+            });
+            navigator.clipboard.write([item]).then(function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: '✅ QR copiado',
+                    text: 'El código QR se ha copiado como imagen.',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true
+                });
+            }).catch(function() {
+                descargarQR();
+            });
+        } else {
+            descargarQR();
+        }
+    }, 'image/png');
+}
+
+// ============================================================
+// DESCARGAR QR
+// ============================================================
+function descargarQR() {
+    var canvas = document.querySelector('#qrCodeContainer canvas');
+    if (!canvas) {
+        Swal.fire({
+            icon: 'info',
+            title: 'QR no disponible',
+            text: 'Primero genera el código QR.',
+            confirmButtonColor: '#0abf9e'
+        });
+        return;
+    }
+
+    var link = document.createElement('a');
+    link.download = 'codigo-qr-portafolio.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    Swal.fire({
+        icon: 'success',
+        title: '✅ QR descargado',
+        text: 'El código QR se ha descargado como imagen.',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2500,
+        timerProgressBar: true
+    });
 }
 
 // ============================================================
@@ -1602,7 +1978,6 @@ function crearCopiaCompleta() {
     var original = document.querySelector('.preview-container');
     var clone = original.cloneNode(true);
     
-    // Expandir descripciones colapsadas
     clone.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed').forEach(function(el) {
         el.classList.remove('collapsed');
         el.classList.add('expanded');
@@ -1610,11 +1985,9 @@ function crearCopiaCompleta() {
         el.style.overflow = 'visible';
     });
     
-    // Eliminar botones "Ver más"
     clone.querySelectorAll('.ver-mas-btn').forEach(function(btn) { btn.remove(); });
     clone.querySelectorAll('.btn-ver-todos').forEach(function(btn) { btn.style.display = 'none'; });
     
-    // INYECTAR TODOS LOS DATOS COMPLETOS DESDE DIVS OCULTOS (sin certificados/evidencias)
     var seccionesCompletas = [
         { source: '#proyectos-completos', target: '#proyectos-grid', inner: '.cards-grid' },
         { source: '#experiencias-completas', target: '#experiencias-grid', inner: '.cards-grid' },
@@ -1637,18 +2010,15 @@ function crearCopiaCompleta() {
         }
     });
     
-    // Ocultar elementos flotantes
     ['fab-container-top', 'btn-volver-flotante'].forEach(function(cls) {
         var el = clone.querySelector('.' + cls);
         if (el) el.style.display = 'none';
     });
     
-    // ELIMINAR COMPLETAMENTE cualquier botón o enlace de certificado/evidencia
     clone.querySelectorAll('.cert-btn, .idioma-cert-link, .idioma-modal-footer, .detail-certs-wrap').forEach(function(el) {
         el.remove();
     });
     
-    // Eliminar cualquier enlace que pueda ser un certificado
     clone.querySelectorAll('a').forEach(function(a) {
         var text = a.textContent || '';
         if (text.indexOf('certificado') !== -1 || text.indexOf('PDF') !== -1 || 
@@ -1745,6 +2115,7 @@ document.addEventListener('keydown', function(e) {
     if(document.getElementById('modal-detalle-exp').style.display==='flex') cerrarDetalleExp();
     if(document.getElementById('modal-detalle-aca').style.display==='flex') cerrarDetalleAca();
     if(document.getElementById('modal-proyecto').style.display==='flex') cerrarModal();
+    if(document.getElementById('modal-compartir').style.display==='flex') cerrarModalCompartir();
 });
 </script>
 
