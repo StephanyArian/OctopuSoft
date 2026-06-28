@@ -513,33 +513,49 @@ function crearCopiaCompleta() {
 }
 
 async function descargarPDF() {
-    document.getElementById('fabMenu').classList.remove('open');
-    Swal.fire({ title:'Generando PDF...', allowOutsideClick:false, showConfirmButton:false, didOpen:function(){ Swal.showLoading(); } });
-    try {
-        var clone = crearCopiaCompleta();
-        var tempDiv = document.createElement('div');
-        Object.assign(tempDiv.style, { position:'absolute', left:'-9999px', top:'-9999px', width:'1200px', backgroundColor:'white' });
-        tempDiv.appendChild(clone); document.body.appendChild(tempDiv);
-        clone.style.cssText = 'max-width:1200px;margin:0 auto;';
-        setTimeout(async function() {
-            try {
-                var canvas = await html2canvas(tempDiv, { scale:2.5, useCORS:true, backgroundColor:'#ffffff', logging:false, windowWidth:tempDiv.scrollWidth, windowHeight:tempDiv.scrollHeight });
-                var jsPDF = window.jspdf.jsPDF;
-                var imgData = canvas.toDataURL('image/png');
-                var pdf = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
-                var pw = pdf.internal.pageSize.getWidth();
-                var ph = pdf.internal.pageSize.getHeight();
-                var iw = pw - 20;
-                var ih = (canvas.height * iw) / canvas.width;
-                var pos = 10, left = ih - (ph - 20), page = 1;
-                pdf.addImage(imgData, 'PNG', 10, pos, iw, ih);
-                while (left > 0) { pdf.addPage(); pos = 10 - (page * (ph - 20)); pdf.addImage(imgData, 'PNG', 10, pos, iw, ih); left -= (ph - 20); page++; }
-                pdf.save('portafolio.pdf');
-                document.body.removeChild(tempDiv);
-                Swal.fire({ icon:'success', title:'¡PDF descargado!', toast:true, position:'top-end', showConfirmButton:false, timer:3000 });
-            } catch(err) { document.body.removeChild(tempDiv); throw err; }
-        }, 800);
-    } catch(e) { Swal.fire({ icon:'error', title:'Error', text:'No se pudo generar el PDF.' }); }
+    
+    var fabMenu = document.getElementById('fabMenu');
+    var fabMenuTop = document.getElementById('fabMenuTop');
+    var fabIconTop = document.getElementById('fabIconTop');
+    if (fabMenu) fabMenu.classList.remove('open');
+    if (fabMenuTop) fabMenuTop.classList.remove('open');
+    if (fabIconTop) fabIconTop.className = 'fas fa-ellipsis-h';
+
+    // Expandir todas las descripciones colapsadas
+    document.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed').forEach(function(el) {
+        el.classList.remove('collapsed');
+        el.classList.add('expanded');
+        el.style.maxHeight = 'none';
+        el.style.overflow = 'visible';
+    });
+
+    // Mostrar contenido completo de cada sección
+    var secciones = [
+        { source: '#proyectos-completos',    target: '#proyectos-grid',    inner: '.cards-grid' },
+        { source: '#experiencias-completas', target: '#experiencias-grid', inner: '.cards-grid' },
+        { source: '#academicas-completas',   target: '#academicas-grid',   inner: '.cards-grid' },
+        { source: '#tecnicas-completas',     target: '#tecnicas-grid',     inner: '' },
+        { source: '#blandas-completas',      target: '#blandas-grid',      inner: '.skills-container' },
+        { source: '#idiomas-completos',      target: '#idiomas-grid',      inner: '.idiomas-preview-grid' }
+    ];
+
+    secciones.forEach(function(sec) {
+        var src = document.querySelector(sec.source);
+        var tgt = document.querySelector(sec.target);
+        if (src && tgt) {
+            var content = sec.inner ? src.querySelector(sec.inner) : src;
+            if (content) tgt.innerHTML = content.innerHTML;
+        }
+    });
+
+    document.querySelectorAll('.btn-ver-todos').forEach(function(el) {
+        el.style.display = 'none';
+    });
+
+    // Esperar que el DOM se actualice y luego imprimir
+    await new Promise(resolve => setTimeout(resolve, 400));
+    
+    window.print();
 }
 
 async function descargarImagen() {
