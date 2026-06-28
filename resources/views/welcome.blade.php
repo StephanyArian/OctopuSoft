@@ -60,6 +60,12 @@
     </div>
     <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Cómo funciona</span>
 </a>
+<a href="{{ route('portafolio.explore') }}" class="nav-link" style="display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#0abf9e,#1de8c0,#00ff88);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(10,191,158,0.7),0 0 30px rgba(0,255,136,0.3);">
+        <i class="bi bi-search" style="font-size:20px;color:#2d0a1e;"></i>
+    </div>
+    <span style="font-size:0.58rem;font-weight:800;background:linear-gradient(135deg,#0abf9e,#00ff88);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:0.5px;">Buscar portafolios</span>
+</a>
             </div>
 
             <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
@@ -186,11 +192,6 @@
                             Explora el talento de nuestra comunidad
                         </p>
                     </div>
-                </div>
-                <div class="header-action">
-                    <a href="{{ route('portafolio.explore') }}" class="btn-outline">
-                        Ver todos los portafolios &nbsp;<i class="fas fa-arrow-right"></i>
-                    </a>
                 </div>
             </div>
             
