@@ -712,7 +712,7 @@
     <div class="section" id="section-academicas">
         <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
         <div class="cards-grid" id="academicas-grid">
-    @foreach($academicasRecientes as $i => $aca)
+    @foreach($academicasRecientes->values() as $i => $aca)
         <div class="card" onclick="event.stopPropagation(); abrirDetalleAca({{ $i }})">
             <h3>{{ $aca->institucion }}</h3>
             <div class="subtitle">{{ $aca->titulo }}</div>
@@ -1632,7 +1632,59 @@
 @endif
     </form>
 </div>
+<script>
+window.previewExperienciasData = {!! json_encode($experiencias->map(function($exp) use ($allowedHtmlTags) {
+    return [
+        'empresa'       => $exp->empresa,
+        'cargo'         => $exp->cargo,
+        'ubicacion'     => $exp->ubicacion,
+        'fecha_inicio'  => \Carbon\Carbon::parse($exp->fecha_inicio)->format('d/m/Y'),
+        'fecha_fin'     => $exp->fecha_fin ? \Carbon\Carbon::parse($exp->fecha_fin)->format('d/m/Y') : null,
+        'trabajo_actual'=> $exp->trabajo_actual ?? false,
+        'descripcion'   => strip_tags($exp->descripcion ?? '', $allowedHtmlTags),
+    ];
+})->values()) !!};
 
+window.previewAcademicasData = {!! json_encode($academicas->map(function($aca) use ($allowedHtmlTags) {
+    $evidencias = [];
+    if (isset($aca->evidence_url) && $aca->evidence_url) {
+        $evidencias = is_array($aca->evidence_url)
+            ? $aca->evidence_url
+            : (json_decode($aca->evidence_url, true) ?? []);
+    }
+    return [
+        'institucion'   => $aca->institucion,
+        'titulo'        => $aca->titulo,
+        'specialty'     => $aca->specialty ?? null,
+        'fecha_inicio'  => \Carbon\Carbon::parse($aca->fecha_inicio)->format('d/m/Y'),
+        'fecha_fin'     => $aca->fecha_fin ? \Carbon\Carbon::parse($aca->fecha_fin)->format('d/m/Y') : null,
+        'estudio_actual'=> $aca->estudio_actual ?? false,
+        'descripcion'   => strip_tags($aca->descripcion ?? '', $allowedHtmlTags),
+        'evidencias'    => array_map(function($e) {
+            return [
+                'url'    => asset('storage/' . $e),
+                'ext'    => pathinfo($e, PATHINFO_EXTENSION),
+                'nombre' => basename($e),
+            ];
+        }, $evidencias),
+    ];
+})->values()) !!};
+
+window.previewProjectsById = {!! json_encode(collect($proyectos)->keyBy('id')->map(function($p) use ($allowedHtmlTags) {
+    return [
+        'id'          => $p->id,
+        'nombre'      => $p->nombre,
+        'descripcion' => strip_tags($p->descripcion ?? '', $allowedHtmlTags),
+        'fecha_inicio'=> optional($p->fecha_inicio)->format('d/m/Y'),
+        'fecha_fin'   => optional($p->fecha_fin)->format('d/m/Y'),
+        'estado'      => $p->estado,
+        'rol'         => $p->rol,
+        'cliente'     => $p->cliente,
+        'tecnologias' => $p->tecnologias,
+        'evidencias'  => $p->evidencias,
+    ];
+})) !!};
+</script>
 </div><!-- fin .preview-container -->
 
 {{-- Vibe Sidebar --}}
@@ -2095,48 +2147,12 @@ function crearCopiaCompleta() {
 }
 
 async function descargarPDF() {
-    
     var fabMenu = document.getElementById('fabMenu');
-    var fabMenuTop = document.getElementById('fabMenuTop');
-    var fabIconTop = document.getElementById('fabIconTop');
+    var fabIcon = document.getElementById('fabIcon');
     if (fabMenu) fabMenu.classList.remove('open');
-    if (fabMenuTop) fabMenuTop.classList.remove('open');
-    if (fabIconTop) fabIconTop.className = 'fas fa-ellipsis-h';
+    if (fabIcon) fabIcon.className = 'fas fa-ellipsis-h';
 
-    // Expandir todas las descripciones colapsadas
-    document.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed').forEach(function(el) {
-        el.classList.remove('collapsed');
-        el.classList.add('expanded');
-        el.style.maxHeight = 'none';
-        el.style.overflow = 'visible';
-    });
-
-    // Mostrar contenido completo de cada sección
-    var secciones = [
-        { source: '#proyectos-completos',    target: '#proyectos-grid',    inner: '.cards-grid' },
-        { source: '#experiencias-completas', target: '#experiencias-grid', inner: '.cards-grid' },
-        { source: '#academicas-completas',   target: '#academicas-grid',   inner: '.cards-grid' },
-        { source: '#tecnicas-completas',     target: '#tecnicas-grid',     inner: '' },
-        { source: '#blandas-completas',      target: '#blandas-grid',      inner: '.skills-container' },
-        { source: '#idiomas-completos',      target: '#idiomas-grid',      inner: '.idiomas-preview-grid' }
-    ];
-
-    secciones.forEach(function(sec) {
-        var src = document.querySelector(sec.source);
-        var tgt = document.querySelector(sec.target);
-        if (src && tgt) {
-            var content = sec.inner ? src.querySelector(sec.inner) : src;
-            if (content) tgt.innerHTML = content.innerHTML;
-        }
-    });
-
-    document.querySelectorAll('.btn-ver-todos').forEach(function(el) {
-        el.style.display = 'none';
-    });
-
-    // Esperar que el DOM se actualice y luego imprimir
-    await new Promise(resolve => setTimeout(resolve, 400));
-
+    await new Promise(resolve => setTimeout(resolve, 300));
     window.print();
 }
 

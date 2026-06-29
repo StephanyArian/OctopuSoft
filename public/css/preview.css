@@ -1926,4 +1926,28 @@ body {
     .profile-social-icons {
         display: none !important;
     }
+
+    /* Mostrar secciones completas y ocultar las parciales al imprimir */
+    #experiencias-completas,
+    #academicas-completas,
+    #tecnicas-completas,
+    #blandas-completas,
+    #idiomas-completos,
+    #proyectos-completos {
+       display: block !important;
+    }
+
+    #experiencias-grid,
+    #academicas-grid,
+    #tecnicas-grid,
+    #blandas-grid,
+    #idiomas-grid,
+    #proyectos-grid {
+       display: none !important;
+    }
+
+    .btn-ver-todos {
+       display: none !important;
+    }
+
 }

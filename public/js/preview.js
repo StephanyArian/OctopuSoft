@@ -513,48 +513,12 @@ function crearCopiaCompleta() {
 }
 
 async function descargarPDF() {
-    
     var fabMenu = document.getElementById('fabMenu');
-    var fabMenuTop = document.getElementById('fabMenuTop');
-    var fabIconTop = document.getElementById('fabIconTop');
+    var fabIcon = document.getElementById('fabIcon');
     if (fabMenu) fabMenu.classList.remove('open');
-    if (fabMenuTop) fabMenuTop.classList.remove('open');
-    if (fabIconTop) fabIconTop.className = 'fas fa-ellipsis-h';
+    if (fabIcon) fabIcon.className = 'fas fa-ellipsis-h';
 
-    // Expandir todas las descripciones colapsadas
-    document.querySelectorAll('.description.collapsed, .proyecto-desc-wrap.collapsed').forEach(function(el) {
-        el.classList.remove('collapsed');
-        el.classList.add('expanded');
-        el.style.maxHeight = 'none';
-        el.style.overflow = 'visible';
-    });
-
-    // Mostrar contenido completo de cada sección
-    var secciones = [
-        { source: '#proyectos-completos',    target: '#proyectos-grid',    inner: '.cards-grid' },
-        { source: '#experiencias-completas', target: '#experiencias-grid', inner: '.cards-grid' },
-        { source: '#academicas-completas',   target: '#academicas-grid',   inner: '.cards-grid' },
-        { source: '#tecnicas-completas',     target: '#tecnicas-grid',     inner: '' },
-        { source: '#blandas-completas',      target: '#blandas-grid',      inner: '.skills-container' },
-        { source: '#idiomas-completos',      target: '#idiomas-grid',      inner: '.idiomas-preview-grid' }
-    ];
-
-    secciones.forEach(function(sec) {
-        var src = document.querySelector(sec.source);
-        var tgt = document.querySelector(sec.target);
-        if (src && tgt) {
-            var content = sec.inner ? src.querySelector(sec.inner) : src;
-            if (content) tgt.innerHTML = content.innerHTML;
-        }
-    });
-
-    document.querySelectorAll('.btn-ver-todos').forEach(function(el) {
-        el.style.display = 'none';
-    });
-
-    // Esperar que el DOM se actualice y luego imprimir
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
+    await new Promise(resolve => setTimeout(resolve, 300));
     window.print();
 }
 
