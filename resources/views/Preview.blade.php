@@ -560,7 +560,7 @@
 
 <div class="fab-container" id="fabContainer">
     <div class="fab-menu" id="fabMenu">
-        @if($tieneContenido ?? false)
+       @if($tieneContenido ?? false)
             <button class="fab-item" onclick="descargarPDF()">
                 <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
             </button>
@@ -568,10 +568,10 @@
                 <i class="fas fa-image"></i><span>Descargar imagen</span>
             </button>
         @else
-            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" onclick="mostrarAlertaIncompleto()">
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" disabled>
                 <i class="fas fa-file-pdf"></i><span>Descargar PDF</span>
             </button>
-            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" onclick="mostrarAlertaIncompleto()">
+            <button class="fab-item" style="opacity:0.5;cursor:not-allowed;" disabled>
                 <i class="fas fa-image"></i><span>Descargar imagen</span>
             </button>
         @endif
@@ -604,11 +604,7 @@
                     <div class="contact-row" style="color:#94a3b8;"><i class="fas fa-map-marker-alt"></i><span>Sin ubicación registrada</span></div>
                 @endif
 
-                @if(!empty($redes['correo']))
-                    <div class="contact-row"><i class="fas fa-envelope"></i><span>{{ $redes['correo'] }}</span></div>
-                @else
-                    <div class="contact-row" style="color:#94a3b8;"><i class="fas fa-envelope"></i><span>Sin correo registrado</span></div>
-                @endif
+               
 
                 @if(!empty($redes['whatsapp']))
                     <div class="contact-row"><i class="fab fa-whatsapp"></i><span>{{ $redes['whatsapp'] }}</span></div>
@@ -644,7 +640,8 @@
             @endif
         </div>
     </div>
-
+    
+    @if($experiencias->count() > 0)
     <div class="section" id="section-experiencias">
         <h2><i class="fas fa-briefcase"></i> Experiencia laboral</h2>
         <div class="cards-grid" id="experiencias-grid">
@@ -709,7 +706,9 @@
             </div>
         </div>
     </div>
-
+    @endif
+    
+    @if($academicas->count() > 0)
     <div class="section" id="section-academicas">
         <h2><i class="fas fa-graduation-cap"></i> Información académica</h2>
         <div class="cards-grid" id="academicas-grid">
@@ -776,6 +775,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     @if(($habilidadesTecnicasFrontend ?? collect())->count() > 0 || ($habilidadesTecnicasBackend ?? collect())->count() > 0)
     <div class="section" id="section-tecnicas">
@@ -1530,34 +1530,28 @@
 {{-- ==================== BARRA PUBLICAR ==================== --}}
 <div class="preview-bottom-bar" id="previewBottomBar">
     @php
-    // ==========================================
-    // CALCULAR SI PUEDE PUBLICAR (3 de 5 secciones)
-    // ==========================================
-    $tieneExperiencia = $experiencias->count() > 0;
-    $tieneAcademica = $academicas->count() > 0;
-    $tieneProyecto = $proyectos->count() > 0;
-    
-    // ✅ CONTAR TODAS LAS TÉCNICAS (sin importar categoría)
-    $totalTecnicas = $habilidadesTecnicasFrontend->count() + $habilidadesTecnicasBackend->count();
-    $tieneHabilidadTecnica = $totalTecnicas > 0;
-    
-    $tieneBiografia = !empty($user->biography);
-    
-    // CONTAR SECCIONES (SOLO 5 PRINCIPALES)
-    $seccionesCompletas = 0;
-    if ($tieneExperiencia) $seccionesCompletas++;
-    if ($tieneHabilidadTecnica) $seccionesCompletas++;
-    if ($tieneProyecto) $seccionesCompletas++;
-    if ($tieneBiografia) $seccionesCompletas++;
-    if ($tieneAcademica) $seccionesCompletas++;
-    
-    // 🔥 REGLA: 3 de 5 secciones
-    $puedePublicar = $seccionesCompletas >= 3;
-    
-    // Para mostrar en el mensaje (opcional)
-    $totalItems = $experiencias->count() + $academicas->count() + $proyectos->count() 
-                + $totalTecnicas + $idiomas->count() + $habilidadesBlandas->count();
-@endphp
+        // Obligatorios
+        $tieneNombreOb = !empty($user->first_name);
+        $tieneTituloOb = !empty($user->profession_id);
+        $tieneBiografiaOb = !empty($user->biography);
+        $tieneCorreoOb = !empty($user->email);
+        $obligatoriosCompletos = $tieneNombreOb && $tieneTituloOb && $tieneBiografiaOb && $tieneCorreoOb;
+
+        // 4 secciones adicionales (necesita 3 de 4)
+        $tieneExperiencia = $experiencias->count() > 0;
+        $tieneAcademica = $academicas->count() > 0;
+        $tieneProyecto = $proyectos->count() > 0;
+        $totalTecnicas = $habilidadesTecnicasFrontend->count() + $habilidadesTecnicasBackend->count();
+        $tieneHabilidadTecnica = $totalTecnicas > 0;
+
+        $seccionesCompletas = 0;
+        if ($tieneExperiencia) $seccionesCompletas++;
+        if ($tieneHabilidadTecnica) $seccionesCompletas++;
+        if ($tieneProyecto) $seccionesCompletas++;
+        if ($tieneAcademica) $seccionesCompletas++;
+
+        $puedePublicar = $obligatoriosCompletos && $seccionesCompletas >= 3;
+    @endphp
 
     <form action="{{ route('perfil.publicar') }}" method="POST" style="margin:0;" id="formPublicar">
         @csrf
@@ -1571,43 +1565,69 @@
             <i class="fas fa-globe"></i> 
             {{ $puedePublicar ? 'Publicar perfil' : 'Completa tu perfil para publicar' }}
         </button>
-     @if(!$puedePublicar)
-    <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;padding:22px 24px;margin-top:16px;width:100%;max-width:480px;box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+    
+        @if(!$puedePublicar)
+    <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;margin-top:14px;width:100%;max-width:440px;box-shadow:0 2px 10px rgba(0,0,0,0.05);text-align:left;">
 
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-            <div style="background:#fff1e0;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <i class="fas fa-clipboard-list" style="color:#f97316;font-size:14px;"></i>
+        <div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:10px;">
+            <i class="fas fa-circle-info" style="color:#f97316;"></i> Para publicar tu perfil necesitas:
+        </div>
+
+        {{-- BLOQUE 1: Datos obligatorios --}}
+        <div style="margin-bottom:14px;">
+            <div style="font-size:10.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">
+                1. Completar tus datos básicos
             </div>
-            <div style="flex:1;">
-                <div style="font-size:14px;font-weight:700;color:#1e293b;">Completa tu perfil para publicar</div>
-                <div style="font-size:11.5px;color:#94a3b8;margin-top:1px;">Necesitas 3 de 5 secciones</div>
-            </div>
-            <div style="font-size:18px;font-weight:800;color:#0abf9e;">
-                {{ $seccionesCompletas }}<span style="font-size:12px;color:#cbd5e1;">/3</span>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+                @php
+                    $checks = [
+                        'Nombre' => $tieneNombreOb,
+                        'Título / profesión' => $tieneTituloOb,
+                        'Biografía' => $tieneBiografiaOb,
+                        
+                    ];
+                @endphp
+                @foreach($checks as $label => $ok)
+                    <div style="font-size:12px;color:{{ $ok ? '#15803d' : '#9a3412' }};display:flex;align-items:center;gap:7px;">
+                        <i class="fas {{ $ok ? 'fa-circle-check' : 'fa-circle-xmark' }}" style="font-size:12px;"></i>
+                        {{ $label }}
+                    </div>
+                @endforeach
             </div>
         </div>
 
-        <div style="height:7px;background:#f1f5f9;border-radius:10px;overflow:hidden;margin-bottom:18px;">
-            <div style="height:100%;width:{{ min(100, ($seccionesCompletas/3)*100) }}%;background:linear-gradient(90deg,#0abf9e,#07866e);border-radius:10px;transition:width 0.6s ease;"></div>
+        {{-- BLOQUE 2: 3 de 4 secciones --}}
+        <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <div style="font-size:10.5px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.04em;">
+                    2. Tener al menos 3 de estas 4 secciones
+                </div>
+                <div style="font-size:12px;font-weight:800;color:#0abf9e;">{{ $seccionesCompletas }}/3</div>
+            </div>
+            <div style="height:5px;background:#f1f5f9;border-radius:10px;overflow:hidden;margin-bottom:8px;">
+                <div style="height:100%;width:{{ min(100, ($seccionesCompletas/3)*100) }}%;background:linear-gradient(90deg,#0abf9e,#07866e);border-radius:10px;"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+                @php
+                    $seccionesCheck = [
+                        'Experiencia laboral' => $tieneExperiencia,
+                        'Habilidad técnica' => $tieneHabilidadTecnica,
+                        'Proyecto' => $tieneProyecto,
+                        'Formación académica' => $tieneAcademica,
+                    ];
+                @endphp
+                @foreach($seccionesCheck as $label => $ok)
+                    <div style="font-size:12px;color:{{ $ok ? '#15803d' : '#64748b' }};display:flex;align-items:center;gap:7px;">
+                        <i class="fas {{ $ok ? 'fa-circle-check' : 'fa-circle' }}" style="font-size:11px;{{ $ok ? '' : 'color:#cbd5e1;' }}"></i>
+                        {{ $label }}
+                    </div>
+                @endforeach
+            </div>
         </div>
 
-        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px;">
-            Te falta completar
+        <div style="font-size:9.5px;color:#cbd5e1;margin-top:10px;border-top:1px solid #f1f5f9;padding-top:8px;">
+            Idiomas y Habilidades blandas son opcionales y no cuentan aquí.
         </div>
-
-        <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px;">
-            @foreach($camposFaltantes as $campo)
-                @if(!str_starts_with($campo, '📊'))
-                    @php $textoLimpio = trim(str_replace('⭐', '', $campo)); @endphp
-                    <li style="font-size:13px;color:#475569;display:flex;align-items:center;gap:10px;">
-                        <span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #fdba74;background:#fff7ed;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
-                            <span style="width:6px;height:6px;border-radius:50%;background:#f97316;"></span>
-                        </span>
-                        {{ $textoLimpio }}
-                    </li>
-                @endif
-            @endforeach
-        </ul>
     </div>
 @endif
     </form>

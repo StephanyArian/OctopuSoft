@@ -94,7 +94,7 @@
                                                 $savedLocation = implode(', ', $locParts);
                                             }
                                         @endphp
-                                        <input class="form-input geo-autocomplete" type="text" id="location" name="location" placeholder="Ej. Cochabamba, Bolivia" value="{{ $savedLocation }}" maxlength="30" autocomplete="off">
+                                        <input class="form-input geo-autocomplete" type="text" id="location" name="location" placeholder="Ej. Cochabamba, Bolivia" value="{{ $savedLocation }}" maxlength="40" autocomplete="off">
                                         <ul id="locationSuggestions" class="geo-dropdown hidden"></ul>
                                         <div id="locationError" class="error-message hidden">Debes seleccionar una ubicación real de la lista de sugerencias.</div>
                                         <span class="text-xs text-gray-400 mt-1">Escribe ciudad o país y selecciónalo de la lista.</span>

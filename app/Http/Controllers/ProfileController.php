@@ -36,7 +36,7 @@ class ProfileController extends Controller
             'location' => [
                 'nullable',
                 'string',
-                'max:30',
+                'max:40',
                 function ($attribute, $value, $fail) {
                     $url = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($value) . '&limit=1';
                     

@@ -19,145 +19,186 @@ class PreviewController extends Controller
  //REGLA: Necesita 3 de 5 secciones principales
  
  
-private function portafolioTieneContenido($user)
-{
-    $userId = $user->id;
-    
-    // ==========================================
-    // 5 SECCIONES PRINCIPALES (CONSULTA DIRECTA A BD)
-    // ==========================================
-    
-    // 1. Experiencia Laboral
-    $tieneExperiencia = DB::table('experiences')
-        ->where('user_id', $userId)
-        ->where('type', 'work')
-        ->where('is_visible', true)
-        ->exists();
-    
-    // 2. Habilidad Técnica (cualquier categoría)
-    $tieneHabilidadTecnica = DB::table('skills')
-        ->where('user_id', $userId)
-        ->where('type', 'technical')
-        ->where('is_visible', true)
-        ->exists();
-    
-    // 3. Proyecto
-    $tieneProyecto = DB::table('projects')
-        ->join('portfolios', 'projects.portfolio_id', '=', 'portfolios.id')
-        ->where('portfolios.user_id', $userId)
-        ->where('projects.is_visible', true)
-        ->exists();
-    
-    // 4. Biografía
-    $tieneBiografia = DB::table('users')
-        ->where('id', $userId)
-        ->whereNotNull('biography')
-        ->where('biography', '!=', '')
-        ->exists();
-    
-    // 5. Formación Académica
-    $tieneAcademica = DB::table('experiences')
-        ->where('user_id', $userId)
-        ->where('type', 'education')
-        ->where('is_visible', true)
-        ->exists();
-    
-    // ==========================================
-    // CONTAR SECCIONES COMPLETAS
-    // ==========================================
-    $seccionesCompletas = 0;
-    if ($tieneExperiencia) $seccionesCompletas++;
-    if ($tieneHabilidadTecnica) $seccionesCompletas++;
-    if ($tieneProyecto) $seccionesCompletas++;
-    if ($tieneBiografia) $seccionesCompletas++;
-    if ($tieneAcademica) $seccionesCompletas++;
-    
-    // 🔥 REGLA: Necesita 3 de 5 secciones
-    return $seccionesCompletas >= 3;
-}
+    private function portafolioTieneContenido($user)
+    {
+        $userId = $user->id;
+
+        // ==========================================
+        // CAMPOS OBLIGATORIOS (SIEMPRE, sin excepción)
+        // ==========================================
+        $tieneNombre = DB::table('users')
+            ->where('id', $userId)
+            ->whereNotNull('first_name')
+            ->where('first_name', '!=', '')
+            ->exists();
+
+        $tieneTitulo = DB::table('users')
+            ->where('id', $userId)
+            ->whereNotNull('profession_id')
+            ->exists();
+
+        $tieneBiografia = DB::table('users')
+            ->where('id', $userId)
+            ->whereNotNull('biography')
+            ->where('biography', '!=', '')
+            ->exists();
+
+        $tieneCorreo = DB::table('users')
+            ->where('id', $userId)
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->exists();
+
+        // Si falta CUALQUIERA de los 4 obligatorios, no se puede publicar
+        if (!$tieneNombre || !$tieneTitulo || !$tieneBiografia || !$tieneCorreo) {
+            return false;
+        }
+
+        // ==========================================
+        // 4 SECCIONES ADICIONALES (necesita 3 de 4)
+        // ==========================================
+        $tieneExperiencia = DB::table('experiences')
+            ->where('user_id', $userId)
+            ->where('type', 'work')
+            ->where('is_visible', true)
+            ->exists();
+
+        $tieneHabilidadTecnica = DB::table('skills')
+            ->where('user_id', $userId)
+            ->where('type', 'technical')
+            ->where('is_visible', true)
+            ->exists();
+
+        $tieneProyecto = DB::table('projects')
+            ->join('portfolios', 'projects.portfolio_id', '=', 'portfolios.id')
+            ->where('portfolios.user_id', $userId)
+            ->where('projects.is_visible', true)
+            ->exists();
+
+        $tieneAcademica = DB::table('experiences')
+            ->where('user_id', $userId)
+            ->where('type', 'education')
+            ->where('is_visible', true)
+            ->exists();
+
+        $seccionesCompletas = 0;
+        if ($tieneExperiencia) $seccionesCompletas++;
+        if ($tieneHabilidadTecnica) $seccionesCompletas++;
+        if ($tieneProyecto) $seccionesCompletas++;
+        if ($tieneAcademica) $seccionesCompletas++;
+
+        // 🔥 REGLA: obligatorios completos + 3 de las 4 secciones adicionales
+        return $seccionesCompletas >= 3;
+    }
 
     /**
      * ==========================================
-     * NUEVO: Obtener campos faltantes para mostrar al usuario
+     *  Obtener campos faltantes para mostrar al usuario
      * ==========================================
      */
-        private function obtenerCamposFaltantes($user)
-{
-    $userId = $user->id;
-    $faltantes = [];
-    $completas = 0;
-    
-    $tieneExperiencia = DB::table('experiences')
-        ->where('user_id', $userId)
-        ->where('type', 'work')
-        ->where('is_visible', true)
-        ->exists();
-    
-    if ($tieneExperiencia) {
-        $completas++;
-    } else {
-        $faltantes[] = '⭐ Agregar al menos una experiencia laboral';
-    }
-    
-    $tieneHabilidadTecnica = DB::table('skills')
-        ->where('user_id', $userId)
-        ->where('type', 'technical')
-        ->where('is_visible', true)
-        ->exists();
-    
-    if ($tieneHabilidadTecnica) {
-        $completas++;
-    } else {
-        $faltantes[] = '⭐ Agregar al menos una habilidad técnica';
-    }
-    
-    $tieneProyecto = DB::table('projects')
-        ->join('portfolios', 'projects.portfolio_id', '=', 'portfolios.id')
-        ->where('portfolios.user_id', $userId)
-        ->where('projects.is_visible', true)
-        ->exists();
-    
-    if ($tieneProyecto) {
-        $completas++;
-    } else {
-        $faltantes[] = 'Agregar al menos un proyecto';
-    }
-    
-    $tieneBiografia = DB::table('users')
-        ->where('id', $userId)
-        ->whereNotNull('biography')
-        ->where('biography', '!=', '')
-        ->exists();
-    
-    if ($tieneBiografia) {
-        $completas++;
-    } else {
-        $faltantes[] = 'Completar tu biografía';
-    }
-    
-    $tieneAcademica = DB::table('experiences')
-        ->where('user_id', $userId)
-        ->where('type', 'education')
-        ->where('is_visible', true)
-        ->exists();
-    
-    if ($tieneAcademica) {
-        $completas++;
-    } else {
-        $faltantes[] = 'Agregar formación académica (recomendado)';
-    }
-    
-    $necesita = 3 - $completas;
-    if ($necesita > 0) {
-        $faltantes[] = "📊 Necesitas {$necesita} sección(es) más para publicar (tienes {$completas} de 3)";
-    }
-    
-    return $faltantes;
-}
+       private function obtenerCamposFaltantes($user)
+        {
+            $userId = $user->id;
+            $faltantes = [];
+
+            // ==========================================
+            // OBLIGATORIOS PRIMERO (siempre se muestran si faltan)
+            // ==========================================
+            $tieneNombre = DB::table('users')
+                ->where('id', $userId)
+                ->whereNotNull('first_name')
+                ->where('first_name', '!=', '')
+                ->exists();
+            if (!$tieneNombre) {
+                $faltantes[] = '🔒 Completar tu nombre (obligatorio)';
+            }
+
+            $tieneTitulo = DB::table('users')
+                ->where('id', $userId)
+                ->whereNotNull('profession_id')
+                ->exists();
+            if (!$tieneTitulo) {
+                $faltantes[] = '🔒 Elegir tu título/profesión (obligatorio)';
+            }
+
+            $tieneBiografia = DB::table('users')
+                ->where('id', $userId)
+                ->whereNotNull('biography')
+                ->where('biography', '!=', '')
+                ->exists();
+            if (!$tieneBiografia) {
+                $faltantes[] = '🔒 Completar tu biografía (obligatorio)';
+            }
+
+            $tieneCorreo = DB::table('users')
+                ->where('id', $userId)
+                ->whereNotNull('email')
+                ->where('email', '!=', '')
+                ->exists();
+            if (!$tieneCorreo) {
+                $faltantes[] = '🔒 Agregar tu correo electrónico (obligatorio)';
+            }
+
+            // ==========================================
+            // 4 SECCIONES ADICIONALES (necesita 3 de 4)
+            // ==========================================
+            $completas = 0;
+
+            $tieneExperiencia = DB::table('experiences')
+                ->where('user_id', $userId)
+                ->where('type', 'work')
+                ->where('is_visible', true)
+                ->exists();
+            if ($tieneExperiencia) {
+                $completas++;
+            } else {
+                $faltantes[] = 'Agregar al menos una experiencia laboral';
+            }
+
+            $tieneHabilidadTecnica = DB::table('skills')
+                ->where('user_id', $userId)
+                ->where('type', 'technical')
+                ->where('is_visible', true)
+                ->exists();
+            if ($tieneHabilidadTecnica) {
+                $completas++;
+            } else {
+                $faltantes[] = 'Agregar al menos una habilidad técnica';
+            }
+
+            $tieneProyecto = DB::table('projects')
+                ->join('portfolios', 'projects.portfolio_id', '=', 'portfolios.id')
+                ->where('portfolios.user_id', $userId)
+                ->where('projects.is_visible', true)
+                ->exists();
+            if ($tieneProyecto) {
+                $completas++;
+            } else {
+                $faltantes[] = 'Agregar al menos un proyecto';
+            }
+
+            $tieneAcademica = DB::table('experiences')
+                ->where('user_id', $userId)
+                ->where('type', 'education')
+                ->where('is_visible', true)
+                ->exists();
+            if ($tieneAcademica) {
+                $completas++;
+            } else {
+                $faltantes[] = 'Agregar formación académica';
+            }
+
+            $necesita = 3 - $completas;
+            if ($necesita > 0) {
+                $faltantes[] = "📊 Necesitas {$necesita} sección(es) más de estas 4 (tienes {$completas} de 3)";
+            }
+
+            return $faltantes;
+        }
 
     /**
      * ==========================================
-     * NUEVO: PUBLICAR PORTAFOLIO
+     *  PUBLICAR PORTAFOLIO
      * ==========================================
      */
     public function publicar(Request $request)

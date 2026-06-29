@@ -139,7 +139,7 @@ document.getElementById('profileForm')?.addEventListener('submit', function (e) 
         locationError.classList.remove('hidden');
         locationError.textContent = 'Por favor, selecciona una ubicación de la lista de sugerencias.';
         isValid = false;
-    } else if (location.length > 30) {
+    } else if (location.length > 40) {
         locationError.classList.remove('hidden');
         locationError.textContent = 'La ubicación no puede exceder los 30 caracteres';
         isValid = false;
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function truncateLocation(label) {
-        return label.length > 30 ? label.substring(0, 30) : label;
+    return label;
     }
 
     if (locationInput && suggestionsList) {
@@ -266,66 +266,79 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── EDITOR QUILL — BIOGRAFÍA ───────────────────────────────
-    if (typeof Quill === 'undefined') return;
-    const qc = document.getElementById('quillEditor');
-    if (!qc) return;
+if (typeof Quill === 'undefined') return;
+const qc = document.getElementById('quillEditor');
+if (!qc) return;
 
-    const Font = Quill.import('formats/font');
-    Font.whitelist = ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'];
-    Quill.register(Font, true);
+const Font = Quill.import('formats/font');
+Font.whitelist = ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'];
+Quill.register(Font, true);
 
-    const quill = new Quill('#quillEditor', {
-        theme: 'snow',
-        placeholder: 'Escribe una breve presentación sobre ti...',
-        modules: {
-            toolbar: [
-                [{ font: ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ color: [] }, { background: [] }],
-                [{ script: 'super' }, { script: 'sub' }],
-                [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-                [{ align: [] }],
-                ['link'],
-                ['clean']
-            ]
-        }
-    });
-
-    window.quillBio = quill;
-
-    const inputBio = document.getElementById('bio');
-    const contadorBio = document.getElementById('contadorBio');
-
-    if (inputBio && inputBio.value.trim()) {
-        quill.root.innerHTML = inputBio.value;
+const quill = new Quill('#quillEditor', {
+    theme: 'snow',
+    placeholder: 'Escribe una breve presentación sobre ti...',
+    modules: {
+        toolbar: [
+            [{ font: ['sans-serif', 'serif', 'monospace', 'arial', 'times', 'courier'] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ color: [] }, { background: [] }],
+            [{ script: 'super' }, { script: 'sub' }],
+            [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+            [{ align: [] }],
+            ['link'],
+            ['clean']
+        ]
     }
+});
 
-    function getBioCharCount() {
-        return bioTextoSinEspacios(quill.getText()).length;
+window.quillBio = quill;
+
+const inputBio = document.getElementById('bio');
+const contadorBio = document.getElementById('contadorBio');
+
+if (inputBio && inputBio.value.trim()) {
+    quill.root.innerHTML = inputBio.value;
+}
+
+function getBioCharCount() {
+    let text = quill.getText();
+    // Quitar el salto de línea final
+    if (text.endsWith('\n')) {
+        text = text.slice(0, -1);
     }
+    return bioTextoSinEspacios(text).length;
+}
 
-    function actualizarContadorBio() {
-        const len = getBioCharCount();
+function actualizarContadorBio() {
+    const len = getBioCharCount();
+    if (contadorBio) {
+        contadorBio.textContent = len + '/500 caracteres';
+        contadorBio.style.color = len > BIO_LIMITE ? '#ef4444' : '#94a3b8';
+        contadorBio.style.fontWeight = len > BIO_LIMITE ? 'bold' : 'normal';
+    }
+    if (inputBio) {
+        inputBio.value = quill.root.innerHTML;
+    }
+}
+
+// ✅ CORREGIDO: NO borra el texto, SOLO actualiza el contador
+quill.on('text-change', function (delta, oldDelta, source) {
+    if (source !== 'user') return;
+    const len = getBioCharCount();
+    if (len > BIO_LIMITE) {
+        // Mostrar error pero NO borrar
         if (contadorBio) {
-            contadorBio.textContent = len + '/500 caracteres';
-            contadorBio.style.color = len > BIO_LIMITE ? '#ef4444' : '#94a3b8';
-            contadorBio.style.fontWeight = len > BIO_LIMITE ? 'bold' : 'normal';
+            contadorBio.textContent = '⚠️ ' + len + '/500 - Límite excedido';
+            contadorBio.style.color = '#ef4444';
+            contadorBio.style.fontWeight = 'bold';
         }
-        if (inputBio) {
-            inputBio.value = quill.root.innerHTML;
-        }
+        return; // ← IMPORTANTE: NO hacer undo()
     }
-
-    quill.on('text-change', function (delta, oldDelta, source) {
-        if (source !== 'user') return;
-
-        const len = getBioCharCount();
-        if (len > BIO_LIMITE) {
-            quill.history.undo();
-            return;
-        }
-        actualizarContadorBio();
-    });
-
     actualizarContadorBio();
+});
+
+// Actualizar contador inicial
+actualizarContadorBio();
+
+console.log('Quill funcionando correctamente');
 });
