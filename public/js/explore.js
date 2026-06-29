@@ -39,6 +39,8 @@ const mobileFilterToggle = document.getElementById('mobileFilterToggle');
     const clearSkillsOption = document.getElementById('clearSkillsOption');
 
     let debounceTimer;
+    let currentFilterController = null;
+    let lastFilterRequestId = 0;
 
     function getCheckedValue(radios, defaultValue = '') {
         const checked = Array.from(radios).find(radio => radio.checked);
@@ -155,49 +157,62 @@ function fetchFilteredPortfolios() {
     const ajaxUrl = new URL(pageUrl, window.location.origin);
     ajaxUrl.searchParams.set('_ajax', '1');
 
+    // Cancela la petición anterior si todavía está pendiente.
+    if (currentFilterController) {
+        currentFilterController.abort();
+    }
+
+    currentFilterController = new AbortController();
+    const requestId = ++lastFilterRequestId;
+
     if (portfoliosGrid) {
-        portfoliosGrid.style.opacity = '0.6';
+        portfoliosGrid.classList.add('is-loading');
     }
 
     fetch(ajaxUrl.toString(), {
         cache: 'no-store',
+        signal: currentFilterController.signal,
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
             'Accept': 'application/json'
         }
     })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
 
-                return response.json();
-            })
-            .then(data => {
-                if (portfoliosGrid) {
-                    portfoliosGrid.style.opacity = '1';
-                }
+            return response.json();
+        })
+        .then(data => {
+            // Evita que una respuesta vieja reemplace una respuesta nueva.
+            if (requestId !== lastFilterRequestId) {
+                return;
+            }
 
-                if (portfoliosGrid && data.html !== undefined) {
-                    portfoliosGrid.innerHTML = data.html;
-                }
+            if (portfoliosGrid && data.html !== undefined) {
+                portfoliosGrid.innerHTML = data.html;
+            }
 
-                if (totalResults) {
-                    totalResults.textContent = data.count;
-                }
+            if (totalResults) {
+                totalResults.textContent = data.count;
+            }
 
-                if (totalResultsHero) {
-                    totalResultsHero.textContent = data.count;
-                }
-            })
-            .catch(error => {
+            if (totalResultsHero) {
+                totalResultsHero.textContent = data.count;
+            }
+        })
+        .catch(error => {
+            if (error.name !== 'AbortError') {
                 console.error('Hubo un problema con la petición AJAX:', error);
-
-                if (portfoliosGrid) {
-                    portfoliosGrid.style.opacity = '1';
-                }
-            });
-    }
+            }
+        })
+        .finally(() => {
+            if (requestId === lastFilterRequestId && portfoliosGrid) {
+                portfoliosGrid.classList.remove('is-loading');
+            }
+        });
+}
 
     function closeAllDropdowns(except = null) {
         dropdowns.forEach(dropdown => {
@@ -303,7 +318,7 @@ function fetchFilteredPortfolios() {
 
             debounceTimer = setTimeout(() => {
                 fetchFilteredPortfolios();
-            }, 350);
+            }, 500);
         });
     }
 
@@ -428,7 +443,7 @@ function fetchFilteredPortfolios() {
 
         debounceTimer = setTimeout(() => {
             fetchFilteredPortfolios();
-        }, 350);
+        }, 500);
     });
 
     floatingSearchInput.addEventListener('keydown', e => {

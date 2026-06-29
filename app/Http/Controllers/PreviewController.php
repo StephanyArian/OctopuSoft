@@ -872,12 +872,13 @@ $companies = collect([
         // ==========================================
 $query = Portfolio::where('is_public', true)
     ->with([
-        'user.profession',
-        'user.skills',
-        'user.experiences',
-        'user.location',
-        'user.professionalNetworks',
-        'projects.technologies'
+        'user:id,profession_id,first_name,last_name,biography,photo_base64,city,country',
+        'user.profession:id,name',
+        'user.skills:id,user_id,type,name,is_visible',
+        'user.experiences:id,user_id,type,institution,title,specialty,description,location,start_date,end_date,is_current,is_visible',
+        'user.location:id,user_id,address',
+        'user.professionalNetworks:id,user_id,is_visible',
+        'projects:id,portfolio_id,name,description,role,company,is_visible',
     ]);
 
 $normalizeText = function ($text) {
@@ -1400,6 +1401,13 @@ if ($request->filled('language')) {
 // ORDENAMIENTO
 $sort = $request->input('sort', 'complete');
 
+$hasCompatibilityContext =
+    $request->filled('search') ||
+    $request->filled('category') ||
+    $request->filled('company') ||
+    $request->filled('language') ||
+    $request->filled('skills');
+
 switch ($sort) {
     case 'asc':
         $query->orderBy('portfolios.created_at', 'asc');
@@ -1526,13 +1534,14 @@ case 'complete':
         }
     };
 
+    if ($hasCompatibilityContext) {
     /*
     |--------------------------------------------------------------------------
     | Coincidencia con búsqueda general
     |--------------------------------------------------------------------------
     */
     if ($request->filled('search')) {
-        $searchTerms = $expandSearchTerms($request->input('search'));
+        $searchTerms = $expandSearchTerms($request->input('search'))->take(8);
 
         foreach ($searchTerms as $term) {
             $like = "%{$term}%";
@@ -1612,7 +1621,7 @@ case 'complete':
     |--------------------------------------------------------------------------
     */
     if ($request->filled('category')) {
-        $categoryTerms = $expandSearchTerms($request->input('category'));
+        $categoryTerms = $expandSearchTerms($request->input('category'))->take(8);
 
         foreach ($categoryTerms as $categoryTerm) {
             $like = "%{$categoryTerm}%";
@@ -1751,7 +1760,11 @@ case 'complete':
     |--------------------------------------------------------------------------
     */
     if ($request->filled('skills')) {
-        $skillsArray = array_filter((array) $request->input('skills'));
+        $skillsArray = array_slice(
+            array_values(array_filter((array) $request->input('skills'))),
+            0,
+            6
+            );
 
         foreach ($skillsArray as $skillName) {
             $skill = $normalizeText($skillName);
@@ -1783,7 +1796,7 @@ case 'complete':
             $compatibilityBindings[] = $like;
         }
     }
-
+}
     $compatibilityScore = implode(' + ', $compatibilityParts);
 
     $query
